@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
-@Profile({"!redis"})
+@Profile({"postgre"})
 @Slf4j
 public class PostgresExampleService {
 

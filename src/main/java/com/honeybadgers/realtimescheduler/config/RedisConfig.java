@@ -28,11 +28,6 @@ public class RedisConfig {
         return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
     }
 
-    /*@Bean
-    public TaskRedisRepository redisRepository(RedisTemplate<String, Task> redisTemplate) {
-        return new TaskRedisRepository(redisTemplate);
-    }*/
-
     @Bean
     public RedisTemplate<String, Task> redisTemplate(/*RedisConnectionFactory redisConnectionFactory*/) {
         RedisTemplate<String, Task> template = new RedisTemplate<>();

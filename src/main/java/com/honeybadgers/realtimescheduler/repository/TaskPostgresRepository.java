@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-@Profile({"!redis"})
+@Profile({"postgre"})
 public interface TaskPostgresRepository extends JpaRepository<Task, Long> {
 
     List<Task> findAllByTaskPriority(Integer taskPriority);
