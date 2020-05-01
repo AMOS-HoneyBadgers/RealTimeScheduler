@@ -29,5 +29,6 @@ public class RedisExampleService {
         List<User> allUsers = StreamSupport.stream(userRedisRepository.findAll().spliterator(), false).collect(Collectors.toList());
         log.info("SIZE: " + allUsers.size());
         log.info("Id: " + allUsers.get(0).getId() + " Name: " + allUsers.get(0).getName() + " Role: " + allUsers.get(0).getRole() + " Age: " + allUsers.get(0).getAge());
+
     }
 }
