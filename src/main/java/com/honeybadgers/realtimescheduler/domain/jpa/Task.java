@@ -1,11 +1,13 @@
 package com.honeybadgers.realtimescheduler.domain.jpa;
 
+import com.honeybadgers.realtimescheduler.domain.User;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.Set;
 
 @Entity
 @Table(name = "task")
@@ -22,6 +24,16 @@ public class Task {
 
     private String name;
 
+    @ManyToOne
+    @JoinColumn(name = "userid")
+    private User user;
+
     @CreationTimestamp
     private Timestamp submittimestamp;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(name = "rt_task_role",
+            joinColumns = @JoinColumn(name = "taskid"),                 // fk for task
+            inverseJoinColumns = @JoinColumn(name = "roleid"))          // fk for role
+    private Set<Role> roleSet;
 }

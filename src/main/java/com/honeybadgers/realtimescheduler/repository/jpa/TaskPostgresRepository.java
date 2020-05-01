@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.repository;
+package com.honeybadgers.realtimescheduler.repository.jpa;
 
 import com.honeybadgers.realtimescheduler.domain.jpa.Task;
 import io.lettuce.core.dynamic.annotation.Param;

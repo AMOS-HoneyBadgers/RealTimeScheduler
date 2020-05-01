@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.realtimescheduler.domain.redis.User;
+import com.honeybadgers.realtimescheduler.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -23,15 +23,17 @@ public class DynamicService {
     }
 
     public void test() {
-        /*User newUser = new User();
-        newUser.setName("test");
-        newUser.setRole("test");
-        newUser.setAge(10);
-        repository.save(newUser);*/
 
         List<User> users = StreamSupport.stream(repository.findAll().spliterator(), false).collect(Collectors.toList());
         log.info("TEST: " + users.size());
         if(users.size() > 0)
             log.info("FIRST ID: " + users.get(0).getId());
+        else {
+            User newUser = new User();
+            newUser.setName("test");
+            newUser.setRole("test");
+            newUser.setAge(10);
+            repository.save(newUser);
+        }
     }
 }
