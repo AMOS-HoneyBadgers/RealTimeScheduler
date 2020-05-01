@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.domain.redis;
+package com.honeybadgers.realtimescheduler.domain;
 
 import lombok.Getter;
 import lombok.Setter;

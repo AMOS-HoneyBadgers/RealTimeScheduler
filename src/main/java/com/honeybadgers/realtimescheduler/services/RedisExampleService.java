@@ -1,7 +1,7 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.realtimescheduler.domain.redis.User;
-import com.honeybadgers.realtimescheduler.repository.UserRedisRepository;
+import com.honeybadgers.realtimescheduler.domain.User;
+import com.honeybadgers.realtimescheduler.repository.redis.UserRedisRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;

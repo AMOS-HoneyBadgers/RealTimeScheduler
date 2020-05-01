@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.web;
 
-import com.honeybadgers.realtimescheduler.domain.redis.User;
+import com.honeybadgers.realtimescheduler.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;

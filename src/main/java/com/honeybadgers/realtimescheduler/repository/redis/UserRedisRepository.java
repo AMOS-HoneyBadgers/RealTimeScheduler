@@ -1,6 +1,6 @@
-package com.honeybadgers.realtimescheduler.repository;
+package com.honeybadgers.realtimescheduler.repository.redis;
 
-import com.honeybadgers.realtimescheduler.domain.redis.User;
+import com.honeybadgers.realtimescheduler.domain.User;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
