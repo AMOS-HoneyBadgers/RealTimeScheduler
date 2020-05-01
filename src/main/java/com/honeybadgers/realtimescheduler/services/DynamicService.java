@@ -1,7 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.realtimescheduler.domain.redis.User;
-import com.honeybadgers.realtimescheduler.repository.UserPostgresRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.repository.CrudRepository;
@@ -24,16 +23,13 @@ public class DynamicService {
     }
 
     public void test() {
-        UserPostgresRepository rep = (UserPostgresRepository) repository;
-
-        User newUser = new User();
+        /*User newUser = new User();
         newUser.setName("test");
         newUser.setRole("test");
         newUser.setAge(10);
-        rep.save(newUser);
+        repository.save(newUser);*/
 
-        rep.flush();
-        List<User> users = StreamSupport.stream(rep.findAll().spliterator(), false).collect(Collectors.toList());
+        List<User> users = StreamSupport.stream(repository.findAll().spliterator(), false).collect(Collectors.toList());
         log.info("TEST: " + users.size());
         if(users.size() > 0)
             log.info("FIRST ID: " + users.get(0).getId());
