@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.services;
 import com.honeybadgers.realtimescheduler.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +12,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 @Service
+@Profile({"redis", "postgre"})
 @Slf4j
 public class UserService {
 
