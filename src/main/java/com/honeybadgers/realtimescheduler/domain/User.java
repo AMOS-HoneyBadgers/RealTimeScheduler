@@ -1,6 +1,8 @@
 package com.honeybadgers.realtimescheduler.domain;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.redis.core.RedisHash;
@@ -19,6 +21,8 @@ import java.io.Serializable;
 @RedisHash("User")
 @Getter
 @Setter
+@NoArgsConstructor
+@AllArgsConstructor
 public class User implements Serializable {
 
     @Id

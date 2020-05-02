@@ -12,15 +12,11 @@ import java.util.stream.StreamSupport;
 
 @Service
 @Slf4j
-public class DynamicService {
+public class UserService {
 
-    final
-    CrudRepository<User, String> repository;
-
+    // Repository, can be either UserPostgreRepository or UserRedisRepository, depending on active profile
     @Autowired
-    public DynamicService(CrudRepository<User, String> repository) {
-        this.repository = repository;
-    }
+    private CrudRepository<User, String> repository;
 
     public void test() {
 
@@ -35,5 +31,29 @@ public class DynamicService {
             newUser.setAge(10);
             repository.save(newUser);
         }
+    }
+
+    public List<User> getAll() {
+        return StreamSupport.stream(repository.findAll().spliterator(), false).collect(Collectors.toList());
+    }
+
+    public User getUserById(String userId) {
+        return repository.findById(userId).orElse(null);
+    }
+
+    public void createUser(User newUser) {
+        repository.save(newUser);
+    }
+
+    public User deleteUser(String userId) {
+        User user = getUserById(userId);
+        return deleteUser(user);
+    }
+
+    public User deleteUser(User user) {
+        if(user == null)
+            return null;
+        repository.delete(user);
+        return user;
     }
 }

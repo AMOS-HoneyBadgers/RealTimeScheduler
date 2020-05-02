@@ -1,17 +1,14 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.domain.User;
+import com.honeybadgers.realtimescheduler.services.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.CrudRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -23,25 +20,19 @@ public class UserController {
     // DISCLAIMER: would be best to use separate Model class for rest communication (not same as for database)
     // here the same is used because the tables/classes are so small
 
-
-    final
-    CrudRepository<User, String> userRepository;
-
     @Autowired
-    public UserController(CrudRepository<User, String> userRepository) {
-        this.userRepository = userRepository;
-    }
+    UserService userService;
 
     @GetMapping("/")
     public ResponseEntity<List<User>> getAllUsers() {
-        return ResponseEntity.ok(StreamSupport.stream(userRepository.findAll().spliterator(), false).collect(Collectors.toList()));
+        return ResponseEntity.ok(userService.getAll());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") String userId) {
-        Optional<User> user = userRepository.findById(userId);
-        if(user.isPresent())
-            return ResponseEntity.ok(user.get());
+        User user = userService.getUserById(userId);
+        if(user != null)
+            return ResponseEntity.ok(user);
         else
             return ResponseEntity.notFound().build();
         // functional single line of same code for ifPresent condition
@@ -50,16 +41,13 @@ public class UserController {
 
     @PostMapping("/add")
     public ResponseEntity<?> createUser(@RequestBody @Valid User newUser) {
-        userRepository.save(newUser);
+        userService.createUser(newUser);
         return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/delete/{userid}")
     public ResponseEntity<?> deleteUserById(@PathVariable String userid) {
-        Optional<User> user = userRepository.findById(userid);
-        if(user.isEmpty())
-            return ResponseEntity.notFound().build();
-        userRepository.delete(user.get());
-        return ResponseEntity.ok(user);
+        User deleted = userService.deleteUser(userid);
+        return ResponseEntity.ok(deleted);
     }
 }
