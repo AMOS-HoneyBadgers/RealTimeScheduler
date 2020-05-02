@@ -1,3 +1,58 @@
+
+-- Role: realtimescheduler
+-- DROP ROLE realtimescheduler;
+
+CREATE ROLE realtimescheduler WITH
+    LOGIN
+    NOSUPERUSER
+    INHERIT
+    CREATEDB
+    NOCREATEROLE
+    NOREPLICATION;
+
+
+-- Database: AMOS
+
+-- DROP DATABASE "AMOS";
+
+CREATE DATABASE "AMOS"
+    WITH
+    OWNER = realtimescheduler
+    ENCODING = 'UTF8'
+    LC_COLLATE = 'German_Germany.1252'
+    LC_CTYPE = 'German_Germany.1252'
+    TABLESPACE = pg_default
+    CONNECTION LIMIT = -1;
+
+
+
+
+
+-- ################################# TABLES
+
+
+-- Table: public."user"
+
+-- DROP TABLE public."user";
+
+CREATE TABLE public."user"
+(
+    id character varying COLLATE pg_catalog."default" NOT NULL,
+    name character varying COLLATE pg_catalog."default",
+    role character varying COLLATE pg_catalog."default",
+    age integer,
+    CONSTRAINT user_pkey PRIMARY KEY (id)
+)
+    WITH (
+        OIDS = FALSE
+    )
+    TABLESPACE pg_default;
+
+ALTER TABLE public."user"
+    OWNER to realtimescheduler;
+
+
+
 -- Table: public.task
 
 -- DROP TABLE public.task;
@@ -24,26 +79,24 @@ ALTER TABLE public.task
     OWNER to realtimescheduler;
 
 
--- Table: public."user"
 
--- DROP TABLE public."user";
+-- Table: public.role
 
-CREATE TABLE public."user"
+-- DROP TABLE public.role;
+
+CREATE TABLE public.role
 (
     id character varying COLLATE pg_catalog."default" NOT NULL,
-    name character varying COLLATE pg_catalog."default",
-    role character varying COLLATE pg_catalog."default",
-    age integer,
-    CONSTRAINT user_pkey PRIMARY KEY (id)
+    name character varying COLLATE pg_catalog."default" NOT NULL,
+    CONSTRAINT role_pkey PRIMARY KEY (id)
 )
     WITH (
         OIDS = FALSE
     )
     TABLESPACE pg_default;
 
-ALTER TABLE public."user"
+ALTER TABLE public.role
     OWNER to realtimescheduler;
-
 
 
 
@@ -71,24 +124,4 @@ CREATE TABLE public.rt_task_role
     TABLESPACE pg_default;
 
 ALTER TABLE public.rt_task_role
-    OWNER to realtimescheduler;
-
-
-
--- Table: public.role
-
--- DROP TABLE public.role;
-
-CREATE TABLE public.role
-(
-    id character varying COLLATE pg_catalog."default" NOT NULL,
-    name character varying COLLATE pg_catalog."default" NOT NULL,
-    CONSTRAINT role_pkey PRIMARY KEY (id)
-)
-    WITH (
-        OIDS = FALSE
-    )
-    TABLESPACE pg_default;
-
-ALTER TABLE public.role
     OWNER to realtimescheduler;

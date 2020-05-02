@@ -8,7 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.ArrayList;
@@ -22,9 +23,23 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
+@ActiveProfiles({"postgre", "redis"})
 @WebMvcTest(UserController.class)       // mock only the given controller (for mock all use @WebMvcTest & @AutoConfigureMockMvc)
 public class UserControllerTest {
+
+
+    /*@TestConfiguration
+    @EnableAutoConfiguration(exclude = {
+            RedisAutoConfiguration.class,
+            RedisRepositoriesAutoConfiguration.class,
+            DataSourceAutoConfiguration.class,
+            DataSourceTransactionManagerAutoConfiguration.class,
+            HibernateJpaAutoConfiguration.class
+    })// disable all DB auto configurations
+    public class TestConfig {
+    }*/
+
 
     @Autowired
     private MockMvc mvc;
