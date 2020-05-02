@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.config;
 
 import com.honeybadgers.realtimescheduler.domain.jpa.Task;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
@@ -11,21 +12,29 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 @Configuration
 @Profile({"redis"})
+@EnableRedisRepositories(basePackages = {"com.honeybadgers.realtimescheduler.repository.redis"})
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 public class RedisConfig {
 
-    /*NEEDS MVN DEP FOR JEDIS @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
-        return new JedisConnectionFactory(config);
-    }*/
+    private int redisPort;
+    private String redisHost;
+
+    // init config with envs loaded from application.properties
+    public RedisConfig(
+            @Value("${spring.redis.port}") int redisPort,
+            @Value("${spring.redis.host}") String redisHost) {
+        this.redisPort = redisPort;
+        this.redisHost = redisHost;
+    }
+
     @Bean
     public LettuceConnectionFactory lettuceConnectionFactory() {
 
-        return new LettuceConnectionFactory(new RedisStandaloneConfiguration("localhost", 6379));
+        return new LettuceConnectionFactory(new RedisStandaloneConfiguration(redisHost, redisPort));
     }
 
     @Bean

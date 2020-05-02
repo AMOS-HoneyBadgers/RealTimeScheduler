@@ -1,36 +1,32 @@
 package com.honeybadgers.realtimescheduler;
 
-import com.honeybadgers.realtimescheduler.services.DynamicService;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
-import org.springframework.context.event.EventListener;
 
 @SpringBootApplication
 @Slf4j
 public class RealtimeschedulerApplication {
 
-    /*@Autowired
-    PostgresExampleService postgresExampleService;*/
+    // these autowired objects were only for test purposes -> normally try to leave this class as less modified as possible
 
     /*@Autowired
-    RedisExampleService redisExampleService;*/
+    PostgresExampleService postgresExampleService;
 
     @Autowired
-    DynamicService dynamicService;
+    RedisExampleService redisExampleService;
+
+    @Autowired
+    UserService userService;*/
 
     public static void main(String[] args) {
         SpringApplication.run(RealtimeschedulerApplication.class, args);
     }
 
-    @EventListener(ApplicationReadyEvent.class)
+    // this will be executed after the application has started (disabled, because that is bad practice to do this here)
+    /*@EventListener(ApplicationReadyEvent.class)
     public void printUsageInformations() {
         log.info("====================== Example Executions ======================");
-        //postgresExampleService.printMaxPrio();
-        //postgresExampleService.printMinPrio();
-        //redisExampleService.testRedis();
-        dynamicService.test();
-    }
+        userService.test();
+    }*/
 }

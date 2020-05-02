@@ -27,4 +27,12 @@ public class PostgresExampleService {
         List<Task> allByMin = taskPostgresRepository.getAllByMinPrio(3);
         log.info(String.valueOf(allByMin.stream().map(task -> task.getTaskPriority()).collect(Collectors.toList())));
     }
+
+    public List<Task> getAllTasks() {
+        return taskPostgresRepository.findAll();
+    }
+
+    public Task findTaskById(Long Id) {
+        return taskPostgresRepository.findById(Id).orElse(null);
+    }
 }
