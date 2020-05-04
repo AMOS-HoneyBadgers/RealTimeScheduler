@@ -3,4 +3,6 @@ applications:
   - name: realtimescheduler
     buildpacks:
       - java_buildpack
+    instances: 1
+    memory: 128M
     path: target/realtimescheduler-0.0.1-SNAPSHOT.jar

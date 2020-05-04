@@ -16,10 +16,13 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      - name: Maven Package
+      - name: Build with Maven
         run: mvn -B clean package -DskipTests
+      - name: Add manifest to build result
+        run: cp ./manifest.yaml ./build/libs
       - name: Maven Verify
         run: mvn -B clean verify
+        
 
   deploy:
     runs-on: ubuntu-18.04
