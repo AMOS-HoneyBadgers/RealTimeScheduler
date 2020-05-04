@@ -13,8 +13,8 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 11
-      - name: Build with Gradle
-        run: ./gradlew clean build
+      - name: Build with Maven
+        run: mvn -B clean package -DskipTests
       - name: Login to cloudfoundry
         uses: comsysto/cloudfoundry-action/auth@v1.0
         with:
