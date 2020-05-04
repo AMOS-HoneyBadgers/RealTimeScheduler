@@ -3,4 +3,4 @@ applications:
   - name: realtimescheduler
     buildpacks:
       - java_buildpack
-    path: target/realtimescheduler-0.0.1-SNAPSHOT.jar
+    path: target/realtimescheduler-0.0.1-SNAPSHOT.jar 
