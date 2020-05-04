@@ -1,4 +1,4 @@
-name: Build Spring Projekt
+name: build
 
 on:
   push:

@@ -1,4 +1,4 @@
-name: Push Projekt to Cloud Foundry
+name: cloudfoundry
 
 
 on:
@@ -16,7 +16,7 @@ jobs:
     needs: build
     
     steps:
-    - uses: citizen-of-planet-earth/cf-cli-action@master
+      uses: citizen-of-planet-earth/cf-cli-action@master
       with:
         cf_api: https://api.my-cloud-foundry.com
         cf_username: lyegeniy@googlemail.com
