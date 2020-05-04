@@ -28,9 +28,9 @@ jobs:
     steps:
       - uses: citizen-of-planet-earth/cf-cli-action@master
         with:
-        cf_api: https://api.my-cloud-foundry.com
-        cf_username: lyegeniy@googlemail.com
-        cf_password: 8BMUVjC.v.nH&uH
-        cf_org: Honeybadger
-        cf_space: development
-        command: push -f manifest.yml
+            cf_api: https://api.run.pivotal.io
+            cf_username: lyegeniy@googlemail.com
+            cf_password: 8BMUVjC.v.nH&uH
+            cf_org: Honeybadger
+            cf_space: development
+            command: push -f manifest.yml
