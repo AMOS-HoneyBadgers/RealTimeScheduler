@@ -4,7 +4,7 @@ name: cloudfoundry
 on:
   push:
     branches:
-      - 'master'
+      - 'd'
 jobs:
   deploy:
     runs-on: ubuntu-latest

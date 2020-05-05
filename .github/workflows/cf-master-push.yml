@@ -4,7 +4,7 @@ name: cloudfoundry
 on:
   push:
     branches:
-      - 'master'
+      - 'd'
 
 jobs:
   build:
@@ -18,8 +18,6 @@ jobs:
           java-version: 1.11
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
-      - name: Add manifest to build result
-        run: cp ./manifest.yaml ./build/libs
       - name: Maven Verify
         run: mvn -B clean verify
         
