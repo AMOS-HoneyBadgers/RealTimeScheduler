@@ -35,4 +35,4 @@ jobs:
             cf_password: 8BMUVjC.v.nH&uH
             cf_org: Honeybadger
             cf_space: development
-            command: push realtimescheduler -m 128M
+            command: push realtimescheduler -m 1G
