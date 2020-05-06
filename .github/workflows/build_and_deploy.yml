@@ -1,4 +1,4 @@
-name: cloudfoundry
+name: build and deploy pipeline
 
 
 on:
@@ -21,6 +21,7 @@ jobs:
         run: mvn -B clean package -DskipTests
       - name: Maven Verify
         run: mvn -B clean verify
+      - name: cloud foundry
       - uses: citizen-of-planet-earth/cf-cli-action@master
         with:
             cf_api: https://api.run.pivotal.io
