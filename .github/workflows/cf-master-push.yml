@@ -4,7 +4,8 @@ name: cloudfoundry
 on:
   push:
     branches:
-      - 'd'
+      - 'develop'
+      - 'master'
 
 jobs:
   build:
