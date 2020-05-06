@@ -21,13 +21,6 @@ jobs:
         run: mvn -B clean package -DskipTests
       - name: Maven Verify
         run: mvn -B clean verify
-        
-
-  deploy:
-    runs-on: ubuntu-18.04
-    needs: build
-    
-    steps:
       - uses: citizen-of-planet-earth/cf-cli-action@master
         with:
             cf_api: https://api.run.pivotal.io
@@ -36,3 +29,4 @@ jobs:
             cf_org: Honeybadger
             cf_space: development
             command: push realtimescheduler -m 1G
+        
