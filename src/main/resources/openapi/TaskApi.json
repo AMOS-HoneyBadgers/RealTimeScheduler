@@ -1,0 +1,169 @@
+{
+
+  // https://app.swaggerhub.com/help/tutorials/openapi-3-tutorial
+  // https://swagger.io/docs/specification/data-models/data-types/
+
+  "openapi": "3.0.0",
+  "info": {
+    "title": "TaskApi",
+    "description": "Api for managing tasks, e.g. creating new, updating existing, deleting obsolete tasks (and more)",
+    "version": "1.0.0",
+    "license": {
+      "name": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https"
+    }
+  ],
+  "paths": {
+    "/test/hello/": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "username",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/200"
+          },
+          "400": {
+            "$ref": "#/components/responses/400"
+          }
+        }
+      },
+      "post": {
+        "description": "",
+        "requestBody": {
+          "description": "",
+          "required": false,
+          "content": {
+
+          }
+        },
+        "responses": {
+          "default": {
+            "$ref": "#/components/responses/200"
+          }
+        }
+      }
+    },
+    "/test/hello/{user}": {
+      "get": {
+        "parameters": [
+          {
+            "name": "user",
+            "in": "path",
+            "schema": {
+              "type": "string"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string",
+                  "title": "errorMessage"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/task/add": {
+      "post": {
+        "responses": {
+          "default": {
+            "$ref": "#/components/responses/200"
+          }
+        },
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Task"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "responses": {
+      "200": {
+        "description": "OK",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "required": [
+                  "username"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "400": {
+        "description": "Bad Request",
+        "content": {
+          "application/json": {
+            "schema": {
+              "type": "string",
+              "title": "errorMessage"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "Task": {
+        "type": "object",
+        "required": [
+          "id",
+          "groupId"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "default": 1
+          },
+          "groupId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "executeTs": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    }
+  }
+}

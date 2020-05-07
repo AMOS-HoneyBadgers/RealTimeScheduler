@@ -1,0 +1,16 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "MonitoringApi",
+    "description": "Api for monitoring application (#task running, #taskOfGroupe, ...)",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https"
+    }
+  ],
+  "paths": {
+    
+  }
+}
