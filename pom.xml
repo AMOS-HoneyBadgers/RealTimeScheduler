@@ -19,6 +19,7 @@
         <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+        <surefire.version>2.19.1</surefire.version>
     </properties>
 
     <dependencies>
@@ -104,6 +105,79 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>2.19.1</version>
+                <configuration>
+                    <systemPropertyVariables>
+                        <coverage-metrics>all</coverage-metrics>
+                        <coverage-check>99</coverage-check>
+                    </systemPropertyVariables>
+                    <argLine>${surefireArgLine}</argLine>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+                    <!-- set arg line property for surefire -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>surefireArgLine</propertyName>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>report</id>
+                        <phase>prepare-package</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>coverage.check</id>
+                        <goals><goal>enforce</goal></goals>
+                        <phase>test</phase>
+                        <configuration>
+                            <rules>
+                                <requireFilesDontExist>
+                                    <files><file>coverage.check.failed</file></files>
+                                </requireFilesDontExist>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--<plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <executions>
+
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                        <configuration>
+                            <propertyName>surefireArgLine</propertyName>
+                            <includes>TaskControllerTest.java</includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
         </plugins>
     </build>
 
