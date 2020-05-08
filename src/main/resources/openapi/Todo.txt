@@ -1,0 +1,7 @@
+- 401 Unauthorized als Response
+- OpenApi Authorization Object
+- Group Model neu und Task Model updaten
+- Error Object für alle Error Responses
+
+- Möglichkeit: Liste an Gruppen zum Start/Stop übergeben
+- Möglichkeit: "Management-Api" zum Stoppen/Starten (des Schedulers) (evtl. MonitoringApi erweitern)

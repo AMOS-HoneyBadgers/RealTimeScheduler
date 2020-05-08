@@ -1,41 +1,41 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "TaskApi",
-    "description": "CRUD Api for task management",
+    "title": "GroupApi",
+    "description": "CRUD Api for group management",
     "version": "1.0.0"
   },
   "servers": [
     {
-      "url": "https://realtimescheduler.cfapps.io/api/task"
+      "url": "https://realtimescheduler.cfapps.io/api/group"
     }
   ],
   "paths": {
     "/" : {
       "get": {
-        "description": "Get all tasks stored in Database",
+        "description": "Get all groups stored in Database",
         "responses": {
           "200" : {
-            "$ref": "#/components/responses/200_TaskList"
+            "$ref": "#/components/responses/200_GroupList"
           }
         }
       },
       "post": {
-        "description": "Create new task and store in Database",
+        "description": "Create new group and store in Database",
         "requestBody": {
-          "description": "Task object",
+          "description": "group object",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/GroupModel"
               }
             }
           }
         },
         "responses": {
           "200" : {
-            "description": "New task was created successfully",
+            "description": "New group was created successfully",
             "content": {
               "text/plain": {
                 "schema": {
@@ -46,7 +46,7 @@
             }
           },
           "400" : {
-            "description": "Error while creating task",
+            "description": "Error while creating group",
             "content": {
               "application/json": {
                 "schema": {
@@ -63,11 +63,11 @@
         }
       }
     },
-    "/{task_Id}" : {
+    "/{group_Id}" : {
       "get" : {
         "parameters": [
           {
-            "name": "task_Id",
+            "name": "group_Id",
             "in": "path",
             "schema": {
               "type": "integer",
@@ -76,20 +76,20 @@
             "required": true
           }
         ],
-        "description": "Return task by task_Id from Database",
+        "description": "Return group by group_Id from Database",
         "responses": {
           "200" : {
-            "description": "Task was returned successfully",
+            "description": "Group was returned successfully",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/TaskModel"
+                  "$ref": "#/components/schemas/GroupModel"
                 }
               }
             }
           },
           "404" : {
-            "description": "Error while retrieving task - task_Id not found",
+            "description": "Error while retrieving group - group_Id not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -108,7 +108,7 @@
       "post": {
         "parameters": [
           {
-            "name": "task_Id",
+            "name": "group_Id",
             "in": "path",
             "schema": {
               "type": "integer",
@@ -117,21 +117,21 @@
             "required": true
           }
         ],
-        "description": "Update task in Database",
+        "description": "Update group in Database",
         "requestBody": {
-          "description": "Task object",
+          "description": "group object",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/GroupModel"
               }
             }
           }
         },
         "responses": {
           "200" : {
-            "description": "New task was updated successfully",
+            "description": "New group was updated successfully",
             "content": {
               "text/plain": {
                 "schema": {
@@ -142,7 +142,7 @@
             }
           },
           "400" : {
-            "description": "Error while updating task - invalid task model",
+            "description": "Error while updating group - invalid group model",
             "content": {
               "application/json": {
                 "schema": {
@@ -157,7 +157,7 @@
             }
           },
           "404" : {
-            "description": "Error while updating task - task_id not found",
+            "description": "Error while updating group - group_id not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -176,7 +176,7 @@
       "delete": {
         "parameters": [
           {
-            "name": "task_Id",
+            "name": "group_Id",
             "in": "path",
             "schema": {
               "type": "integer",
@@ -185,10 +185,10 @@
             "required": true
           }
         ],
-        "description": "Delete task from Database",
+        "description": "Delete group from Database",
         "responses": {
           "200" : {
-            "description": "Task was deleted successfully",
+            "description": "Group was deleted successfully",
             "content": {
               "text/plain": {
                 "schema": {
@@ -199,7 +199,7 @@
             }
           },
           "404" : {
-            "description": "Error while deleting task - task_id not found",
+            "description": "Error while deleting group - group_id not found",
             "content": {
               "application/json": {
                 "schema": {
@@ -215,6 +215,96 @@
           }
         }
       }
+    },
+    "/{group_Id}/start" : {
+      "put": {
+        "description": "Start scheduling all task assigned to group with given group_Id",
+        "parameters": [
+          {
+            "name": "group_Id",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "format" : "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200" : {
+            "description": "All tasks in group successfully queued for scheduling",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type" : "string",
+                  "example" : "200 OK"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description": "Error - group_Id not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errorMessage" : {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
+    },
+    "/{group_Id}/stop" : {
+      "put": {
+        "description": "Stop scheduling all task assigned to group with given group_Id",
+        "parameters": [
+          {
+            "name": "group_Id",
+            "in": "path",
+            "schema": {
+              "type": "integer",
+              "format" : "int64"
+            },
+            "required": true
+          }
+        ],
+        "responses": {
+          "200" : {
+            "description": "All tasks in group successfully stopped scheduling",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type" : "string",
+                  "example" : "200 OK"
+                }
+              }
+            }
+          },
+          "404" : {
+            "description": "Error - group_Id not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "errorMessage" : {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+
     }
 
   },
@@ -231,14 +321,14 @@
           }
         }
       },
-      "200_TaskList" : {
+      "200_GroupList" : {
         "description": "OK",
         "content": {
           "application/json": {
             "schema": {
               "type": "array",
               "items": {
-                "$ref": "#/components/schemas/TaskModel"
+                "$ref": "#/components/schemas/GroupModel"
               }
             }
           }
@@ -246,8 +336,8 @@
       }
     },
     "schemas": {
-      "TaskModel" : {
-        "$ref" : "./GlobalComponents.json#/components/schemas/TaskModel"
+      "GroupModel" : {
+        "$ref" : "./GlobalComponents.json#/components/schemas/GroupModel"
       }
     }
   }
