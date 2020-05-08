@@ -1,0 +1,39 @@
+{
+  "200_Integer" : {
+    "description": "OK",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "integer",
+          "format" : "int64"
+        }
+      }
+    }
+  },
+  "200_TaskList" : {
+    "description": "OK",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "./Schemas.json#/TaskModel"
+          }
+        }
+      }
+    }
+  },
+  "200_GroupList" : {
+    "description": "OK",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "./Schemas.json#/GroupModel"
+          }
+        }
+      }
+    }
+  }
+}

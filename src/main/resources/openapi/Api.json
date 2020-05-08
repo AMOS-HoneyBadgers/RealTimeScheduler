@@ -1,0 +1,24 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Api",
+    "description": "Api",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://realtimescheduler.cfapps.io/api/"
+    }
+  ],
+  "paths": {
+    "$ref": "./paths/Index.json"
+  },
+  "components": {
+    "responses": {
+      "$ref" : "./components/Responses.json"
+    },
+    "schemas": {
+      "$ref" : "./components/Schemas.json"
+    }
+  }
+}

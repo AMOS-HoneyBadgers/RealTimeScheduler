@@ -1,0 +1,35 @@
+{
+  "/group/": {
+    "$ref": "./GroupApi.json#/All"
+  },
+  "/group/{group_Id}": {
+    "$ref": "./GroupApi.json#/ById"
+  },
+  "/group/{group_Id}/start": {
+    "$ref": "./GroupApi.json#/Start"
+  },
+  "/group/{group_Id}/stop": {
+    "$ref": "./GroupApi.json#/Stop"
+  },
+  "/monitoring/task/queued": {
+    "$ref": "./MonitoringApi.json#/Queued"
+  },
+  "/monitoring/task/dispatched": {
+    "$ref": "./MonitoringApi.json#/Dispatched"
+  },
+  "/monitoring/task/dispatched/error/count": {
+    "$ref": "./MonitoringApi.json#/Errors"
+  },
+  "/monitoring/group/{group_Id}/tasks": {
+    "$ref": "./MonitoringApi.json#/TasksByGroup"
+  },
+  "/monitoring/group/count": {
+    "$ref": "./MonitoringApi.json#/GroupCount"
+  },
+  "/task/": {
+    "$ref": "./TaskApi.json#/All"
+  },
+  "/task/{task_Id}": {
+    "$ref": "./TaskApi.json#/ById"
+  }
+}
