@@ -5,6 +5,9 @@
       "responses": {
         "200" : {
           "$ref": "../Api.json#/components/responses/200_GroupList"
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     },
@@ -47,6 +50,9 @@
               }
             }
           }
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
@@ -90,6 +96,9 @@
               }
             }
           }
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     },
@@ -158,6 +167,9 @@
               }
             }
           }
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     },
@@ -200,6 +212,9 @@
               }
             }
           }
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
@@ -244,6 +259,9 @@
               }
             }
           }
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
@@ -289,6 +307,9 @@
               }
             }
           }
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
