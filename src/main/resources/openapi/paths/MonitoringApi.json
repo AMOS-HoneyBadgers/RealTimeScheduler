@@ -5,6 +5,9 @@
       "responses": {
         "200": {
           "$ref": "../Api.json#/components/responses/200_TaskList"
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
@@ -15,6 +18,9 @@
       "responses": {
         "200": {
           "$ref": "../Api.json#/components/responses/200_TaskList"
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
@@ -25,6 +31,9 @@
       "responses": {
         "200": {
           "$ref": "../Api.json#/components/responses/200_Integer"
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
@@ -61,6 +70,9 @@
               }
             }
           }
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
@@ -71,6 +83,9 @@
       "responses": {
         "200": {
           "$ref": "../Api.json#/components/responses/200_Integer"
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
         }
       }
     }
