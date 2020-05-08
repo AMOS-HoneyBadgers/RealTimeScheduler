@@ -1,0 +1,78 @@
+{
+  "Queued": {
+    "get": {
+      "description": "Returns an Array with all Tasks currently being scheduled",
+      "responses": {
+        "200": {
+          "$ref": "../Api.json#/components/responses/200_TaskList"
+        }
+      }
+    }
+  },
+  "Dispatched": {
+    "get": {
+      "description": "Returns an Array with all Tasks currently waiting for feedback from dispatcher",
+      "responses": {
+        "200": {
+          "$ref": "../Api.json#/components/responses/200_TaskList"
+        }
+      }
+    }
+  },
+  "Errors" : {
+    "get": {
+      "description": "Returns the number of tasks with error-feedback from dispatcher",
+      "responses": {
+        "200": {
+          "$ref": "../Api.json#/components/responses/200_Integer"
+        }
+      }
+    }
+  },
+  "TasksByGroup" : {
+    "get": {
+      "description": "Returns the amount of tasks from a group",
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "responses": {
+        "200": {
+          "$ref": "../Api.json#/components/responses/200_Integer"
+        },
+        "404" : {
+          "description": "404: Group not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "GroupCount" : {
+    "get": {
+      "description": "Returns the total number of groups",
+      "responses": {
+        "200": {
+          "$ref": "../Api.json#/components/responses/200_Integer"
+        }
+      }
+    }
+  }
+}

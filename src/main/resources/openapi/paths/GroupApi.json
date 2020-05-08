@@ -1,0 +1,297 @@
+{
+  "All" : {
+    "get": {
+      "description": "Get all groups stored in Database",
+      "responses": {
+        "200" : {
+          "$ref": "../Api.json#/components/responses/200_GroupList"
+        }
+      }
+    },
+    "post": {
+      "description": "Create new group and store in Database",
+      "requestBody": {
+        "description": "group object",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../Api.json#/components/schemas/GroupModel"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200" : {
+          "description": "New group was created successfully",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "400" : {
+          "description": "Error while creating group",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "ById" : {
+    "get" : {
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "description": "Return group by group_Id from Database",
+      "responses": {
+        "200" : {
+          "description": "Group was returned successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../Api.json#/components/schemas/GroupModel"
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error while retrieving group - group_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "post": {
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "description": "Update group in Database",
+      "requestBody": {
+        "description": "group object",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../Api.json#/components/schemas/GroupModel"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200" : {
+          "description": "New group was updated successfully",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "400" : {
+          "description": "Error while updating group - invalid group model",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error while updating group - group_id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "description": "Delete group from Database",
+      "responses": {
+        "200" : {
+          "description": "Group was deleted successfully",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error while deleting group - group_id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "Start" : {
+    "put": {
+      "description": "Start scheduling all task assigned to group with given group_Id",
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "responses": {
+        "200" : {
+          "description": "All tasks in group successfully queued for scheduling",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error - group_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  },
+  "Stop" : {
+    "put": {
+      "description": "Stop scheduling all task assigned to group with given group_Id",
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "responses": {
+        "200" : {
+          "description": "All tasks in group successfully stopped scheduling",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error - group_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+
+  }
+}

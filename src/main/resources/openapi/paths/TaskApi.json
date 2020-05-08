@@ -1,0 +1,207 @@
+{
+  "All" : {
+    "get": {
+      "description": "Get all tasks stored in Database",
+      "responses": {
+        "200" : {
+          "$ref": "../Api.json#/components/responses/200_TaskList"
+        }
+      }
+    },
+    "post": {
+      "description": "Create new task and store in Database",
+      "requestBody": {
+        "description": "Task object",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../Api.json#/components/schemas/TaskModel"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200" : {
+          "description": "New task was created successfully",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "400" : {
+          "description": "Error while creating task",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "ById" : {
+    "get" : {
+      "parameters": [
+        {
+          "name": "task_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "description": "Return task by task_Id from Database",
+      "responses": {
+        "200" : {
+          "description": "Task was returned successfully",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../Api.json#/components/schemas/TaskModel"
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error while retrieving task - task_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "post": {
+      "parameters": [
+        {
+          "name": "task_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "description": "Update task in Database",
+      "requestBody": {
+        "description": "Task object",
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../Api.json#/components/schemas/TaskModel"
+            }
+          }
+        }
+      },
+      "responses": {
+        "200" : {
+          "description": "New task was updated successfully",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "400" : {
+          "description": "Error while updating task - invalid task model",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error while updating task - task_id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "delete": {
+      "parameters": [
+        {
+          "name": "task_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format" : "int64"
+          },
+          "required": true
+        }
+      ],
+      "description": "Delete task from Database",
+      "responses": {
+        "200" : {
+          "description": "Task was deleted successfully",
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type" : "string",
+                "example" : "200 OK"
+              }
+            }
+          }
+        },
+        "404" : {
+          "description": "Error while deleting task - task_id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "errorMessage" : {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
