@@ -9,7 +9,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     },
     "post": {
       "description": "Create new task and store in Database",
@@ -54,7 +59,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   },
   "ById" : {
@@ -100,7 +110,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     },
     "post": {
       "parameters": [
@@ -171,7 +186,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     },
     "delete": {
       "parameters": [
@@ -216,7 +236,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   }
 }

@@ -5,23 +5,148 @@
       "id",
       "groupId"
     ],
+    "oneOf": [
+      {
+        "$ref": "#/TaskPropertiesSeq"
+      },
+      {
+        "$ref": "#/TaskPropertiesPar"
+      }
+    ]
+  },
+  "TaskPropertiesSeq": {
     "properties": {
       "id": {
         "type": "string",
         "format": "uuid"
       },
+      "groupId": {
+        "type": "string",
+        "format": "uuid"
+      },
       "priority": {
         "type": "integer",
-        "minimum": 1,
-        "default": 1
+        "minimum": 0,
+        "maximum": 999
+      },
+      "earliestStart": {
+        "type": "string",
+        "format": "partial-time"
+      },
+      "latestStart": {
+        "type": "string",
+        "format": "partial-time"
+      },
+      "workingDays": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "typeFlag": {
+        "type": "string",
+        "enum": [
+          "batch",
+          "user"
+        ]
+      },
+      "maxFailures": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "sequential"
+        ]
+      },
+      "indexNumber": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "force": {
+        "description": "If set to true: ignore indexNumber and do not wait on previous tasks",
+        "type": "boolean"
+      },
+      "meta": {
+        "description": "Key-value object for meta-data",
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "TaskPropertiesPar": {
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
       },
       "groupId": {
         "type": "string",
         "format": "uuid"
       },
-      "executeTs": {
+      "priority": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 999
+      },
+      "earliestStart": {
         "type": "string",
-        "format": "date-time"
+        "format": "partial-time"
+      },
+      "latestStart": {
+        "type": "string",
+        "format": "partial-time"
+      },
+      "workingDays": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "typeFlag": {
+        "type": "string",
+        "enum": [
+          "batch",
+          "user"
+        ]
+      },
+      "maxFailures": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "mode": {
+        "type": "string",
+        "enum": [
+          "parallel"
+        ]
+      },
+      "parallelismDegree": {
+        "description": "Number of tasks allowed to be executed at the same time",
+        "type": "integer"
+      },
+      "meta": {
+        "description": "Key-value object for meta-data",
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
       }
     }
   },

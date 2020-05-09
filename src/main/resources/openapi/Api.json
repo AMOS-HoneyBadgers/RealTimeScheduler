@@ -19,6 +19,12 @@
     },
     "schemas": {
       "$ref" : "./components/Schemas.json"
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "https",
+        "scheme": "basic"
+      }
     }
   }
 }

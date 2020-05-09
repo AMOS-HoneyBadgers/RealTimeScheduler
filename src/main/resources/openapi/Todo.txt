@@ -1,4 +1,7 @@
-- 401 Unauthorized als Response
+https://swagger.io/docs/specification/describing-responses/
+
+
+- 401 Unauthorized als Response -> done
 - OpenApi Authorization Object
 - Group Model neu und Task Model updaten
 - Error Object für alle Error Responses

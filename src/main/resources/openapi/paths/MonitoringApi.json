@@ -9,7 +9,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   },
   "Dispatched": {
@@ -22,7 +27,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   },
   "Errors" : {
@@ -35,7 +45,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   },
   "TasksByGroup" : {
@@ -74,7 +89,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   },
   "GroupCount" : {
@@ -87,7 +107,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   }
 }
