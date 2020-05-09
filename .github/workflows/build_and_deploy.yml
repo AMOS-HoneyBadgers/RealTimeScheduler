@@ -24,9 +24,9 @@ jobs:
       - name: cloud foundry
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
-            cf_api: https://api.run.pivotal.io
-            cf_username: lyegeniy@googlemail.com
-            cf_password: 8BMUVjC.v.nH&uH
+            cf_api: ${{ secrets.CF_API }}
+            cf_username: ${{ secrets.CF_LOGIN }}
+            cf_password: ${{ secrets.CF_PASS }}
             cf_org: Honeybadger
             cf_space: development
             command: push realtimescheduler -m 1G
