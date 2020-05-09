@@ -9,7 +9,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     },
     "post": {
       "description": "Create new group and store in Database",
@@ -54,7 +59,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
   },
   "ById" : {
@@ -100,7 +110,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     },
     "post": {
       "parameters": [
@@ -171,7 +186,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     },
     "delete": {
       "parameters": [
@@ -216,10 +236,16 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+          {
+            "basicAuth": []
+          }
+        ]
     }
   },
   "Start" : {
+    // TODO really put? (next one as well)
     "put": {
       "description": "Start scheduling all task assigned to group with given group_Id",
       "parameters": [
@@ -263,7 +289,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
 
   },
@@ -311,7 +342,12 @@
         "401": {
           "$ref": "../Api.json#/components/responses/401"
         }
-      }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
     }
 
   }
