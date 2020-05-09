@@ -245,7 +245,6 @@
     }
   },
   "Start" : {
-    // TODO really put? (next one as well)
     "put": {
       "description": "Start scheduling all task assigned to group with given group_Id",
       "parameters": [
