@@ -1,6 +1,9 @@
 #!/bin/sh
 # Please use this before creating OpenApi with codegen and use codegen on created ApiMerged.json
-# Please do not change output name
+# USAGE (in e.g.: git-bash):
+# ./create_openapi_json.sh PATH_TO_OUTPUT_PROJECT
+# NOTE: if you don't specify any path this script will only merge the jsons
+
 if which npm > /dev/null
     then
         package='swagger-cli'
@@ -9,10 +12,22 @@ if which npm > /dev/null
           echo "Error: missing package!"
           echo "Please install swagger-cli using following command:"
           echo "npm install -g $package"
+          read -n 1 -s -r -p "Press any key to continue"
         else
           echo "Building OpenApi File"
           # Please use this output name (added to gitignore)
-          swagger-cli bundle -r Api.json --outfile ApiMerged.json
+          output=$(swagger-cli bundle -r Api.json --outfile ApiMerged.json)
+          if [ "$output" = "Created ApiMerged.json from Api.json" ]; then
+            if [ -d "$1" ]
+              then
+                echo "Running Codegen with output at location: $1"
+                java -jar ./openapi-generator-cli.jar generate -g spring -i ./ApiMerged.json -o "$1"
+            else
+              echo "Invalid path parameter!"
+            fi
+          else
+            echo "Failed to merge OpenApi specs"
+          fi
         fi
     else
         echo "Error - npm not found"

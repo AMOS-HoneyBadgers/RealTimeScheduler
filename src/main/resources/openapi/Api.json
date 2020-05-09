@@ -22,7 +22,7 @@
     },
     "securitySchemes": {
       "basicAuth": {
-        "type": "https",
+        "type": "http",
         "scheme": "basic"
       }
     }
