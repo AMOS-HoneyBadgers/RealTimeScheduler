@@ -111,10 +111,10 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <systemPropertyVariables>
+                    <!--<systemPropertyVariables>
                         <coverage-metrics>all</coverage-metrics>
                         <coverage-check>99</coverage-check>
-                    </systemPropertyVariables>
+                    </systemPropertyVariables>-->
                     <argLine>${surefireArgLine}</argLine>
                 </configuration>
             </plugin>
@@ -140,6 +140,34 @@
                             <goal>report</goal>
                         </goals>
                     </execution>
+
+                    <execution>
+                        <id>coverage-check</id>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <rule>
+                                    <element>BUNDLE</element>
+                                    <excludes>
+                                        <exclude>com.honeybadgers.realtimescheduler.RealtimeschedulerApplication</exclude>
+                                    </excludes>
+                                    <limits>
+                                        <limit>
+                                            <counter>METHOD</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0%</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                                <!--https://www.eclemma.org/jacoco/trunk/doc/counters.html-->
+
+                            </rules>
+                        </configuration>
+                    </execution>
+
+
                 </executions>
             </plugin>
 
