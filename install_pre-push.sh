@@ -1,14 +1,14 @@
-#!/bin/sh
+{ echo "#!/bin/sh
 git stash -q --keep-index
-# Using mvn test to run all unit tests and run plugins to assert
+# Using "mvn test" to run all unit tests and run plugins to assert
 #   * code coverage threshold >= 85% (using surefire, enforcer plugins)
 #   * FindBugs at low threshold errors (using findbugs-maven-plugin)
 #   * Checkstyle has 0 errors (using maven-checkstyle-plugin)
 mvn clean install test
-RESULTS=$?
+RESULTS=\$?
 # Perform checks
 git stash pop -q
-if [ $RESULTS -ne 0 ]; then
+if [ \$RESULTS -ne 0 ]; then
   echo Error: Push criteria not met with one or more of the following issues,
   echo 1. Failure\(s\) in unit tests
   echo 2. Failure to meet 85% code coverage
@@ -17,4 +17,9 @@ if [ $RESULTS -ne 0 ]; then
   exit 1
 fi
 # You shall commit
-exit 0
+exit 0"
+} > pre-push.sh
+pushd .git/hooks
+ln -s ../../pre-push.sh pre-push
+chmod u+x pre-push
+popd
