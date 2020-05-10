@@ -24,32 +24,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ActiveProfiles("postgre")              // set postgre profile as active, because TaskController is only initialized in postgre Profile
-@WebMvcTest(TaskController.class)       // mock only the given controller (for mock all use @WebMvcTest & @AutoConfigureMockMvc)
-public class TaskControllerTest {
-
-
+@WebMvcTest(HelloWorldController.class)
+public class HelloWorldControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
-    private PostgresExampleService service;
-
     @Test
     public void testGetAllTasks() throws Exception {
 
-        Task task = new Task(1L, 10, "testTask1", null, new Timestamp(System.currentTimeMillis()), null);
 
-        List<Task> allTasks = Collections.singletonList(task);
-
-        // specify mock result
-        given(service.getAllTasks()).willReturn(allTasks);
-
-        mvc.perform(get("/api/task/")
+        mvc.perform(get("/test/hello/")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].name", is(task.getName())));
+                .andExpect(status().isOk());
     }
 }
