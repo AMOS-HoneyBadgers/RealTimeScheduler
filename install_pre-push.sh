@@ -9,7 +9,7 @@ RESULTS=\$?
 # Perform checks
 git stash pop -q
 if [ \$RESULTS -ne 0 ]; then
-  echo Error: Commit criteria not met with one or more of the following issues,
+  echo Error: Push criteria not met with one or more of the following issues,
   echo 1. Failure\(s\) in unit tests
   echo 2. Failure to meet 85% code coverage
   echo 3. Failure to meet low FindBugs threshold
@@ -18,8 +18,8 @@ if [ \$RESULTS -ne 0 ]; then
 fi
 # You shall commit
 exit 0"
-} > pre-commit.sh
+} > pre-push.sh
 pushd .git/hooks
-ln -s ../../pre-commit.sh pre-commit
-chmod u+x pre-commit
+ln -s ../../pre-push.sh pre-push
+chmod u+x pre-push
 popd
