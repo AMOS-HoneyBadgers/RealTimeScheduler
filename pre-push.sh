@@ -9,7 +9,7 @@ RESULTS=$?
 # Perform checks
 git stash pop -q
 if [ $RESULTS -ne 0 ]; then
-  echo Error: Commit criteria not met with one or more of the following issues,
+  echo Error: Push criteria not met with one or more of the following issues,
   echo 1. Failure\(s\) in unit tests
   echo 2. Failure to meet 85% code coverage
   echo 3. Failure to meet low FindBugs threshold
