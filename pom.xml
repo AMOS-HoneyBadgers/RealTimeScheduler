@@ -101,6 +101,11 @@
             <artifactId>openapi-generator-maven-plugin</artifactId>
             <version>4.3.1</version>
         </dependency>
+        <dependency>
+            <groupId>org.openapitools</groupId>
+            <artifactId>jackson-databind-nullable</artifactId>
+            <version>0.1.0</version>
+        </dependency>
 
         <dependency>
             <groupId>com.github.joschi.jackson</groupId>
@@ -133,7 +138,8 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
-            <plugin>
+
+            <!--<plugin>
                 <groupId>org.openapitools</groupId>
                 <artifactId>openapi-generator-maven-plugin</artifactId>
                 <version>4.3.1</version>
@@ -145,9 +151,9 @@
                         <configuration>
                             <inputSpec>${project.basedir}/src/main/resources/openapi/Api.json</inputSpec>
                             <generatorName>spring</generatorName>
-                            <output>${project.basedir}/openapi-generated/</output>
+                            <output>${project.basedir}/../openapi-generated/</output>
                             <library>spring-boot</library>
-                            <!--<configHelp>true</configHelp>-->
+                            <!-<configHelp>true</configHelp>->
                             <configOptions>
                                 <java8>true</java8>
                                 <dateLibrary>java8</dateLibrary>
@@ -155,7 +161,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
+            </plugin>-->
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -173,6 +179,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.5</version>
                 <executions>
                     <!-- set arg line property for surefire -->
                     <execution>
@@ -209,7 +216,7 @@
                                             <counter>METHOD</counter>
                                             <value>COVEREDRATIO</value>
                                             <minimum>0%</minimum>
-                                            
+
                                         </limit>
                                     </limits>
                                 </rule>
