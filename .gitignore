@@ -1,5 +1,7 @@
 # Personal
-./src/main/resources/openapi/ApiMerged.json
+
+# exclude generated files by openapi codegen
+**/openapi-generated/**
 
 
 # Compiled class file

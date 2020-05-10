@@ -35,7 +35,7 @@
       ]
     }
   },
-  "Errors" : {
+  "Errors": {
     "get": {
       "description": "Returns the number of tasks with error-feedback from dispatcher",
       "responses": {
@@ -53,7 +53,7 @@
       ]
     }
   },
-  "TasksByGroup" : {
+  "TasksByGroup": {
     "get": {
       "description": "Returns the amount of tasks from a group",
       "parameters": [
@@ -62,7 +62,7 @@
           "in": "path",
           "schema": {
             "type": "integer",
-            "format" : "int64"
+            "format": "int64"
           },
           "required": true
         }
@@ -71,17 +71,12 @@
         "200": {
           "$ref": "../Api.json#/components/responses/200_Integer"
         },
-        "404" : {
+        "404": {
           "description": "404: Group not found",
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "errorMessage" : {
-                    "type": "string"
-                  }
-                }
+                "$ref": "../Api.json#/components/schemas/ErrorModel"
               }
             }
           }
@@ -97,7 +92,7 @@
       ]
     }
   },
-  "GroupCount" : {
+  "GroupCount": {
     "get": {
       "description": "Returns the total number of groups",
       "responses": {
