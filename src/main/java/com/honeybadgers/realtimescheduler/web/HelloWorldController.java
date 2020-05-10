@@ -15,7 +15,7 @@ public class HelloWorldController {
         return "Hello World";
     }
 
-    @GetMapping("/error")
+    /*@GetMapping("/error")
     public ResponseEntity<?> getError() {
         return ResponseEntity.badRequest().build();
     }
@@ -34,6 +34,6 @@ public class HelloWorldController {
     public ResponseEntity<?> loggingBody(@RequestBody String logBody) {
         log.info(logBody);
         return ResponseEntity.accepted().build();
-    }
+    }*/
 
 }

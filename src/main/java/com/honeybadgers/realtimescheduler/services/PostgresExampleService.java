@@ -18,7 +18,7 @@ public class PostgresExampleService {
     @Autowired
     TaskPostgresRepository taskPostgresRepository;
 
-    public void printMaxPrio() {
+    /*public void printMaxPrio() {
         List<Task> allByMax = taskPostgresRepository.getAllByMaxPrio(3);
         log.info(String.valueOf(allByMax.stream().map(task -> task.getTaskPriority()).collect(Collectors.toList())));
     }
@@ -34,5 +34,5 @@ public class PostgresExampleService {
 
     public Task findTaskById(Long Id) {
         return taskPostgresRepository.findById(Id).orElse(null);
-    }
+    }*/
 }

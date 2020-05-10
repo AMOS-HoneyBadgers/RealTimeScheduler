@@ -111,10 +111,6 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
                 <configuration>
-                    <!--<systemPropertyVariables>
-                        <coverage-metrics>all</coverage-metrics>
-                        <coverage-check>99</coverage-check>
-                    </systemPropertyVariables>-->
                     <argLine>${surefireArgLine}</argLine>
                 </configuration>
             </plugin>
@@ -150,14 +146,11 @@
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
-                                    <excludes>
-                                        <exclude>com.honeybadgers.realtimescheduler.RealtimeschedulerApplication</exclude>
-                                    </excludes>
                                     <limits>
                                         <limit>
                                             <counter>METHOD</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0%</minimum>
+                                            <minimum>95%</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -166,9 +159,18 @@
                             </rules>
                         </configuration>
                     </execution>
-
-
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>com/honeybadgers/realtimescheduler/config/**/*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/domain/**/*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/repository/**/*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/services/**/*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/web/TaskController*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/web/UserController*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/RealtimeschedulerApplication*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
 
             <plugin>

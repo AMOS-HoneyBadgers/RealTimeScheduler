@@ -25,12 +25,12 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @GetMapping("/")
+    /*@GetMapping("/")
     public ResponseEntity<List<User>> getAllUsers() {
         return ResponseEntity.ok(userService.getAll());
-    }
+    }*/
 
-    @GetMapping("/{id}")
+    /*@GetMapping("/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") String userId) {
         User user = userService.getUserById(userId);
         if(user != null)
@@ -51,5 +51,5 @@ public class UserController {
     public ResponseEntity<?> deleteUserById(@PathVariable String userid) {
         User deleted = userService.deleteUser(userid);
         return ResponseEntity.ok(deleted);
-    }
+    }*/
 }

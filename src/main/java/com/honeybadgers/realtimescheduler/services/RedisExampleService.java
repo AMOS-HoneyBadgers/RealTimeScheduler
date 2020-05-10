@@ -19,7 +19,7 @@ public class RedisExampleService {
     @Autowired
     UserRedisRepository userRedisRepository;
 
-    public void testRedis() {
+    /*public void testRedis() {
         User newUser = new User();
         newUser.setAge(10);
         newUser.setName("TEST");
@@ -30,5 +30,5 @@ public class RedisExampleService {
         log.info("SIZE: " + allUsers.size());
         log.info("Id: " + allUsers.get(0).getId() + " Name: " + allUsers.get(0).getName() + " Role: " + allUsers.get(0).getRole() + " Age: " + allUsers.get(0).getAge());
 
-    }
+    }*/
 }
