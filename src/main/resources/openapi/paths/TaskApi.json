@@ -1,9 +1,9 @@
 {
-  "All" : {
+  "All": {
     "get": {
       "description": "Get all tasks stored in Database",
       "responses": {
-        "200" : {
+        "200": {
           "$ref": "../Api.json#/components/responses/200_TaskList"
         },
         "401": {
@@ -30,28 +30,22 @@
         }
       },
       "responses": {
-        "200" : {
+        "200": {
           "description": "New task was created successfully",
           "content": {
-            "text/plain": {
+            "application/json": {
               "schema": {
-                "type" : "string",
-                "example" : "200 OK"
+                "$ref": "../Api.json#/components/schemas/ResponseModel"
               }
             }
           }
         },
-        "400" : {
+        "400": {
           "description": "Error while creating task",
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "errorMessage" : {
-                    "type": "string"
-                  }
-                }
+                "$ref": "../Api.json#/components/schemas/ErrorModel"
               }
             }
           }
@@ -67,22 +61,22 @@
       ]
     }
   },
-  "ById" : {
-    "get" : {
+  "ById": {
+    "get": {
       "parameters": [
         {
           "name": "task_Id",
           "in": "path",
           "schema": {
             "type": "integer",
-            "format" : "int64"
+            "format": "int64"
           },
           "required": true
         }
       ],
       "description": "Return task by task_Id from Database",
       "responses": {
-        "200" : {
+        "200": {
           "description": "Task was returned successfully",
           "content": {
             "application/json": {
@@ -92,17 +86,12 @@
             }
           }
         },
-        "404" : {
+        "404": {
           "description": "Error while retrieving task - task_Id not found",
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "errorMessage" : {
-                    "type": "string"
-                  }
-                }
+                "$ref": "../Api.json#/components/schemas/ErrorModel"
               }
             }
           }
@@ -124,7 +113,7 @@
           "in": "path",
           "schema": {
             "type": "integer",
-            "format" : "int64"
+            "format": "int64"
           },
           "required": true
         }
@@ -142,43 +131,32 @@
         }
       },
       "responses": {
-        "200" : {
+        "200": {
           "description": "New task was updated successfully",
           "content": {
-            "text/plain": {
+            "application/json": {
               "schema": {
-                "type" : "string",
-                "example" : "200 OK"
+                "$ref": "../Api.json#/components/schemas/ResponseModel"
               }
             }
           }
         },
-        "400" : {
+        "400": {
           "description": "Error while updating task - invalid task model",
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "errorMessage" : {
-                    "type": "string"
-                  }
-                }
+                "$ref": "../Api.json#/components/schemas/ErrorModel"
               }
             }
           }
         },
-        "404" : {
+        "404": {
           "description": "Error while updating task - task_id not found",
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "errorMessage" : {
-                    "type": "string"
-                  }
-                }
+                "$ref": "../Api.json#/components/schemas/ErrorModel"
               }
             }
           }
@@ -200,35 +178,29 @@
           "in": "path",
           "schema": {
             "type": "integer",
-            "format" : "int64"
+            "format": "int64"
           },
           "required": true
         }
       ],
       "description": "Delete task from Database",
       "responses": {
-        "200" : {
+        "200": {
           "description": "Task was deleted successfully",
           "content": {
-            "text/plain": {
+            "application/json": {
               "schema": {
-                "type" : "string",
-                "example" : "200 OK"
+                "$ref": "../Api.json#/components/schemas/ResponseModel"
               }
             }
           }
         },
-        "404" : {
+        "404": {
           "description": "Error while deleting task - task_id not found",
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "errorMessage" : {
-                    "type": "string"
-                  }
-                }
+                "$ref": "../Api.json#/components/schemas/ErrorModel"
               }
             }
           }

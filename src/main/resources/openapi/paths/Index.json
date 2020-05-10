@@ -5,11 +5,11 @@
   "/group/{group_Id}": {
     "$ref": "./GroupApi.json#/ById"
   },
-  "/group/{group_Id}/start": {
-    "$ref": "./GroupApi.json#/Start"
+  "/task/": {
+    "$ref": "./TaskApi.json#/All"
   },
-  "/group/{group_Id}/stop": {
-    "$ref": "./GroupApi.json#/Stop"
+  "/task/{task_Id}": {
+    "$ref": "./TaskApi.json#/ById"
   },
   "/monitoring/task/queued": {
     "$ref": "./MonitoringApi.json#/Queued"
@@ -26,10 +26,16 @@
   "/monitoring/group/count": {
     "$ref": "./MonitoringApi.json#/GroupCount"
   },
-  "/task/": {
-    "$ref": "./TaskApi.json#/All"
+  "/management/group/{group_Id}/start": {
+    "$ref": "./ManagementApi.json#/GroupStart"
   },
-  "/task/{task_Id}": {
-    "$ref": "./TaskApi.json#/ById"
+  "/management/group/{group_Id}/stop": {
+    "$ref": "./ManagementApi.json#/GroupStop"
+  },
+  "/management/scheduler/start": {
+    "$ref": "./ManagementApi.json#/SchedulerStart"
+  },
+  "/management/scheduler/stop": {
+    "$ref": "./ManagementApi.json#/SchedulerStop"
   }
 }
