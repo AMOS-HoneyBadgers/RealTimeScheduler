@@ -158,6 +158,7 @@
                                             <counter>METHOD</counter>
                                             <value>COVEREDRATIO</value>
                                             <minimum>0%</minimum>
+                                            
                                         </limit>
                                     </limits>
                                 </rule>
