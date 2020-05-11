@@ -35,7 +35,7 @@ public class UserService {
         }
     }
 
-    public List<User> getAll() {
+    /*public List<User> getAll() {
         return StreamSupport.stream(repository.findAll().spliterator(), false).collect(Collectors.toList());
     }
 
@@ -57,5 +57,5 @@ public class UserService {
             return null;
         repository.delete(user);
         return user;
-    }
+    }*/
 }
