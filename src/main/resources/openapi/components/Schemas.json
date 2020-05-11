@@ -1,0 +1,170 @@
+{
+  "TaskModel": {
+    "type": "object",
+    "required": [
+      "id",
+      "groupId"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "groupId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "priority": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 999
+      },
+      "earliestStart": {
+        "type": "string",
+        "format": "partial-time"
+      },
+      "latestStart": {
+        "type": "string",
+        "format": "partial-time"
+      },
+      "workingDays": {
+        "type": "integer",
+        "minimum": 1
+      },
+      "typeFlag": {
+        "type": "string",
+        "enum": [
+          "batch",
+          "user"
+        ]
+      },
+      "maxFailures": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "mode": {
+        "description": "Mode of task",
+        "type": "string",
+        "enum": [
+          "sequential",
+          "parallel"
+        ]
+      },
+      "indexNumber": {
+        "description": "[only with mode = sequential] Index number of task in corresponding sequence",
+        "type": "integer",
+        "minimum": 0
+      },
+      "force": {
+        "description": "[only with mode = sequential] If set to true: ignore indexNumber and do not wait on previous tasks",
+        "type": "boolean"
+      },
+      "parallelismDegree": {
+        "description": "[only with mode = parallel]Number of tasks allowed to be executed at the same time",
+        "type": "integer"
+      },
+      "meta": {
+        "description": "Key-value object for meta-data",
+        "type": "array",
+        "uniqueItems": true,
+        "items": {
+          "type": "object",
+          "properties": {
+            "key": {
+              "type": "string"
+            },
+            "value": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  },
+  "GroupModel": {
+    "type": "object",
+    "required": [
+      "id"
+    ],
+    "properties": {
+      "id": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "parentId": {
+        "type": "string",
+        "format": "uuid"
+      },
+      "priority": {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 999
+      },
+      "typeFlag": {
+        "type": "string",
+        "enum": [
+          "batch",
+          "user"
+        ]
+      },
+      "paused": {
+        "type": "boolean",
+        "default": "false"
+      },
+      "maxFailures": {
+        "type": "integer",
+        "minimum": 0
+      },
+      "mode": {
+        "description": "Mode of tasks of this group",
+        "type": "string",
+        "enum": [
+          "sequential",
+          "parallel"
+        ]
+      },
+      "indexNumber": {
+        "description": "[only with mode = sequential] Index number of task in corresponding sequence",
+        "type": "integer",
+        "minimum": 0
+      },
+      "force": {
+        "description": "[only with mode = sequential] If set to true: ignore indexNumber and do not wait on previous tasks",
+        "type": "boolean"
+      },
+      "parallelismDegree": {
+        "description": "[only with mode = parallel]Number of tasks allowed to be executed at the same time",
+        "type": "integer"
+      }
+    }
+  },
+  "ErrorModel": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "errorMessage": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "code",
+      "message"
+    ]
+  },
+  "ResponseModel": {
+    "type": "object",
+    "properties": {
+      "code": {
+        "type": "string"
+      },
+      "message": {
+        "type": "string"
+      }
+    },
+    "required": [
+      "code"
+    ]
+  }
+}

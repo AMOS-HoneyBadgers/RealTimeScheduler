@@ -1,3 +1,9 @@
+# Personal
+
+# exclude generated files by openapi codegen
+**/openapi-generated/**
+
+
 # Compiled class file
 *.class
 
