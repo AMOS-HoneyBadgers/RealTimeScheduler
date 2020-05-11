@@ -22,6 +22,5 @@ public class RabbitMQSender {
     public void send(String task){
         rabbitTemplate.convertAndSend(exchange, routingkey, task);
         System.out.println("Send msg = " + task);
-
     }
 }

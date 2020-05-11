@@ -17,7 +17,7 @@ public class HelloWorldController {
     RabbitMQSender rabbitMQSender;
 
     @GetMapping("/hello")
-    public String getHelloWorld() {
+    public String getHealth() {
         return "Hello World";
     }
 

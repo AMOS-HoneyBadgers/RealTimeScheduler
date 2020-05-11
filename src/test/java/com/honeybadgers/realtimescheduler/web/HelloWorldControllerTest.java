@@ -6,6 +6,7 @@ import com.honeybadgers.realtimescheduler.services.RabbitMQSender;
 import io.jsonwebtoken.lang.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,26 +27,37 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 @WebMvcTest(HelloWorldController.class)
 public class HelloWorldControllerTest {
 
     @Autowired
     private MockMvc mvc;
 
+    @MockBean
+    private RabbitMQSender rabbitMQSender;
+
+
     @Test
-    public void testGetAllTasks() throws Exception {
-        /*RabbitMQSender rabbitMQSender = Mockito.mock(RabbitMQSender.class);
-        when(rabbitMQSender.send(any(String.class))).thenReturn()
-        mvc.perform(get("hello/")
+    public void testGetHealth() throws Exception {
+        mvc.perform(get("/hello")
                 .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());*/
-        Assert.isTrue(true);
+                .andExpect(status().isOk());
     }
+
+    @Test
+    public void testGetRabbit() throws Exception {
+        mvc.perform(get("/rabbit")
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        //doThrow(IllegalArgumentException.class).when(rabbitMQSender).send(null);
+        verify(rabbitMQSender).send(any());
+    }
+
 
 }
