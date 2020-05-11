@@ -1,0 +1,93 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Api",
+    "description": "Api",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://realtimescheduler.cfapps.io/api/"
+    }
+  ],
+  "paths": {
+    "/group/": {
+      "$ref": "./paths/GroupApi.json#/All"
+    },
+    "/group/{group_Id}": {
+      "$ref": "./paths/GroupApi.json#/ById"
+    },
+    "/task/": {
+      "$ref": "./paths/TaskApi.json#/All"
+    },
+    "/task/{task_Id}": {
+      "$ref": "./paths/TaskApi.json#/ById"
+    },
+    "/monitoring/task/queued": {
+      "$ref": "./paths/MonitoringApi.json#/Queued"
+    },
+    "/monitoring/task/waiting": {
+      "$ref": "./paths/MonitoringApi.json#/Waiting"
+    },
+    "/monitoring/task/dispatched": {
+      "$ref": "./paths/MonitoringApi.json#/Dispatched"
+    },
+    "/monitoring/task/dispatched/error/count": {
+      "$ref": "./paths/MonitoringApi.json#/Errors"
+    },
+    "/monitoring/group/{group_Id}/tasks": {
+      "$ref": "./paths/MonitoringApi.json#/TasksByGroup"
+    },
+    "/monitoring/group/count": {
+      "$ref": "./paths/MonitoringApi.json#/GroupCount"
+    },
+    "/management/group/{group_Id}/start": {
+      "$ref": "./paths/ManagementApi.json#/GroupStart"
+    },
+    "/management/group/{group_Id}/stop": {
+      "$ref": "./paths/ManagementApi.json#/GroupStop"
+    },
+    "/management/scheduler/start": {
+      "$ref": "./paths/ManagementApi.json#/SchedulerStart"
+    },
+    "/management/scheduler/stop": {
+      "$ref": "./paths/ManagementApi.json#/SchedulerStop"
+    }
+  },
+  "components": {
+    "responses": {
+      "200_Integer": {
+        "$ref": "./components/Responses.json#/200_Integer"
+      },
+      "200_TaskList": {
+        "$ref": "./components/Responses.json#/200_TaskList"
+      },
+      "200_GroupList": {
+        "$ref": "./components/Responses.json#/200_GroupList"
+      },
+      "401": {
+        "$ref": "./components/Responses.json#/401"
+      }
+    },
+    "schemas": {
+      "TaskModel": {
+        "$ref": "./components/Schemas.json#/TaskModel"
+      },
+      "GroupModel": {
+        "$ref": "./components/Schemas.json#/GroupModel"
+      },
+      "ErrorModel": {
+        "$ref": "./components/Schemas.json#/ErrorModel"
+      },
+      "ResponseModel": {
+        "$ref": "./components/Schemas.json#/ResponseModel"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}
