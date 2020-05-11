@@ -22,8 +22,8 @@ public class TaskController {
     @Autowired
     PostgresExampleService postgresExampleService;
 
-    @GetMapping("/")
+    /*@GetMapping("/")
     public List<Task> getAllTasks() {
         return postgresExampleService.getAllTasks();
-    }
+    }*/
 }

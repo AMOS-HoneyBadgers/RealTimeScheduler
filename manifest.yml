@@ -6,3 +6,5 @@ applications:
     instances: 1
     memory: 1G
     path: target/realtimescheduler-0.0.1-SNAPSHOT.jar
+    services:
+      - dispatch
