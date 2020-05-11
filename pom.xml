@@ -172,6 +172,7 @@
                         <exclude>com/honeybadgers/realtimescheduler/services/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/web/TaskController*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/web/UserController*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/web/HelloWorldController*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/RealtimeschedulerApplication*</exclude>
                     </excludes>
                 </configuration>
