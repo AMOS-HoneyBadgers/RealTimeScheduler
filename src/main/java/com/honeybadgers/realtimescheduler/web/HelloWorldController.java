@@ -1,21 +1,33 @@
 package com.honeybadgers.realtimescheduler.web;
 
+import com.honeybadgers.realtimescheduler.domain.jpa.Task;
+import com.honeybadgers.realtimescheduler.services.RabbitMQSender;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/test")
 @Slf4j
 public class HelloWorldController {
 
+
+    @Autowired
+    RabbitMQSender rabbitMQSender;
+
     @GetMapping("/hello")
-    public String getHelloWorld() {
+    public String getHealth() {
         return "Hello World";
     }
 
-    @GetMapping("/error")
+    @GetMapping("/rabbit")
+    public String getRabbit() {
+        rabbitMQSender.send("rabbit");
+
+        return "Send Rabbit";
+    }
+    /*@GetMapping("/error")
     public ResponseEntity<?> getError() {
         return ResponseEntity.badRequest().build();
     }
@@ -34,6 +46,6 @@ public class HelloWorldController {
     public ResponseEntity<?> loggingBody(@RequestBody String logBody) {
         log.info(logBody);
         return ResponseEntity.accepted().build();
-    }
+    }*/
 
 }
