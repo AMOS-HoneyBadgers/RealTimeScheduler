@@ -26,6 +26,9 @@
     "/monitoring/task/queued": {
       "$ref": "./paths/MonitoringApi.json#/Queued"
     },
+    "/monitoring/task/waiting": {
+      "$ref": "./paths/MonitoringApi.json#/Waiting"
+    },
     "/monitoring/task/dispatched": {
       "$ref": "./paths/MonitoringApi.json#/Dispatched"
     },

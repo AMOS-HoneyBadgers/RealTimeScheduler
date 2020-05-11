@@ -153,7 +153,7 @@
                             <generatorName>spring</generatorName>
                             <output>${project.basedir}/../openapi-generated/</output>
                             <library>spring-boot</library>
-                            <!-<configHelp>true</configHelp>->
+
                             <configOptions>
                                 <java8>true</java8>
                                 <dateLibrary>java8</dateLibrary>

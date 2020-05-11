@@ -17,6 +17,24 @@
       ]
     }
   },
+  "Waiting": {
+    "get": {
+      "description": "Returns an Array with all Tasks currently waiting to be scheduled",
+      "responses": {
+        "200": {
+          "$ref": "../Api.json#/components/responses/200_TaskList"
+        },
+        "401": {
+          "$ref": "../Api.json#/components/responses/401"
+        }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
+    }
+  },
   "Dispatched": {
     "get": {
       "description": "Returns an Array with all Tasks currently waiting for feedback from dispatcher",
