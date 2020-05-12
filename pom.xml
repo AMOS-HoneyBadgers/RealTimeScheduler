@@ -157,10 +157,19 @@
                             <generatorName>spring</generatorName>
                             <output>${project.basedir}/../openapi-generated/</output>
                             <library>spring-boot</library>
-
                             <configOptions>
                                 <java8>true</java8>
                                 <dateLibrary>java8</dateLibrary>
+                                <title>Realtimescheduler Api</title>
+                                <licenseName>MIT</licenseName>
+                                <developerName>The Honeybadgers</developerName>
+                                <groupId>com.honeybadgers</groupId>
+                                <artifactId>realtimescheduler-api</artifactId>
+                                <basePackage>com.honeybadgers</basePackage>
+                                <apiPackage>com.honeybadgers.controllers</apiPackage>
+                                <invokerPackage>com.honeybadgers.controllers</invokerPackage>
+                                <configPackage>com.honeybadgers.configuration</configPackage>
+                                <modelPackage>com.honeybadgers.models</modelPackage>
                             </configOptions>
                         </configuration>
                     </execution>

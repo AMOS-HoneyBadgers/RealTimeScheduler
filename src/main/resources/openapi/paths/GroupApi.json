@@ -19,7 +19,7 @@
     "post": {
       "description": "Create new group and store in Database",
       "requestBody": {
-        "description": "group object",
+        "description": "new group object",
         "required": true,
         "content": {
           "application/json": {
@@ -190,7 +190,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../Api.json#/components/schemas/ResponseModel"
+                "$ref": "../Api.json#/components/schemas/GroupModel"
               }
             }
           }

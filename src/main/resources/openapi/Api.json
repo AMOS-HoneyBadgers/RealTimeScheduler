@@ -1,9 +1,13 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Api",
-    "description": "Api",
-    "version": "1.0.0"
+    "title": "Realtime Scheduler Api",
+    "description": "Apis for Realtime Scheduler Application",
+    "version": "1.0.0",
+    "license": {
+      "name": "MIT",
+      "url": "https://en.wikipedia.org/wiki/MIT_License"
+    }
   },
   "servers": [
     {
@@ -23,8 +27,8 @@
     "/task/{task_Id}": {
       "$ref": "./paths/TaskApi.json#/ById"
     },
-    "/monitoring/task/queued": {
-      "$ref": "./paths/MonitoringApi.json#/Queued"
+    "/monitoring/task/scheduled": {
+      "$ref": "./paths/MonitoringApi.json#/Scheduled"
     },
     "/monitoring/task/waiting": {
       "$ref": "./paths/MonitoringApi.json#/Waiting"
@@ -32,7 +36,7 @@
     "/monitoring/task/dispatched": {
       "$ref": "./paths/MonitoringApi.json#/Dispatched"
     },
-    "/monitoring/task/dispatched/error/count": {
+    "/monitoring/task/dispatched/errors": {
       "$ref": "./paths/MonitoringApi.json#/Errors"
     },
     "/monitoring/group/{group_Id}/tasks": {

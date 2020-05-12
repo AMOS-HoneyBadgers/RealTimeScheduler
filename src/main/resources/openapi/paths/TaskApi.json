@@ -19,7 +19,7 @@
     "post": {
       "description": "Create new task and store in Database",
       "requestBody": {
-        "description": "Task object",
+        "description": "new task object",
         "required": true,
         "content": {
           "application/json": {
@@ -190,7 +190,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "../Api.json#/components/schemas/ResponseModel"
+                "$ref": "../Api.json#/components/schemas/TaskModel"
               }
             }
           }
