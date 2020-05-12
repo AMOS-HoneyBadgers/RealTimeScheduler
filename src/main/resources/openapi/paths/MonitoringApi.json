@@ -1,7 +1,7 @@
 {
-  "Queued": {
+  "Scheduled": {
     "get": {
-      "description": "Returns an Array with all Tasks currently being scheduled",
+      "description": "Returns an Array with all Tasks already being scheduled",
       "responses": {
         "200": {
           "$ref": "../Api.json#/components/responses/200_TaskList"
@@ -55,10 +55,10 @@
   },
   "Errors": {
     "get": {
-      "description": "Returns the number of tasks with error-feedback from dispatcher",
+      "description": "Returns an array of tasks with error-feedback from dispatcher",
       "responses": {
         "200": {
-          "$ref": "../Api.json#/components/responses/200_Integer"
+          "$ref": "../Api.json#/components/responses/200_TaskList"
         },
         "401": {
           "$ref": "../Api.json#/components/responses/401"

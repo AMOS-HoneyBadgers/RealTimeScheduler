@@ -1,17 +1,22 @@
 {
   "200_Integer" : {
-    "description": "OK",
+    "description": "OK - Returns an integer",
     "content": {
       "application/json": {
         "schema": {
-          "type": "integer",
-          "format" : "int64"
+          "type": "object",
+          "properties": {
+            "number": {
+              "type": "integer",
+              "format" : "int64"
+            }
+          }
         }
       }
     }
   },
   "200_TaskList" : {
-    "description": "OK",
+    "description": "OK - List of tasks",
     "content": {
       "application/json": {
         "schema": {
@@ -24,7 +29,7 @@
     }
   },
   "200_GroupList" : {
-    "description": "OK",
+    "description": "OK - List of groups",
     "content": {
       "application/json": {
         "schema": {
