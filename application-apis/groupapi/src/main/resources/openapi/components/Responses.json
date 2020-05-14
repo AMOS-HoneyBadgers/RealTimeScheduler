@@ -1,0 +1,25 @@
+{
+  "200_GroupList" : {
+    "description": "OK - List of groups",
+    "content": {
+      "application/json": {
+        "schema": {
+          "type": "array",
+          "items": {
+            "$ref": "./Schemas.json#/GroupModel"
+          }
+        }
+      }
+    }
+  },
+  "401": {
+    "description": "Unauthorized",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "./Schemas.json#/ErrorModel"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "401": {
+    "description": "Unauthorized",
+    "content": {
+      "application/json": {
+        "schema": {
+          "$ref": "./Schemas.json#/ErrorModel"
+        }
+      }
+    }
+  }
+}
