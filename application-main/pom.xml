@@ -3,38 +3,73 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.6.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
+        <groupId>com.honeybadgers</groupId>
+        <artifactId>realtimescheduler</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
-    <groupId>com.honeybadgers</groupId>
-    <artifactId>realtimescheduler</artifactId>
+    <artifactId>realtimescheduler-main</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>realtimescheduler</name>
+    <name>realtimescheduler-main</name>
     <description>Realtime Scheduler for AMOS</description>
-    <packaging>pom</packaging>
+    <packaging>jar</packaging>
 
     <properties>
-        <java.version>11</java.version>
-        <spring-cloud.version>Hoxton.SR4</spring-cloud.version>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
         <surefire.version>2.19.1</surefire.version>
-        <springfox-version>2.8.0</springfox-version>
     </properties>
 
     <dependencies>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.12</version>
-            <optional>true</optional>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jdbc</artifactId>
+            <version>2.2.6.RELEASE</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
             <version>2.2.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-redis</artifactId>
+            <version>2.2.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-jdbc</artifactId>
+            <version>2.2.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <version>2.2.6.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-cloudfoundry-discovery</artifactId>
+            <version>2.2.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-amqp</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.2.12</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+            <version>1.4.200</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/it.ozimov/embedded-redis -->
+        <dependency>
+            <groupId>it.ozimov</groupId>
+            <artifactId>embedded-redis</artifactId>
+            <version>0.7.1</version>
             <scope>test</scope>
         </dependency>
         <!-- Bean Validation API support -->
@@ -42,43 +77,6 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
             <version>2.0.1.Final</version>
-        </dependency>
-
-
-
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <!--SpringFox dependencies -->
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>${springfox-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>${springfox-version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.2.11</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.datatype</groupId>
-            <artifactId>jackson-datatype-jsr310</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.openapitools</groupId>
-            <artifactId>jackson-databind-nullable</artifactId>
-            <version>0.1.0</version>
-        </dependency>
-        <!-- Bean Validation API support -->
-        <dependency>
-            <groupId>javax.validation</groupId>
-            <artifactId>validation-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -94,30 +92,47 @@
         </dependencies>
     </dependencyManagement>
 
-    <!-- sub modules -->
-    <modules>
-        <module>application-main</module>
-        <module>application-apis</module>
-    </modules>
-
     <build>
         <plugins>
-            <plugin>
+            <!--<plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>-->
+
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>4.3.1</version>
                 <executions>
                     <execution>
-                        <id>main</id>
                         <goals>
-                            <goal>repackage</goal>
+                            <goal>generate</goal>
                         </goals>
                         <configuration>
-                            <mainClass>com.honeybadgers.</mainClass>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/MonitoringApi.json</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/../application-apis/monitoringapi/</output>
+                            <library>spring-boot</library>
+                            <configOptions>
+                                <java8>true</java8>
+                                <dateLibrary>java8</dateLibrary>
+                                <title>Realtimescheduler Monitoring Api</title>
+                                <licenseName>MIT</licenseName>
+                                <developerName>The Honeybadgers</developerName>
+                                <groupId>com.honeybadgers</groupId>
+                                <artifactId>realtimescheduler-monitoringapi</artifactId>
+                                <basePackage>com.honeybadgers.api</basePackage>
+                                <apiPackage>com.honeybadgers.api.controllers</apiPackage>
+                                <invokerPackage>com.honeybadgers.api.controllers</invokerPackage>
+                                <configPackage>com.honeybadgers.api.configuration</configPackage>
+                                <modelPackage>com.honeybadgers.api.models</modelPackage>
+                            </configOptions>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-            <!--<plugin>
+
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.19.1</version>
@@ -131,7 +146,7 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.5</version>
                 <executions>
-                    <- set arg line property for surefire ->
+                    <!-- set arg line property for surefire -->
                     <execution>
                         <id>prepare-agent</id>
                         <goals>
@@ -166,6 +181,7 @@
                                         </limit>
                                     </limits>
                                 </rule>
+                                <!--https://www.eclemma.org/jacoco/trunk/doc/counters.html-->
 
                             </rules>
                         </configuration>
@@ -201,7 +217,7 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>-->
+            </plugin>
         </plugins>
     </build>
 

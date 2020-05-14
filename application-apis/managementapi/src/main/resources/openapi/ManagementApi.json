@@ -1,0 +1,52 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Realtime Scheduler Api",
+    "description": "Apis for Realtime Scheduler Application",
+    "version": "1.0.0",
+    "license": {
+      "name": "MIT",
+      "url": "https://en.wikipedia.org/wiki/MIT_License"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://realtimescheduler.cfapps.io/api/management"
+    }
+  ],
+  "paths": {
+    "/group/{group_Id}/start": {
+      "$ref": "./paths/ManagementApi.json#/GroupStart"
+    },
+    "/group/{group_Id}/stop": {
+      "$ref": "./paths/ManagementApi.json#/GroupStop"
+    },
+    "/scheduler/start": {
+      "$ref": "./paths/ManagementApi.json#/SchedulerStart"
+    },
+    "/scheduler/stop": {
+      "$ref": "./paths/ManagementApi.json#/SchedulerStop"
+    }
+  },
+  "components": {
+    "responses": {
+      "401": {
+        "$ref": "./components/Responses.json#/401"
+      }
+    },
+    "schemas": {
+      "ErrorModel": {
+        "$ref": "./components/Schemas.json#/ErrorModel"
+      },
+      "ResponseModel": {
+        "$ref": "./components/Schemas.json#/ResponseModel"
+      }
+    },
+    "securitySchemes": {
+      "basicAuth": {
+        "type": "http",
+        "scheme": "basic"
+      }
+    }
+  }
+}

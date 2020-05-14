@@ -1,0 +1,55 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>realtimescheduler-managementapi</artifactId>
+    <packaging>jar</packaging>
+    <name>realtimescheduler-managementapi</name>
+    <parent>
+        <groupId>com.honeybadgers</groupId>
+        <artifactId>realtimescheduler-apis</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            <!--<plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>-->
+
+            <!--<plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>4.3.1</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/src/main/resources/openapi/ManagementApi.json</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}</output>
+                            <library>spring-boot</library>
+                            <configOptions>
+                                <java8>true</java8>
+                                <dateLibrary>java8</dateLibrary>
+                                <title>Realtimescheduler Management Api</title>
+                                <licenseName>MIT</licenseName>
+                                <developerName>The Honeybadgers</developerName>
+                                <groupId>com.honeybadgers</groupId>
+                                <artifactId>realtimescheduler-managementapi</artifactId>
+                                <basePackage>com.honeybadgers.api</basePackage>
+                                <apiPackage>com.honeybadgers.api.controllers</apiPackage>
+                                <invokerPackage>com.honeybadgers.api.controllers</invokerPackage>
+                                <configPackage>com.honeybadgers.api.configuration</configPackage>
+                                <modelPackage>com.honeybadgers.api.models</modelPackage>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>-->
+        </plugins>
+    </build>
+    <dependencies>
+    </dependencies>
+</project>
