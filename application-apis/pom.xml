@@ -1,41 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <artifactId>realtimescheduler-apis</artifactId>
+    <parent>
+        <groupId>com.honeybadgers</groupId>
+        <artifactId>realtimescheduler</artifactId>
+        <version>0.0.1-SNAPSHOT</version>
+    </parent>
     <name>realtimescheduler-apis</name>
     <packaging>pom</packaging>
 
     <properties>
         <springfox-version>2.8.0</springfox-version>
     </properties>
-    <parent>
-        <groupId>com.honeybadgers</groupId>
-        <artifactId>realtimescheduler</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-    </parent>
-    <build>
-        <sourceDirectory>src/main/java</sourceDirectory>
-        <plugins>
-            <!--<plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>-->
-        </plugins>
-    </build>
-
-    <!-- sub modules -->
-    <modules>
-        <module>groupapi</module>
-        <module>managementapi</module>
-        <module>monitoringapi</module>
-        <module>taskapi</module>
-    </modules>
 
     <dependencies>
         <dependency>
@@ -73,4 +49,176 @@
             <artifactId>validation-api</artifactId>
         </dependency>
     </dependencies>
+
+    <!-- sub modules -->
+    <modules>
+        <module>groupapi</module>
+        <module>managementapi</module>
+        <module>monitoringapi</module>
+        <module>taskapi</module>
+    </modules>
+
+    <build>
+        <sourceDirectory>src/main/java</sourceDirectory>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.openapitools</groupId>
+                <artifactId>openapi-generator-maven-plugin</artifactId>
+                <version>4.3.1</version>
+                <executions>
+                    <execution>
+                        <id>GroupApi</id>
+                        <inherited>false</inherited>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi/GroupApi.json</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/groupapi</output>
+                            <library>spring-boot</library>
+                            <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <generateApiTests>true</generateApiTests>
+                            <generateModelTests>true</generateModelTests>
+                            <configOptions>
+                                <java8>true</java8>
+                                <dateLibrary>java8</dateLibrary>
+                                <interfaceOnly>true</interfaceOnly>
+                                <title>Realtimescheduler Group Api</title>
+                                <licenseName>MIT</licenseName>
+                                <developerName>The Honeybadgers</developerName>
+                                <groupId>com.honeybadgers</groupId>
+                                <artifactId>realtimescheduler-groupapi</artifactId>
+                                <parentArtifactId>realtimescheduler-apis</parentArtifactId>
+                                <parentGroupId>com.honeybadgers</parentGroupId>
+                                <parentVersion>0.0.1-SNAPSHOT</parentVersion>
+                                <basePackage>com.honeybadgers.groupapi</basePackage>
+                                <apiPackage>com.honeybadgers.groupapi.controllers</apiPackage>
+                                <invokerPackage>com.honeybadgers.groupapi.controllers</invokerPackage>
+                                <configPackage>com.honeybadgers.groupapi.configuration</configPackage>
+                                <modelPackage>com.honeybadgers.groupapi.models</modelPackage>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>TaskApi</id>
+                        <inherited>false</inherited>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi/TaskApi.json</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/taskapi</output>
+                            <library>spring-boot</library>
+                            <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <generateApiTests>true</generateApiTests>
+                            <generateModelTests>true</generateModelTests>
+                            <configOptions>
+                                <java8>true</java8>
+                                <dateLibrary>java8</dateLibrary>
+                                <interfaceOnly>true</interfaceOnly>
+                                <title>Realtimescheduler Task Api</title>
+                                <licenseName>MIT</licenseName>
+                                <developerName>The Honeybadgers</developerName>
+                                <groupId>com.honeybadgers</groupId>
+                                <artifactId>realtimescheduler-taskapi</artifactId>
+                                <parentArtifactId>realtimescheduler-apis</parentArtifactId>
+                                <parentGroupId>com.honeybadgers</parentGroupId>
+                                <parentVersion>0.0.1-SNAPSHOT</parentVersion>
+                                <basePackage>com.honeybadgers.taskapi</basePackage>
+                                <apiPackage>com.honeybadgers.taskapi.controllers</apiPackage>
+                                <invokerPackage>com.honeybadgers.taskapi.controllers</invokerPackage>
+                                <configPackage>com.honeybadgers.taskapi.configuration</configPackage>
+                                <modelPackage>com.honeybadgers.taskapi.models</modelPackage>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>ManagementApi</id>
+                        <inherited>false</inherited>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi/ManagementApi.json</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/managementapi</output>
+                            <library>spring-boot</library>
+                            <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <generateApiTests>true</generateApiTests>
+                            <generateModelTests>true</generateModelTests>
+                            <configOptions>
+                                <java8>true</java8>
+                                <dateLibrary>java8</dateLibrary>
+                                <interfaceOnly>true</interfaceOnly>
+                                <title>Realtimescheduler Management Api</title>
+                                <licenseName>MIT</licenseName>
+                                <developerName>The Honeybadgers</developerName>
+                                <groupId>com.honeybadgers</groupId>
+                                <artifactId>realtimescheduler-managementapi</artifactId>
+                                <parentArtifactId>realtimescheduler-apis</parentArtifactId>
+                                <parentGroupId>com.honeybadgers</parentGroupId>
+                                <parentVersion>0.0.1-SNAPSHOT</parentVersion>
+                                <basePackage>com.honeybadgers.managementapi</basePackage>
+                                <apiPackage>com.honeybadgers.managementapi.controllers</apiPackage>
+                                <invokerPackage>com.honeybadgers.managementapi.controllers</invokerPackage>
+                                <configPackage>com.honeybadgers.managementapi.configuration</configPackage>
+                                <modelPackage>com.honeybadgers.managementapi.models</modelPackage>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>MonitoringApi</id>
+                        <inherited>false</inherited>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <inputSpec>${project.basedir}/openapi/MonitoringApi.json</inputSpec>
+                            <generatorName>spring</generatorName>
+                            <output>${project.basedir}/monitoringapi</output>
+                            <library>spring-boot</library>
+                            <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
+                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <generateApiTests>true</generateApiTests>
+                            <generateModelTests>true</generateModelTests>
+                            <configOptions>
+                                <java8>true</java8>
+                                <dateLibrary>java8</dateLibrary>
+                                <interfaceOnly>true</interfaceOnly>
+                                <title>Realtimescheduler Monitoring Api</title>
+                                <licenseName>MIT</licenseName>
+                                <developerName>The Honeybadgers</developerName>
+                                <groupId>com.honeybadgers</groupId>
+                                <artifactId>realtimescheduler-monitoringapi</artifactId>
+                                <parentArtifactId>realtimescheduler-apis</parentArtifactId>
+                                <parentGroupId>com.honeybadgers</parentGroupId>
+                                <parentVersion>0.0.1-SNAPSHOT</parentVersion>
+                                <basePackage>com.honeybadgers.monitoringapi</basePackage>
+                                <apiPackage>com.honeybadgers.monitoringapi.controllers</apiPackage>
+                                <invokerPackage>com.honeybadgers.monitoringapi.controllers</invokerPackage>
+                                <configPackage>com.honeybadgers.monitoringapi.configuration</configPackage>
+                                <modelPackage>com.honeybadgers.monitoringapi.models</modelPackage>
+                            </configOptions>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
