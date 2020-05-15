@@ -7,31 +7,38 @@
     ],
     "properties": {
       "id": {
+        "description": "Primary id of task object",
         "type": "string",
         "format": "uuid"
       },
       "groupId": {
+        "description": "Id of group this task is assigned to",
         "type": "string",
         "format": "uuid"
       },
       "priority": {
+        "description": "Priority of this task for scheduling",
         "type": "integer",
         "minimum": 0,
         "maximum": 999
       },
       "earliestStart": {
+        "description": "Time, by which this task is allowed to be dispatched at earliest",
         "type": "string",
         "format": "partial-time"
       },
       "latestStart": {
+        "description": "Time, by which this task has to be dispatched at latest",
         "type": "string",
         "format": "partial-time"
       },
       "workingDays": {
+        "description": "Days for processing",
         "type": "integer",
         "minimum": 1
       },
       "typeFlag": {
+        "description": "Type of this task (relevant for scheduling)",
         "type": "string",
         "enum": [
           "batch",
@@ -39,6 +46,7 @@
         ]
       },
       "maxFailures": {
+        "description": "Maximum number of failures this task is allowed to fail",
         "type": "integer",
         "minimum": 0
       },
@@ -60,7 +68,7 @@
         "type": "boolean"
       },
       "parallelismDegree": {
-        "description": "[only with mode = parallel]Number of tasks allowed to be executed at the same time",
+        "description": "[only with mode = parallel] Number of tasks allowed to be executed at the same time",
         "type": "integer"
       },
       "meta": {
@@ -88,19 +96,23 @@
     ],
     "properties": {
       "id": {
+        "description": "Primary id of task object",
         "type": "string",
         "format": "uuid"
       },
       "parentId": {
+        "description": "Id of parent group object",
         "type": "string",
         "format": "uuid"
       },
       "priority": {
+        "description": "Priority of this task for scheduling",
         "type": "integer",
         "minimum": 0,
         "maximum": 999
       },
       "typeFlag": {
+        "description": "Type of this task (relevant for scheduling)",
         "type": "string",
         "enum": [
           "batch",
@@ -108,10 +120,12 @@
         ]
       },
       "paused": {
+        "description": "Boolean, which identifies, whereas this group (and all of its tasks) are currently paused",
         "type": "boolean",
         "default": "false"
       },
       "maxFailures": {
+        "description": "Maximum number of failures this task is allowed to fail",
         "type": "integer",
         "minimum": 0
       },
@@ -133,7 +147,7 @@
         "type": "boolean"
       },
       "parallelismDegree": {
-        "description": "[only with mode = parallel]Number of tasks allowed to be executed at the same time",
+        "description": "[only with mode = parallel] Number of tasks allowed to be executed at the same time",
         "type": "integer"
       }
     }
