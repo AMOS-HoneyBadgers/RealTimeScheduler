@@ -26,7 +26,7 @@ public class TaskController {
         return this.taskService.getAllTasks();
     }
 
-    @PostMapping("/post",consumes = {MediaType.APPLICATION_JSON_VALUE})
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/post")
     public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
         if(this.taskService.uploadTask(task))
             return ResponseEntity.ok().build();
