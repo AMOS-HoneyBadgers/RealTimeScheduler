@@ -1,6 +1,5 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.realtimescheduler.domain.jpa.Task;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
