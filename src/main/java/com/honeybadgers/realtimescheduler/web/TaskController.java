@@ -5,6 +5,7 @@ import com.honeybadgers.realtimescheduler.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class TaskController {
         return this.taskService.getAllTasks();
     }
 
-    @PostMapping("/post")
+    @PostMapping("/post",consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
         if(this.taskService.uploadTask(task))
             return ResponseEntity.ok().build();

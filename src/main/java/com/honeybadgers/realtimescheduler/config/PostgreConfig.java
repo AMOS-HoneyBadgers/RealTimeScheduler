@@ -9,5 +9,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EnableJpaRepositories(basePackages = {"com.honeybadgers.realtimescheduler.repository"}) // enable all jpa repositories in the given paths
+@EnableAutoConfiguration
 public class PostgreConfig {
 }
