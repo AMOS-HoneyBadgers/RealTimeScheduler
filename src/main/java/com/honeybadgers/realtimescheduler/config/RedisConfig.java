@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.config;
 
-import com.honeybadgers.realtimescheduler.domain.jpa.Task;
+import com.honeybadgers.realtimescheduler.model.Task;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -15,8 +15,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 
 @Configuration
-@Profile({"redis"})
-@EnableRedisRepositories(basePackages = {"com.honeybadgers.realtimescheduler.repository.redis"})
+@EnableRedisRepositories(basePackages = {"com.honeybadgers.realtimescheduler.repository"})
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class, DataSourceTransactionManagerAutoConfiguration.class, HibernateJpaAutoConfiguration.class})
 public class RedisConfig {
 
