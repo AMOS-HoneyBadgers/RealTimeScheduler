@@ -1,5 +1,7 @@
 package com.honeybadgers.taskapi.controllers;
 
+import com.honeybadgers.taskapi.models.TaskModel;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -22,4 +24,8 @@ public class TaskIdApiController implements TaskIdApi {
         return Optional.ofNullable(request);
     }
 
+    @Override
+    public ResponseEntity<TaskModel> taskIdGet(Long taskId) {
+        return ResponseEntity.ok(new TaskModel());
+    }
 }
