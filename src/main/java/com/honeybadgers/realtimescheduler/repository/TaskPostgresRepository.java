@@ -5,6 +5,7 @@ import io.lettuce.core.dynamic.annotation.Param;
 import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
