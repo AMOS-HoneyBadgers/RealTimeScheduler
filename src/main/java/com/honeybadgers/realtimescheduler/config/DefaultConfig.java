@@ -8,9 +8,11 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerA
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.EnableScheduling;
 
 @Configuration
 @Profile({"!postgre & !redis"})
+@EnableScheduling
 @EnableAutoConfiguration(exclude = {
         RedisAutoConfiguration.class,
         RedisRepositoriesAutoConfiguration.class,
