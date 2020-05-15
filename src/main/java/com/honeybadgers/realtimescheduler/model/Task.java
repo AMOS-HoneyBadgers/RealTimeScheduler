@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 import java.util.Set;
 
 @Entity
-@Table(name = "task")
+@Table(name = "tasks")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -20,5 +20,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    private String name;
 
 }
