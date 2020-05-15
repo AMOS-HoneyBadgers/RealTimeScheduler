@@ -19,4 +19,12 @@ public class TaskService {
     public List<Task> getAllTasks() {
         return this.taskPostgresRepository.findAll();
     }
+
+
+    public boolean uploadTask(Task task) {
+        Task s = this.taskPostgresRepository.save(task);
+        if(s == null)
+            return false;
+        return true;
+    }
 }

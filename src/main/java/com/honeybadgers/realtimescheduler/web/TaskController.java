@@ -5,11 +5,10 @@ import com.honeybadgers.realtimescheduler.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -24,5 +23,12 @@ public class TaskController {
     @GetMapping("/all")
     public List<Task> getAllTasks() {
         return this.taskService.getAllTasks();
+    }
+
+    @PostMapping("/post")
+    public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
+        if(this.taskService.uploadTask(task))
+            return ResponseEntity.ok().build();
+        return ResponseEntity.badRequest().build();
     }
 }
