@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @Slf4j
-@EnableJpaRepositories
 public class RealtimeschedulerApplication {
 
     public static void main(String[] args) {
