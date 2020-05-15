@@ -105,6 +105,7 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <inherited>false</inherited>
                 <executions>
                     <execution>
                         <id>main</id>
@@ -112,7 +113,43 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>com.honeybadgers.</mainClass>
+                            <mainClass>com.honeybadgers.realtimescheduler.RealtimeschedulerApplication</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>groupapi</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.honeybadgers.groupapi.OpenAPI2SpringBoot</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>taskapi</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.honeybadgers.taskapi.OpenAPI2SpringBoot</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>managementapi</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.honeybadgers.managementapi.OpenAPI2SpringBoot</mainClass>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>monitoringapi</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <mainClass>com.honeybadgers.monitoringapi.OpenAPI2SpringBoot</mainClass>
                         </configuration>
                     </execution>
                 </executions>
