@@ -15,9 +15,9 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
-@Configuration
-@EnableAutoConfiguration
-@ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
+//@Configuration
+//@EnableAutoConfiguration
+//@ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
 public class RabbitMQConfig {
     @Value("${dispatch.rabbitmq.queue}")
     String queueName;
