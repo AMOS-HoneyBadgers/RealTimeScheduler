@@ -7,8 +7,10 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Set;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tasks")
@@ -18,9 +20,9 @@ import java.util.Set;
 @NoArgsConstructor
 public class Task {
     @Id
-    @Column(name="id")
+    @Column(name="id", unique = true, nullable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private String id;
 
     @Column(name="name")
     private String name;
