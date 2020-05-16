@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+@Profile({"!redis"})
 public interface TaskPostgresRepository extends JpaRepository<Task, Long> {
     Optional<Task> findById(Long id);
 }
