@@ -8,8 +8,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
-@Profile("postgre")
-@EnableJpaRepositories(basePackages = {"com.honeybadgers.realtimescheduler.repository.jpa"})            // enable all jpa repositories in the given paths
-@EnableAutoConfiguration(exclude = {RedisAutoConfiguration.class, RedisRepositoriesAutoConfiguration.class})// disable redis configuration
+@EnableJpaRepositories(basePackages = {"com.honeybadgers.realtimescheduler.repository"}) // enable all jpa repositories in the given paths
+@EnableAutoConfiguration
 public class PostgreConfig {
 }
