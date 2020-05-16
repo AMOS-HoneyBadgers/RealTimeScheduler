@@ -1,0 +1,14 @@
+# Technology Decision
+
+
+This Document is supposed to archive and document the technology and architecture decision that where made throughout the AMOS 2020 Project.
+
+### Cloud Foundry
+
+- We will use Pivotal Web Services, since it is very easy to deploy and add various services like databases,mq etc. Also the DEV-Team got some previous experience with the platform.
+
+### Communication
+
+- CRUD Operations for Tasks, Groups etc. will be exposed through an open REST API
+- For internal communication and handing off tasks to dispatcher, we decided to build a generic interface of event driven patterns, technologies like kafka or mq can be used and swaped within the interface
+
