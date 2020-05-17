@@ -21,10 +21,11 @@ public class TaskService {
     }
 
 
-    public boolean uploadTask(Task task) {
+    public void uploadTask(Task task) {
         Task s = this.taskPostgresRepository.save(task);
-        if(s == null)
-            return false;
-        return true;
+    }
+
+    public void deleteTask(String id) {
+        this.taskPostgresRepository.deleteById(id);
     }
 }
