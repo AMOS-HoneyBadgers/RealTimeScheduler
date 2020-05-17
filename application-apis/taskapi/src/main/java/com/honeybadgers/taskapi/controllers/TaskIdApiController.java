@@ -1,6 +1,8 @@
 package com.honeybadgers.taskapi.controllers;
 
 import com.honeybadgers.taskapi.models.TaskModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -11,6 +13,8 @@ import java.util.Optional;
 @Controller
 @RequestMapping("${openapi.Realtimescheduler Task Api.base-path:/api/task}")
 public class TaskIdApiController implements TaskIdApi {
+
+    final static Logger logger = LogManager.getLogger(TaskIdApiController.class);
 
     private final NativeWebRequest request;
 
@@ -26,6 +30,7 @@ public class TaskIdApiController implements TaskIdApi {
 
     @Override
     public ResponseEntity<TaskModel> taskIdGet(Long taskId) {
+        logger.info("Test taskIdGet with taskId: {}", () -> taskId);
         return ResponseEntity.ok(new TaskModel());
     }
 }
