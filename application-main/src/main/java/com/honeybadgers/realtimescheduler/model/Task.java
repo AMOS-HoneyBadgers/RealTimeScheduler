@@ -21,7 +21,6 @@ import java.util.UUID;
 public class Task {
     @Id
     @Column(name="id", unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
 
     @Column(name="name")
