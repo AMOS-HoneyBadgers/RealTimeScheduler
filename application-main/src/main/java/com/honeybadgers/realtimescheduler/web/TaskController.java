@@ -1,6 +1,8 @@
 package com.honeybadgers.realtimescheduler.web;
 
+import com.honeybadgers.realtimescheduler.model.Group;
 import com.honeybadgers.realtimescheduler.model.Task;
+import com.honeybadgers.realtimescheduler.services.GroupService;
 import com.honeybadgers.realtimescheduler.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,22 +16,61 @@ import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/tasks")        // only initialize if one of the given profiles is active
+@RequestMapping("/data")        // only initialize if one of the given profiles is active
 @Slf4j
 public class TaskController {
 
     @Autowired
     TaskService taskService;
 
-    @GetMapping("/all")
+    @Autowired
+    GroupService groupService;
+
+    @GetMapping("/task")
     public List<Task> getAllTasks() {
         return this.taskService.getAllTasks();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/post")
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
     public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
-        if(this.taskService.uploadTask(task))
-            return ResponseEntity.ok().build();
-        return ResponseEntity.badRequest().build();
+        this.taskService.uploadTask(task);
+        return ResponseEntity.ok().build();
     }
+
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
+    public ResponseEntity<?> updateTask(@Valid @RequestBody Task task) {
+        this.taskService.uploadTask(task);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value="/task/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable(value="id") final String id) {
+        this.taskService.deleteTask(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/group")
+    public List<Group> getAllGroups() {
+        return this.groupService.getAllGroups();
+    }
+
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
+    public ResponseEntity<?> uploadGroup(@Valid @RequestBody Group grp) {
+        this.groupService.uploadGroup(grp);
+        return ResponseEntity.ok().build();
+    }
+
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
+    public ResponseEntity<?> updateGroup(@Valid @RequestBody Group grp) {
+        this.groupService.uploadGroup(grp);
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping(value="/group/{id}")
+    public ResponseEntity<?> deleteGroup(@PathVariable(value="id") final String id) {
+        this.groupService.deleteGroup(id);
+        return ResponseEntity.ok().build();
+    }
+
+
 }

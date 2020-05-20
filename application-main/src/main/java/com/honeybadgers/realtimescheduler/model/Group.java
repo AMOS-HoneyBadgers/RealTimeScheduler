@@ -13,12 +13,13 @@ import java.util.Set;
 import java.util.UUID;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "groups")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Task {
+public class Group {
+
     @Id
     @Column(name="id", unique = true, nullable = false)
     private String id;
