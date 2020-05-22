@@ -28,7 +28,7 @@ applications:
       - java_buildpack
     instances: 1
     memory: 1G
-    path: application-apis/monotoringapi/target/realtimescheduler-monotoringapi-1.0.0.jar
+    path: application-apis/monotoringapi/target/realtimescheduler-monitoringapi-1.0.0.jar
 
   - name: taskapi-amos
     buildpacks:
