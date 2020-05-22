@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,7 +64,11 @@ public interface GroupIdApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"mode\" : \"sequential\", \"maxFailures\" : 0, \"paused\" : false, \"parallelismDegree\" : 5, \"force\" : true, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"priority\" : 80, \"indexNumber\" : 0, \"parentId\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"typeFlag\" : \"batch\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    try {
+                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }
@@ -97,7 +102,11 @@ public interface GroupIdApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"mode\" : \"sequential\", \"maxFailures\" : 0, \"paused\" : false, \"parallelismDegree\" : 5, \"force\" : true, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"priority\" : 80, \"indexNumber\" : 0, \"parentId\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"typeFlag\" : \"batch\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    try {
+                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }
