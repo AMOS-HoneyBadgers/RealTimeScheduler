@@ -37,8 +37,8 @@ jobs:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
+            cf_org: CCC
+            cf_space: AMOS-EDI
             command: push realtimescheduler-amos
       - name: cloud foundry for groupapi project
         uses: citizen-of-planet-earth/cf-cli-action@master
@@ -46,8 +46,8 @@ jobs:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
+            cf_org: CCC
+            cf_space: AMOS-EDI
             command: push groupapi-amos
       - name: cloud foundry for managementapi-amos project
         uses: citizen-of-planet-earth/cf-cli-action@master
@@ -55,8 +55,8 @@ jobs:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
+            cf_org: CCC
+            cf_space: AMOS-EDI
             command: push managementapi-amos
       - name: cloud foundry for monitoringapi-amos project
         uses: citizen-of-planet-earth/cf-cli-action@master
@@ -64,8 +64,8 @@ jobs:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
+            cf_org: CCC
+            cf_space: AMOS-EDI
             command: push monitoringapi-amos
       - name: cloud foundry for taskapi project
         uses: citizen-of-planet-earth/cf-cli-action@master
@@ -73,8 +73,8 @@ jobs:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
+            cf_org: CCC
+            cf_space: AMOS-EDI
             command: push taskapi-amos
             
         
