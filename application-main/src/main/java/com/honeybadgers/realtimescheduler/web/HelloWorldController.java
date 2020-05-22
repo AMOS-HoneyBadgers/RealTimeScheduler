@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 public class HelloWorldController {
 
-    final static Logger logger = LogManager.getLogger(HelloWorldController.class);
+    static final Logger logger = LogManager.getLogger(HelloWorldController.class);
 
 
     @Autowired
