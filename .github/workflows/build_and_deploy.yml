@@ -27,8 +27,11 @@ jobs:
           java-version: 1.11
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
-      - name: Maven Verify
-        run: mvn -B clean verify
+      - name: Maven Verify with SonarScan
+        run: mvn -B clean verify sonar:sonar
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: cloud foundry for scheduler project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:

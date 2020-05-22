@@ -1,14 +1,16 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.services.RabbitMQSender;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@Slf4j
 public class HelloWorldController {
+
+    static final Logger logger = LogManager.getLogger(HelloWorldController.class);
 
 
     @Autowired
@@ -16,6 +18,10 @@ public class HelloWorldController {
 
     @GetMapping("/hello")
     public String getHealth() {
+        logger.info("Test info");
+        logger.debug("Test debug");
+        logger.warn("Test warn");
+        logger.error("Test error");
         return "Hello World";
     }
 

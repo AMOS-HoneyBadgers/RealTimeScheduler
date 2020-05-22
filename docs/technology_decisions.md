@@ -16,4 +16,7 @@ This Document is supposed to archive and document the technology and architectur
 ### Code Quality
  - In order to have a good Code quality, the devs agreed on a 95% test coverage
  - The coverage will be tested with jacoco and checked before every push via a githook
+ 
+### Data Storage
+ - We will use a combination of PostgreSQL and REDIS, because both data-bases have a pre-installed service on the Pivotal Cloud Foundry platform
 
