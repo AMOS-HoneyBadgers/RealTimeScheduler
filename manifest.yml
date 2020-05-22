@@ -23,7 +23,7 @@ applications:
     memory: 1G
     path: application-apis/managementapi/target/realtimescheduler-managementapi-1.0.0.jar
 
-  - name: monotoringapi-amos
+  - name: monitoringapi-amos
     buildpacks:
       - java_buildpack
     instances: 1
