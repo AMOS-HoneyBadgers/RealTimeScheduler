@@ -25,15 +25,10 @@ jobs:
         uses: actions/setup-java@v1
         with:
           java-version: 1.11
-      - name: SonarCloud Scan
-        uses: sonarsource/sonarcloud-github-action@master
-        env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
-      - name: Maven Verify
-        run: mvn -B clean verify
+      - name: Maven Verify with SonarScan
+        run: mvn -B clean verify sonar:sonar
       - name: cloud foundry for scheduler project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:

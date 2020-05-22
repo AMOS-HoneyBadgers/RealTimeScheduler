@@ -22,6 +22,10 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <surefire.version>2.19.1</surefire.version>
         <springfox-version>2.8.0</springfox-version>
+        <sonar.projectKey>AMOS-HoneyBadgers_RealTimeScheduler</sonar.projectKey>
+        <sonar.organization>amos-honeybadgers</sonar.organization>
+        <sonar.host.url>https://sonarcloud.io/</sonar.host.url>
+        <sonar.login>a0045982bd5c6d2746c8e8d751672973352a1318</sonar.login>
     </properties>
 
     <dependencies>
