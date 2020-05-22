@@ -28,7 +28,8 @@ jobs:
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
       - name: Maven Verify with SonarScan
-        run: mvn -B clean verify sonar:sonar
+        #run: mvn -B clean verify sonar:sonar
+        run: mvn -B clean verify
         env:
            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
