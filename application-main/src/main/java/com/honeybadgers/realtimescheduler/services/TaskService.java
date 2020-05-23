@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -15,6 +16,10 @@ public class TaskService {
 
     @Autowired
     TaskPostgresRepository taskPostgresRepository;
+
+    public void run(String id){
+        System.out.println("ID: " + id + "Date: " + new Date());
+    }
 
     public List<Task> getAllTasks() {
         return this.taskPostgresRepository.findAll();
