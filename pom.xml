@@ -236,6 +236,7 @@
                         <exclude>com/honeybadgers/realtimescheduler/RealtimeschedulerApplication*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/config/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/model/**/*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/job/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/repository/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/services/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/web/**/*</exclude>
