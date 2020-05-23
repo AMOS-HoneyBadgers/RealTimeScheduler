@@ -17,6 +17,7 @@ public class RabbitMQSender {
 
     @Value("${dispatch.rabbitmq.routingkey}")
     private String routingkey;
+
     //Task task) {
     public void send(String task){
         rabbitTemplate.convertAndSend(exchange, routingkey, task);

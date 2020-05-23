@@ -17,7 +17,8 @@ import org.springframework.context.annotation.*;
 @Profile("mq")
 @ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
 public class RabbitMQConfig {
-    @Value("${dispatch.rabbitmq.queue}")
+
+    /*@Value("${dispatch.rabbitmq.queue}")
     String queueName;
 
     @Value("${dispatch.rabbitmq.exchange}")
@@ -47,27 +48,12 @@ public class RabbitMQConfig {
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(queueName);
         container.setMessageListener(listenerAdapter);
+
         return container;
     }
 
     @Bean
     MessageListenerAdapter listenerAdapter(RabbitMQReceiver receiver) {
         return new MessageListenerAdapter(receiver, "receive");
-    }
-
-    /*
-    @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }*/
-
-
-/*
-    @Bean
-    @Primary
-    public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        return rabbitTemplate;
     }*/
 }

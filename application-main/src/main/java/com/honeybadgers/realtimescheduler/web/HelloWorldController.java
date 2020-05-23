@@ -4,14 +4,20 @@ import com.honeybadgers.realtimescheduler.services.RabbitMQSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jms.core.JmsTemplate;
+import org.springframework.jms.core.MessageCreator;
 import org.springframework.web.bind.annotation.*;
+
+import javax.jms.Destination;
+import javax.jms.JMSException;
+import javax.jms.Message;
+import javax.jms.Session;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 public class HelloWorldController {
 
     static final Logger logger = LogManager.getLogger(HelloWorldController.class);
-
 
     @Autowired
     RabbitMQSender rabbitMQSender;
