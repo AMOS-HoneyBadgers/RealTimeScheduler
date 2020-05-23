@@ -8,6 +8,7 @@ import com.honeybadgers.realtimescheduler.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -80,24 +81,26 @@ public class TaskController {
 
     @GetMapping("/testCreate/{priority}")
     public ResponseEntity<?>create(@PathVariable(value="priority") final String priority) throws SchedulerException {
-        String id = UUID.randomUUID().toString();
-        JobDetail jd = JobBuilder.newJob(TestJob1.class)
-                .withIdentity(id, "group1")
-                .storeDurably(true)
-                .build();
 
-        Trigger tg = TriggerBuilder.newTrigger()
-                .forJob(jd)
-                .withIdentity(id, "group1")
-                .startNow()
-                .withPriority(Integer.parseInt(priority))
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule())
-                .build();
+        for(int i = 0; i < 5; i++){
+            JobDetail jd = JobBuilder.newJob(TestJob1.class)
+                    .withIdentity(UUID.randomUUID().toString(), "group1")
+                    .usingJobData("id", UUID.randomUUID().toString())
+                    .storeDurably(true)
+                    .build();
 
-        scheduler.scheduleJob(jd, tg);
+            Trigger tg = TriggerBuilder.newTrigger()
+                    .withIdentity(UUID.randomUUID().toString(), "group1")
+                    .startNow()
+                    .withPriority(Integer.parseInt(priority))
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule())
+                    .build();
+            scheduler.scheduleJob(jd, tg);
+        }
+
+        scheduler.start();
 
         return ResponseEntity.ok().build();
     }
-
 
 }
