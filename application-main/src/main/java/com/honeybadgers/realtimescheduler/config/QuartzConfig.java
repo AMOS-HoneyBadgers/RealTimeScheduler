@@ -20,11 +20,12 @@ public class QuartzConfig {
     public Scheduler scheduler() throws SchedulerException {
         SchedulerFactory schedulerFactory = new StdSchedulerFactory();
         Scheduler scheduler = schedulerFactory.getScheduler();
+        scheduler.start();
         return scheduler;
     }
-    @Bean
-    @QuartzDataSource
-    public DataSource quartzDataSource() {
-        return DataSourceBuilder.create().build();
-    }
+    //@Bean
+    //@QuartzDataSource
+    //public DataSource quartzDataSource() {
+    //    return DataSourceBuilder.create().build();
+    //}
 }
