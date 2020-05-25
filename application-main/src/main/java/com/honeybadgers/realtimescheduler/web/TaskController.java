@@ -8,6 +8,7 @@ import com.honeybadgers.realtimescheduler.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,20 +38,20 @@ public class TaskController {
         return this.taskService.getAllTasks();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/task")
     public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
         this.taskService.uploadTask(task);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/task")
     public ResponseEntity<?> updateTask(@Valid @RequestBody Task task) {
         this.taskService.uploadTask(task);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value="/task/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable(value="id") final String id) {
+    @DeleteMapping(value = "/task/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable(value = "id") final String id) {
         this.taskService.deleteTask(id);
         return ResponseEntity.ok().build();
     }
@@ -60,44 +61,65 @@ public class TaskController {
         return this.groupService.getAllGroups();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/group")
     public ResponseEntity<?> uploadGroup(@Valid @RequestBody Group grp) {
         this.groupService.uploadGroup(grp);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/group")
     public ResponseEntity<?> updateGroup(@Valid @RequestBody Group grp) {
         this.groupService.uploadGroup(grp);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value="/group/{id}")
-    public ResponseEntity<?> deleteGroup(@PathVariable(value="id") final String id) {
+    @DeleteMapping(value = "/group/{id}")
+    public ResponseEntity<?> deleteGroup(@PathVariable(value = "id") final String id) {
         this.groupService.deleteGroup(id);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/testCreate/{priority}")
-    public ResponseEntity<?>create(@PathVariable(value="priority") final String priority) throws SchedulerException {
-        String id = UUID.randomUUID().toString();
+    public ResponseEntity<?> create(@PathVariable(value = "priority") final String priority) throws SchedulerException {
+
+        for (int i = 0; i < 10; i++) {
+            JobDetail jd = JobBuilder.newJob(TestJob1.class)
+                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                    .usingJobData("id", UUID.randomUUID().toString())
+                    .storeDurably(true)
+                    .build();
+
+            Trigger tg = TriggerBuilder.newTrigger()
+                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                    .startNow()
+                    .withPriority(i)
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule())
+                    .build();
+            scheduler.scheduleJob(jd, tg);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/testrepeat")
+    public ResponseEntity<?> createRepeatJob() throws SchedulerException {
+
         JobDetail jd = JobBuilder.newJob(TestJob1.class)
-                .withIdentity(id, "group1")
+                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                .usingJobData("id", UUID.randomUUID().toString())
                 .storeDurably(true)
                 .build();
 
         Trigger tg = TriggerBuilder.newTrigger()
-                .forJob(jd)
-                .withIdentity(id, "group1")
+                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
                 .startNow()
-                .withPriority(Integer.parseInt(priority))
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule())
+                .withPriority(1)
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .repeatForever()
+                        .withIntervalInSeconds(5))
                 .build();
 
         scheduler.scheduleJob(jd, tg);
-
         return ResponseEntity.ok().build();
     }
-
 
 }
