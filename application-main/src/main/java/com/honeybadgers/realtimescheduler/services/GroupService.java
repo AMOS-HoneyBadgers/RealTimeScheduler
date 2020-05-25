@@ -19,6 +19,10 @@ public class GroupService {
         return this.groupPostgresRepository.findAll();
     }
 
+    public Group getGroupById(String groupId) {
+        return groupPostgresRepository.findById(groupId).orElse(null);
+    }
+
     public void uploadGroup(Group grp) {
         this.groupPostgresRepository.save(grp);
     }

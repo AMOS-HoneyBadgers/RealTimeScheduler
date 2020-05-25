@@ -1,22 +1,26 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.job.TestJob1;
-import com.honeybadgers.realtimescheduler.model.Group;
-import com.honeybadgers.realtimescheduler.model.Task;
+import com.honeybadgers.realtimescheduler.model.*;
 import com.honeybadgers.realtimescheduler.services.GroupService;
 import com.honeybadgers.realtimescheduler.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.format.datetime.joda.DateTimeParser;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -38,20 +42,36 @@ public class TaskController {
         return this.taskService.getAllTasks();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/task")
-    public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
-        this.taskService.uploadTask(task);
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
+    public ResponseEntity<?> uploadTask(@Valid @RequestBody TaskRestModel task) {
+
+        Task newTask = new Task();
+        newTask.setId( task.getId() );
+        newTask.setGroup(groupService.getGroupById(task.getGroupId()));
+        newTask.setEarliestStart(new Timestamp(task.getEarliestStart()));
+        newTask.setLatestStart(new Timestamp(task.getLatestStart()));
+        newTask.setModeEnum(ModeEnum.getFromString( task.getModeEnum() ));
+        newTask.setTypeFlagEnum( TypeFlagEnum.getFromString( task.getTypeFlagEnum() ) );
+        newTask.setForce( task.getForce() );
+        newTask.setIndexNumber( task.getIndexNumber() );
+        newTask.setPriority( task.getPriority() );
+        newTask.setWorkingDays( task.getWorkingDays() );
+        newTask.setParallelismDegree( task.getParallelismDegree() );
+        newTask.setMetaData( task.getMetaData() );
+        newTask.setMaxFailures(task.getMaxFailures());
+
+        this.taskService.uploadTask(newTask);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/task")
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
     public ResponseEntity<?> updateTask(@Valid @RequestBody Task task) {
         this.taskService.uploadTask(task);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value = "/task/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable(value = "id") final String id) {
+    @DeleteMapping(value="/task/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable(value="id") final String id) {
         this.taskService.deleteTask(id);
         return ResponseEntity.ok().build();
     }
@@ -61,20 +81,30 @@ public class TaskController {
         return this.groupService.getAllGroups();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/group")
-    public ResponseEntity<?> uploadGroup(@Valid @RequestBody Group grp) {
-        this.groupService.uploadGroup(grp);
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
+    public ResponseEntity<?> uploadGroup(@Valid @RequestBody GroupRestModel grp) {
+
+        Group newGroup = new Group();
+        newGroup.setId( grp.getId() );
+        newGroup.setMaxFailures( grp.getMaxFailures() );
+        newGroup.setModeEnum( ModeEnum.getFromString( grp.getModeEnum() ) );
+        newGroup.setTypeFlagEnum( TypeFlagEnum.getFromString( grp.getTypeFlagEnum() ) );
+        newGroup.setPriority( grp.getPriority() );
+        newGroup.setParentGroup(groupService.getGroupById(grp.getParentGroupId()));
+
+
+        this.groupService.uploadGroup(newGroup);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/group")
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
     public ResponseEntity<?> updateGroup(@Valid @RequestBody Group grp) {
         this.groupService.uploadGroup(grp);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value = "/group/{id}")
-    public ResponseEntity<?> deleteGroup(@PathVariable(value = "id") final String id) {
+    @DeleteMapping(value="/group/{id}")
+    public ResponseEntity<?> deleteGroup(@PathVariable(value="id") final String id) {
         this.groupService.deleteGroup(id);
         return ResponseEntity.ok().build();
     }
@@ -119,7 +149,9 @@ public class TaskController {
                 .build();
 
         scheduler.scheduleJob(jd, tg);
+
         return ResponseEntity.ok().build();
     }
+
 
 }

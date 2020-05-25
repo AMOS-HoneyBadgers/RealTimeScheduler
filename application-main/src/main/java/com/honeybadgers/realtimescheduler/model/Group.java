@@ -7,6 +7,8 @@ import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Set;
@@ -24,7 +26,25 @@ public class Group {
     @Column(name="id", unique = true, nullable = false)
     private String id;
 
-    @Column(name="name")
-    private String name;
+    @ManyToOne
+    @JoinColumn(name = "parentId")
+    private Group parentGroup;
+
+    @Max(value = 999)
+    @Min(value = 0)
+    @Column(nullable = false)
+    private int priority;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "typeFlag", nullable = false)
+    private TypeFlagEnum typeFlagEnum;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "mode", nullable = false)
+    private ModeEnum modeEnum;
+
+    private int maxFailures;
+
+    private boolean paused = false;
 
 }
