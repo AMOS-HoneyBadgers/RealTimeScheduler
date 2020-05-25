@@ -5,14 +5,14 @@
 CREATE TABLE public.groups
 (
     id character varying COLLATE pg_catalog."default" NOT NULL,
-    "parentId" character varying COLLATE pg_catalog."default",
+    "parent_id" character varying COLLATE pg_catalog."default",
     priority integer NOT NULL,
-    "typeFlag" character varying COLLATE pg_catalog."default" NOT NULL,
-    "maxFailures" character varying COLLATE pg_catalog."default" NOT NULL,
+    "type_flag" character varying COLLATE pg_catalog."default" NOT NULL,
+    "max_failures" character varying COLLATE pg_catalog."default" NOT NULL,
     mode character varying COLLATE pg_catalog."default" NOT NULL,
     paused boolean,
     CONSTRAINT groups_pkey PRIMARY KEY (id),
-    CONSTRAINT parent FOREIGN KEY ("parentId")
+    CONSTRAINT parent FOREIGN KEY ("parent_id")
         REFERENCES public.groups (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
@@ -33,20 +33,20 @@ ALTER TABLE public.groups
 CREATE TABLE public.tasks
 (
     id character varying COLLATE pg_catalog."default" NOT NULL,
-    "groupId" character varying COLLATE pg_catalog."default" NOT NULL,
+    "group_id" character varying COLLATE pg_catalog."default" NOT NULL,
     priority integer NOT NULL,
-    "earliestStart" timestamp without time zone NOT NULL,
-    "latestStart" timestamp without time zone NOT NULL,
-    "workingDays" integer NOT NULL,
-    "typeFlag" character varying COLLATE pg_catalog."default" NOT NULL,
-    "maxFailures" integer NOT NULL,
+    "earliest_start" timestamp without time zone NOT NULL,
+    "latest_start" timestamp without time zone NOT NULL,
+    "working_days" integer NOT NULL,
+    "type_flag" character varying COLLATE pg_catalog."default" NOT NULL,
+    "max_failures" integer NOT NULL,
     mode character varying COLLATE pg_catalog."default" NOT NULL,
-    "indexNumber" bigint,
+    "index_number" bigint,
     force boolean,
-    "parallelismDegree" integer,
-    "metaData" jsonb,
+    "parallelism_degree" integer,
+    "meta_data" jsonb,
     CONSTRAINT tasks_pkey PRIMARY KEY (id),
-    CONSTRAINT group_fk FOREIGN KEY ("groupId")
+    CONSTRAINT group_fk FOREIGN KEY ("group_id")
         REFERENCES public.groups (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
