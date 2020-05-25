@@ -1,21 +1,26 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.job.TestJob1;
-import com.honeybadgers.realtimescheduler.model.Group;
-import com.honeybadgers.realtimescheduler.model.Task;
+import com.honeybadgers.realtimescheduler.model.*;
 import com.honeybadgers.realtimescheduler.services.GroupService;
 import com.honeybadgers.realtimescheduler.services.TaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.format.datetime.joda.DateTimeParser;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -38,8 +43,24 @@ public class TaskController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
-    public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
-        this.taskService.uploadTask(task);
+    public ResponseEntity<?> uploadTask(@Valid @RequestBody TaskRestModel task) {
+
+        Task newTask = new Task();
+        newTask.setId( task.getId() );
+        newTask.setGroup(groupService.getAllGroups().stream().filter(group -> group.getId().compareToIgnoreCase(task.getGroupId()) == 0).collect(Collectors.toList()).get(0));
+        newTask.setEarliestStart(new Timestamp(task.getEarliestStart()));
+        newTask.setLatestStart(new Timestamp(task.getLatestStart()));
+        newTask.setModeEnum(ModeEnum.getFromString( task.getModeEnum() ));
+        newTask.setTypeFlagEnum( TypeFlagEnum.getFromString( task.getTypeFlagEnum() ) );
+        newTask.setForce( task.getForce() );
+        newTask.setIndexNumber( task.getIndexNumber() );
+        newTask.setPriority( task.getPriority() );
+        newTask.setWorkingDays( task.getWorkingDays() );
+        newTask.setParallelismDegree( task.getParallelismDegree() );
+        newTask.setMetaData( task.getMetaData() );
+        newTask.setMaxFailures(task.getMaxFailures());
+
+        this.taskService.uploadTask(newTask);
         return ResponseEntity.ok().build();
     }
 
@@ -61,8 +82,18 @@ public class TaskController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
-    public ResponseEntity<?> uploadGroup(@Valid @RequestBody Group grp) {
-        this.groupService.uploadGroup(grp);
+    public ResponseEntity<?> uploadGroup(@Valid @RequestBody GroupRestModel grp) {
+
+        Group newGroup = new Group();
+        newGroup.setId( grp.getId() );
+        newGroup.setMaxFailures( grp.getMaxFailures() );
+        newGroup.setModeEnum( ModeEnum.getFromString( grp.getModeEnum() ) );
+        newGroup.setTypeFlagEnum( TypeFlagEnum.getFromString( grp.getTypeFlagEnum() ) );
+        newGroup.setPriority( grp.getPriority() );
+      //  newGroup.setParentGroup(groupService.getAllGroups().stream().filter(group -> group.getId().compareToIgnoreCase(grp.getParentGroupId())== 0).collect(Collectors.toList()).get(0));
+
+
+        this.groupService.uploadGroup(newGroup);
         return ResponseEntity.ok().build();
     }
 

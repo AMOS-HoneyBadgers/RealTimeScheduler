@@ -34,7 +34,7 @@ public class Task {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "groupid")
+    @JoinColumn(name = "groupId")
     private Group group;
 
     @Max(value = 999)
@@ -42,6 +42,7 @@ public class Task {
     @Column(nullable = false)
     private int priority;
 
+    @Column(name = "earliestStart")
     private Timestamp earliestStart;
 
     private Timestamp latestStart;

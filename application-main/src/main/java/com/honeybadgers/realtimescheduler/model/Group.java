@@ -27,16 +27,13 @@ public class Group {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "parentid")
+    @JoinColumn(name = "parentId")
     private Group parentGroup;
 
     @Max(value = 999)
     @Min(value = 0)
     @Column(nullable = false)
     private int priority;
-
-    @Min(value = 1)
-    private int workingDays;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "typeFlag", nullable = false)
