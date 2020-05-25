@@ -1,33 +1,10 @@
 package com.honeybadgers.realtimescheduler.config;
 
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.jms.ConnectionFactory;
-import javax.jms.Destination;
-import javax.jms.Session;
-
-import com.rabbitmq.jms.admin.RMQDestination;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
 import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-
-import com.rabbitmq.jms.admin.RMQConnectionFactory;
 
 @Configuration
 @ComponentScan
@@ -35,7 +12,7 @@ import com.rabbitmq.jms.admin.RMQConnectionFactory;
 @EnableScheduling
 public class StockQuoter {
 
-    private static final Log log = LogFactory.getLog(StockQuoter.class);
+    /*private static final Log log = LogFactory.getLog(StockQuoter.class);
 
     @Bean
     public JmsTemplate jmsTemplate() {
@@ -73,5 +50,5 @@ public class StockQuoter {
 
     public static void main(String[] args) {
         SpringApplication.run(StockQuoter.class, args);
-    }
+    }*/
 }

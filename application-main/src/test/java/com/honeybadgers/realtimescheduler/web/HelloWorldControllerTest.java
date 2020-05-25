@@ -25,8 +25,8 @@ public class HelloWorldControllerTest {
     @Autowired
     private MockMvc mvc;
 
-    @MockBean
-    private RabbitMQSender rabbitMQSender;
+    /*@MockBean
+    private RabbitMQSender rabbitMQSender;*/
 
 
     @Test
@@ -42,7 +42,7 @@ public class HelloWorldControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
         //doThrow(IllegalArgumentException.class).when(rabbitMQSender).send(null);
-        verify(rabbitMQSender).send(any());
+        //verify(rabbitMQSender).send(any());
     }
 
 

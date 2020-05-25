@@ -19,9 +19,6 @@ public class HelloWorldController {
 
     static final Logger logger = LogManager.getLogger(HelloWorldController.class);
 
-    @Autowired
-    RabbitMQSender rabbitMQSender;
-
     @GetMapping("/hello")
     public String getHealth() {
         logger.info("Test info");
@@ -33,7 +30,6 @@ public class HelloWorldController {
 
     @GetMapping("/rabbit")
     public String getRabbit() {
-        rabbitMQSender.send("rabbit");
 
         return "Send Rabbit";
     }

@@ -29,7 +29,7 @@ public class TaskController {
 
     @Autowired
     GroupService groupService;
-    
+
     @Autowired
     Scheduler scheduler;
 

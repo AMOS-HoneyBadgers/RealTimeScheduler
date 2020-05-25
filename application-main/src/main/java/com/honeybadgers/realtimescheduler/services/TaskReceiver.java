@@ -12,7 +12,7 @@ import static com.honeybadgers.realtimescheduler.config.RmqConfig.TASK_QUEUE;
 @Component
 public class TaskReceiver {
 
-    @JmsListener(destination =TASK_QUEUE)
+    @JmsListener(destination ="mydest", containerFactory = "myFactory")
     public void receive(String task) {
         System.out.println("hello" + task);
     }
