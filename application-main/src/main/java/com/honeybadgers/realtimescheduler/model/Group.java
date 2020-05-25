@@ -27,7 +27,7 @@ public class Group {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "parentId")
+    @JoinColumn(name = "parent_id")
     private Group parentGroup;
 
     @Max(value = 999)
@@ -36,7 +36,7 @@ public class Group {
     private int priority;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "typeFlag", nullable = false)
+    @Column(name = "type_flag", nullable = false)
     private TypeFlagEnum typeFlagEnum;
 
     @Enumerated(EnumType.STRING)

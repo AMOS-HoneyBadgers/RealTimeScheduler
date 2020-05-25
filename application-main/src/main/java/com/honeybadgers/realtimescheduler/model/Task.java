@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
@@ -13,11 +12,8 @@ import org.hibernate.annotations.TypeDefs;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tasks")
@@ -30,11 +26,11 @@ import java.util.UUID;
 @NoArgsConstructor
 public class Task {
     @Id
-    @Column(name="id", unique = true, nullable = false)
+    @Column(unique = true, nullable = false)
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "groupId")
+    @JoinColumn(name = "group_id")
     private Group group;
 
     @Max(value = 999)
@@ -42,7 +38,6 @@ public class Task {
     @Column(nullable = false)
     private int priority;
 
-    @Column(name = "earliestStart")
     private Timestamp earliestStart;
 
     private Timestamp latestStart;
@@ -51,7 +46,7 @@ public class Task {
     private int workingDays;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "typeFlag", nullable = false)
+    @Column(name = "type_flag", nullable = false)
     private TypeFlagEnum typeFlagEnum;
 
     @Enumerated(EnumType.STRING)
@@ -67,10 +62,36 @@ public class Task {
     private Integer parallelismDegree;
 
     @Type(type = "jsonb")
-    @Column(name = "metadata", columnDefinition = "jsonb")
+    @Column(columnDefinition = "jsonb")
     @Basic(fetch = FetchType.LAZY)
     private Map<String, String> metaData;
 
+    public Task(String id, int priority, Timestamp latestStart, Timestamp earliestStart, int workingDays, TypeFlagEnum typeFlagEnum, ModeEnum modeEnum, int maxFailures, Integer indexNumber, Boolean force, Map<String, String> metaData) {
+        this.id = id;
+        this.priority = priority;
+        this.latestStart = latestStart;
+        this.earliestStart = earliestStart;
+        this.workingDays = workingDays;
+        this.typeFlagEnum = typeFlagEnum;
+        this.modeEnum = modeEnum;
+        this.maxFailures = maxFailures;
+        this.indexNumber = indexNumber;
+        this.force = force;
+        this.metaData = metaData;
+    }
+
+    public Task(String id, int priority, Timestamp latestStart, Timestamp earliestStart, int workingDays, TypeFlagEnum typeFlagEnum, ModeEnum modeEnum, int maxFailures, Integer parallelismDegree, Map<String, String> metaData) {
+        this.id = id;
+        this.priority = priority;
+        this.latestStart = latestStart;
+        this.earliestStart = earliestStart;
+        this.workingDays = workingDays;
+        this.typeFlagEnum = typeFlagEnum;
+        this.modeEnum = modeEnum;
+        this.maxFailures = maxFailures;
+        this.parallelismDegree = parallelismDegree;
+        this.metaData = metaData;
+    }
 
     @PrePersist
     void checkModeParameters() {
