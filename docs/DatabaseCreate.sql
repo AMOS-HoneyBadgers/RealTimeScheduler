@@ -25,7 +25,6 @@ CREATE TABLE public.groups
 ALTER TABLE public.groups
     OWNER to realtimescheduler;
 
-
 -- Table: public.tasks
 
 -- DROP TABLE public.tasks;
