@@ -33,7 +33,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 
-@RunWith(SpringRunner.class)
+/*@RunWith(SpringRunner.class)
 @ActiveProfiles("dev")
 //@SpringBootTest()
 public class TaskPostgresRepositoryTest {
@@ -101,4 +101,4 @@ public class TaskPostgresRepositoryTest {
         assertThat(found.get().getId())
                 .isEqualTo(task.getId());
     }
-}
+}*/
