@@ -47,7 +47,7 @@ public class TaskController {
 
         Task newTask = new Task();
         newTask.setId( task.getId() );
-        newTask.setGroup(groupService.getAllGroups().stream().filter(group -> group.getId().compareToIgnoreCase(task.getGroupId()) == 0).collect(Collectors.toList()).get(0));
+        newTask.setGroup(groupService.getGroupById(task.getGroupId()));
         newTask.setEarliestStart(new Timestamp(task.getEarliestStart()));
         newTask.setLatestStart(new Timestamp(task.getLatestStart()));
         newTask.setModeEnum(ModeEnum.getFromString( task.getModeEnum() ));
@@ -90,7 +90,7 @@ public class TaskController {
         newGroup.setModeEnum( ModeEnum.getFromString( grp.getModeEnum() ) );
         newGroup.setTypeFlagEnum( TypeFlagEnum.getFromString( grp.getTypeFlagEnum() ) );
         newGroup.setPriority( grp.getPriority() );
-      //  newGroup.setParentGroup(groupService.getAllGroups().stream().filter(group -> group.getId().compareToIgnoreCase(grp.getParentGroupId())== 0).collect(Collectors.toList()).get(0));
+        newGroup.setParentGroup(groupService.getGroupById(grp.getParentGroupId()));
 
 
         this.groupService.uploadGroup(newGroup);
