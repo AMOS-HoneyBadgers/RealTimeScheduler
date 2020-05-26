@@ -2,25 +2,19 @@ package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.job.TestJob1;
 import com.honeybadgers.realtimescheduler.model.*;
-import com.honeybadgers.realtimescheduler.services.GroupService;
-import com.honeybadgers.realtimescheduler.services.TaskService;
+import com.honeybadgers.realtimescheduler.services.IGroupService;
+import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.format.datetime.joda.DateTimeParser;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.sql.Date;
 import java.sql.Timestamp;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -29,10 +23,10 @@ import java.util.stream.Collectors;
 public class TaskController {
 
     @Autowired
-    TaskService taskService;
+    ITaskService taskService;
 
     @Autowired
-    GroupService groupService;
+    IGroupService groupService;
 
     @Autowired
     Scheduler scheduler;
