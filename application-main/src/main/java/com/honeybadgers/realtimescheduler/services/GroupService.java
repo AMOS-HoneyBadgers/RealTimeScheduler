@@ -10,24 +10,28 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class GroupService {
+public class GroupService implements IGroupService {
 
     @Autowired
     GroupPostgresRepository groupPostgresRepository;
 
+    @Override
     public List<Group> getAllGroups() {
-        return this.groupPostgresRepository.findAll();
+        return groupPostgresRepository.findAll();
     }
 
+    @Override
     public Group getGroupById(String groupId) {
         return groupPostgresRepository.findById(groupId).orElse(null);
     }
 
+    @Override
     public void uploadGroup(Group grp) {
-        this.groupPostgresRepository.save(grp);
+        groupPostgresRepository.save(grp);
     }
 
+    @Override
     public void deleteGroup(String id) {
-        this.groupPostgresRepository.deleteById(id);
+        groupPostgresRepository.deleteById(id);
     }
 }
