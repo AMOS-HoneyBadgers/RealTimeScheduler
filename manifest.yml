@@ -1,38 +1,38 @@
 ---
 applications:
-  - name: realtimescheduler
+  - name: realtimescheduler-amos
     buildpacks:
       - java_buildpack
-    instances: 1
+    instances: 2
     memory: 1G
     path: application-main/target/realtimescheduler-main-0.0.1-SNAPSHOT.jar
     services:
       - dispatch
 
-  - name: groupapi
+  - name: groupapi-amos
     buildpacks:
       - java_buildpack
     instances: 1
-    memory: 512M
+    memory: 1G
     path: application-apis/groupapi/target/realtimescheduler-groupapi-1.0.0.jar
 
-  - name: managementapi
+  - name: managementapi-amos
     buildpacks:
       - java_buildpack
     instances: 1
-    memory: 512M
+    memory: 1G
     path: application-apis/managementapi/target/realtimescheduler-managementapi-1.0.0.jar
 
-  - name: monotoringapi
+  - name: monitoringapi-amos
     buildpacks:
       - java_buildpack
     instances: 1
-    memory: 512M
-    path: application-apis/monotoringapi/target/realtimescheduler-monotoringapi-1.0.0.jar
+    memory: 1G
+    path: application-apis/monitoringapi/target/realtimescheduler-monitoringapi-1.0.0.jar
 
-  - name: taskapi
+  - name: taskapi-amos
     buildpacks:
       - java_buildpack
     instances: 1
-    memory: 512M
+    memory: 1G
     path: application-apis/taskapi/target/realtimescheduler-taskapi-1.0.0.jar

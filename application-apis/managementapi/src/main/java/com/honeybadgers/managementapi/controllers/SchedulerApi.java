@@ -25,6 +25,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,7 +60,11 @@ public interface SchedulerApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    try {
+                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }
@@ -90,7 +95,11 @@ public interface SchedulerApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
-                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    try {
+                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }

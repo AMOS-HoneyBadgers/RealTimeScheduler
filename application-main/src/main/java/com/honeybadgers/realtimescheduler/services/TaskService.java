@@ -7,24 +7,27 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
 @Slf4j
-public class TaskService {
+public class TaskService implements ITaskService {
 
     @Autowired
     TaskPostgresRepository taskPostgresRepository;
 
+    @Override
     public List<Task> getAllTasks() {
-        return this.taskPostgresRepository.findAll();
+        return taskPostgresRepository.findAll();
     }
 
-
+    @Override
     public void uploadTask(Task task) {
-        Task s = this.taskPostgresRepository.save(task);
+        taskPostgresRepository.save(task);
     }
 
+    @Override
     public void deleteTask(String id) {
         this.taskPostgresRepository.deleteById(id);
     }

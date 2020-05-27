@@ -13,8 +13,6 @@ on:
     types:
       - created
   
-    
-
 jobs:
   build:
     runs-on: ubuntu-18.04
@@ -27,52 +25,55 @@ jobs:
           java-version: 1.11
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
-      - name: Maven Verify
-        run: mvn -B clean verify
+      - name: Maven Verify with SonarScan
+        run: mvn -B clean verify sonar:sonar
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: cloud foundry for scheduler project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
-            command: push realtimescheduler -m 1G
+            cf_org: CCC
+            cf_space: AMOS-EDI
+            command: push realtimescheduler-amos
       - name: cloud foundry for groupapi project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
-            command: push groupapi -m 1G
-      - name: cloud foundry for managementapi project
+            cf_org: CCC
+            cf_space: AMOS-EDI
+            command: push groupapi-amos
+      - name: cloud foundry for managementapi-amos project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
-            command: push managementapi -m 1G
-      - name: cloud foundry for monitoringapi project
+            cf_org: CCC
+            cf_space: AMOS-EDI
+            command: push managementapi-amos
+      - name: cloud foundry for monitoringapi-amos project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
-            command: push monitoringapi -m 1G
+            cf_org: CCC
+            cf_space: AMOS-EDI
+            command: push monitoringapi-amos
       - name: cloud foundry for taskapi project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
             cf_api: ${{ secrets.CF_API }}
             cf_username: ${{ secrets.CF_LOGIN }}
             cf_password: ${{ secrets.CF_PASS }}
-            cf_org: Honeybadger
-            cf_space: development
-            command: push taskapi -m 1G
+            cf_org: CCC
+            cf_space: AMOS-EDI
+            command: push taskapi-amos
             
         
