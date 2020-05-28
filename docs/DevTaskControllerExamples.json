@@ -1,0 +1,32 @@
+{
+  "groupExample": {
+    "id": "testGroup2",
+    "activeTimes": [
+      {
+        "from": "02:00:00",
+        "to": "12:00:00"
+      }
+    ],
+    "workingDays": [
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+    ],
+    "priority": 21,
+    "typeFlagEnum": "Batch",
+    "modeEnum": "Parallel",
+    "parallelismDegree": 10
+  },
+  "taskExample": {
+    "id": "550e8400-e29b-11d4-a716-446655440000",
+    "groupId": "testGroup2",
+    "priority": 999,
+    "typeFlagEnum": "Batch",
+    "modeEnum": "Parallel",
+    "parallelismDegree": 10
+  }
+}

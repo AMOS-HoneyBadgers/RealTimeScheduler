@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,36 +37,51 @@ public class TaskController {
         return this.taskService.getAllTasks();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/task")
     public ResponseEntity<?> uploadTask(@Valid @RequestBody TaskRestModel task) {
 
         Task newTask = new Task();
-        newTask.setId( task.getId() );
+        newTask.setId(task.getId());
         newTask.setGroup(groupService.getGroupById(task.getGroupId()));
-        newTask.setEarliestStart(new Timestamp(task.getEarliestStart()));
-        newTask.setLatestStart(new Timestamp(task.getLatestStart()));
-        newTask.setModeEnum(ModeEnum.getFromString( task.getModeEnum() ));
-        newTask.setTypeFlagEnum( TypeFlagEnum.getFromString( task.getTypeFlagEnum() ) );
-        newTask.setForce( task.getForce() );
-        newTask.setIndexNumber( task.getIndexNumber() );
-        newTask.setPriority( task.getPriority() );
-        newTask.setWorkingDays( task.getWorkingDays() );
-        newTask.setParallelismDegree( task.getParallelismDegree() );
-        newTask.setMetaData( task.getMetaData() );
-        newTask.setMaxFailures(task.getMaxFailures());
+        newTask.setActiveTimeFrames(task.getActiveTimes());
+        if(task.getWorkingDays() == null) {
+            newTask.setWorkingDays(new int[]{1,1,1,1,1,1,1});
+        } else {
+            newTask.setWorkingDays(Arrays.stream(task.getWorkingDays()).mapToInt(value -> {
+                if (value == null)
+                    return 1;
+                return value;
+            }).toArray());
+        }
+        ModeEnum modeEnum = ModeEnum.getFromString(task.getModeEnum());
+        if (modeEnum != null)
+            newTask.setModeEnum(modeEnum);
+        TypeFlagEnum typeFlagEnum = TypeFlagEnum.getFromString(task.getTypeFlagEnum());
+        if(typeFlagEnum != null)
+            newTask.setTypeFlagEnum(typeFlagEnum);
+        if(task.getForce() != null)
+            newTask.setForce(task.getForce());
+        newTask.setIndexNumber(task.getIndexNumber());
+        newTask.setPriority(task.getPriority());
+        newTask.setParallelismDegree(task.getParallelismDegree());
+        newTask.setMetaData(task.getMetaData());
+        if(task.getRetries() != null)
+            newTask.setRetries(task.getRetries());
+        if(task.getPaused() != null)
+            newTask.setPaused(task.getPaused());
 
         this.taskService.uploadTask(newTask);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/task")
     public ResponseEntity<?> updateTask(@Valid @RequestBody Task task) {
         this.taskService.uploadTask(task);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value="/task/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable(value="id") final String id) {
+    @DeleteMapping(value = "/task/{id}")
+    public ResponseEntity<?> deleteTask(@PathVariable(value = "id") final String id) {
         this.taskService.deleteTask(id);
         return ResponseEntity.ok().build();
     }
@@ -75,30 +91,47 @@ public class TaskController {
         return this.groupService.getAllGroups();
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
+    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/group")
     public ResponseEntity<?> uploadGroup(@Valid @RequestBody GroupRestModel grp) {
 
         Group newGroup = new Group();
-        newGroup.setId( grp.getId() );
-        newGroup.setMaxFailures( grp.getMaxFailures() );
-        newGroup.setModeEnum( ModeEnum.getFromString( grp.getModeEnum() ) );
-        newGroup.setTypeFlagEnum( TypeFlagEnum.getFromString( grp.getTypeFlagEnum() ) );
-        newGroup.setPriority( grp.getPriority() );
-        newGroup.setParentGroup(groupService.getGroupById(grp.getParentGroupId()));
-
+        newGroup.setId(grp.getId());
+        newGroup.setActiveTimeFrames(grp.getActiveTimes());
+        if(grp.getWorkingDays() == null) {
+            newGroup.setWorkingDays(new int[]{1,1,1,1,1,1,1});
+        } else {
+            newGroup.setWorkingDays(Arrays.stream(grp.getWorkingDays()).mapToInt(value -> {
+                if (value == null)
+                    return 1;
+                return value;
+            }).toArray());
+        }
+        ModeEnum modeEnum = ModeEnum.getFromString(grp.getModeEnum());
+        if (modeEnum != null)
+            newGroup.setModeEnum(modeEnum);
+        TypeFlagEnum typeFlagEnum = TypeFlagEnum.getFromString(grp.getTypeFlagEnum());
+        if(typeFlagEnum != null)
+            newGroup.setTypeFlagEnum(typeFlagEnum);
+        newGroup.setPriority(grp.getPriority());
+        if(grp.getPaused() != null)
+            newGroup.setPaused(grp.getPaused());
+        newGroup.setParallelismDegree(grp.getParallelismDegree());
+        newGroup.setLastIndexNumber(grp.getLastIndexNumber());
+        if(grp.getParentGroupId() != null)
+            newGroup.setParentGroup(groupService.getGroupById(grp.getParentGroupId()));
 
         this.groupService.uploadGroup(newGroup);
         return ResponseEntity.ok().build();
     }
 
-    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
+    @PutMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value = "/group")
     public ResponseEntity<?> updateGroup(@Valid @RequestBody Group grp) {
         this.groupService.uploadGroup(grp);
         return ResponseEntity.ok().build();
     }
 
-    @DeleteMapping(value="/group/{id}")
-    public ResponseEntity<?> deleteGroup(@PathVariable(value="id") final String id) {
+    @DeleteMapping(value = "/group/{id}")
+    public ResponseEntity<?> deleteGroup(@PathVariable(value = "id") final String id) {
         this.groupService.deleteGroup(id);
         return ResponseEntity.ok().build();
     }

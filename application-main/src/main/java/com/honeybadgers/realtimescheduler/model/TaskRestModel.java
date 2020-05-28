@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 
@@ -25,21 +26,21 @@ public class TaskRestModel {
 
     private int priority;
 
-    private long earliestStart;
+    private List<ActiveTimes> activeTimes;
 
-    private long latestStart;
-
-    private int workingDays;
+    private Integer[] workingDays;
 
     private String typeFlagEnum;
 
     private String modeEnum;
 
-    private int maxFailures;
+    private Boolean paused;
 
-    private Integer indexNumber;
+    private Integer retries;
 
     private Boolean force;
+
+    private Integer indexNumber;
 
     private Integer parallelismDegree;
 

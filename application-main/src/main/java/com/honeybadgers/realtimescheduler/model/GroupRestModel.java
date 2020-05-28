@@ -9,6 +9,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -22,12 +23,18 @@ public class GroupRestModel {
 
     private int priority;
 
+    private List<ActiveTimes> activeTimes;
+
+    private Integer[] workingDays;
+
     private String typeFlagEnum;
 
     private String modeEnum;
 
-    private int maxFailures;
+    private Boolean paused;
 
-    private boolean paused = false;
+    private Integer lastIndexNumber;
+
+    private Integer parallelismDegree;
 
 }
