@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.web;
 
+import com.honeybadgers.realtimescheduler.services.ICommunication;
 import com.honeybadgers.realtimescheduler.services.RabbitMQSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,6 +20,9 @@ public class HelloWorldController {
 
     static final Logger logger = LogManager.getLogger(HelloWorldController.class);
 
+    @Autowired
+    ICommunication sender;
+
     @GetMapping("/hello")
     public String getHealth() {
         logger.info("Test info");
@@ -30,7 +34,7 @@ public class HelloWorldController {
 
     @GetMapping("/rabbit")
     public String getRabbit() {
-
+        sender.send("helloooo christoff and marco are here");
         return "Send Rabbit";
     }
     /*@GetMapping("/error")

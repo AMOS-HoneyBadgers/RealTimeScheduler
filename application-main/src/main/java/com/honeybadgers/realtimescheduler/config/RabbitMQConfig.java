@@ -1,6 +1,16 @@
 package com.honeybadgers.realtimescheduler.config;
 
+import com.honeybadgers.realtimescheduler.services.RabbitMQReceiver;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
+import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
 public class RabbitMQConfig {
 
-    /*@Value("${dispatch.rabbitmq.queue}")
+    @Value("${dispatch.rabbitmq.queue}")
     String queueName;
 
     @Value("${dispatch.rabbitmq.exchange}")
@@ -46,5 +56,5 @@ public class RabbitMQConfig {
     @Bean
     MessageListenerAdapter listenerAdapter(RabbitMQReceiver receiver) {
         return new MessageListenerAdapter(receiver, "receive");
-    }*/
+    }
 }
