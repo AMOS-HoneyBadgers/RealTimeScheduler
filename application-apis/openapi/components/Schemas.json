@@ -23,7 +23,7 @@
         "maximum": 999
       },
       "active_times": {
-        "$ref": "#ActiveTimesModel"
+        "$ref": "#/ActiveTimesModel"
       },
       "working_days": {
         "description": "Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)",
@@ -119,7 +119,7 @@
         "maximum": 999
       },
       "active_times": {
-        "$ref": "#ActiveTimesModel"
+        "$ref": "#/ActiveTimesModel"
       },
       "working_days": {
         "description": "Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)",
