@@ -238,6 +238,7 @@
                 <configuration>
                     <excludes>
                         <exclude>com/honeybadgers/realtimescheduler/RealtimeschedulerApplication*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/exception/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/config/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/job/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/model/**/*</exclude>
