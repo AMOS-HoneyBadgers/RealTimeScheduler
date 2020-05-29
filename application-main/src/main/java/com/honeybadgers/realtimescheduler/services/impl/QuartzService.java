@@ -1,6 +1,5 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.realtimescheduler.exception.CreationException;
 import com.honeybadgers.realtimescheduler.exception.LimitExceededException;
 import com.honeybadgers.realtimescheduler.model.Group;
 import com.honeybadgers.realtimescheduler.model.ModeEnum;
@@ -11,6 +10,7 @@ import org.quartz.JobDetail;
 import org.quartz.Scheduler;
 import org.quartz.Trigger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.transaction.Transactional;
 import java.util.ArrayList;
@@ -26,6 +26,9 @@ public class QuartzService implements IQuartzService {
 
     @Autowired
     Scheduler scheduler;
+
+    @Value("${com.realtimescheduler.scheduler.retries-modifier:1}")
+    private Double retriesModifier;
 
 
     public JobDetail createJobDetails(Task task) {
@@ -57,67 +60,73 @@ public class QuartzService implements IQuartzService {
 
     @Transactional
     public int calculateTaskTotalPriority(Task task) throws LimitExceededException {
-        int totalPriority = 0;
-        // priority of task is base priority -> most important part
-        // deadline of task gets accounted if tasks have same prio -> TODO: would require new prio calc OF ALL TASK ON CHANGE OF ANY TASK
-        // retries: higher retries -> lower totalPrio
-        if(exceedGroupLimitations(task))
-            throw new LimitExceededException("Group limit was exceeded!");
+        Map<Task, Integer> prios;
 
         // TODO enforce sequence number
 
         // get all tasks with same prio (include yourself) for deadline accounting
         List<Task> allSamePrioTasks = taskRepository.findAllScheduledTasksWithSamePrio(task.getPriority(), task.getId());
 
-        // get DeadlinePrio of all tasks
-        Map<Task, Integer> deadlinePrios = applyDeadlineOnPrio(allSamePrioTasks);
+        // apply deadline and type_flag on prio of all tasks
+        prios = applyOrderOnPrio(allSamePrioTasks);
 
         // apply #retries to prio
-        Map<Task, Integer> retriesPrios = applyRetriesOnPrio(deadlinePrios);
+        prios = applyRetriesOnPrio(prios);
 
         // recalculate priorities of found tasks and reschedule them
-        Map<Task, Integer> selfExcluded = new HashMap<>(retriesPrios);
+        Map<Task, Integer> selfExcluded = new HashMap<>(prios);
         selfExcluded.remove(task);
         scheduleTasks(new ArrayList<>(selfExcluded.keySet()), new ArrayList<>(selfExcluded.values()));
 
-        return retriesPrios.get(task);
+        return prios.get(task);
     }
 
-    private Map<Task, Integer> applyDeadlineOnPrio(List<Task> tasks) {
+    private Map<Task, Integer> applyOrderOnPrio(List<Task> tasks) {
         Map<Task, Integer> deadlinePrios = new HashMap<>();
         int offset = 0;
-        for(Task task : tasks) {
-            if(task.getDeadline() != null)
+        for(int i = 0; i < tasks.size(); i++) {
+            if(tasks.get(i).getDeadline() != null)
                 offset++;
-            deadlinePrios.put(task, task.getPriority() + offset);
+            deadlinePrios.put(tasks.get(i), tasks.get(i).getPriority() + offset);
         }
 
         assert deadlinePrios.size() == tasks.size();
         return deadlinePrios;
     }
 
-    private Map<Task, Integer> applyRetriesOnPrio(Map<Task, Integer> deadlinePrios) {
-        Map<Task, Integer> mapped = deadlinePrios.entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, value -> {
-                    // TODO how to apply
-                    return value.getValue() + 1;
+    private Map<Task, Integer> applyRetriesOnPrio(Map<Task, Integer> inputPrios) {
+        Map<Task, Integer> outputPrios = inputPrios.entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry -> {
+                    Task task = entry.getKey();
+                    return Math.max(0, entry.getValue() - ((int) Math.round(task.getRetries() * retriesModifier)));
                 }));
 
-        assert deadlinePrios.size() == mapped.size();
-        return mapped;
+        assert inputPrios.size() == outputPrios.size();
+        return outputPrios;
     }
 
-    private boolean exceedGroupLimitations(Task task) {
+    /**
+     * Check if group limitations have been exceeded (parallelismDegree -> too many tasks already dispatched)
+     * To be called, for example, before dispatching a task
+     * @param group Group to be checked
+     * @throws LimitExceededException
+     */
+    private void checkGroupLimitations(Group group) throws LimitExceededException {
+        assert group != null;
+
         boolean paral = false;
-        if(task.getModeEnum() == ModeEnum.Parallel) {
-            paral = exceedsParallelismDegree(task);
+        if(group.getModeEnum() == ModeEnum.Parallel) {
+            paral = exceedsParallelismDegree(group);
         }
 
-        return paral;
+        if(paral)
+            throw new LimitExceededException("Group limit was exceeded!");
     }
 
-    private boolean exceedsParallelismDegree(Task task) {
-        Group group = task.getGroup();
+    private boolean exceedsParallelismDegree(Group group) {
+        assert group != null;
+
+        Group backup = group;
         // get lowestParallelismDegree
         int lowestParallelismDegree = Integer.MAX_VALUE;
         while(group != null) {
@@ -126,7 +135,7 @@ public class QuartzService implements IQuartzService {
         }
 
         // check if lowestParallelismDegree is exceeded -> get all dispatched tasks ()
-        // TODO
-        return false;
+        List<Task> dispatched = taskRepository.findAllDispatchedTasks(backup.getId());
+        return lowestParallelismDegree <= dispatched.size();
     }
 }
