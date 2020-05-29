@@ -13,6 +13,7 @@ import org.hibernate.annotations.TypeDefs;
 import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
@@ -40,15 +41,23 @@ public class Task {
     @Column(name = "priority", nullable = false)
     private int priority;
 
+    @Column(name = "deadline")
+    private Timestamp deadline;
+
     @Type(type = "jsonb")
     @Column(name = "active_times", columnDefinition = "jsonb")
     @Basic(fetch = FetchType.LAZY)
     private List<ActiveTimes> activeTimeFrames;
 
     // hibernate does not support boolean[] not even using hibernate-types-52
+    // -> boolean as int
     @Type(type = "int-array")
     @Column(name = "working_days", columnDefinition = "integer[]")
     private int[] workingDays;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private TaskStatusEnum status = TaskStatusEnum.Waiting;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_flag", nullable = false)
@@ -72,10 +81,6 @@ public class Task {
     @Column(name = "index_number")
     private Integer indexNumber;
 
-    @Min(value = 1)
-    @Column(name = "parallelism_degree")
-    private Integer parallelismDegree;
-
     @Type(type = "jsonb")
     @Column(name = "meta_data", columnDefinition = "jsonb")
     @Basic(fetch = FetchType.LAZY)
@@ -84,9 +89,7 @@ public class Task {
 
     @PrePersist
     void checkModeParameters() {
-        if(this.modeEnum == ModeEnum.Parallel) {
-            assert this.parallelismDegree != null;
-        } else if(this.modeEnum == ModeEnum.Sequential) {
+        if(this.modeEnum == ModeEnum.Sequential) {
             assert this.indexNumber != null;
         }
     }

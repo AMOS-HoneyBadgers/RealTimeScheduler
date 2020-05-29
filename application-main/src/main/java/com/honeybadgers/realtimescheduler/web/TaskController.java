@@ -53,6 +53,9 @@ public class TaskController {
                 return value;
             }).toArray());
         }
+        TaskStatusEnum statusEnum = TaskStatusEnum.getFromString(task.getStatusEnum());
+        if(statusEnum != null)
+            newTask.setStatus(statusEnum);
         ModeEnum modeEnum = ModeEnum.getFromString(task.getModeEnum());
         if (modeEnum != null)
             newTask.setModeEnum(modeEnum);
@@ -63,7 +66,8 @@ public class TaskController {
             newTask.setForce(task.getForce());
         newTask.setIndexNumber(task.getIndexNumber());
         newTask.setPriority(task.getPriority());
-        newTask.setParallelismDegree(task.getParallelismDegree());
+        if(task.getDeadline() != null)
+            newTask.setDeadline(new Timestamp(task.getDeadline()));
         newTask.setMetaData(task.getMetaData());
         if(task.getRetries() != null)
             newTask.setRetries(task.getRetries());

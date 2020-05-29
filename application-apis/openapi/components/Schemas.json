@@ -20,7 +20,12 @@
         "description": "Priority of this task for scheduling",
         "type": "integer",
         "minimum": 0,
-        "maximum": 999
+        "maximum": 9999
+      },
+      "deadline": {
+        "description": "DateTime until this task has to be completed",
+        "type": "sting",
+        "format": "date-time"
       },
       "active_times": {
         "$ref": "#/ActiveTimesModel"
@@ -33,6 +38,17 @@
         },
         "minItems": 7,
         "maxItems": 7
+      },
+      "status": {
+        "description": "Status of task lifecycle",
+        "type": "string",
+        "default": "waiting",
+        "enum": [
+          "waiting",
+          "scheduled",
+          "dispatched",
+          "finished"
+        ]
       },
       "type_flag": {
         "description": "Type of this task (relevant for scheduling)",
@@ -70,11 +86,6 @@
       },
       "index_number": {
         "description": "[only with mode = sequential] Index number of task in corresponding sequence",
-        "type": "integer",
-        "minimum": 1
-      },
-      "parallelism_degree": {
-        "description": "[only with mode = parallel] Number of tasks allowed to be executed at the same time",
         "type": "integer",
         "minimum": 1
       },
@@ -116,7 +127,7 @@
         "description": "Priority of this task for scheduling",
         "type": "integer",
         "minimum": 0,
-        "maximum": 999
+        "maximum": 9999
       },
       "active_times": {
         "$ref": "#/ActiveTimesModel"
