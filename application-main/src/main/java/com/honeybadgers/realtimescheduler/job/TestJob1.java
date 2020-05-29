@@ -1,7 +1,7 @@
 package com.honeybadgers.realtimescheduler.job;
 
 
-import com.honeybadgers.realtimescheduler.services.TaskService;
+import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
 

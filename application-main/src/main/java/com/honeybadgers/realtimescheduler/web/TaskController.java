@@ -63,7 +63,6 @@ public class TaskController {
             newTask.setForce(task.getForce());
         newTask.setIndexNumber(task.getIndexNumber());
         newTask.setPriority(task.getPriority());
-        newTask.setParallelismDegree(task.getParallelismDegree());
         newTask.setMetaData(task.getMetaData());
         if(task.getRetries() != null)
             newTask.setRetries(task.getRetries());

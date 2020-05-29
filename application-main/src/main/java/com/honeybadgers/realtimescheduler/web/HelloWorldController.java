@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.web;
 
-import com.honeybadgers.realtimescheduler.services.RabbitMQSender;
+import com.honeybadgers.realtimescheduler.services.impl.RabbitMQSender;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

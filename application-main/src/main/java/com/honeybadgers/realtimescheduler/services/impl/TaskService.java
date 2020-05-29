@@ -1,7 +1,8 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.realtimescheduler.model.Task;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
+import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;

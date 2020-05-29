@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.realtimescheduler.services.impl;
 
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
