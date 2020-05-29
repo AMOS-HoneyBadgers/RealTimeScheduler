@@ -24,7 +24,7 @@
       },
       "deadline": {
         "description": "DateTime until this task has to be completed",
-        "type": "sting",
+        "type": "string",
         "format": "date-time"
       },
       "active_times": {
@@ -131,7 +131,7 @@
       },
       "deadline": {
         "description": "Default deadline for all tasks of this group",
-        "type": "sting",
+        "type": "string",
         "format": "date-time"
       },
       "active_times": {
