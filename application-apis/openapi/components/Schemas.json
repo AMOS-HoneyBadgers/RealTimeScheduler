@@ -124,16 +124,21 @@
         "maxLength": 128
       },
       "priority": {
-        "description": "Priority of this task for scheduling",
+        "description": "Default priority of all tasks of this group",
         "type": "integer",
         "minimum": 0,
         "maximum": 9999
+      },
+      "deadline": {
+        "description": "Default deadline for all tasks of this group",
+        "type": "sting",
+        "format": "date-time"
       },
       "active_times": {
         "$ref": "#/ActiveTimesModel"
       },
       "working_days": {
-        "description": "Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)",
+        "description": "Default working_days for tasks of this group",
         "type": "array",
         "items": {
           "type": "boolean"

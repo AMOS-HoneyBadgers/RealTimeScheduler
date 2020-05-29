@@ -91,6 +91,9 @@ public class Task {
     void checkModeParameters() {
         if(this.modeEnum == ModeEnum.Sequential) {
             assert this.indexNumber != null;
+        } else if(this.modeEnum == ModeEnum.Parallel) {
+            // TODO decide if necc
+            assert this.group.getParallelismDegree() != null;
         }
     }
 }

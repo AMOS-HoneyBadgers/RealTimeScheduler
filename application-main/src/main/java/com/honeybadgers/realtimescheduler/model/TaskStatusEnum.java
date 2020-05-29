@@ -4,6 +4,8 @@ public enum TaskStatusEnum {
     Waiting, Scheduled, Dispatched, Finished;
 
     public static TaskStatusEnum getFromString(String status) {
+        if (status == null)
+            return null;
         if (status.compareToIgnoreCase("Waiting") == 0) {
             return Waiting;
         } else if (status.compareToIgnoreCase("Scheduled") == 0) {

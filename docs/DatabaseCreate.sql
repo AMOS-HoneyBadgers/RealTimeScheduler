@@ -7,6 +7,7 @@ CREATE TABLE public."group"
     id character varying(128) COLLATE pg_catalog."default" NOT NULL,
     parent_id character varying(128) COLLATE pg_catalog."default",
     priority integer NOT NULL,
+    deadline timestamp without time zone,
     active_times jsonb,
     working_days integer[],
     type_flag character varying COLLATE pg_catalog."default" NOT NULL,
