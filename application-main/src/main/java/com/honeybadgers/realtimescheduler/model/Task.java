@@ -57,7 +57,7 @@ public class Task {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private TaskStatusEnum status;
+    private TaskStatusEnum status = TaskStatusEnum.Waiting;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_flag", nullable = false)
@@ -91,6 +91,9 @@ public class Task {
     void checkModeParameters() {
         if(this.modeEnum == ModeEnum.Sequential) {
             assert this.indexNumber != null;
+        } else if(this.modeEnum == ModeEnum.Parallel) {
+            // TODO decide if necc
+            assert this.group.getParallelismDegree() != null;
         }
     }
 }

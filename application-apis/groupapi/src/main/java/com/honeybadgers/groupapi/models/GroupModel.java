@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import org.openapitools.jackson.nullable.JsonNullable;
@@ -15,7 +16,7 @@ import javax.validation.constraints.*;
 /**
  * GroupModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-28T20:31:14.644+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:47.074+02:00[Europe/Berlin]")
 
 public class GroupModel   {
   @JsonProperty("id")
@@ -26,6 +27,10 @@ public class GroupModel   {
 
   @JsonProperty("priority")
   private Integer priority;
+
+  @JsonProperty("deadline")
+  @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
+  private OffsetDateTime deadline;
 
   @JsonProperty("active_times")
   @Valid
@@ -167,20 +172,41 @@ public class GroupModel   {
   }
 
   /**
-   * Priority of this task for scheduling
+   * Default priority of all tasks of this group
    * minimum: 0
-   * maximum: 999
+   * maximum: 9999
    * @return priority
   */
-  @ApiModelProperty(value = "Priority of this task for scheduling")
+  @ApiModelProperty(value = "Default priority of all tasks of this group")
 
-@Min(0) @Max(999) 
+@Min(0) @Max(9999) 
   public Integer getPriority() {
     return priority;
   }
 
   public void setPriority(Integer priority) {
     this.priority = priority;
+  }
+
+  public GroupModel deadline(OffsetDateTime deadline) {
+    this.deadline = deadline;
+    return this;
+  }
+
+  /**
+   * Default deadline for all tasks of this group
+   * @return deadline
+  */
+  @ApiModelProperty(value = "Default deadline for all tasks of this group")
+
+  @Valid
+
+  public OffsetDateTime getDeadline() {
+    return deadline;
+  }
+
+  public void setDeadline(OffsetDateTime deadline) {
+    this.deadline = deadline;
   }
 
   public GroupModel activeTimes(List<Object> activeTimes) {
@@ -225,10 +251,10 @@ public class GroupModel   {
   }
 
   /**
-   * Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)
+   * Default working_days for tasks of this group
    * @return workingDays
   */
-  @ApiModelProperty(value = "Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)")
+  @ApiModelProperty(value = "Default working_days for tasks of this group")
 
 @Size(min=7,max=7) 
   public List<Boolean> getWorkingDays() {
@@ -354,6 +380,7 @@ public class GroupModel   {
     return Objects.equals(this.id, groupModel.id) &&
         Objects.equals(this.parentId, groupModel.parentId) &&
         Objects.equals(this.priority, groupModel.priority) &&
+        Objects.equals(this.deadline, groupModel.deadline) &&
         Objects.equals(this.activeTimes, groupModel.activeTimes) &&
         Objects.equals(this.workingDays, groupModel.workingDays) &&
         Objects.equals(this.typeFlag, groupModel.typeFlag) &&
@@ -365,7 +392,7 @@ public class GroupModel   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, parentId, priority, activeTimes, workingDays, typeFlag, mode, paused, lastIndexNumber, parallelismDegree);
+    return Objects.hash(id, parentId, priority, deadline, activeTimes, workingDays, typeFlag, mode, paused, lastIndexNumber, parallelismDegree);
   }
 
   @Override
@@ -376,6 +403,7 @@ public class GroupModel   {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    parentId: ").append(toIndentedString(parentId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
+    sb.append("    deadline: ").append(toIndentedString(deadline)).append("\n");
     sb.append("    activeTimes: ").append(toIndentedString(activeTimes)).append("\n");
     sb.append("    workingDays: ").append(toIndentedString(workingDays)).append("\n");
     sb.append("    typeFlag: ").append(toIndentedString(typeFlag)).append("\n");

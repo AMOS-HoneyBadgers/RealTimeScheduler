@@ -4,6 +4,8 @@ public enum ModeEnum {
     Sequential, Parallel;
 
     public static ModeEnum getFromString(String mode){
+        if(mode == null)
+            return null;
         if( mode.compareToIgnoreCase("Sequential") == 0 ){
             return Sequential;
         }else if ( mode.compareToIgnoreCase( "Parallel")  == 0){

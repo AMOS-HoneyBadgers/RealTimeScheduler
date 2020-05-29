@@ -26,7 +26,6 @@
     "groupId": "testGroup2",
     "priority": 999,
     "typeFlagEnum": "Batch",
-    "modeEnum": "Parallel",
-    "parallelismDegree": 10
+    "modeEnum": "Parallel"
   }
 }

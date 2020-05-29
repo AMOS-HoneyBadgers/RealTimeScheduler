@@ -47,6 +47,9 @@ public class Group {
     @Column(name = "priority", nullable = false)
     private int priority;
 
+    @Column(name = "deadline")
+    private Timestamp deadline;
+
     @Type(type = "jsonb")
     @Column(name = "active_times", columnDefinition = "jsonb")
     @Basic(fetch = FetchType.LAZY)

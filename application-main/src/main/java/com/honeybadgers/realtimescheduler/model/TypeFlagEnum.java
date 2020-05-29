@@ -3,10 +3,12 @@ package com.honeybadgers.realtimescheduler.model;
 public enum TypeFlagEnum {
     Batch, Realtime;
 
-    public static TypeFlagEnum getFromString(String mode){
-        if( mode.compareToIgnoreCase("Batch") == 0 ){
+    public static TypeFlagEnum getFromString(String type) {
+        if (type == null)
+            return null;
+        if (type.compareToIgnoreCase("Batch") == 0) {
             return Batch;
-        } else if ( mode.compareToIgnoreCase( "Realtime")  == 0){
+        } else if (type.compareToIgnoreCase("Realtime") == 0) {
             return Realtime;
         } else {
             return Batch;
