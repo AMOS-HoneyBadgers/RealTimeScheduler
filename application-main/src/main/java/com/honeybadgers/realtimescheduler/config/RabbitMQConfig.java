@@ -19,7 +19,7 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
 public class RabbitMQConfig {
 
-    @Value("${dispatch.rabbitmq.queue}")
+    @Value("${dispatch.rabbitmq.dispatcherqueue}")
     String queueName;
 
     @Value("${dispatch.rabbitmq.exchange}")
