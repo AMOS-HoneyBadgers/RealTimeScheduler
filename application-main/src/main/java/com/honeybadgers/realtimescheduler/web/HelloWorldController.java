@@ -28,7 +28,7 @@ public class HelloWorldController {
 
     @GetMapping("/rabbit")
     public String getRabbit() {
-        sender.send("helloooo christoff and marco are here");
+        sender.sendTaskToDispatcher("helloooo christoff and marco are in dispatcher");
         return "Send Rabbit";
     }
     /*@GetMapping("/error")

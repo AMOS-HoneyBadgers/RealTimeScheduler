@@ -1,11 +1,42 @@
 package com.honeybadgers.realtimescheduler.services;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class RabbitMQReceiver {
 
-    public void receive(String in) {
+    @Autowired
+    ICommunication communication;
+
+    public RabbitMQReceiver() {
+
+    }
+
+    public RabbitMQReceiver(ICommunication communication) {
+        this.communication = communication;
+    }
+
+    public void receiveTask(String in) {
         System.out.println(" [x] Received '" + in + "'");
+        try {
+            workTask();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        communication.sendFeedbackToScheduler("feedback sent");
+    }
+
+    public void workTask() throws InterruptedException {
+
+        //actual long waitTime = (long) (Math.random() * ((10000 - 1000) + 1));
+        //for test
+        long waitTime = (long) (Math.random() * ((1001 - 1000) + 1));
+        Thread.sleep(waitTime);
+    }
+
+    public void receiveFeedback(String in) {
+        System.out.println(" [x] Received '" + in + "'");
+
     }
 }

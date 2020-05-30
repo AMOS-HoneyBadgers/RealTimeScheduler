@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
 public interface ICommunication {
-    void send(String task);
+    void sendTaskToDispatcher(String task);
+    String sendFeedbackToScheduler(String feedback);
 }
