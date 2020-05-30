@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.model;
 
+import com.vladmihalcea.hibernate.type.array.IntArrayType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -13,12 +14,14 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 @Entity
-@Table(name = "tasks")
+@Table(name = "task")
 @TypeDefs({
-        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class)
+        @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
+        @TypeDef(name = "int-array", typeClass = IntArrayType.class)
 })
 @Getter
 @Setter
@@ -26,81 +29,71 @@ import java.util.Map;
 @NoArgsConstructor
 public class Task {
     @Id
-    @Column(unique = true, nullable = false)
+    @Column(name = "id", unique = true, nullable = false)
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "group_id")
+    @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
     @Max(value = 999)
     @Min(value = 0)
-    @Column(nullable = false)
+    @Column(name = "priority", nullable = false)
     private int priority;
 
-    private Timestamp earliestStart;
+    @Column(name = "deadline")
+    private Timestamp deadline;
 
-    private Timestamp latestStart;
+    @Type(type = "jsonb")
+    @Column(name = "active_times", columnDefinition = "jsonb")
+    @Basic(fetch = FetchType.LAZY)
+    private List<ActiveTimes> activeTimeFrames;
 
-    @Min(value = 1)
-    private int workingDays;
+    // hibernate does not support boolean[] not even using hibernate-types-52
+    // -> boolean as int
+    @Type(type = "int-array")
+    @Column(name = "working_days", columnDefinition = "integer[]")
+    private int[] workingDays;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private TaskStatusEnum status = TaskStatusEnum.Waiting;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_flag", nullable = false)
-    private TypeFlagEnum typeFlagEnum;
+    private TypeFlagEnum typeFlagEnum = TypeFlagEnum.Batch;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "mode", nullable = false)
-    private ModeEnum modeEnum;
+    private ModeEnum modeEnum = ModeEnum.Parallel;
 
-    private int maxFailures;
+    @Min(value = 0)
+    @Column(name = "retries")
+    private int retries = 0;
 
+    @Column(name = "paused", nullable = false)
+    private boolean paused = false;
+
+    @Column(name = "force", nullable = false)
+    private boolean force = false;
+
+    @Min(value = 1)
+    @Column(name = "index_number")
     private Integer indexNumber;
 
-    private Boolean force;
-
-    private Integer parallelismDegree;
-
     @Type(type = "jsonb")
-    @Column(columnDefinition = "jsonb")
+    @Column(name = "meta_data", columnDefinition = "jsonb")
     @Basic(fetch = FetchType.LAZY)
     private Map<String, String> metaData;
 
-    public Task(String id, int priority, Timestamp latestStart, Timestamp earliestStart, int workingDays, TypeFlagEnum typeFlagEnum, ModeEnum modeEnum, int maxFailures, Integer indexNumber, Boolean force, Map<String, String> metaData) {
-        this.id = id;
-        this.priority = priority;
-        this.latestStart = latestStart;
-        this.earliestStart = earliestStart;
-        this.workingDays = workingDays;
-        this.typeFlagEnum = typeFlagEnum;
-        this.modeEnum = modeEnum;
-        this.maxFailures = maxFailures;
-        this.indexNumber = indexNumber;
-        this.force = force;
-        this.metaData = metaData;
-    }
-
-    public Task(String id, int priority, Timestamp latestStart, Timestamp earliestStart, int workingDays, TypeFlagEnum typeFlagEnum, ModeEnum modeEnum, int maxFailures, Integer parallelismDegree, Map<String, String> metaData) {
-        this.id = id;
-        this.priority = priority;
-        this.latestStart = latestStart;
-        this.earliestStart = earliestStart;
-        this.workingDays = workingDays;
-        this.typeFlagEnum = typeFlagEnum;
-        this.modeEnum = modeEnum;
-        this.maxFailures = maxFailures;
-        this.parallelismDegree = parallelismDegree;
-        this.metaData = metaData;
-    }
 
     @PrePersist
     void checkModeParameters() {
-        if(this.modeEnum == ModeEnum.Parallel) {
-            assert this.parallelismDegree != null;
-        } else if(this.modeEnum == ModeEnum.Sequential) {
+        if(this.modeEnum == ModeEnum.Sequential) {
             assert this.indexNumber != null;
-            if(this.force == null)
-                this.force = false;
+        } else if(this.modeEnum == ModeEnum.Parallel) {
+            // TODO decide if necc
+            assert this.group.getParallelismDegree() != null;
         }
     }
 }

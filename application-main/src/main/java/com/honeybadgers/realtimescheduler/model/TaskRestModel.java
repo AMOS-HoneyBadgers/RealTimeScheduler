@@ -10,6 +10,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Map;
 
 
@@ -19,29 +20,33 @@ import java.util.Map;
 @Setter
 public class TaskRestModel {
 
+    // TODO apply new changes of model
+
     private String id;
 
     private String groupId;
 
     private int priority;
 
-    private long earliestStart;
+    private Integer deadline;
 
-    private long latestStart;
+    private List<ActiveTimes> activeTimes;
 
-    private int workingDays;
+    private Integer[] workingDays;
+
+    private String statusEnum;
 
     private String typeFlagEnum;
 
     private String modeEnum;
 
-    private int maxFailures;
+    private Boolean paused;
 
-    private Integer indexNumber;
+    private Integer retries;
 
     private Boolean force;
 
-    private Integer parallelismDegree;
+    private Integer indexNumber;
 
     private Map<String, String> metaData;
 

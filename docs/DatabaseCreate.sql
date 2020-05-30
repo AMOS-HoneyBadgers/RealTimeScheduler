@@ -1,19 +1,23 @@
--- Table: public.groups
+-- Table: public."group"
 
--- DROP TABLE public.groups;
+-- DROP TABLE public."group";
 
-CREATE TABLE public.groups
+CREATE TABLE public."group"
 (
-    id character varying COLLATE pg_catalog."default" NOT NULL,
-    "parent_id" character varying COLLATE pg_catalog."default",
+    id character varying(128) COLLATE pg_catalog."default" NOT NULL,
+    parent_id character varying(128) COLLATE pg_catalog."default",
     priority integer NOT NULL,
-    "type_flag" character varying COLLATE pg_catalog."default" NOT NULL,
-    "max_failures" character varying COLLATE pg_catalog."default" NOT NULL,
+    deadline timestamp without time zone,
+    active_times jsonb,
+    working_days integer[],
+    type_flag character varying COLLATE pg_catalog."default" NOT NULL,
     mode character varying COLLATE pg_catalog."default" NOT NULL,
-    paused boolean,
-    CONSTRAINT groups_pkey PRIMARY KEY (id),
-    CONSTRAINT parent FOREIGN KEY ("parent_id")
-        REFERENCES public.groups (id) MATCH SIMPLE
+    paused boolean NOT NULL,
+    last_index_number bigint,
+    parallelism_degree integer,
+    CONSTRAINT group_pkey PRIMARY KEY (id),
+    CONSTRAINT parent_fk FOREIGN KEY (parent_id)
+        REFERENCES public."group" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
@@ -22,31 +26,34 @@ CREATE TABLE public.groups
     )
     TABLESPACE pg_default;
 
-ALTER TABLE public.groups
+ALTER TABLE public."group"
     OWNER to realtimescheduler;
 
--- Table: public.tasks
 
--- DROP TABLE public.tasks;
 
-CREATE TABLE public.tasks
+-- Table: public.task
+
+-- DROP TABLE public.task;
+
+CREATE TABLE public.task
 (
-    id character varying COLLATE pg_catalog."default" NOT NULL,
-    "group_id" character varying COLLATE pg_catalog."default" NOT NULL,
+    id character varying(36) COLLATE pg_catalog."default" NOT NULL,
+    group_id character varying(128) COLLATE pg_catalog."default" NOT NULL,
     priority integer NOT NULL,
-    "earliest_start" timestamp without time zone NOT NULL,
-    "latest_start" timestamp without time zone NOT NULL,
-    "working_days" integer NOT NULL,
-    "type_flag" character varying COLLATE pg_catalog."default" NOT NULL,
-    "max_failures" integer NOT NULL,
+    deadline timestamp without time zone,
+    active_times jsonb,
+    working_days integer[],
+    status character varying COLLATE pg_catalog."default" NOT NULL,
+    type_flag character varying COLLATE pg_catalog."default" NOT NULL,
     mode character varying COLLATE pg_catalog."default" NOT NULL,
-    "index_number" bigint,
-    force boolean,
-    "parallelism_degree" integer,
-    "meta_data" jsonb,
-    CONSTRAINT tasks_pkey PRIMARY KEY (id),
-    CONSTRAINT group_fk FOREIGN KEY ("group_id")
-        REFERENCES public.groups (id) MATCH SIMPLE
+    retries integer,
+    paused boolean NOT NULL,
+    force boolean NOT NULL,
+    index_number bigint,
+    meta_data jsonb,
+    CONSTRAINT task_pkey PRIMARY KEY (id),
+    CONSTRAINT group_fk FOREIGN KEY (group_id)
+        REFERENCES public."group" (id) MATCH SIMPLE
         ON UPDATE NO ACTION
         ON DELETE NO ACTION
 )
@@ -55,5 +62,5 @@ CREATE TABLE public.tasks
     )
     TABLESPACE pg_default;
 
-ALTER TABLE public.tasks
+ALTER TABLE public.task
     OWNER to realtimescheduler;

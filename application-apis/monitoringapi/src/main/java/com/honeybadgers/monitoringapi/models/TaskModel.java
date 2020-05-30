@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.honeybadgers.monitoringapi.models.TaskModelMeta;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -17,26 +18,71 @@ import javax.validation.constraints.*;
 /**
  * TaskModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:26.611+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:48.075+02:00[Europe/Berlin]")
 
 public class TaskModel   {
   @JsonProperty("id")
   private UUID id;
 
-  @JsonProperty("groupId")
-  private UUID groupId;
+  @JsonProperty("group_id")
+  private String groupId;
 
   @JsonProperty("priority")
   private Integer priority;
 
-  @JsonProperty("earliestStart")
-  private String earliestStart;
+  @JsonProperty("deadline")
+  @org.springframework.format.annotation.DateTimeFormat(iso = org.springframework.format.annotation.DateTimeFormat.ISO.DATE_TIME)
+  private OffsetDateTime deadline;
 
-  @JsonProperty("latestStart")
-  private String latestStart;
+  @JsonProperty("active_times")
+  @Valid
+  private List<Object> activeTimes = null;
 
-  @JsonProperty("workingDays")
-  private Integer workingDays;
+  @JsonProperty("working_days")
+  @Valid
+  private List<Boolean> workingDays = null;
+
+  /**
+   * Status of task lifecycle
+   */
+  public enum StatusEnum {
+    WAITING("waiting"),
+    
+    SCHEDULED("scheduled"),
+    
+    DISPATCHED("dispatched"),
+    
+    FINISHED("finished");
+
+    private String value;
+
+    StatusEnum(String value) {
+      this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    @JsonCreator
+    public static StatusEnum fromValue(String value) {
+      for (StatusEnum b : StatusEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+  }
+
+  @JsonProperty("status")
+  private StatusEnum status = StatusEnum.WAITING;
 
   /**
    * Type of this task (relevant for scheduling)
@@ -44,7 +90,7 @@ public class TaskModel   {
   public enum TypeFlagEnum {
     BATCH("batch"),
     
-    USER("user");
+    REALTIME("realtime");
 
     private String value;
 
@@ -73,11 +119,8 @@ public class TaskModel   {
     }
   }
 
-  @JsonProperty("typeFlag")
-  private TypeFlagEnum typeFlag;
-
-  @JsonProperty("maxFailures")
-  private Integer maxFailures;
+  @JsonProperty("type_flag")
+  private TypeFlagEnum typeFlag = TypeFlagEnum.BATCH;
 
   /**
    * Mode of task
@@ -115,16 +158,19 @@ public class TaskModel   {
   }
 
   @JsonProperty("mode")
-  private ModeEnum mode;
+  private ModeEnum mode = ModeEnum.PARALLEL;
 
-  @JsonProperty("indexNumber")
-  private Integer indexNumber;
+  @JsonProperty("retries")
+  private Integer retries = 0;
+
+  @JsonProperty("paused")
+  private Boolean paused = false;
 
   @JsonProperty("force")
-  private Boolean force;
+  private Boolean force = false;
 
-  @JsonProperty("parallelismDegree")
-  private Integer parallelismDegree;
+  @JsonProperty("index_number")
+  private Integer indexNumber;
 
   @JsonProperty("meta")
   @Valid
@@ -152,7 +198,7 @@ public class TaskModel   {
     this.id = id;
   }
 
-  public TaskModel groupId(UUID groupId) {
+  public TaskModel groupId(String groupId) {
     this.groupId = groupId;
     return this;
   }
@@ -164,13 +210,12 @@ public class TaskModel   {
   @ApiModelProperty(required = true, value = "Id of group this task is assigned to")
   @NotNull
 
-  @Valid
-
-  public UUID getGroupId() {
+@Size(max=128) 
+  public String getGroupId() {
     return groupId;
   }
 
-  public void setGroupId(UUID groupId) {
+  public void setGroupId(String groupId) {
     this.groupId = groupId;
   }
 
@@ -182,12 +227,12 @@ public class TaskModel   {
   /**
    * Priority of this task for scheduling
    * minimum: 0
-   * maximum: 999
+   * maximum: 9999
    * @return priority
   */
   @ApiModelProperty(value = "Priority of this task for scheduling")
 
-@Min(0) @Max(999) 
+@Min(0) @Max(9999) 
   public Integer getPriority() {
     return priority;
   }
@@ -196,65 +241,101 @@ public class TaskModel   {
     this.priority = priority;
   }
 
-  public TaskModel earliestStart(String earliestStart) {
-    this.earliestStart = earliestStart;
+  public TaskModel deadline(OffsetDateTime deadline) {
+    this.deadline = deadline;
     return this;
   }
 
   /**
-   * Time, by which this task is allowed to be dispatched at earliest
-   * @return earliestStart
+   * DateTime until this task has to be completed
+   * @return deadline
   */
-  @ApiModelProperty(value = "Time, by which this task is allowed to be dispatched at earliest")
+  @ApiModelProperty(value = "DateTime until this task has to be completed")
 
+  @Valid
 
-  public String getEarliestStart() {
-    return earliestStart;
+  public OffsetDateTime getDeadline() {
+    return deadline;
   }
 
-  public void setEarliestStart(String earliestStart) {
-    this.earliestStart = earliestStart;
+  public void setDeadline(OffsetDateTime deadline) {
+    this.deadline = deadline;
   }
 
-  public TaskModel latestStart(String latestStart) {
-    this.latestStart = latestStart;
+  public TaskModel activeTimes(List<Object> activeTimes) {
+    this.activeTimes = activeTimes;
+    return this;
+  }
+
+  public TaskModel addActiveTimesItem(Object activeTimesItem) {
+    if (this.activeTimes == null) {
+      this.activeTimes = new ArrayList<>();
+    }
+    this.activeTimes.add(activeTimesItem);
     return this;
   }
 
   /**
-   * Time, by which this task has to be dispatched at latest
-   * @return latestStart
+   * Array containing time frames, in which tasks are allowed to be dispatched
+   * @return activeTimes
   */
-  @ApiModelProperty(value = "Time, by which this task has to be dispatched at latest")
+  @ApiModelProperty(value = "Array containing time frames, in which tasks are allowed to be dispatched")
 
 
-  public String getLatestStart() {
-    return latestStart;
+  public List<Object> getActiveTimes() {
+    return activeTimes;
   }
 
-  public void setLatestStart(String latestStart) {
-    this.latestStart = latestStart;
+  public void setActiveTimes(List<Object> activeTimes) {
+    this.activeTimes = activeTimes;
   }
 
-  public TaskModel workingDays(Integer workingDays) {
+  public TaskModel workingDays(List<Boolean> workingDays) {
     this.workingDays = workingDays;
     return this;
   }
 
+  public TaskModel addWorkingDaysItem(Boolean workingDaysItem) {
+    if (this.workingDays == null) {
+      this.workingDays = new ArrayList<>();
+    }
+    this.workingDays.add(workingDaysItem);
+    return this;
+  }
+
   /**
-   * Days for processing
-   * minimum: 1
+   * Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)
    * @return workingDays
   */
-  @ApiModelProperty(value = "Days for processing")
+  @ApiModelProperty(value = "Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)")
 
-@Min(1)
-  public Integer getWorkingDays() {
+@Size(min=7,max=7) 
+  public List<Boolean> getWorkingDays() {
     return workingDays;
   }
 
-  public void setWorkingDays(Integer workingDays) {
+  public void setWorkingDays(List<Boolean> workingDays) {
     this.workingDays = workingDays;
+  }
+
+  public TaskModel status(StatusEnum status) {
+    this.status = status;
+    return this;
+  }
+
+  /**
+   * Status of task lifecycle
+   * @return status
+  */
+  @ApiModelProperty(value = "Status of task lifecycle")
+
+
+  public StatusEnum getStatus() {
+    return status;
+  }
+
+  public void setStatus(StatusEnum status) {
+    this.status = status;
   }
 
   public TaskModel typeFlag(TypeFlagEnum typeFlag) {
@@ -277,27 +358,6 @@ public class TaskModel   {
     this.typeFlag = typeFlag;
   }
 
-  public TaskModel maxFailures(Integer maxFailures) {
-    this.maxFailures = maxFailures;
-    return this;
-  }
-
-  /**
-   * Maximum number of failures this task is allowed to fail
-   * minimum: 0
-   * @return maxFailures
-  */
-  @ApiModelProperty(value = "Maximum number of failures this task is allowed to fail")
-
-@Min(0)
-  public Integer getMaxFailures() {
-    return maxFailures;
-  }
-
-  public void setMaxFailures(Integer maxFailures) {
-    this.maxFailures = maxFailures;
-  }
-
   public TaskModel mode(ModeEnum mode) {
     this.mode = mode;
     return this;
@@ -318,25 +378,45 @@ public class TaskModel   {
     this.mode = mode;
   }
 
-  public TaskModel indexNumber(Integer indexNumber) {
-    this.indexNumber = indexNumber;
+  public TaskModel retries(Integer retries) {
+    this.retries = retries;
     return this;
   }
 
   /**
-   * [only with mode = sequential] Index number of task in corresponding sequence
+   * Number of times, this task has been retried
    * minimum: 0
-   * @return indexNumber
+   * @return retries
   */
-  @ApiModelProperty(value = "[only with mode = sequential] Index number of task in corresponding sequence")
+  @ApiModelProperty(value = "Number of times, this task has been retried")
 
 @Min(0)
-  public Integer getIndexNumber() {
-    return indexNumber;
+  public Integer getRetries() {
+    return retries;
   }
 
-  public void setIndexNumber(Integer indexNumber) {
-    this.indexNumber = indexNumber;
+  public void setRetries(Integer retries) {
+    this.retries = retries;
+  }
+
+  public TaskModel paused(Boolean paused) {
+    this.paused = paused;
+    return this;
+  }
+
+  /**
+   * Boolean, which identifies, whereas this group (and all of its tasks) are currently paused
+   * @return paused
+  */
+  @ApiModelProperty(value = "Boolean, which identifies, whereas this group (and all of its tasks) are currently paused")
+
+
+  public Boolean getPaused() {
+    return paused;
+  }
+
+  public void setPaused(Boolean paused) {
+    this.paused = paused;
   }
 
   public TaskModel force(Boolean force) {
@@ -345,10 +425,10 @@ public class TaskModel   {
   }
 
   /**
-   * [only with mode = sequential] If set to true: ignore indexNumber and do not wait on previous tasks
+   * If set to true: send task directly to dispatcher without scheduling
    * @return force
   */
-  @ApiModelProperty(value = "[only with mode = sequential] If set to true: ignore indexNumber and do not wait on previous tasks")
+  @ApiModelProperty(value = "If set to true: send task directly to dispatcher without scheduling")
 
 
   public Boolean getForce() {
@@ -359,24 +439,25 @@ public class TaskModel   {
     this.force = force;
   }
 
-  public TaskModel parallelismDegree(Integer parallelismDegree) {
-    this.parallelismDegree = parallelismDegree;
+  public TaskModel indexNumber(Integer indexNumber) {
+    this.indexNumber = indexNumber;
     return this;
   }
 
   /**
-   * [only with mode = parallel] Number of tasks allowed to be executed at the same time
-   * @return parallelismDegree
+   * [only with mode = sequential] Index number of task in corresponding sequence
+   * minimum: 1
+   * @return indexNumber
   */
-  @ApiModelProperty(value = "[only with mode = parallel] Number of tasks allowed to be executed at the same time")
+  @ApiModelProperty(value = "[only with mode = sequential] Index number of task in corresponding sequence")
 
-
-  public Integer getParallelismDegree() {
-    return parallelismDegree;
+@Min(1)
+  public Integer getIndexNumber() {
+    return indexNumber;
   }
 
-  public void setParallelismDegree(Integer parallelismDegree) {
-    this.parallelismDegree = parallelismDegree;
+  public void setIndexNumber(Integer indexNumber) {
+    this.indexNumber = indexNumber;
   }
 
   public TaskModel meta(List<TaskModelMeta> meta) {
@@ -421,21 +502,22 @@ public class TaskModel   {
     return Objects.equals(this.id, taskModel.id) &&
         Objects.equals(this.groupId, taskModel.groupId) &&
         Objects.equals(this.priority, taskModel.priority) &&
-        Objects.equals(this.earliestStart, taskModel.earliestStart) &&
-        Objects.equals(this.latestStart, taskModel.latestStart) &&
+        Objects.equals(this.deadline, taskModel.deadline) &&
+        Objects.equals(this.activeTimes, taskModel.activeTimes) &&
         Objects.equals(this.workingDays, taskModel.workingDays) &&
+        Objects.equals(this.status, taskModel.status) &&
         Objects.equals(this.typeFlag, taskModel.typeFlag) &&
-        Objects.equals(this.maxFailures, taskModel.maxFailures) &&
         Objects.equals(this.mode, taskModel.mode) &&
-        Objects.equals(this.indexNumber, taskModel.indexNumber) &&
+        Objects.equals(this.retries, taskModel.retries) &&
+        Objects.equals(this.paused, taskModel.paused) &&
         Objects.equals(this.force, taskModel.force) &&
-        Objects.equals(this.parallelismDegree, taskModel.parallelismDegree) &&
+        Objects.equals(this.indexNumber, taskModel.indexNumber) &&
         Objects.equals(this.meta, taskModel.meta);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, groupId, priority, earliestStart, latestStart, workingDays, typeFlag, maxFailures, mode, indexNumber, force, parallelismDegree, meta);
+    return Objects.hash(id, groupId, priority, deadline, activeTimes, workingDays, status, typeFlag, mode, retries, paused, force, indexNumber, meta);
   }
 
   @Override
@@ -446,15 +528,16 @@ public class TaskModel   {
     sb.append("    id: ").append(toIndentedString(id)).append("\n");
     sb.append("    groupId: ").append(toIndentedString(groupId)).append("\n");
     sb.append("    priority: ").append(toIndentedString(priority)).append("\n");
-    sb.append("    earliestStart: ").append(toIndentedString(earliestStart)).append("\n");
-    sb.append("    latestStart: ").append(toIndentedString(latestStart)).append("\n");
+    sb.append("    deadline: ").append(toIndentedString(deadline)).append("\n");
+    sb.append("    activeTimes: ").append(toIndentedString(activeTimes)).append("\n");
     sb.append("    workingDays: ").append(toIndentedString(workingDays)).append("\n");
+    sb.append("    status: ").append(toIndentedString(status)).append("\n");
     sb.append("    typeFlag: ").append(toIndentedString(typeFlag)).append("\n");
-    sb.append("    maxFailures: ").append(toIndentedString(maxFailures)).append("\n");
     sb.append("    mode: ").append(toIndentedString(mode)).append("\n");
-    sb.append("    indexNumber: ").append(toIndentedString(indexNumber)).append("\n");
+    sb.append("    retries: ").append(toIndentedString(retries)).append("\n");
+    sb.append("    paused: ").append(toIndentedString(paused)).append("\n");
     sb.append("    force: ").append(toIndentedString(force)).append("\n");
-    sb.append("    parallelismDegree: ").append(toIndentedString(parallelismDegree)).append("\n");
+    sb.append("    indexNumber: ").append(toIndentedString(indexNumber)).append("\n");
     sb.append("    meta: ").append(toIndentedString(meta)).append("\n");
     sb.append("}");
     return sb.toString();
