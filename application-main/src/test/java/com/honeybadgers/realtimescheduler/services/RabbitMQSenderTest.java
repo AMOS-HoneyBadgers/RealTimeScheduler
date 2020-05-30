@@ -2,14 +2,17 @@ package com.honeybadgers.realtimescheduler.services;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+@RunWith(MockitoJUnitRunner.class)
 class RabbitMQSenderTest {
 
     @Mock
@@ -20,7 +23,7 @@ class RabbitMQSenderTest {
     @BeforeEach
     public void beforeEach() {
         MockitoAnnotations.initMocks(this);
-        sender = new RabbitMQSender();
+        sender = new RabbitMQSender(rabbitTemplate);
     }
 
 
