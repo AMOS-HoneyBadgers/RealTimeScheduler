@@ -31,10 +31,13 @@ class RabbitMQSenderTest {
     void sendTaskToDispatcher() {
         RabbitMQSender spy = Mockito.spy(sender);
         spy.sendTaskToDispatcher("task");
-        //Mockito.verify(rabbitTemplate.)
+        Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
     }
 
     @Test
     void sendFeedbackToScheduler() {
+        RabbitMQSender spy = Mockito.spy(sender);
+        spy.sendFeedbackToScheduler("feedback");
+        Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
     }
 }

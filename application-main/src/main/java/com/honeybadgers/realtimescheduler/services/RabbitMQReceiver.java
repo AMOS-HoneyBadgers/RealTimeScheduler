@@ -37,6 +37,11 @@ public class RabbitMQReceiver {
 
     public void receiveFeedback(String in) {
         System.out.println(" [x] Received '" + in + "'");
-
+        changeTaskStatus(in);
     }
+
+    public void changeTaskStatus(String in) {
+        // do database operation
+    }
+
 }

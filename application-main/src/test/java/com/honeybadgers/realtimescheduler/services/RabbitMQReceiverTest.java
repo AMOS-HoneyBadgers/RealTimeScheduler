@@ -14,7 +14,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(SpringJUnit4ClassRunner.class)
 class RabbitMQReceiverTest {
 
     @Mock
@@ -29,10 +29,19 @@ class RabbitMQReceiverTest {
     }
 
     @Test
-    public void someTest() throws InterruptedException {
+    public void testReceiveTaskCallsInternalMethods() throws InterruptedException {
         RabbitMQReceiver spy = Mockito.spy(receiver);
         spy.receiveTask("ss");
         Mockito.verify(spy).receiveTask(Mockito.any());
         Mockito.verify(spy).workTask();
+    }
+
+
+    @Test
+    public void testReceiveFeedbackCallsInternalMethods() throws InterruptedException {
+        RabbitMQReceiver spy = Mockito.spy(receiver);
+        spy.receiveFeedback("ss");
+        Mockito.verify(spy).receiveFeedback(Mockito.any());
+        Mockito.verify(spy).changeTaskStatus(Mockito.any());
     }
 }
