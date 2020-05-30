@@ -33,6 +33,6 @@ public class RabbitMQSender implements ICommunication {
 
     @Override
     public void send(String task) {
-        
+
     }
 }
