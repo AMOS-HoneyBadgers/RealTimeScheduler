@@ -171,12 +171,8 @@ public class TaskController {
 
         Task task = new Task();
         task.setPriority(Integer.parseInt(priority));
-        this.taskService.calculatePriority(task);
-        this.taskService.scheduleTask(Integer.parseInt(priority));
-
-
+        RedisTask redisTask = this.taskService.calculatePriority(task);
+        this.taskService.scheduleTask(redisTask);
         return ResponseEntity.ok().build();
     }
-
-
 }
