@@ -13,4 +13,8 @@ public interface ITaskService {
     void uploadTask(Task task);
 
     void deleteTask(String id);
+
+    void calculatePriority(Task task);
+
+    void scheduleTask(int priority);
 }

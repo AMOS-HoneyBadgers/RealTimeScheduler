@@ -16,8 +16,11 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import static org.quartz.DateBuilder.futureDate;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -145,16 +148,18 @@ public class TaskController {
     @GetMapping("/testCreate/{priority}")
     public ResponseEntity<?> create(@PathVariable(value = "priority") final String priority) throws SchedulerException {
 
+        Date startTime = futureDate(5, DateBuilder.IntervalUnit.SECOND);
+
         for (int i = 0; i < 10; i++) {
             JobDetail jd = JobBuilder.newJob(TestJob1.class)
                     .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                    .usingJobData("id", UUID.randomUUID().toString())
+                    .usingJobData("id", Integer.toString(i))
                     .storeDurably(true)
                     .build();
 
             Trigger tg = TriggerBuilder.newTrigger()
                     .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                    .startNow()
+                    .startAt(startTime)
                     .withPriority(i)
                     .withSchedule(SimpleScheduleBuilder.simpleSchedule())
                     .build();
@@ -163,25 +168,14 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/testrepeat")
-    public ResponseEntity<?> createRepeatJob() throws SchedulerException {
+    @GetMapping("/testtask/{priority}")
+    public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) throws SchedulerException {
 
-        JobDetail jd = JobBuilder.newJob(TestJob1.class)
-                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                .usingJobData("id", UUID.randomUUID().toString())
-                .storeDurably(true)
-                .build();
+        Task task = new Task();
+        task.setPriority(Integer.parseInt(priority));
+        this.taskService.calculatePriority(task);
+        this.taskService.scheduleTask(Integer.parseInt(priority));
 
-        Trigger tg = TriggerBuilder.newTrigger()
-                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                .startNow()
-                .withPriority(1)
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .repeatForever()
-                        .withIntervalInSeconds(5))
-                .build();
-
-        scheduler.scheduleJob(jd, tg);
 
         return ResponseEntity.ok().build();
     }

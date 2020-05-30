@@ -29,4 +29,14 @@ public class TaskService implements ITaskService {
     public void deleteTask(String id) {
         this.taskPostgresRepository.deleteById(id);
     }
+
+    @Override
+    public void calculatePriority(Task task) {
+        
+    }
+
+    @Override
+    public void scheduleTask(int priority) {
+
+    }
 }

@@ -42,6 +42,7 @@ public class RabbitMQConfig {
     Queue dispatcherqueue() {
         return new Queue(dispatcherqueue, false);
     }
+
     @Qualifier("feedbackqueue")
     @Bean
     Queue feedbackqueue() {
@@ -53,6 +54,7 @@ public class RabbitMQConfig {
     DirectExchange dispatcherexchange() {
         return new DirectExchange(dispatcherExchange);
     }
+
     @Qualifier("feedbackExchange")
     @Bean
     DirectExchange feedbackexchange() {
