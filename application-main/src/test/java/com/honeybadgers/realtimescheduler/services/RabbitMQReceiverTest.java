@@ -1,28 +1,22 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import org.junit.Before;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-class RabbitMQReceiverTest {
+public class RabbitMQReceiverTest {
 
     @Mock
     ICommunication sender;
 
     private RabbitMQReceiver receiver;
 
-    @BeforeEach
+    @Before
     public void beforeEach() {
         MockitoAnnotations.initMocks(this);
         receiver = new RabbitMQReceiver(sender);

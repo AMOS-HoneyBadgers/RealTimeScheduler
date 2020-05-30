@@ -44,7 +44,20 @@
             <version>2.2.6.RELEASE</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.3.2</version>
+            <scope>test</scope>
         <!-- Bean Validation API support -->
+        </dependency>
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
@@ -189,6 +202,7 @@
                     <argLine>${surefireArgLine}</argLine>
                 </configuration>
             </plugin>
+
 
             <plugin>
                 <groupId>org.jacoco</groupId>
