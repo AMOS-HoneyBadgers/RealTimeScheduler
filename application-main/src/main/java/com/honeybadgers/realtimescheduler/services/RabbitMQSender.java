@@ -32,9 +32,10 @@ public class RabbitMQSender implements ICommunication {
 
     // Mock for Dispatcher
     @Override
-    public void sendFeedbackToScheduler(String feedback) {
+    public String sendFeedbackToScheduler(String feedback) {
         rabbitTemplate.convertAndSend(feedbackExchange, feedbackroutingkey, feedback);
         System.out.println("Send msg = " + feedback);
+        return "test";
     }
 
 
