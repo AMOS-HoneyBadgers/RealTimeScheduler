@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import org.springframework.amqp.core.AmqpTemplate;
+
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 public class RabbitMQSender implements ICommunication {
 
     @Autowired
-    private AmqpTemplate rabbitTemplate;
+    private RabbitTemplate rabbitTemplate;
 
     @Value("${dispatch.rabbitmq.exchange}")
     private String exchange;
