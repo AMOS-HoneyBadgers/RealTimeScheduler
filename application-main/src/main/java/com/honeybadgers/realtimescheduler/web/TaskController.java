@@ -1,10 +1,9 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.job.TestJob1;
-import com.honeybadgers.realtimescheduler.model.Group;
-import com.honeybadgers.realtimescheduler.model.Task;
-import com.honeybadgers.realtimescheduler.services.GroupService;
-import com.honeybadgers.realtimescheduler.services.TaskService;
+import com.honeybadgers.realtimescheduler.model.*;
+import com.honeybadgers.realtimescheduler.services.IGroupService;
+import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,10 +23,10 @@ import java.util.UUID;
 public class TaskController {
 
     @Autowired
-    TaskService taskService;
+    ITaskService taskService;
 
     @Autowired
-    GroupService groupService;
+    IGroupService groupService;
 
     @Autowired
     Scheduler scheduler;
@@ -37,8 +37,24 @@ public class TaskController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/task")
-    public ResponseEntity<?> uploadTask(@Valid @RequestBody Task task) {
-        this.taskService.uploadTask(task);
+    public ResponseEntity<?> uploadTask(@Valid @RequestBody TaskRestModel task) {
+
+        Task newTask = new Task();
+        newTask.setId( task.getId() );
+        newTask.setGroup(groupService.getGroupById(task.getGroupId()));
+        newTask.setEarliestStart(new Timestamp(task.getEarliestStart()));
+        newTask.setLatestStart(new Timestamp(task.getLatestStart()));
+        newTask.setModeEnum(ModeEnum.getFromString( task.getModeEnum() ));
+        newTask.setTypeFlagEnum( TypeFlagEnum.getFromString( task.getTypeFlagEnum() ) );
+        newTask.setForce( task.getForce() );
+        newTask.setIndexNumber( task.getIndexNumber() );
+        newTask.setPriority( task.getPriority() );
+        newTask.setWorkingDays( task.getWorkingDays() );
+        newTask.setParallelismDegree( task.getParallelismDegree() );
+        newTask.setMetaData( task.getMetaData() );
+        newTask.setMaxFailures(task.getMaxFailures());
+
+        this.taskService.uploadTask(newTask);
         return ResponseEntity.ok().build();
     }
 
@@ -60,8 +76,18 @@ public class TaskController {
     }
 
     @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE}, value="/group")
-    public ResponseEntity<?> uploadGroup(@Valid @RequestBody Group grp) {
-        this.groupService.uploadGroup(grp);
+    public ResponseEntity<?> uploadGroup(@Valid @RequestBody GroupRestModel grp) {
+
+        Group newGroup = new Group();
+        newGroup.setId( grp.getId() );
+        newGroup.setMaxFailures( grp.getMaxFailures() );
+        newGroup.setModeEnum( ModeEnum.getFromString( grp.getModeEnum() ) );
+        newGroup.setTypeFlagEnum( TypeFlagEnum.getFromString( grp.getTypeFlagEnum() ) );
+        newGroup.setPriority( grp.getPriority() );
+        newGroup.setParentGroup(groupService.getGroupById(grp.getParentGroupId()));
+
+
+        this.groupService.uploadGroup(newGroup);
         return ResponseEntity.ok().build();
     }
 
@@ -78,19 +104,42 @@ public class TaskController {
     }
 
     @GetMapping("/testCreate/{priority}")
-    public ResponseEntity<?>create(@PathVariable(value="priority") final String priority) throws SchedulerException {
-        String id = UUID.randomUUID().toString();
+    public ResponseEntity<?> create(@PathVariable(value = "priority") final String priority) throws SchedulerException {
+
+        for (int i = 0; i < 10; i++) {
+            JobDetail jd = JobBuilder.newJob(TestJob1.class)
+                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                    .usingJobData("id", UUID.randomUUID().toString())
+                    .storeDurably(true)
+                    .build();
+
+            Trigger tg = TriggerBuilder.newTrigger()
+                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                    .startNow()
+                    .withPriority(i)
+                    .withSchedule(SimpleScheduleBuilder.simpleSchedule())
+                    .build();
+            scheduler.scheduleJob(jd, tg);
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/testrepeat")
+    public ResponseEntity<?> createRepeatJob() throws SchedulerException {
+
         JobDetail jd = JobBuilder.newJob(TestJob1.class)
-                .withIdentity(id, "group1")
+                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
+                .usingJobData("id", UUID.randomUUID().toString())
                 .storeDurably(true)
                 .build();
 
         Trigger tg = TriggerBuilder.newTrigger()
-                .forJob(jd)
-                .withIdentity(id, "group1")
+                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
                 .startNow()
-                .withPriority(Integer.parseInt(priority))
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule())
+                .withPriority(1)
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
+                        .repeatForever()
+                        .withIntervalInSeconds(5))
                 .build();
 
         scheduler.scheduleJob(jd, tg);

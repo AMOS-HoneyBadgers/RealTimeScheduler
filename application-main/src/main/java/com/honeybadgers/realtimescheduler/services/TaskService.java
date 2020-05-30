@@ -12,24 +12,22 @@ import java.util.List;
 
 @Service
 @Slf4j
-public class TaskService {
+public class TaskService implements ITaskService {
 
     @Autowired
     TaskPostgresRepository taskPostgresRepository;
 
-    public void run(String id){
-        System.out.println("ID: " + id + "Date: " + new Date());
-    }
-
+    @Override
     public List<Task> getAllTasks() {
-        return this.taskPostgresRepository.findAll();
+        return taskPostgresRepository.findAll();
     }
 
-
+    @Override
     public void uploadTask(Task task) {
-        Task s = this.taskPostgresRepository.save(task);
+        taskPostgresRepository.save(task);
     }
 
+    @Override
     public void deleteTask(String id) {
         this.taskPostgresRepository.deleteById(id);
     }
