@@ -24,6 +24,10 @@ public class RabbitMQSender implements ICommunication {
     @Value("${dispatch.rabbitmq.feedbackexchange}")
     String feedbackExchange;
 
+    public RabbitMQSender(RabbitTemplate template) {
+        this.rabbitTemplate = template;
+    }
+
     @Override
     public void sendTaskToDispatcher(String task) {
         rabbitTemplate.convertAndSend(dispatcherexchange, dispatcherroutingkey, task);
