@@ -1,7 +1,9 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.job.TestJob1;
-import com.honeybadgers.realtimescheduler.model.*;
+import com.honeybadgers.models.*;
+import com.honeybadgers.realtimescheduler.model.GroupRestModel;
+import com.honeybadgers.realtimescheduler.model.TaskRestModel;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;

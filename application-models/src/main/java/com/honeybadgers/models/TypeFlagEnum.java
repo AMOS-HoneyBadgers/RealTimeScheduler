@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.model;
+package com.honeybadgers.models;
 
 public enum TypeFlagEnum {
     Batch, Realtime;
