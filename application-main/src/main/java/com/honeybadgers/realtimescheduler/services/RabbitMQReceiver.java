@@ -28,10 +28,7 @@ public class RabbitMQReceiver {
     }
 
     public void workTask() throws InterruptedException {
-
-        //actual long waitTime = (long) (Math.random() * ((10000 - 1000) + 1));
-        //for test
-        long waitTime = (long) (Math.random() * ((1001 - 1000) + 1));
+        long waitTime = (long) (Math.random() * ((10000 - 1000) + 1));
         Thread.sleep(waitTime);
     }
 
