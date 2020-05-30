@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.job.TestJob1;
 import com.honeybadgers.realtimescheduler.model.*;
+import com.honeybadgers.realtimescheduler.services.ICommunication;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +35,9 @@ public class TaskController {
 
     @Autowired
     Scheduler scheduler;
+
+    @Autowired
+    ICommunication sender;
 
     @GetMapping("/task")
     public List<Task> getAllTasks() {
@@ -171,8 +175,10 @@ public class TaskController {
 
         Task task = new Task();
         task.setPriority(Integer.parseInt(priority));
+        task.setId(UUID.randomUUID().toString());
         RedisTask redisTask = this.taskService.calculatePriority(task);
         this.taskService.scheduleTask(redisTask);
+        //sender.sendTaskToDispatcher(redisTask);
         return ResponseEntity.ok().build();
     }
 }
