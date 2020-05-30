@@ -30,4 +30,9 @@ public class RabbitMQSender implements ICommunication {
         System.out.println("Send msg = " + task);
 
     }
+
+    @Override
+    public void send(String task) {
+        
+    }
 }
