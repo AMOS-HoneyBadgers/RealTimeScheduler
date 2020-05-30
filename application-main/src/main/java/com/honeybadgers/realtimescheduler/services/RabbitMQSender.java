@@ -13,26 +13,29 @@ public class RabbitMQSender implements ICommunication {
     private RabbitTemplate rabbitTemplate;
 
     @Value("${dispatch.rabbitmq.dispatcherexchange}")
-    private String exchange;
+    private String dispatcherexchange;
 
     @Value("${dispatch.rabbitmq.dispatcherroutingkey}")
-    private String routingkey;
+    private String dispatcherroutingkey;
 
-    public void sendTaskToDispatcher(String task){
-        rabbitTemplate.convertAndSend(exchange, routingkey, task);
+    @Value("${dispatch.rabbitmq.feedbackroutingkey}")
+    private String feedbackroutingkey;
+
+    @Value("${dispatch.rabbitmq.feedbackexchange}")
+    String feedbackExchange;
+
+    @Override
+    public void sendTaskToDispatcher(String task) {
+        rabbitTemplate.convertAndSend(dispatcherexchange, dispatcherroutingkey, task);
         System.out.println("Send msg = " + task);
-        
     }
 
     // Mock for Dispatcher
-    public void sendFeedbackToScheduler(String task){
-        rabbitTemplate.convertAndSend(exchange, routingkey, task);
-        System.out.println("Send msg = " + task);
-
-    }
-
     @Override
-    public void send(String task) {
-        
+    public void sendFeedbackToScheduler(String feedback) {
+        rabbitTemplate.convertAndSend(feedbackExchange, feedbackroutingkey, feedback);
+        System.out.println("Send msg = " + feedback);
     }
+
+
 }
