@@ -166,25 +166,14 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/testrepeat")
-    public ResponseEntity<?> createRepeatJob() throws SchedulerException {
+    @GetMapping("/testtask/{priority}")
+    public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) throws SchedulerException {
 
-        JobDetail jd = JobBuilder.newJob(TestJob1.class)
-                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                .usingJobData("id", UUID.randomUUID().toString())
-                .storeDurably(true)
-                .build();
+        Task task = new Task();
+        task.setPriority(Integer.parseInt(priority));
+        this.taskService.calculatePriority(task);
+        this.taskService.scheduleTask(priority);
 
-        Trigger tg = TriggerBuilder.newTrigger()
-                .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                .startNow()
-                .withPriority(1)
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule()
-                        .repeatForever()
-                        .withIntervalInSeconds(5))
-                .build();
-
-        scheduler.scheduleJob(jd, tg);
 
         return ResponseEntity.ok().build();
     }
