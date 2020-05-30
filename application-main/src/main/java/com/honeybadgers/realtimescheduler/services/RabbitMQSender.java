@@ -12,10 +12,10 @@ public class RabbitMQSender implements ICommunication {
     @Autowired
     private RabbitTemplate rabbitTemplate;
 
-    @Value("${dispatch.rabbitmq.exchange}")
+    @Value("${dispatch.rabbitmq.dispatcherexchange}")
     private String exchange;
 
-    @Value("${dispatch.rabbitmq.routingkey}")
+    @Value("${dispatch.rabbitmq.dispatcherroutingkey}")
     private String routingkey;
 
     public void sendTaskToDispatcher(String task){

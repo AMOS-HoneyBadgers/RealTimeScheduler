@@ -5,7 +5,11 @@ import org.springframework.stereotype.Component;
 @Component
 public class RabbitMQReceiver {
 
-    public void receive(String in) {
+    public void receiveTask(String in) {
+        System.out.println(" [x] Received '" + in + "'");
+    }
+
+    public void receiveFeedback(String in) {
         System.out.println(" [x] Received '" + in + "'");
     }
 }
