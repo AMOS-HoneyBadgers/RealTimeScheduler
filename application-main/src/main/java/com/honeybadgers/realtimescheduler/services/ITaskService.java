@@ -16,5 +16,5 @@ public interface ITaskService {
 
     void calculatePriority(Task task);
 
-    void scheduleTask(String priority);
+    void scheduleTask(int priority);
 }
