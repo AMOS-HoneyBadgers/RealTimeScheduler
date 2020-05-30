@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
+import org.junit.Before;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -15,46 +16,23 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 class RabbitMQReceiverTest {
-    @Bean
-    public ICommunication sender(){
-        return Mockito.mock(ICommunication.class);
-    };
-    @Autowired
+
+    @Mock
     ICommunication sender;
 
+    private RabbitMQReceiver receiver;
 
-   /* @Test
-    void receiveTaskWithRealObjectFromRabbitMQReceiver() throws InterruptedException {
-        MockComm mockComm = new MockComm();
-        RabbitMQReceiver rabbitMQReceiverSpy = Mockito.spy(new RabbitMQReceiver(mockComm));
-        rabbitMQReceiverSpy.receiveTask("test");
-        Mockito.verify(rabbitMQReceiverSpy).receiveTask(Mockito.anyString());
-        Mockito.verify(rabbitMQReceiverSpy).workTask();
-    }*/
-
-   /* @Test
-    void receiveTaskWithMockFromRabbitMQReceiver() throws InterruptedException {
-        RabbitMQReceiver rabbitMQReceiverSpy = Mockito.mock(RabbitMQReceiver.class);
-        Mockito.when(sender.sendFeedbackToScheduler(Mockito.anyString())).thenReturn("test");
-        rabbitMQReceiverSpy.receiveTask("test");
-        Mockito.verify(rabbitMQReceiverSpy).receiveTask(Mockito.anyString());
-        Mockito.verify(rabbitMQReceiverSpy).workTask();
-    }*/
-
-    @Test
-    void receiveFeedback() {
+    @BeforeEach
+    public void beforeEach() {
+        MockitoAnnotations.initMocks(this);
+        receiver = new RabbitMQReceiver(sender);
     }
 
-    /*class MockComm implements ICommunication {
-
-        @Override
-        public void sendTaskToDispatcher(String task) {
-            System.out.println("got" + task);
-        }
-
-        @Override
-        public String sendFeedbackToScheduler(String feedback) {
-            System.out.println("got" + feedback);
-        }
-    }*/
+    @Test
+    public void someTest() throws InterruptedException {
+        RabbitMQReceiver spy = Mockito.spy(receiver);
+        spy.receiveTask("ss");
+        Mockito.verify(spy).receiveTask(Mockito.any());
+        Mockito.verify(spy).workTask();
+    }
 }
