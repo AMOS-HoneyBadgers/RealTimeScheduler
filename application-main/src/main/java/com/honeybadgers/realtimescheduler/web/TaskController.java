@@ -172,7 +172,7 @@ public class TaskController {
         Task task = new Task();
         task.setPriority(Integer.parseInt(priority));
         this.taskService.calculatePriority(task);
-        this.taskService.scheduleTask(priority);
+        this.taskService.scheduleTask(Integer.parseInt(priority));
 
 
         return ResponseEntity.ok().build();
