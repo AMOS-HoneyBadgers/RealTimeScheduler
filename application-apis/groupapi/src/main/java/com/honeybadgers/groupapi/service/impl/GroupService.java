@@ -33,7 +33,7 @@ public class GroupService implements IGroupService {
         newGroup.setParentGroup(groupRepository.findById(restModel.getParentId()).orElse(null));
 
         // convert List<TaskModelActiveTimes> to List<ActiveTimes>
-        newGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(GroupModelActiveTimes::getAsJpaModel).collect(Collectors.toList()));
+        newGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
         // convert List<Boolean> to int[]
         if(restModel.getWorkingDays() != null) {
             newGroup.setWorkingDays(restModel.getWorkingDays().stream().mapToInt(value -> {

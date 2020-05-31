@@ -46,7 +46,7 @@ public class TaskService implements ITaskService {
 
         // convert List<TaskModelActiveTimes> to List<ActiveTimes> or use default of group
         if(restModel.getActiveTimes() != null)
-            newTask.setActiveTimeFrames(restModel.getActiveTimes().stream().map(TaskModelActiveTimes::getAsJpaModel).collect(Collectors.toList()));
+            newTask.setActiveTimeFrames(restModel.getActiveTimes().stream().map(taskModelActiveTimes -> taskModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
         else
             newTask.setActiveTimeFrames(group.getActiveTimeFrames());
 
