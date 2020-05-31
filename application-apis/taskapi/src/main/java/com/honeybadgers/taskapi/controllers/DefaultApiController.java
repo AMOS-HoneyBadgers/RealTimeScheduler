@@ -6,6 +6,8 @@ import com.honeybadgers.taskapi.models.ErrorModel;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +25,8 @@ public class DefaultApiController implements DefaultApi {
 
     @Autowired
     ITaskService taskService;
+
+    static final Logger logger = LogManager.getLogger(DefaultApiController.class);
 
     private final NativeWebRequest request;
 
@@ -44,9 +48,17 @@ public class DefaultApiController implements DefaultApi {
     @Override
     public ResponseEntity<ResponseModel> rootPost(@Valid TaskModel taskModel) {
 
+        logger.info("Hi");
+
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
+
+        if(taskModel == null){
+            response.setCode("400");
+            response.setMessage("Missing Body");
+            return ResponseEntity.badRequest().body(response);
+        }
 
         try {
             taskService.createTask(taskModel);
