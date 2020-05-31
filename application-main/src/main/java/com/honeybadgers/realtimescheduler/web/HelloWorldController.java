@@ -1,10 +1,12 @@
 package com.honeybadgers.realtimescheduler.web;
 
-import com.honeybadgers.realtimescheduler.services.impl.RabbitMQSender;
+import com.honeybadgers.realtimescheduler.services.ICommunication;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -12,9 +14,8 @@ public class HelloWorldController {
 
     static final Logger logger = LogManager.getLogger(HelloWorldController.class);
 
-
     @Autowired
-    RabbitMQSender rabbitMQSender;
+    ICommunication sender;
 
     @GetMapping("/hello")
     public String getHealth() {
@@ -27,8 +28,7 @@ public class HelloWorldController {
 
     @GetMapping("/rabbit")
     public String getRabbit() {
-        rabbitMQSender.send("rabbit");
-
+        sender.sendTaskToDispatcher("helloooo christoff and marco are in dispatcher");
         return "Send Rabbit";
     }
     /*@GetMapping("/error")

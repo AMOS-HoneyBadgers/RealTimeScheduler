@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.model;
+package com.honeybadgers.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

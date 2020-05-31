@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.web;
 
-import com.honeybadgers.realtimescheduler.services.impl.RabbitMQSender;
+import com.honeybadgers.realtimescheduler.services.ICommunication;
+import com.honeybadgers.realtimescheduler.services.RabbitMQSender;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class HelloWorldControllerTest {
     private MockMvc mvc;
 
     @MockBean
-    private RabbitMQSender rabbitMQSender;
+    private ICommunication sender;
 
 
     @Test
@@ -35,15 +36,4 @@ public class HelloWorldControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
-
-    @Test
-    public void testGetRabbit() throws Exception {
-        mvc.perform(get("/rabbit")
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        //doThrow(IllegalArgumentException.class).when(rabbitMQSender).send(null);
-        verify(rabbitMQSender).send(any());
-    }
-
-
 }

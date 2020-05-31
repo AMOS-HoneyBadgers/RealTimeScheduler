@@ -1,70 +1,101 @@
 package com.honeybadgers.realtimescheduler.config;
 
-import com.honeybadgers.realtimescheduler.services.impl.RabbitMQReceiver;
-import org.springframework.amqp.core.*;
+import com.honeybadgers.realtimescheduler.services.RabbitMQReceiver;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableAutoConfiguration
-@Profile("mq")
 @ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
 public class RabbitMQConfig {
-    @Value("${dispatch.rabbitmq.queue}")
-    String queueName;
 
-    @Value("${dispatch.rabbitmq.exchange}")
-    String exchange;
+    @Value("${dispatch.rabbitmq.dispatcherqueue}")
+    String dispatcherqueue;
 
-    @Value("${dispatch.rabbitmq.routingkey}")
-    private String routingkey;
+    @Value("${dispatch.rabbitmq.feedbackqueue}")
+    String feedbackqueue;
 
+    @Value("${dispatch.rabbitmq.dispatcherexchange}")
+    String dispatcherExchange;
+
+    @Value("${dispatch.rabbitmq.feedbackexchange}")
+    String feedbackExchange;
+
+    @Value("${dispatch.rabbitmq.dispatcherroutingkey}")
+    private String dispatcherroutingkey;
+    @Value("${dispatch.rabbitmq.feedbackroutingkey}")
+    private String feedbackroutingkey;
+
+    @Qualifier("dispatcherqueue")
     @Bean
-    Queue queue() {
-        return new Queue(queueName, false);
+    Queue dispatcherqueue() {
+        return new Queue(dispatcherqueue, false);
+    }
+
+    @Qualifier("feedbackqueue")
+    @Bean
+    Queue feedbackqueue() {
+        return new Queue(feedbackqueue, false);
+    }
+
+    @Qualifier("dispatcherExchange")
+    @Bean
+    DirectExchange dispatcherexchange() {
+        return new DirectExchange(dispatcherExchange);
+    }
+
+    @Qualifier("feedbackExchange")
+    @Bean
+    DirectExchange feedbackexchange() {
+        return new DirectExchange(feedbackExchange);
     }
 
     @Bean
-    DirectExchange exchange() {
-        return new DirectExchange(exchange);
-    }
-
-    @Bean
-    Binding binding(Queue queue, DirectExchange exchange) {
-        return BindingBuilder.bind(queue).to(exchange).with(routingkey);
+    Binding dispatchbinding(@Qualifier("dispatcherqueue") Queue dispatcherqueue, @Qualifier("dispatcherExchange") DirectExchange exchange) {
+        return BindingBuilder.bind(dispatcherqueue).to(exchange).with(dispatcherroutingkey);
     }
     @Bean
-    SimpleMessageListenerContainer container(ConnectionFactory connectionFactory,
-                                             MessageListenerAdapter listenerAdapter) {
+    Binding feedbackbinding(@Qualifier("feedbackqueue") Queue feedbackqueue, @Qualifier("feedbackExchange")DirectExchange exchange) {
+        return BindingBuilder.bind(feedbackqueue).to(exchange).with(feedbackroutingkey);
+    }
+    @Bean
+    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory,
+                                             MessageListenerAdapter dispatchlistenerAdapter) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(queueName);
-        container.setMessageListener(listenerAdapter);
+        container.setQueueNames(dispatcherqueue);
+        container.setMessageListener(dispatchlistenerAdapter);
+
+        return container;
+    }
+    @Bean
+    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory,
+                                             MessageListenerAdapter feedbacklistenerAdapter) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(feedbackqueue);
+        container.setMessageListener(feedbacklistenerAdapter);
+
         return container;
     }
 
     @Bean
-    MessageListenerAdapter listenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receive");
+    MessageListenerAdapter feedbacklistenerAdapter(RabbitMQReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveFeedback");
     }
-
-    /*
     @Bean
-    public MessageConverter jsonMessageConverter() {
-        return new Jackson2JsonMessageConverter();
-    }*/
-
-
-/*
-    @Bean
-    @Primary
-    public AmqpTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        return rabbitTemplate;
-    }*/
+    MessageListenerAdapter dispatchlistenerAdapter(RabbitMQReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveTask");
+    }
 }
