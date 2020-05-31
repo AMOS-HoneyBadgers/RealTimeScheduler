@@ -1,9 +1,7 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.models.Group;
-import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -26,11 +24,13 @@ class GroupServiceTest {
 
     @BeforeEach
     public void setUp() throws Exception {
+
         MockitoAnnotations.initMocks(this);
     }
 
     @Test
     void getAllGroups() {
+        groupService = new GroupService(groupPostgresRepository);
         List<Group> groups = new ArrayList<Group>();
         for (int i = 1; i < 4; i++) {
             Group group = new Group();

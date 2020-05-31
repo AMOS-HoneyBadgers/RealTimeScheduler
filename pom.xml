@@ -295,7 +295,7 @@
                         <exclude>com/honeybadgers/realtimescheduler/model/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/job/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/repository/**/*</exclude>
-                        <!--<exclude>com/honeybadgers/realtimescheduler/services/**/*</exclude>-->
+                        <exclude>com/honeybadgers/realtimescheduler/services/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/web/**/*</exclude>
                         <exclude>com/honeybadgers/groupapi/**/*</exclude>
                         <exclude>com/honeybadgers/taskapi/**/*</exclude>
