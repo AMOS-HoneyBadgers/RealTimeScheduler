@@ -12,7 +12,13 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.honeybadgers.taskapi", "com.honeybadgers.taskapi.controllers" , "com.honeybadgers.taskapi.configuration"})
+@ComponentScan(basePackages = {
+        "com.honeybadgers.taskapi",
+        "com.honeybadgers.taskapi.controllers" ,
+        "com.honeybadgers.taskapi.configuration",
+        "com.honeybadgers.taskapi.repository",
+        "com.honeybadgers.taskapi.service"
+})
 public class OpenAPI2SpringBoot implements CommandLineRunner {
 
     @Override
