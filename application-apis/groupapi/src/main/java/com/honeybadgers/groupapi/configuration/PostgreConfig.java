@@ -1,4 +1,4 @@
-package com.honeybadgers.taskapi.config;
+package com.honeybadgers.groupapi.configuration;
 
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -7,7 +7,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EntityScan(basePackages = {"com.honeybadgers.models"})
-@EnableJpaRepositories(basePackages = {"com.honeybadgers.taskapi.repository"}) // enable all jpa repositories in the given paths
+@EnableJpaRepositories(basePackages = {"com.honeybadgers.groupapi.repository"}) // enable all jpa repositories in the given paths
 @EnableAutoConfiguration
 public class PostgreConfig {
 }

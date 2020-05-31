@@ -45,6 +45,8 @@ public class DefaultApiController implements DefaultApi {
     public ResponseEntity<ResponseModel> rootPost(@Valid TaskModel taskModel) {
 
         ResponseModel response = new ResponseModel();
+        response.setCode("200");
+        response.setMessage("Success");
 
         try {
             taskService.createTask(taskModel);
@@ -58,6 +60,6 @@ public class DefaultApiController implements DefaultApi {
             return ResponseEntity.badRequest().body(response);
         }
 
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok(response);
     }
 }
