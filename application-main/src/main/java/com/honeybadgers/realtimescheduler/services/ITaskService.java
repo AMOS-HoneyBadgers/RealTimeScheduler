@@ -15,7 +15,7 @@ public interface ITaskService {
 
     void deleteTask(String id);
 
-    RedisTask calculatePriority(Task task);
+    long calculatePriority(Task task);
 
-    void scheduleTask(RedisTask redisTask);
+    void scheduleTask(Task task);
 }

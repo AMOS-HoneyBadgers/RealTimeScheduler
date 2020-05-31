@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.web;
 import com.honeybadgers.realtimescheduler.job.TestJob1;
 import com.honeybadgers.models.*;
 import com.honeybadgers.realtimescheduler.model.GroupRestModel;
+import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.model.TaskRestModel;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
@@ -173,13 +174,13 @@ public class TaskController {
     }
 
     @GetMapping("/testtask/{priority}")
-    public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) throws SchedulerException {
+    public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
 
         Task task = new Task();
         task.setPriority(Integer.parseInt(priority));
         task.setId(UUID.randomUUID().toString());
-        RedisTask redisTask = this.taskService.calculatePriority(task);
-        this.taskService.scheduleTask(redisTask);
+        task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
+        taskService.scheduleTask(task);
         //sender.sendTaskToDispatcher(redisTask);
         return ResponseEntity.ok().build();
     }
