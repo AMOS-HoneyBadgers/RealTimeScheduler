@@ -36,7 +36,7 @@ public class TaskModel   {
 
   @JsonProperty("active_times")
   @Valid
-  private List<Object> activeTimes = null;
+  private List<TaskModelActiveTimes> activeTimes = null;
 
   @JsonProperty("working_days")
   @Valid
@@ -262,12 +262,12 @@ public class TaskModel   {
     this.deadline = deadline;
   }
 
-  public TaskModel activeTimes(List<Object> activeTimes) {
+  public TaskModel activeTimes(List<TaskModelActiveTimes> activeTimes) {
     this.activeTimes = activeTimes;
     return this;
   }
 
-  public TaskModel addActiveTimesItem(Object activeTimesItem) {
+  public TaskModel addActiveTimesItem(TaskModelActiveTimes activeTimesItem) {
     if (this.activeTimes == null) {
       this.activeTimes = new ArrayList<>();
     }
@@ -282,11 +282,11 @@ public class TaskModel   {
   @ApiModelProperty(value = "Array containing time frames, in which tasks are allowed to be dispatched")
 
 
-  public List<Object> getActiveTimes() {
+  public List<TaskModelActiveTimes> getActiveTimes() {
     return activeTimes;
   }
 
-  public void setActiveTimes(List<Object> activeTimes) {
+  public void setActiveTimes(List<TaskModelActiveTimes> activeTimes) {
     this.activeTimes = activeTimes;
   }
 

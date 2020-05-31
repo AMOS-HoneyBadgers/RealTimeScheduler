@@ -1,9 +1,11 @@
 package com.honeybadgers.models;
 
+import javax.lang.model.element.UnknownElementException;
+
 public enum ModeEnum {
     Sequential, Parallel;
 
-    public static ModeEnum getFromString(String mode){
+    public static ModeEnum getFromString(String mode) throws UnknownEnumException {
         if(mode == null)
             return null;
         if( mode.compareToIgnoreCase("Sequential") == 0 ){
@@ -11,7 +13,7 @@ public enum ModeEnum {
         }else if ( mode.compareToIgnoreCase( "Parallel")  == 0){
             return Parallel;
         }else{
-            return Parallel;
+            throw new UnknownEnumException("Unknown Enum: " + mode);
         }
     }
 }

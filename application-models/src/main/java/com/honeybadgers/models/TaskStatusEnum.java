@@ -3,7 +3,7 @@ package com.honeybadgers.models;
 public enum TaskStatusEnum {
     Waiting, Scheduled, Dispatched, Finished;
 
-    public static TaskStatusEnum getFromString(String status) {
+    public static TaskStatusEnum getFromString(String status) throws UnknownEnumException {
         if (status == null)
             return null;
         if (status.compareToIgnoreCase("Waiting") == 0) {
@@ -15,7 +15,7 @@ public enum TaskStatusEnum {
         } else if (status.compareToIgnoreCase("Finished") == 0) {
             return Finished;
         } else {
-            return Waiting;
+            throw new UnknownEnumException("Unknown Enum: " + status);
         }
     }
 }
