@@ -88,7 +88,8 @@ public class TaskService implements ITaskService {
             newTask.setDeadline(group.getDeadline());
 
         // map List<TaskModelMeta> to Map<String, String>
-        newTask.setMetaData(restModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
+        if(restModel.getMeta() != null)
+            newTask.setMetaData(restModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
 
         try {
             taskRepository.save(newTask);
