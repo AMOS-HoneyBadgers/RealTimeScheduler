@@ -15,6 +15,10 @@ public class GroupService implements IGroupService {
     @Autowired
     GroupPostgresRepository groupPostgresRepository;
 
+    public GroupService(GroupPostgresRepository groupPostgresRepository){
+        this.groupPostgresRepository =groupPostgresRepository;
+    }
+
     @Override
     public List<Group> getAllGroups() {
         return groupPostgresRepository.findAll();
