@@ -1,9 +1,9 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.realtimescheduler.exception.LimitExceededException;
-import com.honeybadgers.realtimescheduler.model.Group;
-import com.honeybadgers.realtimescheduler.model.ModeEnum;
-import com.honeybadgers.realtimescheduler.model.Task;
+import com.honeybadgers.models.Group;
+import com.honeybadgers.models.ModeEnum;
+import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.IQuartzService;
 import org.quartz.JobDetail;

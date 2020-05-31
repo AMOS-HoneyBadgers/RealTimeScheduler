@@ -2,7 +2,7 @@ package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.realtimescheduler.exception.CreationException;
 import com.honeybadgers.realtimescheduler.exception.LimitExceededException;
-import com.honeybadgers.realtimescheduler.model.Task;
+import com.honeybadgers.models.Task;
 import org.quartz.JobDetail;
 import org.quartz.Trigger;
 import org.springframework.stereotype.Service;
