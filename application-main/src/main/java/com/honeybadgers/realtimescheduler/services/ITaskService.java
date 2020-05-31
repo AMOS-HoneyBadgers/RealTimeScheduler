@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
+import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.models.Task;
 import org.springframework.stereotype.Service;
 
@@ -14,7 +15,7 @@ public interface ITaskService {
 
     void deleteTask(String id);
 
-    void calculatePriority(Task task);
+    RedisTask calculatePriority(Task task);
 
-    void scheduleTask(int priority);
+    void scheduleTask(RedisTask redisTask);
 }

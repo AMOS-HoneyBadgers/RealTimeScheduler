@@ -6,6 +6,7 @@ import com.honeybadgers.realtimescheduler.model.GroupRestModel;
 import com.honeybadgers.realtimescheduler.model.TaskRestModel;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import com.honeybadgers.realtimescheduler.services.ICommunication;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +37,9 @@ public class TaskController {
 
     @Autowired
     Scheduler scheduler;
+
+    @Autowired
+    ICommunication sender;
 
     @GetMapping("/task")
     public List<Task> getAllTasks() {
@@ -173,10 +177,10 @@ public class TaskController {
 
         Task task = new Task();
         task.setPriority(Integer.parseInt(priority));
-        this.taskService.calculatePriority(task);
-        this.taskService.scheduleTask(Integer.parseInt(priority));
-
-
+        task.setId(UUID.randomUUID().toString());
+        RedisTask redisTask = this.taskService.calculatePriority(task);
+        this.taskService.scheduleTask(redisTask);
+        //sender.sendTaskToDispatcher(redisTask);
         return ResponseEntity.ok().build();
     }
 
