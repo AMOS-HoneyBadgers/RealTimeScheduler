@@ -34,7 +34,7 @@ public class GroupModel   {
 
   @JsonProperty("active_times")
   @Valid
-  private List<Object> activeTimes = null;
+  private List<GroupModelActiveTimes> activeTimes = null;
 
   @JsonProperty("working_days")
   @Valid
@@ -209,12 +209,12 @@ public class GroupModel   {
     this.deadline = deadline;
   }
 
-  public GroupModel activeTimes(List<Object> activeTimes) {
+  public GroupModel activeTimes(List<GroupModelActiveTimes> activeTimes) {
     this.activeTimes = activeTimes;
     return this;
   }
 
-  public GroupModel addActiveTimesItem(Object activeTimesItem) {
+  public GroupModel addActiveTimesItem(GroupModelActiveTimes activeTimesItem) {
     if (this.activeTimes == null) {
       this.activeTimes = new ArrayList<>();
     }
@@ -229,11 +229,11 @@ public class GroupModel   {
   @ApiModelProperty(value = "Array containing time frames, in which tasks are allowed to be dispatched")
 
 
-  public List<Object> getActiveTimes() {
+  public List<GroupModelActiveTimes> getActiveTimes() {
     return activeTimes;
   }
 
-  public void setActiveTimes(List<Object> activeTimes) {
+  public void setActiveTimes(List<GroupModelActiveTimes> activeTimes) {
     this.activeTimes = activeTimes;
   }
 

@@ -63,15 +63,14 @@ public class TaskController {
                 return value;
             }).toArray());
         }
-        TaskStatusEnum statusEnum = TaskStatusEnum.getFromString(task.getStatusEnum());
-        if(statusEnum != null)
-            newTask.setStatus(statusEnum);
-        ModeEnum modeEnum = ModeEnum.getFromString(task.getModeEnum());
-        if (modeEnum != null)
-            newTask.setModeEnum(modeEnum);
-        TypeFlagEnum typeFlagEnum = TypeFlagEnum.getFromString(task.getTypeFlagEnum());
-        if(typeFlagEnum != null)
-            newTask.setTypeFlagEnum(typeFlagEnum);
+        try {
+            newTask.setStatus(TaskStatusEnum.getFromString(task.getStatusEnum()));
+            newTask.setModeEnum(ModeEnum.getFromString(task.getModeEnum()));
+            newTask.setTypeFlagEnum(TypeFlagEnum.getFromString(task.getTypeFlagEnum()));
+        } catch (UnknownEnumException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
         if(task.getForce() != null)
             newTask.setForce(task.getForce());
         newTask.setIndexNumber(task.getIndexNumber());
@@ -120,12 +119,13 @@ public class TaskController {
                 return value;
             }).toArray());
         }
-        ModeEnum modeEnum = ModeEnum.getFromString(grp.getModeEnum());
-        if (modeEnum != null)
-            newGroup.setModeEnum(modeEnum);
-        TypeFlagEnum typeFlagEnum = TypeFlagEnum.getFromString(grp.getTypeFlagEnum());
-        if(typeFlagEnum != null)
-            newGroup.setTypeFlagEnum(typeFlagEnum);
+        try {
+            newGroup.setModeEnum(ModeEnum.getFromString(grp.getModeEnum()));
+            newGroup.setTypeFlagEnum(TypeFlagEnum.getFromString(grp.getTypeFlagEnum()));
+        } catch (UnknownEnumException e) {
+            return ResponseEntity.badRequest().build();
+        }
+
         newGroup.setPriority(grp.getPriority());
         if(grp.getPaused() != null)
             newGroup.setPaused(grp.getPaused());
@@ -147,29 +147,6 @@ public class TaskController {
     @DeleteMapping(value = "/group/{id}")
     public ResponseEntity<?> deleteGroup(@PathVariable(value = "id") final String id) {
         this.groupService.deleteGroup(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/testCreate/{priority}")
-    public ResponseEntity<?> create(@PathVariable(value = "priority") final String priority) throws SchedulerException {
-
-        Date startTime = futureDate(5, DateBuilder.IntervalUnit.SECOND);
-
-        for (int i = 0; i < 10; i++) {
-            JobDetail jd = JobBuilder.newJob(TestJob1.class)
-                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                    .usingJobData("id", Integer.toString(i))
-                    .storeDurably(true)
-                    .build();
-
-            Trigger tg = TriggerBuilder.newTrigger()
-                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                    .startAt(startTime)
-                    .withPriority(i)
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule())
-                    .build();
-            scheduler.scheduleJob(jd, tg);
-        }
         return ResponseEntity.ok().build();
     }
 
