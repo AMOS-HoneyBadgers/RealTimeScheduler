@@ -1,43 +1,40 @@
 package com.honeybadgers.realtimescheduler.services;
 
-
 import com.honeybadgers.models.Group;
-import com.honeybadgers.models.Task;
-import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.services.impl.GroupService;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.mockito.Mockito.*;
-
 @RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = GroupService.class)
 public class GroupServiceTest {
 
-    @Mock
+    @MockBean
     GroupPostgresRepository groupPostgresRepository;
-
-    private GroupService groupService;
-
-    @Before
-    public void setUp() throws Exception {
-        groupService = new GroupService(groupPostgresRepository);
-    }
+    @Autowired
+    GroupService groupService;
 
     @Test
     public void getAllGroups() {
-        GroupService spy = spy(groupService);
-        spy.getAllGroups();
-        verify(groupPostgresRepository).findAll();
+        List<Group> groups = new ArrayList<Group>();
+        for (int i = 1; i < 4; i++) {
+            Group group = new Group();
+            group.setId(String.valueOf(i));
+            groups.add(group);
+        }
+        Mockito.when(groupPostgresRepository.findAll()).thenReturn(groups);
+        List<Group> returnedGroups = groupService.getAllGroups();
+        Assert.assertEquals(groups, returnedGroups);
     }
 
     @Test

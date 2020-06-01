@@ -1,10 +1,9 @@
-package com.honeybadgers.taskapi.controllers;
+package com.honeybadgers.groupapi.controllers;
 
-
-import com.honeybadgers.taskapi.exceptions.JpaException;
-import com.honeybadgers.taskapi.models.TaskModel;
-import com.honeybadgers.taskapi.service.ITaskService;
-import com.honeybadgers.taskapi.utils.TestUtils;
+import com.honeybadgers.groupapi.exceptions.JpaException;
+import com.honeybadgers.groupapi.models.GroupModel;
+import com.honeybadgers.groupapi.service.IGroupService;
+import com.honeybadgers.groupapi.utils.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,7 +17,6 @@ import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -26,51 +24,48 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DefaultApiController.class)
 public class DefaultApiControllerTest {
 
-
     @Autowired
     private MockMvc mvc;
 
     @MockBean
-    ITaskService taskservice;
+    IGroupService groupService;
 
 
     @Test
-    public void testTaskCreate() throws Exception {
-        TaskModel testModel = new TaskModel();
-        testModel.setId(UUID.randomUUID());
-        testModel.setGroupId("TestGruppe");
+    public void testGroupCreate() throws Exception {
+        GroupModel testModel = new GroupModel();
+        testModel.setId("TestGroup");
 
-        mvc.perform(post( "/api/task/")
+        mvc.perform(post( "/api/group/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isOk());
 
-        verify(taskservice, only())
-        .createTask(any(TaskModel.class));
+        verify(groupService, only())
+                .createGroup(any(GroupModel.class));
     }
 
     @Test
-    public void testTaskCreate_JpaExceptionWasThrown() throws Exception {
-        TaskModel testModel = new TaskModel();
-        testModel.setId(UUID.randomUUID());
-        testModel.setGroupId("TestGruppe");
+    public void testGroupCreate_JpaExceptionWasThrown() throws Exception {
+        GroupModel testModel = new GroupModel();
+        testModel.setId("TestGroup");
 
         JpaException ex = new JpaException("Primary or unique constraint failed!");
-        when(taskservice.createTask(any(TaskModel.class))).thenThrow(ex);
+        when(groupService.createGroup(any(GroupModel.class))).thenThrow(ex);
 
-        mvc.perform(post( "/api/task/")
+        mvc.perform(post( "/api/group/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isBadRequest());
 
-        verify(taskservice, only())
-                .createTask(any(TaskModel.class));
+        verify(groupService, only())
+                .createGroup(any(GroupModel.class));
     }
 
     @Test
-    public void testTaskCreate_invalidModel() throws Exception {
+    public void testGroupCreate_invalidModel() throws Exception {
 
-        mvc.perform(post( "/api/task/")
+        mvc.perform(post( "/api/group/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
                         "{" +
@@ -81,6 +76,4 @@ public class DefaultApiControllerTest {
                 ))
                 .andExpect(status().isBadRequest());
     }
-
-    
 }

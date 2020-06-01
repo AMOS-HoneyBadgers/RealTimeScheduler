@@ -13,7 +13,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.sql.Array;
+import java.sql.Time;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 
@@ -33,7 +36,15 @@ public class GroupService implements IGroupService {
         newGroup.setParentGroup(groupRepository.findById(restModel.getParentId()).orElse(null));
 
         // convert List<TaskModelActiveTimes> to List<ActiveTimes>
-        newGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
+        if (restModel.getActiveTimes() != null){
+          newGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
+         }else{
+            ActiveTimes[] activeTimes = new ActiveTimes[]{
+                    new ActiveTimes(new Time(9,0,0), new Time(12,0,0))
+            };
+            newGroup.setActiveTimeFrames( Arrays.asList(activeTimes) );
+        }
+        
         // convert List<Boolean> to int[]
         if(restModel.getWorkingDays() != null) {
             newGroup.setWorkingDays(restModel.getWorkingDays().stream().mapToInt(value -> {

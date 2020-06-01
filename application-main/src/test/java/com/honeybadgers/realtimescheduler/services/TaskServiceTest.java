@@ -1,16 +1,17 @@
 package com.honeybadgers.realtimescheduler.services;
 
-
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
@@ -19,20 +20,17 @@ import java.util.List;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = TaskService.class)
 public class TaskServiceTest {
 
-    @Mock
+    @MockBean
     private TaskPostgresRepository taskPostgresRepository;
 
-    @Mock
+    @MockBean
     private TaskRedisRepository taskRedisRepository;
 
+    @Autowired
     private TaskService service;
-
-    @Before
-    public void beforeEach() {
-        service = new TaskService(taskRedisRepository, taskPostgresRepository);
-    }
 
     @Test
     public void testGetAllTasks() {

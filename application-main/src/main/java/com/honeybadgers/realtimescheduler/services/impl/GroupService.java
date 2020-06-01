@@ -1,7 +1,8 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.Group;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
+import com.honeybadgers.realtimescheduler.services.IGroupService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,10 +15,6 @@ public class GroupService implements IGroupService {
 
     @Autowired
     GroupPostgresRepository groupPostgresRepository;
-
-    public GroupService(GroupPostgresRepository groupPostgresRepository){
-        this.groupPostgresRepository = groupPostgresRepository;
-    }
 
     @Override
     public List<Group> getAllGroups() {
