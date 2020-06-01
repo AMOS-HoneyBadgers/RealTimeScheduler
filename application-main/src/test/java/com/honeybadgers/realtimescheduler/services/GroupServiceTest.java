@@ -2,35 +2,30 @@ package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.models.Group;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
+import com.honeybadgers.realtimescheduler.services.impl.GroupService;
 import org.junit.Assert;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+@RunWith(SpringJUnit4ClassRunner.class)
+@SpringBootTest(classes = GroupService.class)
+public class GroupServiceTest {
 
-class GroupServiceTest {
-
-    @Mock
+    @MockBean
     GroupPostgresRepository groupPostgresRepository;
-    @InjectMocks
-    private GroupService groupService;
-
-    @BeforeEach
-    public void setUp() throws Exception {
-
-        MockitoAnnotations.initMocks(this);
-    }
+    @Autowired
+    GroupService groupService;
 
     @Test
-    void getAllGroups() {
-        groupService = new GroupService(groupPostgresRepository);
+    public void getAllGroups() {
         List<Group> groups = new ArrayList<Group>();
         for (int i = 1; i < 4; i++) {
             Group group = new Group();
@@ -43,14 +38,14 @@ class GroupServiceTest {
     }
 
     @Test
-    void getGroupById() {
+    public void getGroupById() {
         GroupService spy = Mockito.spy(groupService);
         spy.getGroupById("test");
         Mockito.verify(spy).getGroupById("test");
     }
 
     @Test
-    void uploadGroup() {
+    public void uploadGroup() {
         Group group = new Group();
         group.setId("test");
         GroupService spy = Mockito.spy(groupService);
@@ -59,7 +54,7 @@ class GroupServiceTest {
     }
 
     @Test
-    void deleteGroup() {
+    public void deleteGroup() {
         GroupService spy = Mockito.spy(groupService);
         spy.deleteGroup("test");
         Mockito.verify(spy).deleteGroup("test");

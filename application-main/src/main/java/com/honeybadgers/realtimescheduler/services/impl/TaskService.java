@@ -1,9 +1,10 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -21,11 +22,6 @@ public class TaskService implements ITaskService {
 
     @Autowired
     TaskRedisRepository taskRedisRepository;
-
-    public TaskService(TaskRedisRepository taskRedisRepository,TaskPostgresRepository taskPostgresRepository) {
-        this.taskPostgresRepository = taskPostgresRepository;
-        this.taskRedisRepository = taskRedisRepository;
-    }
 
     @Override
     public List<Task> getAllTasks() {

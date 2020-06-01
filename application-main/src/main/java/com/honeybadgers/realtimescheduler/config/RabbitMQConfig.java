@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.config;
 
-import com.honeybadgers.realtimescheduler.services.RabbitMQReceiver;
+import com.honeybadgers.realtimescheduler.services.impl.RabbitMQReceiver;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
