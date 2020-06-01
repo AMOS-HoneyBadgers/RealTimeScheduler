@@ -55,7 +55,7 @@ public class TaskService implements ITaskService {
     @Override
     public void scheduleTask(RedisTask redisTask) {
         taskRedisRepository.save(redisTask);
-        Optional<RedisTask> redisTask1 = taskRedisRepository.findById(redisTask.getId());
-        System.out.println("Task-id: " + redisTask1.get().getId() + ", priority: " + redisTask1.get().getPriority());
+        //Optional<RedisTask> redisTask1 = taskRedisRepository.findById(redisTask.getId());
+        //System.out.println("Task-id: " + redisTask1.get().getId() + ", priority: " + redisTask1.get().getPriority());
     }
 }
