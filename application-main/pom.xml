@@ -66,17 +66,16 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
             <version>3.1.0</version>
             <type>jar</type>
-        </dependency
+        </dependency>
+
         <dependency>
             <groupId>com.honeybadgers</groupId>
             <artifactId>application-models</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-
         </dependency>
     </dependencies>
 

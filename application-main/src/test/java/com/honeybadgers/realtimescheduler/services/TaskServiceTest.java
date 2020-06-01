@@ -1,8 +1,8 @@
 package com.honeybadgers.realtimescheduler.services;
 
 
+import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.model.RedisTask;
-import com.honeybadgers.realtimescheduler.model.Task;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import org.junit.Assert;
@@ -11,14 +11,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class TaskServiceTest {
@@ -38,24 +36,24 @@ public class TaskServiceTest {
 
     @Test
     public void testGetAllTasks() {
-        TaskService spy = Mockito.spy(service);
+        TaskService spy = spy(service);
         spy.getAllTasks();
-        Mockito.verify(taskPostgresRepository).findAll();
+        verify(taskPostgresRepository).findAll();
     }
 
     @Test
     public void testUploadTask() {
-        TaskService spy = Mockito.spy(service);
-        spy.uploadTask(Mockito.any());
-        Mockito.verify(taskPostgresRepository).save(Mockito.any());
+        TaskService spy = spy(service);
+        spy.uploadTask(any());
+        verify(taskPostgresRepository).save(Mockito.any());
     }
 
     @Test
     public void testDeleteTaskWithCorrectId() {
         String id = "123";
-        TaskService spy = Mockito.spy(service);
+        TaskService spy = spy(service);
         spy.deleteTask(id);
-        Mockito.verify(taskPostgresRepository).deleteById(id);
+        verify(taskPostgresRepository).deleteById(id);
     }
 
     @Test
@@ -69,21 +67,21 @@ public class TaskServiceTest {
 
     @Test
     public void testScheduleTask() {
-        TaskService spy = Mockito.spy(service);
-        spy.scheduleTask(Mockito.any());
-        Mockito.verify(taskRedisRepository).save(Mockito.any());
+        TaskService spy = spy(service);
+        spy.scheduleTask(any());
+        verify(taskRedisRepository).save(any());
     }
 
     @Test
-    void testgetAllTasks2() {
+    public void testgetAllTasks2() {
         List<Task> tasks = new ArrayList<Task>();
         for (int i = 1; i < 4; i++) {
             Task t = new Task();
             t.setId(String.valueOf(i));
             tasks.add(t);
         }
-        Mockito.when(taskPostgresRepositoryMock.findAll()).thenReturn(tasks);
-        List<Task> returnedTasks = taskService.getAllTasks();
+        Mockito.when(taskPostgresRepository.findAll()).thenReturn(tasks);
+        List<Task> returnedTasks = service.getAllTasks();
         Assert.assertEquals(tasks, returnedTasks);
     }
   

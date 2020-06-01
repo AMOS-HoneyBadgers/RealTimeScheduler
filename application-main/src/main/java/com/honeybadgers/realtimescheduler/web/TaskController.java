@@ -5,6 +5,8 @@ import com.honeybadgers.realtimescheduler.model.*;
 import com.honeybadgers.realtimescheduler.services.ICommunication;
 
 import com.honeybadgers.models.*;
+
+
 import com.honeybadgers.realtimescheduler.model.GroupRestModel;
 import com.honeybadgers.realtimescheduler.model.TaskRestModel;
 
@@ -149,29 +151,6 @@ public class TaskController {
     @DeleteMapping(value = "/group/{id}")
     public ResponseEntity<?> deleteGroup(@PathVariable(value = "id") final String id) {
         this.groupService.deleteGroup(id);
-        return ResponseEntity.ok().build();
-    }
-
-    @GetMapping("/testCreate/{priority}")
-    public ResponseEntity<?> create(@PathVariable(value = "priority") final String priority) throws SchedulerException {
-
-        Date startTime = futureDate(5, DateBuilder.IntervalUnit.SECOND);
-
-        for (int i = 0; i < 10; i++) {
-            JobDetail jd = JobBuilder.newJob(TestJob1.class)
-                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                    .usingJobData("id", Integer.toString(i))
-                    .storeDurably(true)
-                    .build();
-
-            Trigger tg = TriggerBuilder.newTrigger()
-                    .withIdentity(UUID.randomUUID().toString(), UUID.randomUUID().toString())
-                    .startAt(startTime)
-                    .withPriority(i)
-                    .withSchedule(SimpleScheduleBuilder.simpleSchedule())
-                    .build();
-            scheduler.scheduleJob(jd, tg);
-        }
         return ResponseEntity.ok().build();
     }
 
