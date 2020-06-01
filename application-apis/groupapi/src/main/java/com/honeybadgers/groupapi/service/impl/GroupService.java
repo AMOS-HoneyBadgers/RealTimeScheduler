@@ -93,8 +93,8 @@ public class GroupService implements IGroupService {
     }
 
     @Override
-    public Group updateGroup(GroupModel restModel) throws JpaException, UnknownEnumException, NoSuchElementException {
-        Group targetGroup = groupRepository.findById(restModel.getId()).orElse(null);
+    public Group updateGroup(String group_id, GroupModel restModel) throws JpaException, UnknownEnumException, NoSuchElementException {
+        Group targetGroup = groupRepository.findById(group_id).orElse(null);
         Group parentgroup = null;
 
         if(targetGroup == null){

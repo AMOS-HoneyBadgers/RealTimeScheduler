@@ -11,5 +11,5 @@ public interface IGroupService {
 
     Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException;
 
-    Group updateGroup(GroupModel restModel) throws JpaException, UnknownEnumException;;
+    Group updateGroup(String group_id, GroupModel restModel) throws JpaException, UnknownEnumException;;
 }

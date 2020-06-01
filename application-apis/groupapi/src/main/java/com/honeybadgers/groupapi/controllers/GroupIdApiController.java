@@ -5,6 +5,8 @@ import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.ResponseModel;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.models.UnknownEnumException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -25,6 +27,8 @@ public class GroupIdApiController implements GroupIdApi {
     @Autowired
     IGroupService groupService;
 
+    final static Logger logger = LogManager.getLogger(GroupIdApiController.class);
+
     @org.springframework.beans.factory.annotation.Autowired
     public GroupIdApiController(NativeWebRequest request) {
         this.request = request;
@@ -36,32 +40,34 @@ public class GroupIdApiController implements GroupIdApi {
     }
 
     @Override
-    public ResponseEntity<GroupModel> groupIdIdGet(Long groupId) {
-        return null;
+    public ResponseEntity<GroupModel> groupIdIdGet(String groupId) {
+
+        logger.info("Test groupIdGet with taskId: {}", () -> groupId);
+        return ResponseEntity.ok(new GroupModel());
     }
 
     @Override
-    public ResponseEntity<ResponseModel> groupIdIdPost(Long groupId, @Valid GroupModel groupModel) {
+    public ResponseEntity<ResponseModel> groupIdIdPost(String groupId, @Valid GroupModel groupModel) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
 
         try {
-            groupService.updateGroup(groupModel);
+            groupService.updateGroup(groupId, groupModel);
         } catch (JpaException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (NoSuchElementException e) {
-            response.setCode("405");
+            response.setCode("404");
             response.setMessage(e.getMessage());
-            return ResponseEntity.badRequest().body(response);
+            return ResponseEntity.notFound().build();
         } catch (UnknownEnumException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
 
-        return ResponseEntity.badRequest().body(response);
+        return ResponseEntity.ok(response);
     }
 }
