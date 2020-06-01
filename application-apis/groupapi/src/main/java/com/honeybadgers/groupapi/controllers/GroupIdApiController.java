@@ -40,15 +40,14 @@ public class GroupIdApiController implements GroupIdApi {
         return null;
     }
 
-
-    public ResponseEntity<ResponseModel> rootPost(@Valid GroupModel taskModel){
+    @Override
+    public ResponseEntity<ResponseModel> groupIdIdPost(Long groupId, @Valid GroupModel groupModel) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
 
-
         try {
-            groupService.updateGroup(taskModel);
+            groupService.updateGroup(groupModel);
         } catch (JpaException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
@@ -63,8 +62,6 @@ public class GroupIdApiController implements GroupIdApi {
             return ResponseEntity.badRequest().body(response);
         }
 
-
         return ResponseEntity.badRequest().body(response);
     }
-
 }
