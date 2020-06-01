@@ -24,6 +24,11 @@ public class TaskService implements ITaskService {
     @Autowired
     TaskRedisRepository taskRedisRepository;
 
+    public TaskService(TaskRedisRepository taskRedisRepository,TaskPostgresRepository taskPostgresRepository) {
+        this.taskPostgresRepository = taskPostgresRepository;
+        this.taskRedisRepository = taskRedisRepository;
+    }
+
     @Override
     public List<Task> getAllTasks() {
         return taskPostgresRepository.findAll();

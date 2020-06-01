@@ -178,7 +178,7 @@ public class TaskController {
         task.setId(UUID.randomUUID().toString());
         RedisTask redisTask = this.taskService.calculatePriority(task);
         this.taskService.scheduleTask(redisTask);
-        //sender.sendTaskToDispatcher(redisTask);
+        sender.sendTaskToDispatcher("testetset");
         return ResponseEntity.ok().build();
     }
 }
