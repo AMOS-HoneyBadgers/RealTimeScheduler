@@ -16,7 +16,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import java.io.IOException;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -48,7 +47,8 @@ public class GroupIdApiControllerTest {
 
     @Test
     public void testGroupUpdate() throws Exception {
-       
+
+
     }
 
 }

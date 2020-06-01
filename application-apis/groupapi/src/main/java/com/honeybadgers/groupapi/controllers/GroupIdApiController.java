@@ -53,7 +53,7 @@ public class GroupIdApiController implements GroupIdApi {
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (NoSuchElementException e) {
-            response.setCode("404");
+            response.setCode("405");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (UnknownEnumException e) {
