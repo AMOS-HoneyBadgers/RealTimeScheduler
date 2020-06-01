@@ -67,7 +67,7 @@ public class TaskServiceTest {
     public void testScheduleTask() {
         TaskService spy = Mockito.spy(service);
         spy.scheduleTask(Mockito.any());
-        Mockito.verify(taskPostgresRepository).save(Mockito.any());
+        Mockito.verify(taskRedisRepository).save(Mockito.any());
     }
 
 
