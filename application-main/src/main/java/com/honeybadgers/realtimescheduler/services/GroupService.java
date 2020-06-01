@@ -16,7 +16,7 @@ public class GroupService implements IGroupService {
     GroupPostgresRepository groupPostgresRepository;
 
     public GroupService(GroupPostgresRepository groupPostgresRepository){
-        this.groupPostgresRepository =groupPostgresRepository;
+        this.groupPostgresRepository = groupPostgresRepository;
     }
 
     @Override
