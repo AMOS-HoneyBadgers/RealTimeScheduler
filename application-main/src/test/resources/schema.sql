@@ -1,27 +1,27 @@
+
+CREATE domain IF NOT EXISTS jsonb AS other;
+
 -- Table: public."group"
 
 -- DROP TABLE public."group";
 
-CREATE TABLE test_group
+CREATE TABLE "group"
 (
     id character varying(128) NOT NULL,
     parent_id character varying(128),
     priority integer NOT NULL,
     deadline timestamp without time zone,
-    active_times text,
-    working_days integer[],
+    active_times jsonb,
+    working_days ARRAY,
     type_flag character varying NOT NULL,
     mode character varying NOT NULL,
     paused boolean NOT NULL,
     last_index_number bigint,
-    parallelism_degree integer,
-    CONSTRAINT group_pkey PRIMARY KEY (id),
-    CONSTRAINT parent_fk FOREIGN KEY (parent_id)
-        REFERENCES test_group (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    parallelism_degree integer
 );
 
+ALTER TABLE "group" ADD PRIMARY KEY (id);
+ALTER TABLE "group" ADD FOREIGN KEY (parent_id) REFERENCES "group" (id);
 
 
 -- Table: public.task
@@ -34,8 +34,8 @@ CREATE TABLE task
     group_id character varying(128) NOT NULL,
     priority integer NOT NULL,
     deadline timestamp without time zone,
-    active_times text,
-    working_days integer[],
+    active_times jsonb,
+    working_days ARRAY,
     status character varying NOT NULL,
     type_flag character varying NOT NULL,
     mode character varying NOT NULL,
@@ -43,10 +43,8 @@ CREATE TABLE task
     paused boolean NOT NULL,
     force boolean NOT NULL,
     index_number bigint,
-    meta_data text,
-    CONSTRAINT task_pkey PRIMARY KEY (id),
-    CONSTRAINT group_fk FOREIGN KEY (group_id)
-        REFERENCES test_group (id) MATCH SIMPLE
-        ON UPDATE NO ACTION
-        ON DELETE NO ACTION
+    meta_data jsonb
 );
+
+ALTER TABLE task ADD PRIMARY KEY (id);
+ALTER TABLE task ADD FOREIGN KEY (group_id) REFERENCES "group" (id);
