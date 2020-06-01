@@ -1,12 +1,19 @@
 package com.honeybadgers.realtimescheduler.services;
 
+
 import com.honeybadgers.models.Group;
+import com.honeybadgers.models.Task;
+import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
+import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
+import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
+import org.junit.Before;
+import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
@@ -18,7 +25,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 //@RunWith(SpringJUnit4ClassRunner.class)
 //@SpringBootTest(classes = GroupService.class)
@@ -29,7 +36,7 @@ class GroupServiceTest {
     @InjectMocks//@Autowired
     GroupService groupService;
 
-    @BeforeEach
+    @Before
     public void setUp() throws Exception {
 
         MockitoAnnotations.initMocks(this);
@@ -49,14 +56,14 @@ class GroupServiceTest {
     }
 
     @Test
-    void getGroupById() {
+    public void getGroupById() {
         GroupService spy = Mockito.spy(groupService);
         spy.getGroupById("test");
         Mockito.verify(spy).getGroupById("test");
     }
 
     @Test
-    void uploadGroup() {
+    public void uploadGroup() {
         Group group = new Group();
         group.setId("test");
         GroupService spy = Mockito.spy(groupService);
@@ -65,7 +72,7 @@ class GroupServiceTest {
     }
 
     @Test
-    void deleteGroup() {
+    public void deleteGroup() {
         GroupService spy = Mockito.spy(groupService);
         spy.deleteGroup("test");
         Mockito.verify(spy).deleteGroup("test");
