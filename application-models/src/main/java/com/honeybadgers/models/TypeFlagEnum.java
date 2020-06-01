@@ -1,9 +1,9 @@
-package com.honeybadgers.realtimescheduler.model;
+package com.honeybadgers.models;
 
 public enum TypeFlagEnum {
     Batch, Realtime;
 
-    public static TypeFlagEnum getFromString(String type) {
+    public static TypeFlagEnum getFromString(String type) throws UnknownEnumException {
         if (type == null)
             return null;
         if (type.compareToIgnoreCase("Batch") == 0) {
@@ -11,7 +11,7 @@ public enum TypeFlagEnum {
         } else if (type.compareToIgnoreCase("Realtime") == 0) {
             return Realtime;
         } else {
-            return Batch;
+            throw new UnknownEnumException("Unknown Enum: " + type);
         }
     }
 }
