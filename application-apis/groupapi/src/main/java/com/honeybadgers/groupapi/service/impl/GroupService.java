@@ -116,7 +116,7 @@ public class GroupService implements IGroupService {
         if (restModel.getActiveTimes() != null){
             targetGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
         }else{
-            targetGroup.setActiveTimeFrames( Arrays.asList(new ActiveTimes[]{}));
+            targetGroup.setActiveTimeFrames( null );
         }
 
         if(restModel.getWorkingDays() != null) {
@@ -126,11 +126,16 @@ public class GroupService implements IGroupService {
                 // convert boolean to int
                 return (value ? 1 : 0);
             }).toArray());
+        }else {
+            targetGroup.setWorkingDays(new int[]{1,1,1,1,1,1,1});
         }
 
         // map OffsetDateTime to Timestamp
-        if(restModel.getDeadline() != null)
+        if(restModel.getDeadline() != null){
             targetGroup.setDeadline(Timestamp.valueOf(restModel.getDeadline().toLocalDateTime()));
+        }else{
+            targetGroup.setDeadline(null);
+        }
 
         targetGroup.setModeEnum(ModeEnum.getFromString(restModel.getMode().getValue()));
         targetGroup.setTypeFlagEnum(TypeFlagEnum.getFromString(restModel.getTypeFlag().getValue()));
