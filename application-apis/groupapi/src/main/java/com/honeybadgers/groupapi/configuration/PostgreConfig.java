@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EntityScan(basePackages = {"com.honeybadgers.models"})
-@EnableJpaRepositories(basePackages = {"com.honeybadgers.groupapi.repository"}) // enable all jpa repositories in the given paths
 @EnableAutoConfiguration
 public class PostgreConfig {
 }
