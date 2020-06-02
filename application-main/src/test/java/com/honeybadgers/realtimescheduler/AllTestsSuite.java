@@ -5,7 +5,6 @@ import com.honeybadgers.realtimescheduler.services.GroupServiceTest;
 import com.honeybadgers.realtimescheduler.services.RabbitMQReceiverTest;
 import com.honeybadgers.realtimescheduler.services.RabbitMQSenderTest;
 import com.honeybadgers.realtimescheduler.services.TaskServiceTest;
-import com.honeybadgers.realtimescheduler.web.HelloWorldControllerTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
@@ -16,7 +15,6 @@ import org.junit.runners.Suite;
         TaskServiceTest.class,
         RabbitMQReceiverTest.class,
         RabbitMQSenderTest.class,
-        HelloWorldControllerTest.class,
         SpringJpaContextIntegrationTest.class
 })
 public class AllTestsSuite {

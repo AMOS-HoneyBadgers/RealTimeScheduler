@@ -100,13 +100,9 @@
             <version>${springfox-version}</version>
         </dependency>
         <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.2.11</version>
-        </dependency>
-        <dependency>
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
+            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.openapitools</groupId>
@@ -117,6 +113,7 @@
         <dependency>
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
+            <version>2.0.1.Final</version>
         </dependency>
         <!-- JPA Dependencies -->
         <dependency>
@@ -239,12 +236,16 @@
                     <excludes>
                         <exclude>com/honeybadgers/realtimescheduler/RealtimeschedulerApplication*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/exception/**/*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/web/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/config/**/*</exclude>
-                        <exclude>com/honeybadgers/realtimescheduler/job/**/*</exclude>
-                        <exclude>com/honeybadgers/realtimescheduler/model/**/*</exclude>
+                        <!--<exclude>com/honeybadgers/realtimescheduler/model/**/*</exclude>-->
                         <!--<exclude>com/honeybadgers/realtimescheduler/repository/**/*</exclude>-->
                         <!--<exclude>com/honeybadgers/realtimescheduler/services/**/*</exclude>-->
-                        <exclude>com/honeybadgers/realtimescheduler/web/**/*</exclude>
+                        <exclude>com/honeybadgers/groupapi/models/**/*</exclude>
+                        <exclude>com/honeybadgers/taskapi/models/**/*</exclude>
+                        <exclude>com/honeybadgers/managementapi/models/**/*</exclude>
+                        <exclude>com/honeybadgers/monitoringapi/models/**/*</exclude>
+
                         <exclude>com/honeybadgers/groupapi/**/*</exclude>
                         <exclude>com/honeybadgers/taskapi/**/*</exclude>
                         <exclude>com/honeybadgers/managementapi/**/*</exclude>
