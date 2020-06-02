@@ -5,15 +5,18 @@ import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
+import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +35,9 @@ public class TaskServiceTest {
 
     @Autowired
     private TaskService service;
+
+    @Value("${com.realtimescheduler.scheduler.priority.deadline-bonus-base-prio-dependant}")
+    boolean deadlineBaseDependant;
 
     @Test
     public void testGetAllTasks() {
@@ -56,27 +62,44 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testcalculatePriorityCreatesARealRedisTaskObject() {
+    public void testCalculatePriority() {
         Task newTask = new Task();
         newTask.setId("TEST");
         newTask.setPriority(20);
-        // TODO (placeholder for jacoco)
-        service.calculatePriority(newTask);
-        assertTrue(true);
+        deadlineBaseDependant = true;
+        long prio = service.calculatePriority(newTask);
+        // has same final priority because deadline is not set
+        Assert.assertEquals(20, prio);
+
+        // set deadline and check final priority
+        newTask.setDeadline(new Timestamp(System.currentTimeMillis() + 100000));
+        prio = service.calculatePriority(newTask);
+        Assert.assertTrue(prio > 20);
+
+        // create new Task with lower deadline and check final prio
+        Task newTaskHigherPrio = new Task();
+        newTaskHigherPrio.setId("TEST2");
+        newTaskHigherPrio.setPriority(20);
+        newTaskHigherPrio.setDeadline(new Timestamp(System.currentTimeMillis() + 50000));
+        long higherPrio = service.calculatePriority(newTaskHigherPrio);
+        Assert.assertTrue(higherPrio > prio);
+
+
     }
 
     @Test
     public void testScheduleTask() {
-        Task newTask = new Task();
-        newTask.setId("TEST");
-        newTask.setPriority(20);
-        // TODO (placeholder for jacoco)
-        service.scheduleTask(newTask);
-        assertTrue(true);
+        Task t = new Task();
+        t.setId("TEST");
+        RedisTask taskFromRedisRepo = new RedisTask();
+        //Mockito.when(taskRedisRepository.findById(t.getId())).thenReturn(java.util.Optional.of(taskFromRedisRepo));
+        TaskService spy = spy(service);
+        spy.scheduleTask(t);
+        verify(taskRedisRepository).save(any());
     }
 
     @Test
-    public void testgetAllTasks2() {
+    public void testGetAllTasks2() {
         List<Task> tasks = new ArrayList<Task>();
         for (int i = 1; i < 4; i++) {
             Task t = new Task();

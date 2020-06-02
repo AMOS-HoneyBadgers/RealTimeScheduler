@@ -161,6 +161,4 @@ public class TaskController {
         //sender.sendTaskToDispatcher(redisTask);
         return ResponseEntity.ok().build();
     }
-
-
 }
