@@ -1,6 +1,7 @@
 package com.honeybadgers.taskapi.service.impl;
 
 import com.honeybadgers.models.*;
+import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,13 +31,21 @@ public class TaskService implements ITaskService {
     TaskRepository taskRepository;
 
     @Override
-    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException {
+    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
         Task newTask = new Task();
         newTask.setId(restModel.getId().toString());
         Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
         // foreign key is declared as NOT NULL -> throw JpaException now because it will be thrown on save(newTask) anyway
         if(group == null)
             throw new JpaException("Group not found!");
+        else {
+            List<Group> groupChildren = groupRepository.findAllByParentGroupId(group.getId());
+            if(!groupChildren.isEmpty())
+                // TODO perhaps move group of task or sth similar
+                throw new CreationException("Group of task has other groups as children: " +
+                        groupChildren.stream().map(Group::getId).collect(Collectors.joining(", ")) +
+                        " -> aborting!");
+        }
         newTask.setGroup(group);
 
         // set priority or default prio of group

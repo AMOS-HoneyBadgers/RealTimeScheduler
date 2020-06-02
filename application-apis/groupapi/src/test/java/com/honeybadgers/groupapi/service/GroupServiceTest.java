@@ -1,5 +1,7 @@
 package com.honeybadgers.groupapi.service;
 
+import com.honeybadgers.groupapi.exceptions.CreationException;
+import com.honeybadgers.groupapi.repository.TaskRepository;
 import com.honeybadgers.models.Task;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,8 +19,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -30,6 +32,9 @@ public class GroupServiceTest {
 
     @MockBean
     GroupRepository groupRepository;
+
+    @MockBean
+    TaskRepository taskRepository;
 
     @Autowired
     IGroupService groupService;
@@ -56,10 +61,13 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testCreateGroup() throws JpaException, UnknownEnumException {
+    public void testCreateGroup() throws JpaException, UnknownEnumException, CreationException {
+
+        when(taskRepository.findAllByGroupId("parentGroup")).thenReturn(new ArrayList<>());
 
         GroupModel restGroup = new GroupModel();
         restGroup.setId("TestGroup");
+        restGroup.setParentId("parentGroup");
         restGroup.setPriority(100);
 
         Group group = groupService.createGroup(restGroup);
@@ -68,7 +76,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testCreateGroupPrimaryViolation(){
+    public void testCreateGroup_primaryViolation(){
         DataIntegrityViolationException vio = new DataIntegrityViolationException("primary key violation");
 
         when(groupRepository.save(any(Group.class))).thenThrow(vio);
@@ -78,7 +86,25 @@ public class GroupServiceTest {
         restGroup.setPriority(100);
 
         Exception e = assertThrows(JpaException.class, () -> groupService.createGroup(restGroup));
-        assertEquals(e.getMessage(), "Primary or unique constraint failed!");
+        assertEquals("Primary or unique constraint failed!", e.getMessage());
+    }
+
+    @Test
+    public void testCreateGroup_parentChildrenViolation(){
+
+        Task child = new Task();
+        child.setId("TestTask");
+        Task child2 = new Task();
+        child2.setId("TestTask2");
+        when(taskRepository.findAllByGroupId("parentGroup")).thenReturn(Arrays.asList(child, child2));
+
+        GroupModel restGroup = new GroupModel();
+        restGroup.setId("TestGroup");
+        restGroup.setParentId("parentGroup");
+        restGroup.setPriority(100);
+
+        Exception e = assertThrows(CreationException.class, () -> groupService.createGroup(restGroup));
+        assertEquals("Parent group has tasks as children: TestTask, TestTask2 -> aborting!", e.getMessage());
     }
 
     @Test
@@ -106,7 +132,7 @@ public class GroupServiceTest {
         restGroup.setPriority(100);
 
         Exception e = assertThrows(NoSuchElementException.class, () -> groupService.updateGroup(group_id, restGroup));
-        assertEquals(e.getMessage(), "Group does not exist");
+        assertEquals("Group does not exist", e.getMessage());
     }
 
     @Test
@@ -119,7 +145,7 @@ public class GroupServiceTest {
         restGroup.setPriority(100);
 
         Exception e = assertThrows(NoSuchElementException.class, () -> groupService.updateGroup(group_id, restGroup));
-        assertEquals(e.getMessage(), "Parent Group does not exist");
+        assertEquals("Parent Group does not exist", e.getMessage());
     }
 
 }

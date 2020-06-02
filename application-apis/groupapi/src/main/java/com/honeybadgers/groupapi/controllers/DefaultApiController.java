@@ -1,5 +1,6 @@
 package com.honeybadgers.groupapi.controllers;
 
+import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.ResponseModel;
@@ -53,7 +54,7 @@ public class DefaultApiController implements DefaultApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        } catch (JpaException e) {
+        } catch (JpaException | CreationException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);

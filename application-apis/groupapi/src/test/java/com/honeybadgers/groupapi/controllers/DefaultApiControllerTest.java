@@ -1,5 +1,6 @@
 package com.honeybadgers.groupapi.controllers;
 
+import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.service.IGroupService;
@@ -51,6 +52,24 @@ public class DefaultApiControllerTest {
         testModel.setId("TestGroup");
 
         JpaException ex = new JpaException("Primary or unique constraint failed!");
+        when(groupService.createGroup(any(GroupModel.class))).thenThrow(ex);
+
+        mvc.perform(post( "/api/group/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtils.convertObjectToJsonBytes(testModel)))
+                .andExpect(status().isBadRequest());
+
+        verify(groupService, only())
+                .createGroup(any(GroupModel.class));
+    }
+
+    @Test
+    public void testGroupCreate_CreationExceptionWasThrown() throws Exception {
+        GroupModel testModel = new GroupModel();
+        testModel.setId("TestGroup");
+        testModel.setParentId("TestParentId");
+
+        CreationException ex = new CreationException("Parent group has tasks as children -> aborting!");
         when(groupService.createGroup(any(GroupModel.class))).thenThrow(ex);
 
         mvc.perform(post( "/api/group/")
