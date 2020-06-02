@@ -12,5 +12,5 @@ import java.io.Serializable;
 public class RedisTask implements Serializable {
 
     private String id;
-    private int priority;
+    private long priority;
 }
