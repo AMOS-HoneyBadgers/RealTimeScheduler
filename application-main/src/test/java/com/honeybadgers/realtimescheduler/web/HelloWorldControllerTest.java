@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.realtimescheduler.services.ICommunication;
+import com.honeybadgers.realtimescheduler.services.impl.RabbitMQSender;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
