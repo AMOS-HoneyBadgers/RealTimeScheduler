@@ -66,7 +66,9 @@ public class TaskServiceTest {
         Task newTask = new Task();
         newTask.setId("TEST");
         newTask.setPriority(20);
+        // don't know why this isn't working yet
         deadlineBaseDependant = true;
+
         long prio = service.calculatePriority(newTask);
         // has same final priority because deadline is not set
         Assert.assertEquals(20, prio);
@@ -76,7 +78,7 @@ public class TaskServiceTest {
         prio = service.calculatePriority(newTask);
         Assert.assertTrue(prio > 20);
 
-        // create new Task with lower deadline and check final prio
+        // create new Task with lower deadline and check final priority
         Task newTaskHigherPrio = new Task();
         newTaskHigherPrio.setId("TEST2");
         newTaskHigherPrio.setPriority(20);
@@ -91,8 +93,6 @@ public class TaskServiceTest {
     public void testScheduleTask() {
         Task t = new Task();
         t.setId("TEST");
-        RedisTask taskFromRedisRepo = new RedisTask();
-        //Mockito.when(taskRedisRepository.findById(t.getId())).thenReturn(java.util.Optional.of(taskFromRedisRepo));
         TaskService spy = spy(service);
         spy.scheduleTask(t);
         verify(taskRedisRepository).save(any());

@@ -45,22 +45,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-quartz</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.quartz-scheduler</groupId>
-            <artifactId>quartz</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.apache.maven.surefire</groupId>
             <artifactId>surefire-junit-platform</artifactId>
             <version>3.0.0-M4</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
