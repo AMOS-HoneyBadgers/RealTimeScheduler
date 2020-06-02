@@ -162,5 +162,4 @@ public class GroupService implements IGroupService {
         return targetGroup;
     }
 
-
 }

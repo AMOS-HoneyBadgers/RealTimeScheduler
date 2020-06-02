@@ -1,10 +1,16 @@
 package com.honeybadgers.realtimescheduler.web;
 
-import com.honeybadgers.realtimescheduler.job.TestJob1;
+
+import com.honeybadgers.realtimescheduler.model.*;
+import com.honeybadgers.realtimescheduler.services.ICommunication;
+
 import com.honeybadgers.models.*;
+
+
 import com.honeybadgers.realtimescheduler.model.GroupRestModel;
 import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.model.TaskRestModel;
+
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import com.honeybadgers.realtimescheduler.services.ICommunication;
@@ -158,7 +164,7 @@ public class TaskController {
         task.setId(UUID.randomUUID().toString());
         task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
         taskService.scheduleTask(task);
-        //sender.sendTaskToDispatcher(redisTask);
+        sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
     }
 }
