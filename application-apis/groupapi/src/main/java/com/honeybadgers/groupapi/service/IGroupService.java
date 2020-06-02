@@ -10,4 +10,6 @@ import org.springframework.stereotype.Service;
 public interface IGroupService {
 
     Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException;
+
+    Group updateGroup(String group_id, GroupModel restModel) throws JpaException, UnknownEnumException;;
 }
