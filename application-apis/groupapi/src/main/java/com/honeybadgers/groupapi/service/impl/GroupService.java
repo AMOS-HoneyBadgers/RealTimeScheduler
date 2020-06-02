@@ -1,9 +1,11 @@
 package com.honeybadgers.groupapi.service.impl;
 
+import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
 import com.honeybadgers.groupapi.repository.GroupRepository;
+import com.honeybadgers.groupapi.repository.TaskRepository;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.models.*;
 import org.apache.logging.log4j.LogManager;
@@ -17,6 +19,7 @@ import java.sql.Array;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
@@ -29,25 +32,39 @@ public class GroupService implements IGroupService {
     @Autowired
     GroupRepository groupRepository;
 
+    @Autowired
+    TaskRepository taskRepository;
+
     @Override
-    public Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException {
+    public Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException {
         Group newGroup = new Group();
 
         newGroup.setId(restModel.getId());
-        newGroup.setParentGroup(groupRepository.findById(restModel.getParentId()).orElse(null));
+        Group parent = groupRepository.findById(restModel.getParentId()).orElse(null);
+        if (parent != null) {
+            List<Task> taskChildren = taskRepository.findAllByGroupId(parent.getId());
+            if (!taskChildren.isEmpty())
+                // TODO perhaps move group of task or sth similar
+                throw new CreationException(
+                        "Parent group has tasks as children: " +
+                                taskChildren.stream().map(Task::getId).collect(Collectors.joining(", ")) +
+                                " -> aborting!"
+                );
+        }
+        newGroup.setParentGroup(parent);
 
         // convert List<TaskModelActiveTimes> to List<ActiveTimes>
-        if (restModel.getActiveTimes() != null){
-          newGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
-         }else{
+        if (restModel.getActiveTimes() != null) {
+            newGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
+        } else {
             ActiveTimes[] activeTimes = new ActiveTimes[]{
-                    new ActiveTimes(new Time(9,0,0), new Time(12,0,0))
+                    new ActiveTimes(new Time(9, 0, 0), new Time(12, 0, 0))
             };
-            newGroup.setActiveTimeFrames( Arrays.asList(activeTimes) );
+            newGroup.setActiveTimeFrames(Arrays.asList(activeTimes));
         }
-        
+
         // convert List<Boolean> to int[]
-        if(restModel.getWorkingDays() != null) {
+        if (restModel.getWorkingDays() != null) {
             newGroup.setWorkingDays(restModel.getWorkingDays().stream().mapToInt(value -> {
                 if (value == null)
                     return 1;
@@ -55,11 +72,11 @@ public class GroupService implements IGroupService {
                 return (value ? 1 : 0);
             }).toArray());
         } else {
-            newGroup.setWorkingDays(new int[]{1,1,1,1,1,1,1});
+            newGroup.setWorkingDays(new int[]{1, 1, 1, 1, 1, 1, 1});
         }
 
         // map OffsetDateTime to Timestamp
-        if(restModel.getDeadline() != null)
+        if (restModel.getDeadline() != null)
             newGroup.setDeadline(Timestamp.valueOf(restModel.getDeadline().toLocalDateTime()));
 
         newGroup.setModeEnum(ModeEnum.getFromString(restModel.getMode().getValue()));
@@ -74,9 +91,9 @@ public class GroupService implements IGroupService {
         try {
             groupRepository.save(newGroup);
         } catch (DataIntegrityViolationException e) {
-            if(e.getMessage() != null) {
+            if (e.getMessage() != null) {
                 logger.error("DataIntegrityViolation while trying to add new Group: \n" + e.getMessage());
-                if(e.getMessage().contains("primary")) {
+                if (e.getMessage().contains("primary")) {
                     throw new JpaException("Primary or unique constraint failed!");
                 } else {
                     throw new JpaException(e.getMessage());
@@ -97,43 +114,43 @@ public class GroupService implements IGroupService {
         Group targetGroup = groupRepository.findById(group_id).orElse(null);
         Group parentgroup = null;
 
-        if(targetGroup == null){
+        if (targetGroup == null) {
             throw new NoSuchElementException("Group does not exist");
         }
 
-        if(restModel.getParentId() == null){
+        if (restModel.getParentId() == null) {
             targetGroup.setParentGroup(null);
-        }else{
+        } else {
             parentgroup = groupRepository.findById(restModel.getParentId()).orElse(null);
-            if(parentgroup == null){
+            if (parentgroup == null) {
                 throw new NoSuchElementException("Parent Group does not exist");
-            }else{
+            } else {
                 targetGroup.setParentGroup(parentgroup);
             }
         }
 
         // convert List<TaskModelActiveTimes> to List<ActiveTimes>
-        if (restModel.getActiveTimes() != null){
+        if (restModel.getActiveTimes() != null) {
             targetGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
-        }else{
-            targetGroup.setActiveTimeFrames( null );
+        } else {
+            targetGroup.setActiveTimeFrames(null);
         }
 
-        if(restModel.getWorkingDays() != null) {
+        if (restModel.getWorkingDays() != null) {
             targetGroup.setWorkingDays(restModel.getWorkingDays().stream().mapToInt(value -> {
                 if (value == null)
                     return 1;
                 // convert boolean to int
                 return (value ? 1 : 0);
             }).toArray());
-        }else {
-            targetGroup.setWorkingDays(new int[]{1,1,1,1,1,1,1});
+        } else {
+            targetGroup.setWorkingDays(new int[]{1, 1, 1, 1, 1, 1, 1});
         }
 
         // map OffsetDateTime to Timestamp
-        if(restModel.getDeadline() != null){
+        if (restModel.getDeadline() != null) {
             targetGroup.setDeadline(Timestamp.valueOf(restModel.getDeadline().toLocalDateTime()));
-        }else{
+        } else {
             targetGroup.setDeadline(null);
         }
 
@@ -149,9 +166,9 @@ public class GroupService implements IGroupService {
         try {
             groupRepository.save(targetGroup);
         } catch (DataIntegrityViolationException e) {
-            if(e.getMessage() != null) {
+            if (e.getMessage() != null) {
                 logger.error("DataIntegrityViolation while trying to add new Group: \n" + e.getMessage());
-                if(e.getMessage().contains("primary")) {
+                if (e.getMessage().contains("primary")) {
                     throw new JpaException("Primary or unique constraint failed!");
                 } else {
                     throw new JpaException(e.getMessage());

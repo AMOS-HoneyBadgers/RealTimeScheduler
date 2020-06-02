@@ -1,6 +1,7 @@
 package com.honeybadgers.taskapi.controllers;
 
 import com.honeybadgers.models.UnknownEnumException;
+import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.ErrorModel;
 import com.honeybadgers.taskapi.models.ResponseModel;
@@ -66,7 +67,7 @@ public class DefaultApiController implements DefaultApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        } catch (JpaException e) {
+        } catch (JpaException | CreationException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
