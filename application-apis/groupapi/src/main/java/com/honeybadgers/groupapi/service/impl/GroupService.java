@@ -17,6 +17,7 @@ import java.sql.Array;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 
@@ -90,4 +91,76 @@ public class GroupService implements IGroupService {
 
         return newGroup;
     }
+
+    @Override
+    public Group updateGroup(String group_id, GroupModel restModel) throws JpaException, UnknownEnumException, NoSuchElementException {
+        Group targetGroup = groupRepository.findById(group_id).orElse(null);
+        Group parentgroup = null;
+
+        if(targetGroup == null){
+            throw new NoSuchElementException("Group does not exist");
+        }
+
+        if(restModel.getParentId() == null){
+            targetGroup.setParentGroup(null);
+        }else{
+            parentgroup = groupRepository.findById(restModel.getParentId()).orElse(null);
+            if(parentgroup == null){
+                throw new NoSuchElementException("Parent Group does not exist");
+            }else{
+                targetGroup.setParentGroup(parentgroup);
+            }
+        }
+
+        // convert List<TaskModelActiveTimes> to List<ActiveTimes>
+        if (restModel.getActiveTimes() != null){
+            targetGroup.setActiveTimeFrames(restModel.getActiveTimes().stream().map(groupModelActiveTimes -> groupModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
+        }else{
+            targetGroup.setActiveTimeFrames( Arrays.asList(new ActiveTimes[]{}));
+        }
+
+        if(restModel.getWorkingDays() != null) {
+            targetGroup.setWorkingDays(restModel.getWorkingDays().stream().mapToInt(value -> {
+                if (value == null)
+                    return 1;
+                // convert boolean to int
+                return (value ? 1 : 0);
+            }).toArray());
+        }
+
+        // map OffsetDateTime to Timestamp
+        if(restModel.getDeadline() != null)
+            targetGroup.setDeadline(Timestamp.valueOf(restModel.getDeadline().toLocalDateTime()));
+
+        targetGroup.setModeEnum(ModeEnum.getFromString(restModel.getMode().getValue()));
+        targetGroup.setTypeFlagEnum(TypeFlagEnum.getFromString(restModel.getTypeFlag().getValue()));
+
+        targetGroup.setPriority(restModel.getPriority());
+
+        targetGroup.setPaused(restModel.getPaused());
+        targetGroup.setParallelismDegree(restModel.getParallelismDegree());
+        targetGroup.setLastIndexNumber(restModel.getLastIndexNumber());
+
+        try {
+            groupRepository.save(targetGroup);
+        } catch (DataIntegrityViolationException e) {
+            if(e.getMessage() != null) {
+                logger.error("DataIntegrityViolation while trying to add new Group: \n" + e.getMessage());
+                if(e.getMessage().contains("primary")) {
+                    throw new JpaException("Primary or unique constraint failed!");
+                } else {
+                    throw new JpaException(e.getMessage());
+                }
+            } else {
+                // exception has no message (should not happen but just in case)
+                logger.error("DataIntegrityViolation on group update!");
+                logger.error(e.getStackTrace());
+                throw new JpaException("DataIntegrityViolation on save new group!");
+            }
+        }
+
+        return targetGroup;
+    }
+
+
 }

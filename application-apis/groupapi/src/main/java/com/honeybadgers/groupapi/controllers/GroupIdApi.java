@@ -58,7 +58,7 @@ public interface GroupIdApi {
     @RequestMapping(value = "/{group_Id}/id",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    default ResponseEntity<GroupModel> groupIdIdDelete(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<GroupModel> groupIdIdDelete(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -92,7 +92,7 @@ public interface GroupIdApi {
     @RequestMapping(value = "/{group_Id}/id",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<GroupModel> groupIdIdGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<GroupModel> groupIdIdGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -130,7 +130,7 @@ public interface GroupIdApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    default ResponseEntity<ResponseModel> groupIdIdPost(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId,@ApiParam(value = "group object" ,required=true )  @Valid @RequestBody GroupModel groupModel) {
+    default ResponseEntity<ResponseModel> groupIdIdPost(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId,@ApiParam(value = "group object" ,required=true )  @Valid @RequestBody GroupModel groupModel) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
