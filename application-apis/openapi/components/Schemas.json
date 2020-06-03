@@ -3,7 +3,7 @@
     "type": "object",
     "required": [
       "id",
-      "groupId"
+      "group_id"
     ],
     "properties": {
       "id": {
@@ -11,65 +11,83 @@
         "type": "string",
         "format": "uuid"
       },
-      "groupId": {
+      "group_id": {
         "description": "Id of group this task is assigned to",
         "type": "string",
-        "format": "uuid"
+        "maxLength": 128
       },
       "priority": {
         "description": "Priority of this task for scheduling",
         "type": "integer",
         "minimum": 0,
-        "maximum": 999
+        "maximum": 9999
       },
-      "earliestStart": {
-        "description": "Time, by which this task is allowed to be dispatched at earliest",
+      "deadline": {
+        "description": "DateTime until this task has to be completed",
         "type": "string",
-        "format": "partial-time"
+        "format": "date-time"
       },
-      "latestStart": {
-        "description": "Time, by which this task has to be dispatched at latest",
+      "active_times": {
+        "$ref": "#/ActiveTimesModel"
+      },
+      "working_days": {
+        "description": "Boolean array, where each entry indicates, whereas tasks are allowed to be dispatched on that day (Starting with monday)",
+        "type": "array",
+        "items": {
+          "type": "boolean"
+        },
+        "minItems": 7,
+        "maxItems": 7
+      },
+      "status": {
+        "description": "Status of task lifecycle",
         "type": "string",
-        "format": "partial-time"
-      },
-      "workingDays": {
-        "description": "Days for processing",
-        "type": "integer",
-        "minimum": 1
-      },
-      "typeFlag": {
-        "description": "Type of this task (relevant for scheduling)",
-        "type": "string",
+        "default": "waiting",
         "enum": [
-          "batch",
-          "user"
+          "waiting",
+          "scheduled",
+          "dispatched",
+          "finished"
         ]
       },
-      "maxFailures": {
-        "description": "Maximum number of failures this task is allowed to fail",
-        "type": "integer",
-        "minimum": 0
+      "type_flag": {
+        "description": "Type of this task (relevant for scheduling)",
+        "type": "string",
+        "default": "batch",
+        "enum": [
+          "batch",
+          "realtime"
+        ]
       },
       "mode": {
         "description": "Mode of task",
         "type": "string",
+        "default": "parallel",
         "enum": [
           "sequential",
           "parallel"
         ]
       },
-      "indexNumber": {
-        "description": "[only with mode = sequential] Index number of task in corresponding sequence",
+      "retries": {
+        "description": "Number of times, this task has been retried",
         "type": "integer",
-        "minimum": 0
+        "minimum": 0,
+        "default": 0
+      },
+      "paused": {
+        "description": "Boolean, which identifies, whereas this group (and all of its tasks) are currently paused",
+        "type": "boolean",
+        "default": "false"
       },
       "force": {
-        "description": "[only with mode = sequential] If set to true: ignore indexNumber and do not wait on previous tasks",
-        "type": "boolean"
+        "description": "If set to true: send task directly to dispatcher without scheduling",
+        "type": "boolean",
+        "default": "false"
       },
-      "parallelismDegree": {
-        "description": "[only with mode = parallel] Number of tasks allowed to be executed at the same time",
-        "type": "integer"
+      "index_number": {
+        "description": "[only with mode = sequential] Index number of task in corresponding sequence",
+        "type": "integer",
+        "minimum": 1
       },
       "meta": {
         "description": "Key-value object for meta-data",
@@ -98,25 +116,52 @@
       "id": {
         "description": "Primary id of task object",
         "type": "string",
-        "format": "uuid"
+        "maxLength": 128
       },
-      "parentId": {
+      "parent_id": {
         "description": "Id of parent group object",
         "type": "string",
-        "format": "uuid"
+        "maxLength": 128
       },
       "priority": {
-        "description": "Priority of this task for scheduling",
+        "description": "Default priority of all tasks of this group",
         "type": "integer",
         "minimum": 0,
-        "maximum": 999
+        "maximum": 9999
       },
-      "typeFlag": {
+      "deadline": {
+        "description": "Default deadline for all tasks of this group",
+        "type": "string",
+        "format": "date-time"
+      },
+      "active_times": {
+        "$ref": "#/ActiveTimesModel"
+      },
+      "working_days": {
+        "description": "Default working_days for tasks of this group",
+        "type": "array",
+        "items": {
+          "type": "boolean"
+        },
+        "minItems": 7,
+        "maxItems": 7
+      },
+      "type_flag": {
         "description": "Type of this task (relevant for scheduling)",
         "type": "string",
+        "default": "batch",
         "enum": [
           "batch",
-          "user"
+          "realtime"
+        ]
+      },
+      "mode": {
+        "description": "Mode of tasks of this group",
+        "type": "string",
+        "default": "parallel",
+        "enum": [
+          "sequential",
+          "parallel"
         ]
       },
       "paused": {
@@ -124,31 +169,34 @@
         "type": "boolean",
         "default": "false"
       },
-      "maxFailures": {
-        "description": "Maximum number of failures this task is allowed to fail",
+      "last_index_number": {
+        "description": "Index number of last dispatched task of this group",
         "type": "integer",
         "minimum": 0
       },
-      "mode": {
-        "description": "Mode of tasks of this group",
-        "type": "string",
-        "enum": [
-          "sequential",
-          "parallel"
-        ]
-      },
-      "indexNumber": {
-        "description": "[only with mode = sequential] Index number of task in corresponding sequence",
-        "type": "integer",
-        "minimum": 0
-      },
-      "force": {
-        "description": "[only with mode = sequential] If set to true: ignore indexNumber and do not wait on previous tasks",
-        "type": "boolean"
-      },
-      "parallelismDegree": {
+      "parallelism_degree": {
         "description": "[only with mode = parallel] Number of tasks allowed to be executed at the same time",
-        "type": "integer"
+        "type": "integer",
+        "minimum": 1
+      }
+    }
+  },
+  "ActiveTimesModel": {
+    "description": "Array containing time frames, in which tasks are allowed to be dispatched",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "from": {
+          "description": "Start of time frame",
+          "type": "string",
+          "format": "partial-time"
+        },
+        "to": {
+          "description": "End of time frame",
+          "type": "string",
+          "format": "partial-time"
+        }
       }
     }
   },

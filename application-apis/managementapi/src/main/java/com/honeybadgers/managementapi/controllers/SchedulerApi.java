@@ -25,11 +25,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:26.284+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:47.871+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "scheduler", description = "the scheduler API")
@@ -60,11 +59,7 @@ public interface SchedulerApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
-                    try {
-                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
             }
@@ -95,11 +90,7 @@ public interface SchedulerApi {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
-                    try {
-                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
             }

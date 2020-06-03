@@ -48,6 +48,11 @@
             <groupId>javax.validation</groupId>
             <artifactId>validation-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.honeybadgers</groupId>
+            <artifactId>application-models</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <!-- sub modules -->
@@ -89,7 +94,7 @@
                             <output>${project.basedir}/groupapi</output>
                             <library>spring-boot</library>
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
-                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <skipOverwrite>true</skipOverwrite>
                             <generateApiTests>true</generateApiTests>
                             <generateModelTests>true</generateModelTests>
                             <configOptions>
@@ -124,7 +129,7 @@
                             <output>${project.basedir}/taskapi</output>
                             <library>spring-boot</library>
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
-                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <skipOverwrite>true</skipOverwrite>
                             <generateApiTests>true</generateApiTests>
                             <generateModelTests>true</generateModelTests>
                             <configOptions>
@@ -159,7 +164,7 @@
                             <output>${project.basedir}/managementapi</output>
                             <library>spring-boot</library>
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
-                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <skipOverwrite>true</skipOverwrite>
                             <generateApiTests>true</generateApiTests>
                             <generateModelTests>true</generateModelTests>
                             <configOptions>
@@ -194,7 +199,7 @@
                             <output>${project.basedir}/monitoringapi</output>
                             <library>spring-boot</library>
                             <skipIfSpecIsUnchanged>true</skipIfSpecIsUnchanged>
-                            <!--<skipOverwrite>true</skipOverwrite>-->
+                            <skipOverwrite>true</skipOverwrite>
                             <generateApiTests>true</generateApiTests>
                             <generateModelTests>true</generateModelTests>
                             <configOptions>

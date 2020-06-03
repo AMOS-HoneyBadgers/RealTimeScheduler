@@ -26,11 +26,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import javax.validation.constraints.*;
-import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T15:34:10.745+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:47.074+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "{group_Id}", description = "the {group_Id} API")
@@ -59,16 +58,12 @@ public interface GroupIdApi {
     @RequestMapping(value = "/{group_Id}/id",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    default ResponseEntity<GroupModel> groupIdIdDelete(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<GroupModel> groupIdIdDelete(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"mode\" : \"sequential\", \"maxFailures\" : 0, \"paused\" : false, \"parallelismDegree\" : 5, \"force\" : true, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"priority\" : 80, \"indexNumber\" : 0, \"parentId\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"typeFlag\" : \"batch\" }";
-                    try {
-                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    String exampleString = "{ \"mode\" : \"parallel\", \"paused\" : false, \"working_days\" : [ true, true, true, true, true ], \"parent_id\" : \"parent_id\", \"active_times\" : [ \"{}\", \"{}\" ], \"last_index_number\" : 0, \"id\" : \"id\", \"priority\" : 800, \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"parallelism_degree\" : 1, \"type_flag\" : \"batch\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
             }
@@ -97,16 +92,12 @@ public interface GroupIdApi {
     @RequestMapping(value = "/{group_Id}/id",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<GroupModel> groupIdIdGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<GroupModel> groupIdIdGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"mode\" : \"sequential\", \"maxFailures\" : 0, \"paused\" : false, \"parallelismDegree\" : 5, \"force\" : true, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"priority\" : 80, \"indexNumber\" : 0, \"parentId\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"typeFlag\" : \"batch\" }";
-                    try {
-                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    String exampleString = "{ \"mode\" : \"parallel\", \"paused\" : false, \"working_days\" : [ true, true, true, true, true ], \"parent_id\" : \"parent_id\", \"active_times\" : [ \"{}\", \"{}\" ], \"last_index_number\" : 0, \"id\" : \"id\", \"priority\" : 800, \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"parallelism_degree\" : 1, \"type_flag\" : \"batch\" }";
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
             }
@@ -139,16 +130,12 @@ public interface GroupIdApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    default ResponseEntity<ResponseModel> groupIdIdPost(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId,@ApiParam(value = "group object" ,required=true )  @Valid @RequestBody GroupModel groupModel) {
+    default ResponseEntity<ResponseModel> groupIdIdPost(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId,@ApiParam(value = "group object" ,required=true )  @Valid @RequestBody GroupModel groupModel) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
                     String exampleString = "{ \"code\" : \"code\", \"message\" : \"message\" }";
-                    try {
-                        ApiUtil.setExampleResponse(request, "application/json", exampleString);
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                    ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
             }
