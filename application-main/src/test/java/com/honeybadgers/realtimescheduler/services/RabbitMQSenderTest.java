@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.realtimescheduler.services.impl.RabbitMQSender;
+
+import com.honeybadgers.communication.RabbitMQSender;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +36,13 @@ public class RabbitMQSenderTest {
     public void testSendFeedbackToScheduler() {
         RabbitMQSender spy = Mockito.spy(sender);
         spy.sendFeedbackToScheduler("feedback");
+        Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
+    }
+
+    @Test
+    public void sendTaskToTaskQueue() {
+        RabbitMQSender spy =  Mockito.spy(sender);
+        spy.sendTaskToTasksQueue("tasks");
         Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
     }
 }

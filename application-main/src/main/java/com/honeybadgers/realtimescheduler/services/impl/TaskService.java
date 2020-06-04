@@ -8,9 +8,12 @@ import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -80,5 +83,12 @@ public class TaskService implements ITaskService {
         redisTask.setPriority(calculatePriority(task));
         taskRedisRepository.save(redisTask);
         log.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
+    }
+    public List<RedisTask> getAllRedisTasks(){
+       Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();
+       List<RedisTask> sortedList = new ArrayList<RedisTask>();
+       redisTasks.forEach(sortedList::add);
+       Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
+       return sortedList;
     }
 }

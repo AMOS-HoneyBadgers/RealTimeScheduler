@@ -11,4 +11,5 @@ import org.springframework.stereotype.Service;
 public interface ITaskService {
 
     Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
+        void sendTaskToTaskEventQueue(String taskId);
 }

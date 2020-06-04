@@ -42,7 +42,7 @@ public class DefaultApiControllerTest {
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isOk());
 
-        verify(groupService, only())
+        verify(groupService)
                 .createGroup(any(GroupModel.class));
     }
 
@@ -59,7 +59,7 @@ public class DefaultApiControllerTest {
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isBadRequest());
 
-        verify(groupService, only())
+        verify(groupService)
                 .createGroup(any(GroupModel.class));
     }
 
@@ -77,7 +77,7 @@ public class DefaultApiControllerTest {
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isBadRequest());
 
-        verify(groupService, only())
+        verify(groupService)
                 .createGroup(any(GroupModel.class));
     }
 

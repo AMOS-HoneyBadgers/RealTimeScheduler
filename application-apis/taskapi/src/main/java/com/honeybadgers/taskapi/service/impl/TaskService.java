@@ -1,9 +1,9 @@
 package com.honeybadgers.taskapi.service.impl;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.models.TaskModel;
-import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.repository.GroupRepository;
 import com.honeybadgers.taskapi.repository.TaskRepository;
@@ -29,6 +29,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     TaskRepository taskRepository;
+
+    @Autowired
+    ICommunication sender;
 
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
@@ -121,4 +124,10 @@ public class TaskService implements ITaskService {
 
         return newTask;
     }
+
+    @Override
+    public void sendTaskToTaskEventQueue(String taskId) {
+        sender.sendTaskToTasksQueue(taskId);
+    }
+
 }

@@ -173,6 +173,7 @@
         <module>application-main</module>
         <module>application-apis</module>
         <module>application-models</module>
+        <module>application-queuecommunication</module>
     </modules>
 
     <build>

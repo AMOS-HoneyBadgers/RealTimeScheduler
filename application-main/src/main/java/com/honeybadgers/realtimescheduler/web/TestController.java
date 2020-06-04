@@ -1,9 +1,9 @@
 package com.honeybadgers.realtimescheduler.web;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import com.honeybadgers.realtimescheduler.services.ICommunication;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -37,5 +37,16 @@ public class TestController {
         taskService.scheduleTask(task);
         sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/getAllRedisTasks")
+    public ResponseEntity<?> getAllRedisTasks(){
+        System.out.println("instanzcheck");
+        return ResponseEntity.ok(taskService.getAllRedisTasks());
+    }
+
+    @PostMapping("/testTaskQueue/{task}")
+    public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
+        sender.sendTaskToTasksQueue(task);
+        return ResponseEntity.ok("sent task " + task);
     }
 }
