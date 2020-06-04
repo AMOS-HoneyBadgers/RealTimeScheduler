@@ -19,5 +19,5 @@ public interface ITaskService {
 
     void scheduleTask(Task task);
 
-    List<RedisTask> getAllRedisTasks();
+    //List<RedisTask> getAllRedisTasks();
 }
