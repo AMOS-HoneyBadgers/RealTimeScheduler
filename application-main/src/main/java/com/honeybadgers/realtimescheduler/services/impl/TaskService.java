@@ -96,11 +96,11 @@ public class TaskService implements ITaskService {
 
         log.info("###############################--------------------!!!!!!!!+++++++++++++++?????????=========== taskid: " + opt.getId());
     }
-    public List<RedisTask> getAllRedisTasks(){
+    /*public List<RedisTask> getAllRedisTasks(){
        Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();
        List<RedisTask> sortedList = new ArrayList<RedisTask>();
        redisTasks.forEach(sortedList::add);
        Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
        return sortedList;
-    }
+    }*/
 }

@@ -98,7 +98,7 @@ public class TaskServiceTest {
         Task t = new Task();
         t.setId("TEST");
         TaskService spy = spy(service);
-        spy.getAllRedisTasks();
+        //spy.scheduleTask(t);
         //verify(taskRedisRepository).save(any());
 
     }

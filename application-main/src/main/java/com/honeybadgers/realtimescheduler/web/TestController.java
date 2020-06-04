@@ -40,11 +40,11 @@ public class TestController {
         sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/getAllRedisTasks")
+    /*@GetMapping("/getAllRedisTasks")
     public ResponseEntity<?> getAllRedisTasks(){
         System.out.println("instanzcheck");
         return ResponseEntity.ok(taskService.getAllRedisTasks());
-    }
+    }*/
 
     @PostMapping("/testTaskQueue/{task}")
     public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
