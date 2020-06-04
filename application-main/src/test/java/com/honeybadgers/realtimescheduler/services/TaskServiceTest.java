@@ -93,12 +93,12 @@ public class TaskServiceTest {
 
     }
 
-    @Test
+    @Test(expected = RuntimeException.class)
     public void testScheduleTask() {
         Task t = new Task();
         t.setId("TEST");
         TaskService spy = spy(service);
-        //spy.scheduleTask(t);
+        spy.scheduleTask(t);
         //verify(taskRedisRepository).save(any());
 
     }
