@@ -19,7 +19,7 @@ public class TaskRedisRepository2 implements CrudRepository<RedisTask, String> {
     private static final String KEY = "REDISTASK";
 
     @Autowired
-    @Qualifier("prioRedisTemplate")
+    //@Qualifier("prioRedisTemplate")
     RedisTemplate redisTemplate;
 
     private HashOperations<String, String, RedisTask> hashOperations;

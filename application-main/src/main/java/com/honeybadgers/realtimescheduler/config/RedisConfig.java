@@ -14,7 +14,7 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @EnableRedisRepositories(basePackages = "com.honeybadgers.realtimescheduler")
 public class RedisConfig {
 
-    @Value("${spring.redis.prio.host}")
+    /*@Value("${spring.redis.prio.host}")
     private String priohost;
 
     @Value("${spring.redis.prio.port}")
@@ -64,6 +64,18 @@ public class RedisConfig {
     public RedisTemplate<String, Object> lockRedisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
+        return template;
+    }*/
+
+    @Bean
+    JedisConnectionFactory jedisConnectionFactory() {
+        return new JedisConnectionFactory();
+    }
+
+    @Bean
+    public RedisTemplate<String, Object> redisTemplate() {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        template.setConnectionFactory(jedisConnectionFactory());
         return template;
     }
 
