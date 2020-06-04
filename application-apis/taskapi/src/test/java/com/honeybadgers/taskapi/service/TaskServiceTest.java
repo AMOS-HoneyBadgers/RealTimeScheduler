@@ -36,6 +36,8 @@ public class TaskServiceTest {
 
     @MockBean
     GroupRepository groupRepository;
+    @MockBean
+    ISendTasksToTaksQueue iSendTasksToTaksQueue;
 
     @Autowired
     ITaskService taskService;

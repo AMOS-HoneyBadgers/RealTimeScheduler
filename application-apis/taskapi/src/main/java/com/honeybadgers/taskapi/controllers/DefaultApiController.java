@@ -27,6 +27,7 @@ public class DefaultApiController implements DefaultApi {
     @Autowired
     ITaskService taskService;
 
+
     static final Logger logger = LogManager.getLogger(DefaultApiController.class);
 
     private final NativeWebRequest request;
@@ -63,6 +64,7 @@ public class DefaultApiController implements DefaultApi {
 
         try {
             taskService.createTask(taskModel);
+            taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
         } catch (UnknownEnumException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
