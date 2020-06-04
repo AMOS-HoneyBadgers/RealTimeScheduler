@@ -34,7 +34,6 @@ public class RedisConfig {
 
 
     @Bean(name="prioConnectionFactory")
-    @Primary
     JedisConnectionFactory jedisConnectionFactoryForPrioDatabase() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(priohost);
@@ -54,6 +53,7 @@ public class RedisConfig {
     }
 
     @Bean(name="prioRedisTemplate")
+    @Primary
     public RedisTemplate<String, Object> prioRedisTemplate() {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForPrioDatabase());

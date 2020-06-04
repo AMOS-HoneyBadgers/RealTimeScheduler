@@ -4,18 +4,18 @@ import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository2;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -23,6 +23,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     TaskPostgresRepository taskPostgresRepository;
+
+    @Autowired
+    TaskRedisRepository2 taskRedisRepository2;
 
     @Autowired
     TaskRedisRepository taskRedisRepository;
@@ -76,13 +79,22 @@ public class TaskService implements ITaskService {
 
     @Override
     public void scheduleTask(Task task) {
-        RedisTask redisTask = taskRedisRepository.findById(task.getId()).orElse(null);
+        /*RedisTask redisTask = taskRedisRepository.findById(task.getId()).orElse(null);
         if(redisTask == null){
             redisTask = createRedisTask(task.getId());
         }
         redisTask.setPriority(calculatePriority(task));
         taskRedisRepository.save(redisTask);
-        log.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
+        log.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());*/
+
+        RedisTask redisTask = createRedisTask(task.getId());
+        redisTask.setPriority(calculatePriority(task));
+        taskRedisRepository2.save(redisTask);
+        RedisTask opt = taskRedisRepository2.findById(redisTask.getId()).orElse(null);
+        if(opt == null)
+            throw new RuntimeException("could not find redistask id");
+
+        log.info("###############################--------------------!!!!!!!!+++++++++++++++?????????=========== taskid: " + opt.getId());
     }
     public List<RedisTask> getAllRedisTasks(){
        Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();

@@ -34,6 +34,8 @@ public class TestController {
         task.setPriority(Integer.parseInt(priority));
         task.setId(UUID.randomUUID().toString());
         task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
+
+
         taskService.scheduleTask(task);
         sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
