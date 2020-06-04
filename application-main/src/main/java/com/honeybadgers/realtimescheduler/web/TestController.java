@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+import static org.cloudfoundry.operations.util.OperationsLogging.log;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/data")        // only initialize if one of the given profiles is active
@@ -41,6 +43,7 @@ public class TestController {
     }
     @GetMapping("/getAllRedisTasks")
     public ResponseEntity<?> getAllRedisTasks(){
+        System.out.println("instanzcheck");
         return ResponseEntity.ok(taskService.getAllRedisTasks());
     }
 }
