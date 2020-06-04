@@ -1,6 +1,6 @@
-package com.honeybadgers.realtimescheduler.config;
+package com.honeybadgers.communication.config;
 
-import com.honeybadgers.realtimescheduler.services.impl.RabbitMQReceiver;
+import com.honeybadgers.communication.RabbitMQReceiver;
 import org.springframework.amqp.core.Binding;
 import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
@@ -17,7 +17,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
+@ComponentScan(basePackages = "com.honeybadgers.communication")
 public class RabbitMQConfig {
 
     @Value("${dispatch.rabbitmq.dispatcherqueue}")

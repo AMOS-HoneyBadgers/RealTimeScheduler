@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.communication;
 
 public interface ICommunication {
     void sendTaskToDispatcher(String task);

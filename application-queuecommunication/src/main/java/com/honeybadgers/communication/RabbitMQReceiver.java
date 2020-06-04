@@ -1,6 +1,5 @@
-package com.honeybadgers.realtimescheduler.services.impl;
+package com.honeybadgers.communication;
 
-import com.honeybadgers.realtimescheduler.services.ICommunication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

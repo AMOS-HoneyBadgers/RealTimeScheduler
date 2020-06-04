@@ -1,7 +1,7 @@
-package com.honeybadgers.realtimescheduler.services.impl;
+package com.honeybadgers.communication;
 
 
-import com.honeybadgers.realtimescheduler.services.ICommunication;
+import com.honeybadgers.communication.ICommunication;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;

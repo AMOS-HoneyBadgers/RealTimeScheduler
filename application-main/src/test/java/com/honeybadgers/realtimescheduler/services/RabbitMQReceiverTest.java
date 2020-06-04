@@ -1,6 +1,8 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.realtimescheduler.services.impl.RabbitMQReceiver;
+
+import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.communication.RabbitMQReceiver;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

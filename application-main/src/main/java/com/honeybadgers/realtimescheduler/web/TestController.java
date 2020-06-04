@@ -1,10 +1,9 @@
 package com.honeybadgers.realtimescheduler.web;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
-import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import com.honeybadgers.realtimescheduler.services.ICommunication;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -12,8 +11,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.util.UUID;
-
-import static org.cloudfoundry.operations.util.OperationsLogging.log;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
