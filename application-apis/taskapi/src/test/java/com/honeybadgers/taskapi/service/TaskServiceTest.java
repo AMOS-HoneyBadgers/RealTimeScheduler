@@ -1,5 +1,6 @@
 package com.honeybadgers.taskapi.service;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.Group;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.models.UnknownEnumException;
@@ -37,7 +38,7 @@ public class TaskServiceTest {
     @MockBean
     GroupRepository groupRepository;
     @MockBean
-    ISendTasksToTaksQueue iSendTasksToTaksQueue;
+    ICommunication communication;
 
     @Autowired
     ITaskService taskService;
