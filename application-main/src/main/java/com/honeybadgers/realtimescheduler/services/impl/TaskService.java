@@ -81,4 +81,7 @@ public class TaskService implements ITaskService {
         taskRedisRepository.save(redisTask);
         log.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
     }
+    public Iterable<RedisTask> getAllRedisTasks(){
+        return this.taskRedisRepository.findAll();
+    }
 }

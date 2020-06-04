@@ -18,4 +18,6 @@ public interface ITaskService {
     long calculatePriority(Task task);
 
     void scheduleTask(Task task);
+
+    Iterable<RedisTask> getAllRedisTasks();
 }

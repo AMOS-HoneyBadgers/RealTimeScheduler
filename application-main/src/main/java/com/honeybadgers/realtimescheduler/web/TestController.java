@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.models.*;
+import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import com.honeybadgers.realtimescheduler.services.ICommunication;
@@ -37,5 +38,9 @@ public class TestController {
         taskService.scheduleTask(task);
         sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
+    }
+    @GetMapping("/getAllRedisTasks")
+    public ResponseEntity<?> getAllRedisTasks(){
+        return ResponseEntity.ok(taskService.getAllRedisTasks());
     }
 }
