@@ -127,7 +127,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public void sendTaskToTaskEventQueue(String taskId) {
-        sender.sendTaskToTaskQueue(taskId);
+        sender.sendTaskToTasksQueue(taskId);
     }
 
 }

@@ -1,5 +1,6 @@
 package com.honeybadgers.groupapi.service;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.repository.TaskRepository;
 import com.honeybadgers.models.Task;
@@ -37,7 +38,7 @@ public class GroupServiceTest {
     TaskRepository taskRepository;
 
     @MockBean
-    ISendGroupsToTaksQueue sender;
+    ICommunication sender;
 
     @Autowired
     IGroupService groupService;

@@ -1,12 +1,12 @@
 package com.honeybadgers.groupapi.service.impl;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.repository.TaskRepository;
 import com.honeybadgers.groupapi.service.IGroupService;
-import com.honeybadgers.groupapi.service.ISendGroupsToTaksQueue;
 import com.honeybadgers.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -33,7 +33,7 @@ public class GroupService implements IGroupService {
     @Autowired
     TaskRepository taskRepository;
     @Autowired
-    ISendGroupsToTaksQueue sender;
+    ICommunication sender;
 
     @Override
     public Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException {

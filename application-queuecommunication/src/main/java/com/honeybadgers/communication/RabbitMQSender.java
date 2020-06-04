@@ -38,18 +38,24 @@ public class RabbitMQSender implements ICommunication {
     @Override
     public void sendTaskToDispatcher(String task) {
         rabbitTemplate.convertAndSend(dispatcherexchange, dispatcherroutingkey, task);
-        System.out.println("Send msg = " + task);
+        System.out.println("Send task to dispatcher + " + task);
     }
 
     public String sendFeedbackToScheduler(String feedback) {
         rabbitTemplate.convertAndSend(feedbackExchange, feedbackroutingkey, feedback);
-        System.out.println("Send msg = " + feedback);
+        System.out.println("Send feedback to Scheduler = " + feedback);
         return "test";
     }
 
     @Override
-    public void sendTaskToTaskQueue(String task) {
+    public void sendTaskToTasksQueue(String task) {
         rabbitTemplate.convertAndSend(tasksExchange, tasksroutingkey, task);
-        System.out.println("Send msg = " + task);
+        System.out.println("Send task to Taskqueue= " + task);
+    }
+
+    @Override
+    public void sendGroupToTasksQueue(String group) {
+        rabbitTemplate.convertAndSend(tasksExchange, tasksroutingkey, group);
+        System.out.println("Send group Taskqueue= " + group);
     }
 }

@@ -46,7 +46,7 @@ public class TestController {
 
     @PostMapping("/testTaskQueue/{task}")
     public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
-        sender.sendTaskToTaskQueue(task);
+        sender.sendTaskToTasksQueue(task);
         return ResponseEntity.ok("sent task " + task);
     }
 }

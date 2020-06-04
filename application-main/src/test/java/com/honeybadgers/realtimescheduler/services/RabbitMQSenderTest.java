@@ -42,7 +42,7 @@ public class RabbitMQSenderTest {
     @Test
     public void sendTaskToTaskQueue() {
         RabbitMQSender spy =  Mockito.spy(sender);
-        spy.sendTaskToTaskQueue("tasks");
+        spy.sendTaskToTasksQueue("tasks");
         Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
     }
 }
