@@ -3,19 +3,17 @@ package com.honeybadgers.groupapi.service.impl;
 import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
 import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.repository.TaskRepository;
 import com.honeybadgers.groupapi.service.IGroupService;
+import com.honeybadgers.groupapi.service.ISendGroupsToTaksQueue;
 import com.honeybadgers.models.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.sql.Array;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -34,6 +32,8 @@ public class GroupService implements IGroupService {
 
     @Autowired
     TaskRepository taskRepository;
+    @Autowired
+    ISendGroupsToTaksQueue sender;
 
     @Override
     public Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException {
@@ -183,5 +183,11 @@ public class GroupService implements IGroupService {
 
         return targetGroup;
     }
+
+    @Override
+    public void sendGroupToTaskEventQueue(String groupId) {
+        sender.sendGroupToTasksQueue(groupId);
+    }
+
 
 }

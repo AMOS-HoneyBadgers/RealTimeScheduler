@@ -36,6 +36,9 @@ public class GroupServiceTest {
     @MockBean
     TaskRepository taskRepository;
 
+    @MockBean
+    ISendGroupsToTaksQueue sender;
+
     @Autowired
     IGroupService groupService;
 
