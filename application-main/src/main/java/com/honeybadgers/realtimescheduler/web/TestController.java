@@ -46,4 +46,10 @@ public class TestController {
         System.out.println("instanzcheck");
         return ResponseEntity.ok(taskService.getAllRedisTasks());
     }
+
+    @PostMapping("/testTaskQueue/{task}")
+    public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
+        sender.sendTaskToTaskQueue(task);
+        return ResponseEntity.ok("sent task " + task);
+    }
 }

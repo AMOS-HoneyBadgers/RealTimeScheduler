@@ -42,4 +42,7 @@ public class RabbitMQReceiver {
         // do database operation
     }
 
+    public void receiveTaskFromEventQueue(String in) {
+        System.out.println(" [x] Received '" + in + "'");
+    }
 }

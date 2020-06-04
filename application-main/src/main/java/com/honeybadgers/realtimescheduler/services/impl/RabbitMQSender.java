@@ -22,8 +22,14 @@ public class RabbitMQSender implements ICommunication {
     @Value("${dispatch.rabbitmq.feedbackroutingkey}")
     private String feedbackroutingkey;
 
+    @Value("${dispatch.rabbitmq.tasksroutingkey}")
+    private String tasksroutingkey;
+
     @Value("${dispatch.rabbitmq.feedbackexchange}")
     String feedbackExchange;
+
+    @Value("${dispatch.rabbitmq.tasksexchange}")
+    String tasksExchange;
 
     public RabbitMQSender(RabbitTemplate template) {
         this.rabbitTemplate = template;
@@ -41,4 +47,9 @@ public class RabbitMQSender implements ICommunication {
         return "test";
     }
 
+    @Override
+    public void sendTaskToTaskQueue(String task) {
+        rabbitTemplate.convertAndSend(tasksExchange, tasksroutingkey, task);
+        System.out.println("Send msg = " + task);
+    }
 }

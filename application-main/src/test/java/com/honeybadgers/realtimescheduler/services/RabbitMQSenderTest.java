@@ -37,4 +37,11 @@ public class RabbitMQSenderTest {
         spy.sendFeedbackToScheduler("feedback");
         Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
     }
+
+    @Test
+    public void sendTaskToTaskQueue() {
+        RabbitMQSender spy =  Mockito.spy(sender);
+        spy.sendTaskToTaskQueue("tasks");
+        Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
+    }
 }

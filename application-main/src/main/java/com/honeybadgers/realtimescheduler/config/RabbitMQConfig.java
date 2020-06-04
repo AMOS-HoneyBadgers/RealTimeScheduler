@@ -26,16 +26,24 @@ public class RabbitMQConfig {
     @Value("${dispatch.rabbitmq.feedbackqueue}")
     String feedbackqueue;
 
+    @Value("${dispatch.rabbitmq.tasksqueue}")
+    String tasksqueue;
+
     @Value("${dispatch.rabbitmq.dispatcherexchange}")
     String dispatcherExchange;
 
     @Value("${dispatch.rabbitmq.feedbackexchange}")
     String feedbackExchange;
 
+    @Value("${dispatch.rabbitmq.tasksexchange}")
+    String tasksExchange;
+
     @Value("${dispatch.rabbitmq.dispatcherroutingkey}")
     private String dispatcherroutingkey;
     @Value("${dispatch.rabbitmq.feedbackroutingkey}")
     private String feedbackroutingkey;
+    @Value("${dispatch.rabbitmq.tasksroutingkey}")
+    private String tasksroutingkey;
 
     @Qualifier("dispatcherqueue")
     @Bean
@@ -47,6 +55,12 @@ public class RabbitMQConfig {
     @Bean
     Queue feedbackqueue() {
         return new Queue(feedbackqueue, false);
+    }
+
+    @Qualifier("taskqueue")
+    @Bean
+    Queue tasksqueue() {
+        return new Queue(tasksqueue, false);
     }
 
     @Qualifier("dispatcherExchange")
@@ -61,6 +75,12 @@ public class RabbitMQConfig {
         return new DirectExchange(feedbackExchange);
     }
 
+    @Qualifier("tasksExchange")
+    @Bean
+    DirectExchange tasksexchange() {
+        return new DirectExchange(tasksExchange);
+    }
+
     @Bean
     Binding dispatchbinding(@Qualifier("dispatcherqueue") Queue dispatcherqueue, @Qualifier("dispatcherExchange") DirectExchange exchange) {
         return BindingBuilder.bind(dispatcherqueue).to(exchange).with(dispatcherroutingkey);
@@ -68,6 +88,10 @@ public class RabbitMQConfig {
     @Bean
     Binding feedbackbinding(@Qualifier("feedbackqueue") Queue feedbackqueue, @Qualifier("feedbackExchange")DirectExchange exchange) {
         return BindingBuilder.bind(feedbackqueue).to(exchange).with(feedbackroutingkey);
+    }
+    @Bean
+    Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange")DirectExchange exchange) {
+        return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
     @Bean
     SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory,
@@ -89,6 +113,16 @@ public class RabbitMQConfig {
 
         return container;
     }
+    @Bean
+    SimpleMessageListenerContainer taskscontainer(ConnectionFactory connectionFactory,
+                                                     MessageListenerAdapter taskslistenerAdapter) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(tasksqueue);
+        container.setMessageListener(taskslistenerAdapter);
+
+        return container;
+    }
 
     @Bean
     MessageListenerAdapter feedbacklistenerAdapter(RabbitMQReceiver receiver) {
@@ -97,5 +131,9 @@ public class RabbitMQConfig {
     @Bean
     MessageListenerAdapter dispatchlistenerAdapter(RabbitMQReceiver receiver) {
         return new MessageListenerAdapter(receiver, "receiveTask");
+    }
+    @Bean
+    MessageListenerAdapter taskslistenerAdapter(RabbitMQReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveTaskFromEventQueue");
     }
 }
