@@ -1,5 +1,6 @@
 package com.honeybadgers.communication;
 
+import com.honeybadgers.communication.model.TaskQueueModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -43,5 +44,9 @@ public class RabbitMQReceiver {
 
     public void receiveTaskFromEventQueue(String in) {
         System.out.println(" [x] Received '" + in + "'");
+    }
+
+    public void receiveTaskFromPriorityQueue(TaskQueueModel in) {
+        System.out.println(" [x] Received task from priority queue'" + in.toString() + "'");
     }
 }

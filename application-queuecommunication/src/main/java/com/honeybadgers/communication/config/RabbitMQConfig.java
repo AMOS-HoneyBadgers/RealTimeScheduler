@@ -8,6 +8,7 @@ import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -29,6 +30,9 @@ public class RabbitMQConfig {
     @Value("${dispatch.rabbitmq.tasksqueue}")
     String tasksqueue;
 
+    @Value("${dispatch.rabbitmq.priorityqueue}")
+    String priorityqueue;
+
     @Value("${dispatch.rabbitmq.dispatcherexchange}")
     String dispatcherExchange;
 
@@ -37,6 +41,8 @@ public class RabbitMQConfig {
 
     @Value("${dispatch.rabbitmq.tasksexchange}")
     String tasksExchange;
+    @Value("${dispatch.rabbitmq.priorityexchange}")
+    String priorityExchange;
 
     @Value("${dispatch.rabbitmq.dispatcherroutingkey}")
     private String dispatcherroutingkey;
@@ -44,6 +50,8 @@ public class RabbitMQConfig {
     private String feedbackroutingkey;
     @Value("${dispatch.rabbitmq.tasksroutingkey}")
     private String tasksroutingkey;
+    @Value("${dispatch.rabbitmq.priorityroutingkey}")
+    private String priorityroutingkey;
 
     @Qualifier("dispatcherqueue")
     @Bean
@@ -61,6 +69,11 @@ public class RabbitMQConfig {
     @Bean
     Queue tasksqueue() {
         return new Queue(tasksqueue, false);
+    }
+    @Qualifier("priorityqueue")
+    @Bean
+    Queue priorityqueue() {
+        return new Queue(priorityqueue, false);
     }
 
     @Qualifier("dispatcherExchange")
@@ -81,6 +94,12 @@ public class RabbitMQConfig {
         return new DirectExchange(tasksExchange);
     }
 
+    @Qualifier("priorityExchange")
+    @Bean
+    DirectExchange priorityExchange() {
+        return new DirectExchange(priorityExchange);
+    }
+
     @Bean
     Binding dispatchbinding(@Qualifier("dispatcherqueue") Queue dispatcherqueue, @Qualifier("dispatcherExchange") DirectExchange exchange) {
         return BindingBuilder.bind(dispatcherqueue).to(exchange).with(dispatcherroutingkey);
@@ -92,6 +111,10 @@ public class RabbitMQConfig {
     @Bean
     Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange")DirectExchange exchange) {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
+    }
+    @Bean
+    Binding prioritybinding(@Qualifier("priorityqueue") Queue priorityqueue, @Qualifier("priorityExchange")DirectExchange exchange) {
+        return BindingBuilder.bind(priorityqueue).to(exchange).with(priorityroutingkey);
     }
     @Bean
     SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory,
@@ -123,6 +146,17 @@ public class RabbitMQConfig {
 
         return container;
     }
+    @Bean
+    SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory,
+                                                     MessageListenerAdapter prioritylistenerAdapter) {
+        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
+        container.setConnectionFactory(connectionFactory);
+        container.setQueueNames(priorityqueue);
+        prioritylistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
+        container.setMessageListener(prioritylistenerAdapter);
+
+        return container;
+    }
 
     @Bean
     MessageListenerAdapter feedbacklistenerAdapter(RabbitMQReceiver receiver) {
@@ -135,5 +169,9 @@ public class RabbitMQConfig {
     @Bean
     MessageListenerAdapter taskslistenerAdapter(RabbitMQReceiver receiver) {
         return new MessageListenerAdapter(receiver, "receiveTaskFromEventQueue");
+    }
+    @Bean
+    MessageListenerAdapter prioritylistenerAdapter(RabbitMQReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveTaskFromPriorityQueue");
     }
 }
