@@ -1,7 +1,10 @@
-package com.honeybadgers.communication.config;
+package com.honeybadgers.realtimescheduler.config;
 
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
+import com.honeybadgers.realtimescheduler.services.RabbitMQTaskReceiver;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
@@ -14,10 +17,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @EnableAutoConfiguration
-@ComponentScan(basePackages = "com.honeybadgers.communication")
-public class RabbitMQConfig {
+@ComponentScan(basePackages = "com.honeybadgers.realtimescheduler")
+public class RabbitMQConfigScheduler {
 
-    @Value("${dispatch.rabbitmq.dispatcherqueue}")
+    /*@Value("${dispatch.rabbitmq.dispatcherqueue}")
     String dispatcherqueue;
 
     @Value("${dispatch.rabbitmq.feedbackqueue}")
@@ -91,51 +94,46 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
     @Bean
-    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory) {
+    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory,
+                                             MessageListenerAdapter dispatchlistenerAdapter) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(dispatcherqueue);
+        container.setMessageListener(dispatchlistenerAdapter);
 
         return container;
     }
     @Bean
-    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory) {
+    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory,
+                                             MessageListenerAdapter feedbacklistenerAdapter) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(feedbackqueue);
+        container.setMessageListener(feedbacklistenerAdapter);
 
         return container;
     }
-
-    /*@Bean
-    SimpleMessageListenerContainer taskscontainer(ConnectionFactory connectionFactory) {
+    @Bean
+    SimpleMessageListenerContainer taskscontainer(ConnectionFactory connectionFactory,
+                                                     MessageListenerAdapter taskslistenerAdapter) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(tasksqueue);
+        container.setMessageListener(taskslistenerAdapter);
 
         return container;
+    }
+
+    @Bean
+    MessageListenerAdapter feedbacklistenerAdapter(RabbitMQTaskReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveFeedback");
+    }
+    @Bean
+    MessageListenerAdapter dispatchlistenerAdapter(RabbitMQTaskReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveTask");
+    }
+    @Bean
+    MessageListenerAdapter taskslistenerAdapter(RabbitMQTaskReceiver receiver) {
+        return new MessageListenerAdapter(receiver, "receiveTaskFromEventQueue");
     }*/
-
-    @Bean
-    public SimpleRabbitListenerContainerFactory taskcontainerfactory(ConnectionFactory connectionFactory) {
-        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        return factory;
-    }
-
-    @Bean
-    public Declarables topicBindings() {
-        Queue queue = new Queue("tasks");
-        TopicExchange topicExchange = new TopicExchange("tasks.exchange");
-
-        return new Declarables(
-                queue,
-                topicExchange,
-                BindingBuilder
-                        .bind(queue)
-                        .to(topicExchange)
-                        .with("tasks.routingkey")
-        );
-    }
-
 }

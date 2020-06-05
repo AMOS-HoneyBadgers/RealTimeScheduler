@@ -1,19 +1,18 @@
-package com.honeybadgers.communication;
+package com.honeybadgers.realtimescheduler.services;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
-public class RabbitMQReceiver {
+public class RabbitMQTaskReceiver {
 
-    @Autowired
+    /*@Autowired
     ICommunication communication;
 
-    public RabbitMQReceiver() {
+    public RabbitMQTaskReceiver() {
 
     }
 
-    public RabbitMQReceiver(ICommunication communication) {
+    public RabbitMQTaskReceiver(ICommunication communication) {
         this.communication = communication;
     }
 
@@ -43,5 +42,5 @@ public class RabbitMQReceiver {
 
     public void receiveTaskFromEventQueue(String in) {
         System.out.println(" [x] Received '" + in + "'");
-    }
+    }*/
 }
