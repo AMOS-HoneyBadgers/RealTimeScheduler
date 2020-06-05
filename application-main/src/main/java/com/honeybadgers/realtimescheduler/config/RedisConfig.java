@@ -17,48 +17,42 @@ public class RedisConfig {
 
     static final Logger logger = LogManager.getLogger(RedisConfig.class);
 
-    private String priohost;
-
-    private int prioport;
-
-    private String priopassword;
-
-    private String lockhost;
-
-    private int lockport;
-
-    private String lockpassword;
-
     @Autowired
-    public RedisConfig(CloudFoundryProperties cloudConfig) {
-        logger.info("################################## START");
+    RedisApplicationProperties redisApplicationProperties;
+
+    public RedisConfig() {
+        /*logger.info("################################## START");
         logger.warn("+++++++++++++++++++++ CLOUDCONFIG IS NULL: " + (cloudConfig == null));
         logger.warn("++++++++++++++++++++ TEST TO STRING: " + cloudConfig.toString());
         logger.warn("++++++++++++++++++++ prio_Store IS NULL: " + (cloudConfig.priority_store == null));
-        logger.warn("++++++++++++++++++++ lock_Store IS NULL: " + (cloudConfig.lock_store == null));
+        logger.warn("++++++++++++++++++++ lock_Store IS NULL: " + (cloudConfig.priority_store == null));
         logger.warn("++++++++++++++++++++ prioStore creds: " + cloudConfig.priority_store.credentials.toString());
-        logger.warn("++++++++++++++++++++ lockStore creds: " + cloudConfig.lock_store.credentials.toString());
+        logger.warn("++++++++++++++++++++ lockStore creds: " + cloudConfig.priority_store.credentials.toString());
         priohost = cloudConfig.priority_store.credentials.get("hostname");
         logger.info("################################## host: " + priohost);
         priopassword = cloudConfig.priority_store.credentials.get("password");
         logger.info("################################## pw: " + priopassword);
         prioport = Integer.parseInt(cloudConfig.priority_store.credentials.get("port"));
         logger.info("################################## port: " + prioport);
-        lockhost = cloudConfig.lock_store.credentials.get("hostname");
+        lockhost = cloudConfig.priority_store.credentials.get("hostname");
         logger.info("################################## host: " + lockhost);
-        lockpassword = cloudConfig.lock_store.credentials.get("password");
+        lockpassword = cloudConfig.priority_store.credentials.get("password");
         logger.info("################################## pw: " + lockpassword);
-        lockport = Integer.parseInt(cloudConfig.lock_store.credentials.get("port"));
+        lockport = 15915;//Integer.parseInt(cloudConfig.priority_store.credentials.get("port"));
         logger.info("################################## port: " + lockport);
-        logger.info("################################## END");
+        logger.info("################################## END");*/
     }
 
     @Bean(name="prioConnectionFactory")
+    @Primary
     JedisConnectionFactory jedisConnectionFactoryForPrioDatabase() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(priohost);
-        redisStandaloneConfiguration.setPassword(priopassword);
-        redisStandaloneConfiguration.setPort(prioport);
+        logger.warn("#################### PRIO DB HOST: " + redisApplicationProperties.prio.host);
+        logger.warn("#################### PRIO DB PW: " + redisApplicationProperties.prio.password);
+        logger.warn("#################### PRIO DB PORT: " + redisApplicationProperties.prio.port);
+        redisStandaloneConfiguration.setHostName(redisApplicationProperties.prio.host);
+        redisStandaloneConfiguration.setPassword(redisApplicationProperties.prio.password);
+        redisStandaloneConfiguration.setPort(Integer.parseInt(redisApplicationProperties.prio.port));
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
@@ -66,9 +60,12 @@ public class RedisConfig {
     @Bean(name="lockConnectionFactory")
     JedisConnectionFactory jedisConnectionFactoryForLockDatabase() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(lockhost);
-        redisStandaloneConfiguration.setPassword(lockpassword);
-        redisStandaloneConfiguration.setPort(lockport);
+        logger.warn("#################### LOCK DB HOST: " + redisApplicationProperties.lock.host);
+        logger.warn("#################### LOCK DB PW: " + redisApplicationProperties.lock.password);
+        logger.warn("#################### LOCK DB PORT: " + redisApplicationProperties.lock.port);
+        redisStandaloneConfiguration.setHostName(redisApplicationProperties.lock.host);
+        redisStandaloneConfiguration.setPassword(redisApplicationProperties.lock.password);
+        redisStandaloneConfiguration.setPort(Integer.parseInt(redisApplicationProperties.lock.port));
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
