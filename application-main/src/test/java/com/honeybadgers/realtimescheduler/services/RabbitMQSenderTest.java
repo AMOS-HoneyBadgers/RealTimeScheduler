@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.services;
 
 
 
+import com.honeybadgers.communication.RabbitMQSender;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,17 +14,15 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @RunWith(SpringJUnit4ClassRunner.class)
 public class RabbitMQSenderTest {
 
-    /*@Mock
+    @Mock
     private RabbitTemplate rabbitTemplate;
 
     private RabbitMQSender sender;
 
     @Before
     public void beforeEach() {
-        //MockitoAnnotations.initMocks(this);
         sender = new RabbitMQSender(rabbitTemplate);
     }
-
 
     @Test
     public void testSendTaskToDispatcher() {
@@ -44,5 +43,5 @@ public class RabbitMQSenderTest {
         RabbitMQSender spy =  Mockito.spy(sender);
         spy.sendTaskToTasksQueue("tasks");
         Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
-    }*/
+    }
 }

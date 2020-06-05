@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.web;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
@@ -23,8 +24,8 @@ public class TestController {
     @Autowired
     IGroupService groupService;
 
-    //@Autowired
-    //ICommunication sender;
+    @Autowired
+    ICommunication sender;
 
     @GetMapping("/testtask/{priority}")
     public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
@@ -35,19 +36,14 @@ public class TestController {
         task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
 
 
-        taskService.scheduleTask(task);
+        taskService.scheduleTask(task.getId());
         //sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
     }
-    /*@GetMapping("/getAllRedisTasks")
-    public ResponseEntity<?> getAllRedisTasks(){
-        System.out.println("instanzcheck");
-        return ResponseEntity.ok(taskService.getAllRedisTasks());
-    }*/
 
     @PostMapping("/testTaskQueue/{task}")
     public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
-        //sender.sendTaskToTasksQueue(task);
+        sender.sendTaskToTasksQueue(task);
         return ResponseEntity.ok("sent task " + task);
     }
 }
