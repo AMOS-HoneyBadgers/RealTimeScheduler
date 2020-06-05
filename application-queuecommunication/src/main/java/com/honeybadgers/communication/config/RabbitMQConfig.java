@@ -122,6 +122,7 @@ public class RabbitMQConfig {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(dispatcherqueue);
+        dispatchlistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
         container.setMessageListener(dispatchlistenerAdapter);
 
         return container;
@@ -132,6 +133,7 @@ public class RabbitMQConfig {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(feedbackqueue);
+        feedbacklistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
         container.setMessageListener(feedbacklistenerAdapter);
 
         return container;
@@ -142,6 +144,7 @@ public class RabbitMQConfig {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(tasksqueue);
+        taskslistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
         container.setMessageListener(taskslistenerAdapter);
 
         return container;
