@@ -34,15 +34,17 @@ public class TestController {
         task.setPriority(Integer.parseInt(priority));
         task.setId(UUID.randomUUID().toString());
         task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
+
+
         taskService.scheduleTask(task);
         sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
     }
-    @GetMapping("/getAllRedisTasks")
+    /*@GetMapping("/getAllRedisTasks")
     public ResponseEntity<?> getAllRedisTasks(){
         System.out.println("instanzcheck");
         return ResponseEntity.ok(taskService.getAllRedisTasks());
-    }
+    }*/
 
     @PostMapping("/testTaskQueue/{task}")
     public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
