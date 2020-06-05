@@ -2,6 +2,7 @@ package com.honeybadgers.managementapi.service.impl;
 
 import com.honeybadgers.managementapi.repository.StateRepository;
 import com.honeybadgers.managementapi.service.IManagmentService;
+import com.honeybadgers.models.RedisTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,11 @@ public class ManagmentService implements IManagmentService {
 
     @Override
     public void pauseTask(Long task, OffsetDateTime resumeDate) {
+        RedisTask taskPaused = stateRepository.findById(task.toString()).orElse(null);
+
+        if(taskPaused == null){
+
+        }
 
     }
 
