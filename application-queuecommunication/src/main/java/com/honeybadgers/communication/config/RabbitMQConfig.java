@@ -1,10 +1,7 @@
 package com.honeybadgers.communication.config;
 
-import com.honeybadgers.communication.RabbitMQReceiver;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
@@ -113,39 +110,18 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
     @Bean
-    Binding prioritybinding(@Qualifier("priorityqueue") Queue priorityqueue, @Qualifier("priorityExchange")DirectExchange exchange) {
-        return BindingBuilder.bind(priorityqueue).to(exchange).with(priorityroutingkey);
-    }
-    @Bean
-    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory,
-                                             MessageListenerAdapter dispatchlistenerAdapter) {
+    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(dispatcherqueue);
-        dispatchlistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
-        container.setMessageListener(dispatchlistenerAdapter);
 
         return container;
     }
     @Bean
-    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory,
-                                             MessageListenerAdapter feedbacklistenerAdapter) {
+    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(feedbackqueue);
-        feedbacklistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
-        container.setMessageListener(feedbacklistenerAdapter);
-
-        return container;
-    }
-    @Bean
-    SimpleMessageListenerContainer taskscontainer(ConnectionFactory connectionFactory,
-                                                     MessageListenerAdapter taskslistenerAdapter) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(tasksqueue);
-        taskslistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
-        container.setMessageListener(taskslistenerAdapter);
 
         return container;
     }
@@ -162,16 +138,10 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    MessageListenerAdapter feedbacklistenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveFeedback");
-    }
-    @Bean
-    MessageListenerAdapter dispatchlistenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveTask");
-    }
-    @Bean
-    MessageListenerAdapter taskslistenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveTaskFromEventQueue");
+    public SimpleRabbitListenerContainerFactory taskcontainerfactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        return factory;
     }
     @Bean
     MessageListenerAdapter prioritylistenerAdapter(RabbitMQReceiver receiver) {

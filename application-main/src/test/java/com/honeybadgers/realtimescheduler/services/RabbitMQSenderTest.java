@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services;
 
 
+
 import com.honeybadgers.communication.RabbitMQSender;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,10 +21,8 @@ public class RabbitMQSenderTest {
 
     @Before
     public void beforeEach() {
-        //MockitoAnnotations.initMocks(this);
         sender = new RabbitMQSender(rabbitTemplate);
     }
-
 
     @Test
     public void testSendTaskToDispatcher() {

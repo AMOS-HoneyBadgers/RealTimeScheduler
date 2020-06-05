@@ -8,7 +8,6 @@ import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import javax.annotation.PostConstruct;
 import java.util.Optional;
@@ -37,7 +36,7 @@ public class TaskRedisRepository2 implements CrudRepository<RedisTask, String> {
 
     @Override
     public <S extends RedisTask> Iterable<S> saveAll(Iterable<S> iterable) {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
@@ -48,41 +47,41 @@ public class TaskRedisRepository2 implements CrudRepository<RedisTask, String> {
 
     @Override
     public boolean existsById(String s) {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
     public Iterable<RedisTask> findAll() {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
     public Iterable<RedisTask> findAllById(Iterable<String> iterable) {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
     public long count() {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
     public void deleteById(String s) {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
     public void delete(RedisTask redisTask) {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
     public void deleteAll(Iterable<? extends RedisTask> iterable) {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 
     @Override
     public void deleteAll() {
-        throw new NotImplementedException();
+        throw new RuntimeException();
     }
 }

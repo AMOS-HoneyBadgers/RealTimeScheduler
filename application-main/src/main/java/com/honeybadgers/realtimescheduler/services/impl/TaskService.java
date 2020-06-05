@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
@@ -29,6 +30,9 @@ public class TaskService implements ITaskService {
 
     @Autowired
     TaskRedisRepository taskRedisRepository;
+
+    @Autowired
+    ICommunication sender;
 
     @Value("${com.realtimescheduler.scheduler.priority.deadline-modifier}")
     double deadlineModifier;
@@ -77,30 +81,44 @@ public class TaskService implements ITaskService {
         return redisTask;
     }
 
+    public List<RedisTask> getAllRedisTasksAndSort(){
+        Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();
+        List<RedisTask> sortedList = new ArrayList<RedisTask>();
+        redisTasks.forEach(sortedList::add);
+        Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
+
+        return sortedList;
+    }
+
     @Override
-    public void scheduleTask(Task task) {
-        /*RedisTask redisTask = taskRedisRepository.findById(task.getId()).orElse(null);
+    public void scheduleTask(String taskId) {
+        // TODO Transaction
+        RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
+
         if(redisTask == null){
-            redisTask = createRedisTask(task.getId());
+            redisTask = createRedisTask(taskId);
         }
+
+        Task task = taskPostgresRepository.findById(taskId).orElse(null);
+        if(task == null)
+            throw new RuntimeException("task could not be found in database");
+
         redisTask.setPriority(calculatePriority(task));
         taskRedisRepository.save(redisTask);
-        log.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());*/
 
-        RedisTask redisTask = createRedisTask(task.getId());
-        redisTask.setPriority(calculatePriority(task));
-        taskRedisRepository2.save(redisTask);
-        RedisTask opt = taskRedisRepository2.findById(redisTask.getId()).orElse(null);
-        if(opt == null)
-            throw new RuntimeException("could not find redistask id");
+        List<RedisTask> tasks = this.getAllRedisTasksAndSort();
 
-        log.info("###############################--------------------!!!!!!!!+++++++++++++++?????????=========== taskid: " + opt.getId());
+        // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
+        try {
+            for(int i = 0; i < 100; i++) {
+                sender.sendTaskToDispatcher(tasks.get(i).getId());
+            }
+        } catch(IndexOutOfBoundsException e) {
+            System.out.println("passt scho" + e.getMessage());
+        }
+
+
+        log.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
     }
-    /*public List<RedisTask> getAllRedisTasks(){
-       Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();
-       List<RedisTask> sortedList = new ArrayList<RedisTask>();
-       redisTasks.forEach(sortedList::add);
-       Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
-       return sortedList;
-    }*/
+
 }

@@ -36,15 +36,10 @@ public class TestController {
         task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
 
 
-        taskService.scheduleTask(task);
-        sender.sendTaskToDispatcher(task.getId());
+        taskService.scheduleTask(task.getId());
+        //sender.sendTaskToDispatcher(task.getId());
         return ResponseEntity.ok().build();
     }
-    /*@GetMapping("/getAllRedisTasks")
-    public ResponseEntity<?> getAllRedisTasks(){
-        System.out.println("instanzcheck");
-        return ResponseEntity.ok(taskService.getAllRedisTasks());
-    }*/
 
     @PostMapping("/testTaskQueue/{task}")
     public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
