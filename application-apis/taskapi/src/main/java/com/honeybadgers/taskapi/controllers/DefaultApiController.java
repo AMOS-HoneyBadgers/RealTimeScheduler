@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.Optional;
+
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:25.874+02:00[Europe/Berlin]")
 
 @Controller
@@ -44,6 +46,7 @@ public class DefaultApiController implements DefaultApi {
 
     /**
      * Creation of new Task
+     *
      * @param taskModel new task object (required)
      * @return
      */
@@ -56,7 +59,7 @@ public class DefaultApiController implements DefaultApi {
         response.setCode("200");
         response.setMessage("Success");
 
-        if(taskModel == null){
+        if (taskModel == null) {
             response.setCode("400");
             response.setMessage("Missing Body");
             return ResponseEntity.badRequest().body(response);
@@ -64,7 +67,10 @@ public class DefaultApiController implements DefaultApi {
 
         try {
             taskService.createTask(taskModel);
-            taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
+            if (taskModel.getForce() != null && taskModel.getForce())
+                taskService.sendTaskToPriorityQueue(taskModel);
+            else
+                taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
         } catch (UnknownEnumException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());

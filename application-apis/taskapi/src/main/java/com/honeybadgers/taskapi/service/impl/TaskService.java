@@ -1,6 +1,7 @@
 package com.honeybadgers.taskapi.service.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.*;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.models.TaskModel;
@@ -17,6 +18,7 @@ import com.honeybadgers.taskapi.exceptions.JpaException;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,11 +41,11 @@ public class TaskService implements ITaskService {
         newTask.setId(restModel.getId().toString());
         Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
         // foreign key is declared as NOT NULL -> throw JpaException now because it will be thrown on save(newTask) anyway
-        if(group == null)
+        if (group == null)
             throw new JpaException("Group not found!");
         else {
             List<Group> groupChildren = groupRepository.findAllByParentGroupId(group.getId());
-            if(!groupChildren.isEmpty())
+            if (!groupChildren.isEmpty())
                 // TODO perhaps move group of task or sth similar
                 throw new CreationException("Group of task has other groups as children: " +
                         groupChildren.stream().map(Group::getId).collect(Collectors.joining(", ")) +
@@ -52,19 +54,19 @@ public class TaskService implements ITaskService {
         newTask.setGroup(group);
 
         // set priority or default prio of group
-        if(restModel.getPriority() != null)
+        if (restModel.getPriority() != null)
             newTask.setPriority(restModel.getPriority());
         else
             newTask.setPriority(group.getPriority());
 
         // convert List<TaskModelActiveTimes> to List<ActiveTimes> or use default of group
-        if(restModel.getActiveTimes() != null)
+        if (restModel.getActiveTimes() != null)
             newTask.setActiveTimeFrames(restModel.getActiveTimes().stream().map(taskModelActiveTimes -> taskModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
         else
             newTask.setActiveTimeFrames(group.getActiveTimeFrames());
 
         // convert List<Boolean> to int[]
-        if(restModel.getWorkingDays() != null) {
+        if (restModel.getWorkingDays() != null) {
             newTask.setWorkingDays(restModel.getWorkingDays().stream().mapToInt(value -> {
                 if (value == null)
                     return 1;
@@ -77,12 +79,12 @@ public class TaskService implements ITaskService {
 
         // convert Enums using RestEnum.toString and JpaEnum.fromString
         newTask.setStatus(TaskStatusEnum.getFromString(restModel.getStatus().getValue()));
-        if(restModel.getMode() != null)
+        if (restModel.getMode() != null)
             newTask.setModeEnum(ModeEnum.getFromString(restModel.getMode().getValue()));
         else
             // use group default
             newTask.setModeEnum(group.getModeEnum());
-        if(restModel.getTypeFlag() != null)
+        if (restModel.getTypeFlag() != null)
             newTask.setTypeFlagEnum(TypeFlagEnum.getFromString(restModel.getTypeFlag().getValue()));
         else
             // use group default
@@ -95,21 +97,21 @@ public class TaskService implements ITaskService {
 
         newTask.setIndexNumber(restModel.getIndexNumber());
         // map OffsetDateTime to Timestamp or use group default
-        if(restModel.getDeadline() != null)
+        if (restModel.getDeadline() != null)
             newTask.setDeadline(Timestamp.valueOf(restModel.getDeadline().toLocalDateTime()));
         else
             newTask.setDeadline(group.getDeadline());
 
         // map List<TaskModelMeta> to Map<String, String>
-        if(restModel.getMeta() != null)
+        if (restModel.getMeta() != null)
             newTask.setMetaData(restModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
 
         try {
             taskRepository.save(newTask);
         } catch (DataIntegrityViolationException e) {
-            if(e.getMessage() != null) {
+            if (e.getMessage() != null) {
                 logger.error("DataIntegrityViolation while trying to add new Task: \n" + e.getMessage());
-                if(e.getMessage().contains("primary")) {
+                if (e.getMessage().contains("primary")) {
                     throw new JpaException("Primary or unique constraint failed!");
                 } else {
                     throw new JpaException(e.getMessage());
@@ -128,6 +130,22 @@ public class TaskService implements ITaskService {
     @Override
     public void sendTaskToTaskEventQueue(String taskId) {
         sender.sendTaskToTasksQueue(taskId);
+    }
+
+    @Override
+    public void sendTaskToPriorityQueue(TaskModel task) {
+        TaskQueueModel taskQueueModel = new TaskQueueModel();
+        if (task.getDeadline() != null)
+            taskQueueModel.setDeadline(Timestamp.valueOf(task.getDeadline().toLocalDateTime()));
+        taskQueueModel.setGroupId(task.getGroupId());
+        taskQueueModel.setId(task.getId().toString());
+        taskQueueModel.setIndexNumber(task.getIndexNumber());
+        if (task.getMeta() != null)
+            taskQueueModel.setMetaData(task.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
+        taskQueueModel.setPriority(task.getPriority());
+        taskQueueModel.setRetries(task.getRetries());
+        taskQueueModel.setTypeFlagEnum(task.getTypeFlag().getValue());
+        sender.sendTaskToPriorityQueue(taskQueueModel);
     }
 
 }
