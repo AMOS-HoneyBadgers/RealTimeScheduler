@@ -121,6 +121,12 @@ public class TaskServiceTest {
         List<Task> returnedTasks = service.getAllTasks();
         Assert.assertEquals(tasks, returnedTasks);
     }
+
+    @Test
+    public void testGetAllTasksAndSort() {
+        // TODO IMPLEMENT @Christoff and @Stan
+        service.getAllRedisTasksAndSort();
+    }
   
 }
 
