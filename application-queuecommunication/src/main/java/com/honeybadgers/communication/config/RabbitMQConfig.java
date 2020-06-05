@@ -107,35 +107,10 @@ public class RabbitMQConfig {
         return container;
     }
 
-    /*@Bean
-    SimpleMessageListenerContainer taskscontainer(ConnectionFactory connectionFactory) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(tasksqueue);
-
-        return container;
-    }*/
-
     @Bean
     public SimpleRabbitListenerContainerFactory taskcontainerfactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         return factory;
     }
-
-    @Bean
-    public Declarables topicBindings() {
-        Queue queue = new Queue("tasks");
-        TopicExchange topicExchange = new TopicExchange("tasks.exchange");
-
-        return new Declarables(
-                queue,
-                topicExchange,
-                BindingBuilder
-                        .bind(queue)
-                        .to(topicExchange)
-                        .with("tasks.routingkey")
-        );
-    }
-
 }

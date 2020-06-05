@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 public class TaskConsumerRabbit {
 
     @RabbitListener(queues="tasks")
-    public void receive(String message) {
+    public void receiveTask(String message) {
         System.out.println("Received message '{}'" + message);
     }
 

@@ -12,7 +12,6 @@ public class RabbitMQEventConsumerConfiguration {
     @Value("${dispatch.rabbitmq.tasksqueue}")
     private String taskqueue;
 
-
     @Value("${dispatch.rabbitmq.tasksroutingkey}")
     private String tasksroutingkey;
 
