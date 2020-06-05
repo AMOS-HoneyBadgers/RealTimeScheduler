@@ -2,7 +2,7 @@ package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
-import com.honeybadgers.realtimescheduler.model.RedisTask;
+import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository1;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository2;
 import com.honeybadgers.realtimescheduler.services.IGroupService;

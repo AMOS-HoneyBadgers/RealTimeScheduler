@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.repository;
 
-import com.honeybadgers.realtimescheduler.model.RedisTask;
+import com.honeybadgers.models.RedisTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;

@@ -1,10 +1,8 @@
 package com.honeybadgers.realtimescheduler.repository;
 
-import com.honeybadgers.realtimescheduler.model.RedisTask;
+import com.honeybadgers.models.RedisTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.repository.CrudRepository;

@@ -2,17 +2,14 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.Task;
-import com.honeybadgers.realtimescheduler.model.RedisTask;
+import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository2;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
