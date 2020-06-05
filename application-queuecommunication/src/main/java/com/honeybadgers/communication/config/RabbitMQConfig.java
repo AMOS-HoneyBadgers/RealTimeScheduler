@@ -126,13 +126,10 @@ public class RabbitMQConfig {
         return container;
     }
     @Bean
-    SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory,
-                                                     MessageListenerAdapter prioritylistenerAdapter) {
+    SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(priorityqueue);
-        prioritylistenerAdapter.setMessageConverter(new Jackson2JsonMessageConverter());
-        container.setMessageListener(prioritylistenerAdapter);
 
         return container;
     }
@@ -142,9 +139,5 @@ public class RabbitMQConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         return factory;
-    }
-    @Bean
-    MessageListenerAdapter prioritylistenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveTaskFromPriorityQueue");
     }
 }
