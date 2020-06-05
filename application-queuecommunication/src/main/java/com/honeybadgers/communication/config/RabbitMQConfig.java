@@ -1,13 +1,11 @@
 package com.honeybadgers.communication.config;
 
-import com.honeybadgers.communication.RabbitMQReceiver;
-import org.springframework.amqp.core.Binding;
-import org.springframework.amqp.core.BindingBuilder;
-import org.springframework.amqp.core.DirectExchange;
-import org.springframework.amqp.core.Queue;
+import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -29,6 +27,9 @@ public class RabbitMQConfig {
     @Value("${dispatch.rabbitmq.tasksqueue}")
     String tasksqueue;
 
+    @Value("${dispatch.rabbitmq.priorityqueue}")
+    String priorityqueue;
+
     @Value("${dispatch.rabbitmq.dispatcherexchange}")
     String dispatcherExchange;
 
@@ -37,6 +38,8 @@ public class RabbitMQConfig {
 
     @Value("${dispatch.rabbitmq.tasksexchange}")
     String tasksExchange;
+    @Value("${dispatch.rabbitmq.priorityexchange}")
+    String priorityExchange;
 
     @Value("${dispatch.rabbitmq.dispatcherroutingkey}")
     private String dispatcherroutingkey;
@@ -44,6 +47,8 @@ public class RabbitMQConfig {
     private String feedbackroutingkey;
     @Value("${dispatch.rabbitmq.tasksroutingkey}")
     private String tasksroutingkey;
+    @Value("${dispatch.rabbitmq.priorityroutingkey}")
+    private String priorityroutingkey;
 
     @Qualifier("dispatcherqueue")
     @Bean
@@ -61,6 +66,11 @@ public class RabbitMQConfig {
     @Bean
     Queue tasksqueue() {
         return new Queue(tasksqueue, false);
+    }
+    @Qualifier("priorityqueue")
+    @Bean
+    Queue priorityqueue() {
+        return new Queue(priorityqueue, false);
     }
 
     @Qualifier("dispatcherExchange")
@@ -81,6 +91,12 @@ public class RabbitMQConfig {
         return new DirectExchange(tasksExchange);
     }
 
+    @Qualifier("priorityExchange")
+    @Bean
+    DirectExchange priorityExchange() {
+        return new DirectExchange(priorityExchange);
+    }
+
     @Bean
     Binding dispatchbinding(@Qualifier("dispatcherqueue") Queue dispatcherqueue, @Qualifier("dispatcherExchange") DirectExchange exchange) {
         return BindingBuilder.bind(dispatcherqueue).to(exchange).with(dispatcherroutingkey);
@@ -94,46 +110,34 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
     @Bean
-    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory,
-                                             MessageListenerAdapter dispatchlistenerAdapter) {
+    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(dispatcherqueue);
-        container.setMessageListener(dispatchlistenerAdapter);
 
         return container;
     }
     @Bean
-    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory,
-                                             MessageListenerAdapter feedbacklistenerAdapter) {
+    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
         container.setQueueNames(feedbackqueue);
-        container.setMessageListener(feedbacklistenerAdapter);
 
         return container;
     }
     @Bean
-    SimpleMessageListenerContainer taskscontainer(ConnectionFactory connectionFactory,
-                                                     MessageListenerAdapter taskslistenerAdapter) {
+    SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
         container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(tasksqueue);
-        container.setMessageListener(taskslistenerAdapter);
+        container.setQueueNames(priorityqueue);
 
         return container;
     }
 
     @Bean
-    MessageListenerAdapter feedbacklistenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveFeedback");
-    }
-    @Bean
-    MessageListenerAdapter dispatchlistenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveTask");
-    }
-    @Bean
-    MessageListenerAdapter taskslistenerAdapter(RabbitMQReceiver receiver) {
-        return new MessageListenerAdapter(receiver, "receiveTaskFromEventQueue");
+    public SimpleRabbitListenerContainerFactory taskcontainerfactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        return factory;
     }
 }

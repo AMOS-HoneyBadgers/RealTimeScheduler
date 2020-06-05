@@ -1,5 +1,6 @@
 package com.honeybadgers.taskapi.service;
 
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.models.UnknownEnumException;
 import com.honeybadgers.taskapi.exceptions.CreationException;
@@ -12,4 +13,6 @@ public interface ITaskService {
 
     Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
         void sendTaskToTaskEventQueue(String taskId);
+        //TODO specify which type should be sent to the dispatcher
+        void sendTaskToPriorityQueue(TaskModel task);
 }

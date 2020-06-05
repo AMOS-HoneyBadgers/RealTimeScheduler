@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
@@ -36,6 +37,10 @@ public class TaskServiceTest {
 
     @MockBean
     private TaskRedisRepository2 taskRedisRepository2;
+
+    @MockBean
+
+    private ICommunication sender;
 
     @Autowired
     private TaskService service;
@@ -93,12 +98,13 @@ public class TaskServiceTest {
 
     }
 
+    // TODO TEST ANPASSEN
     @Test(expected = RuntimeException.class)
     public void testScheduleTask() {
         Task t = new Task();
         t.setId("TEST");
         TaskService spy = spy(service);
-        spy.scheduleTask(t);
+        spy.scheduleTask(t.getId());
         //verify(taskRedisRepository).save(any());
 
     }
@@ -114,6 +120,12 @@ public class TaskServiceTest {
         Mockito.when(taskPostgresRepository.findAll()).thenReturn(tasks);
         List<Task> returnedTasks = service.getAllTasks();
         Assert.assertEquals(tasks, returnedTasks);
+    }
+
+    @Test
+    public void testGetAllTasksAndSort() {
+        // TODO IMPLEMENT @Christoff and @Stan
+        service.getAllRedisTasksAndSort();
     }
   
 }

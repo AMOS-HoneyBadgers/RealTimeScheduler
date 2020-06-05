@@ -17,7 +17,7 @@ public interface ITaskService {
 
     long calculatePriority(Task task);
 
-    void scheduleTask(Task task);
+    void scheduleTask(String taskId);
 
     //List<RedisTask> getAllRedisTasks();
 }
