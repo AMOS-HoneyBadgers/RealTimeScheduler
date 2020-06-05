@@ -1,4 +1,107 @@
 {
+  "TaskStart": {
+    "put": {
+      "description": "Start scheduling all task assigned to group with given group_Id",
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "required": true
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "All tasks in group successfully queued for scheduling",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ResponseModel"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Error - group_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ErrorModel"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../ManagementApi.json#/components/responses/401"
+        }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
+    }
+  },
+  "TaskStop": {
+    "put": {
+      "description": "Stop scheduling all task assigned to group with given group_Id",
+      "requestBody": {
+        "description": "new task object",
+        "required": false,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../ManagementApi.json#/components/schemas/DateTimeBody"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "group_Id",
+          "in": "path",
+          "schema": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "required": true
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "All tasks in group successfully stopped scheduling",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ResponseModel"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Error - group_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ErrorModel"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../ManagementApi.json#/components/responses/401"
+        }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
+    }
+  },
   "GroupStart": {
     "put": {
       "description": "Start scheduling all task assigned to group with given group_Id",
@@ -48,6 +151,17 @@
   "GroupStop": {
     "put": {
       "description": "Stop scheduling all task assigned to group with given group_Id",
+      "requestBody": {
+        "description": "new task object",
+        "required": false,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../ManagementApi.json#/components/schemas/DateTimeBody"
+            }
+          }
+        }
+      },
       "parameters": [
         {
           "name": "group_Id",
@@ -119,6 +233,17 @@
   "SchedulerStop": {
     "put": {
       "description": "Stop scheduler",
+      "requestBody": {
+        "description": "new task object",
+        "required": false,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../ManagementApi.json#/components/schemas/DateTimeBody"
+            }
+          }
+        }
+      },
       "responses": {
         "200": {
           "description": "Scheduler successfully stopped",

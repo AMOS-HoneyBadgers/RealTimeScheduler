@@ -15,6 +15,12 @@
     }
   ],
   "paths": {
+    "/task/{task_Id}/start": {
+      "$ref": "./paths/ManagementApi.json#/TaskStart"
+    },
+    "/task/{task_Id}/stop": {
+      "$ref": "./paths/ManagementApi.json#/TaskStop"
+    },
     "/group/{group_Id}/start": {
       "$ref": "./paths/ManagementApi.json#/GroupStart"
     },
@@ -40,6 +46,19 @@
       },
       "ResponseModel": {
         "$ref": "./components/Schemas.json#/ResponseModel"
+      },
+      "DateTimeBody": {
+        "type": "object",
+        "properties": {
+          "resume_date_time": {
+            "description": "DateTime, when to resume after being stopped",
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "resume_date_time"
+        ]
       }
     },
     "securitySchemes": {
