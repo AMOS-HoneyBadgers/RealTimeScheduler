@@ -11,6 +11,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import java.util.Optional;
+import java.util.UUID;
+
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-05T20:22:57.974+02:00[Europe/Berlin]")
 
 @Controller
@@ -34,13 +36,13 @@ public class TaskApiController implements TaskApi {
 
 
     @Override
-    public ResponseEntity<ResponseModel> taskTaskIdStartPut(Long groupId) {
+    public ResponseEntity<ResponseModel> taskTaskIdStartPut(UUID taskId) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
 
         try{
-            managmentService.resumeTask(groupId);
+            managmentService.resumeTask(taskId);
         }catch(Exception e){
 
         }
@@ -49,13 +51,13 @@ public class TaskApiController implements TaskApi {
     }
 
     @Override
-    public ResponseEntity<ResponseModel> taskTaskIdStopPut(Long groupId, @Valid DateTimeBody dateTimeBody) {
+    public ResponseEntity<ResponseModel> taskTaskIdStopPut(UUID taskId, @Valid DateTimeBody dateTimeBody) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
 
         try{
-            managmentService.pauseTask(groupId, dateTimeBody.getResumeDateTime());
+            managmentService.pauseTask(taskId, dateTimeBody.getResumeDateTime());
         }catch(Exception e){
 
         }

@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
+import java.util.UUID;
 
 @Service
 public class ManagementService implements IManagementService {
@@ -24,7 +25,7 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void pauseTask(Long task, OffsetDateTime resumeDate) {
+    public void pauseTask(UUID task, OffsetDateTime resumeDate) {
         /*RedisTask taskPaused = stateRepository.findById(task).orElse(null);
 
         if(taskPaused == null){
@@ -34,7 +35,7 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void resumeTask(Long task) {
+    public void resumeTask(UUID task) {
 
     }
 

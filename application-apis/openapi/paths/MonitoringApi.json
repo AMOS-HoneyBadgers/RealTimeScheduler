@@ -79,8 +79,7 @@
           "name": "group_Id",
           "in": "path",
           "schema": {
-            "type": "string",
-            "format": "uuid"
+            "type": "string"
           },
           "required": true
         }

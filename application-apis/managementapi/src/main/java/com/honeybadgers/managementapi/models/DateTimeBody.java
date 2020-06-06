@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 /**
  * DateTimeBody
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:32:35.410+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:10:06.339+02:00[Europe/Berlin]")
 
 public class DateTimeBody   {
   @JsonProperty("resume_date_time")

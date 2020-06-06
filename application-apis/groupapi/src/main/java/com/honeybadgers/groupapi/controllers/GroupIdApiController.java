@@ -42,14 +42,14 @@ public class GroupIdApiController implements GroupIdApi {
     }
 
     @Override
-    public ResponseEntity<GroupModel> groupIdIdGet(UUID groupId) {
+    public ResponseEntity<GroupModel> groupIdIdGet(String groupId) {
 
         logger.info("Test groupIdGet with taskId: {}", () -> groupId);
         return ResponseEntity.ok(new GroupModel());
     }
 
     @Override
-    public ResponseEntity<ResponseModel> groupIdIdPost(UUID groupId, @Valid GroupModel groupModel) {
+    public ResponseEntity<ResponseModel> groupIdIdPost(String groupId, @Valid GroupModel groupModel) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");

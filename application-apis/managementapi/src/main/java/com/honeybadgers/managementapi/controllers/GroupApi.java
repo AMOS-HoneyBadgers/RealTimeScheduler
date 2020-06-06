@@ -8,7 +8,6 @@ package com.honeybadgers.managementapi.controllers;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ErrorModel;
 import com.honeybadgers.managementapi.models.ResponseModel;
-import java.util.UUID;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:32:35.410+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:10:06.339+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "group", description = "the group API")
@@ -59,7 +58,7 @@ public interface GroupApi {
     @RequestMapping(value = "/group/{group_Id}/start",
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> groupGroupIdStartPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") UUID groupId) {
+    default ResponseEntity<ResponseModel> groupGroupIdStartPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -95,7 +94,7 @@ public interface GroupApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> groupGroupIdStopPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") UUID groupId,@ApiParam(value = "DateTime body which indicates, when to resume scheduling"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
+    default ResponseEntity<ResponseModel> groupGroupIdStopPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId,@ApiParam(value = "DateTime body which indicates, when to resume scheduling"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

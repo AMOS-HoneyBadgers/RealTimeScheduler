@@ -8,7 +8,6 @@ package com.honeybadgers.groupapi.controllers;
 import com.honeybadgers.groupapi.models.ErrorModel;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.ResponseModel;
-import java.util.UUID;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:27:01.355+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:08:19.461+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "{group_Id}", description = "the {group_Id} API")
@@ -59,7 +58,7 @@ public interface GroupIdApi {
     @RequestMapping(value = "/{group_Id}/id",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    default ResponseEntity<GroupModel> groupIdIdDelete(@ApiParam(value = "",required=true) @PathVariable("group_Id") UUID groupId) {
+    default ResponseEntity<GroupModel> groupIdIdDelete(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -93,7 +92,7 @@ public interface GroupIdApi {
     @RequestMapping(value = "/{group_Id}/id",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<GroupModel> groupIdIdGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") UUID groupId) {
+    default ResponseEntity<GroupModel> groupIdIdGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -131,7 +130,7 @@ public interface GroupIdApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    default ResponseEntity<ResponseModel> groupIdIdPost(@ApiParam(value = "",required=true) @PathVariable("group_Id") UUID groupId,@ApiParam(value = "group object" ,required=true )  @Valid @RequestBody GroupModel groupModel) {
+    default ResponseEntity<ResponseModel> groupIdIdPost(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId,@ApiParam(value = "group object" ,required=true )  @Valid @RequestBody GroupModel groupModel) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
