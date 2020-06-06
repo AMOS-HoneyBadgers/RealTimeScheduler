@@ -1,7 +1,7 @@
 package com.honeybadgers.managementapi.controllers;
 
 import com.honeybadgers.managementapi.models.ResponseModel;
-import com.honeybadgers.managementapi.service.IManagmentService;
+import com.honeybadgers.managementapi.service.IManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -17,7 +17,7 @@ public class SchedulerApiController implements SchedulerApi {
     private final NativeWebRequest request;
 
     @Autowired
-    IManagmentService managmentService;
+    IManagementService managmentService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public SchedulerApiController(NativeWebRequest request) {

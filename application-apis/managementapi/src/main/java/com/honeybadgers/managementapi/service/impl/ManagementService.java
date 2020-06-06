@@ -1,15 +1,14 @@
 package com.honeybadgers.managementapi.service.impl;
 
 import com.honeybadgers.managementapi.repository.StateRepository;
-import com.honeybadgers.managementapi.service.IManagmentService;
-import com.honeybadgers.models.RedisTask;
+import com.honeybadgers.managementapi.service.IManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
 
 @Service
-public class ManagmentService implements IManagmentService {
+public class ManagementService implements IManagementService {
 
     @Autowired
     StateRepository stateRepository;
