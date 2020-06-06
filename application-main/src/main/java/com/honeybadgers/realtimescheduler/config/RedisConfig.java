@@ -1,8 +1,6 @@
 package com.honeybadgers.realtimescheduler.config;
 
-import com.honeybadgers.realtimescheduler.model.RedisTask;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.honeybadgers.models.RedisTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

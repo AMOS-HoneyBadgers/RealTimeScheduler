@@ -5,6 +5,7 @@
  */
 package com.honeybadgers.managementapi.controllers;
 
+import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ErrorModel;
 import com.honeybadgers.managementapi.models.ResponseModel;
 import io.swagger.annotations.*;
@@ -28,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:47.871+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:10:06.339+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "scheduler", description = "the scheduler API")
@@ -73,6 +74,7 @@ public interface SchedulerApi {
      * PUT /scheduler/stop
      * Stop scheduler
      *
+     * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
      * @return Scheduler successfully stopped (status code 200)
      *         or Unauthorized (status code 401)
      */
@@ -84,8 +86,9 @@ public interface SchedulerApi {
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorModel.class) })
     @RequestMapping(value = "/scheduler/stop",
         produces = { "application/json" }, 
+        consumes = { "application/json" },
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> schedulerStopPut() {
+    default ResponseEntity<ResponseModel> schedulerStopPut(@ApiParam(value = "DateTime body which indicates, when to resume scheduling"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

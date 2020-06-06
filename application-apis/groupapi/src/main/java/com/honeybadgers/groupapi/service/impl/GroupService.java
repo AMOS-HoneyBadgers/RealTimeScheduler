@@ -39,6 +39,10 @@ public class GroupService implements IGroupService {
     public Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException {
         Group newGroup = new Group();
 
+        Group checkGroup = groupRepository.findById(restModel.getId()).orElse(null);
+        if (checkGroup != null) {
+            throw new JpaException("Primary or unique constraint failed!");
+        }
         newGroup.setId(restModel.getId());
         Group parent = groupRepository.findById(restModel.getParentId()).orElse(null);
         if (parent != null) {
@@ -91,21 +95,10 @@ public class GroupService implements IGroupService {
         try {
             groupRepository.save(newGroup);
         } catch (DataIntegrityViolationException e) {
-            if (e.getMessage() != null) {
-                logger.error("DataIntegrityViolation while trying to add new Group: \n" + e.getMessage());
-                if (e.getMessage().contains("primary")) {
-                    throw new JpaException("Primary or unique constraint failed!");
-                } else {
-                    throw new JpaException(e.getMessage());
-                }
-            } else {
-                // exception has no message (should not happen but just in case)
-                logger.error("DataIntegrityViolation on save new group!");
-                logger.error(e.getStackTrace());
-                throw new JpaException("DataIntegrityViolation on save new group!");
-            }
+            logger.error("DataIntegrityViolation while trying to add new Group: \n" + e.getMessage());
+            // exception has no message (should not happen but just in case)
+            throw new JpaException("DataIntegrityViolation on save new group!");
         }
-
         return newGroup;
     }
 

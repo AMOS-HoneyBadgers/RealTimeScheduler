@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.realtimescheduler.model.RedisTask;
+import com.honeybadgers.models.RedisTask;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,7 +10,11 @@ public interface ISchedulerService {
 
     RedisTask createRedisTask(String taskId);
 
-    boolean checkTaskOnLocked(String taskId);
+    boolean isTaskLocked(String taskId);
+
+    boolean isGroupLocked(String groupId);
+
+    boolean isSchedulerLocked();
 
     void scheduleTask(String taskId);
 
