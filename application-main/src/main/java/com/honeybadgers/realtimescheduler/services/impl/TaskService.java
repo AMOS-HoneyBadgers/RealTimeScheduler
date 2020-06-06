@@ -1,17 +1,11 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.Task;
-import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository2;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -24,12 +18,6 @@ public class TaskService implements ITaskService {
     @Autowired
     TaskPostgresRepository taskPostgresRepository;
 
-    @Autowired
-    TaskRedisRepository2 taskRedisRepository2;
-
-    @Autowired
-    TaskRedisRepository taskRedisRepository;
-
     @Value("${com.realtimescheduler.scheduler.priority.deadline-modifier}")
     double deadlineModifier;
 
@@ -39,6 +27,11 @@ public class TaskService implements ITaskService {
     @Override
     public List<Task> getAllTasks() {
         return taskPostgresRepository.findAll();
+    }
+
+    @Override
+    public Optional<Task> getTaskById(String id) {
+        return taskPostgresRepository.findById(id);
     }
 
     @Override
@@ -71,36 +64,4 @@ public class TaskService implements ITaskService {
         return Math.round(finalPriority);
     }
 
-    private RedisTask createRedisTask(String taskId){
-        RedisTask redisTask = new RedisTask();
-        redisTask.setId(taskId);
-        return redisTask;
-    }
-
-    @Override
-    public void scheduleTask(Task task) {
-        /*RedisTask redisTask = taskRedisRepository.findById(task.getId()).orElse(null);
-        if(redisTask == null){
-            redisTask = createRedisTask(task.getId());
-        }
-        redisTask.setPriority(calculatePriority(task));
-        taskRedisRepository.save(redisTask);
-        log.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());*/
-
-        RedisTask redisTask = createRedisTask(task.getId());
-        redisTask.setPriority(calculatePriority(task));
-        taskRedisRepository2.save(redisTask);
-        RedisTask opt = taskRedisRepository2.findById(redisTask.getId()).orElse(null);
-        if(opt == null)
-            throw new RuntimeException("could not find redistask id");
-
-        log.info("###############################--------------------!!!!!!!!+++++++++++++++?????????=========== taskid: " + opt.getId());
-    }
-    /*public List<RedisTask> getAllRedisTasks(){
-       Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();
-       List<RedisTask> sortedList = new ArrayList<RedisTask>();
-       redisTasks.forEach(sortedList::add);
-       Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
-       return sortedList;
-    }*/
 }

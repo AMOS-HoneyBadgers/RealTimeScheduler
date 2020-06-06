@@ -1,10 +1,12 @@
 package com.honeybadgers.realtimescheduler.config;
 
-import org.springframework.beans.factory.annotation.Value;
+import com.honeybadgers.realtimescheduler.model.RedisTask;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
-import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -14,31 +16,17 @@ import org.springframework.data.redis.repository.configuration.EnableRedisReposi
 @EnableRedisRepositories(basePackages = "com.honeybadgers.realtimescheduler")
 public class RedisConfig {
 
-    /*@Value("${spring.redis.prio.host}")
-    private String priohost;
-
-    @Value("${spring.redis.prio.port}")
-    private int prioport;
-
-    @Value("${spring.redis.prio.password}")
-    private String priopassword;
-
-    @Value("${spring.redis.lock.host}")
-    private String lockhost;
-
-    @Value("${spring.redis.lock.port}")
-    private int lockport;
-
-    @Value("${spring.redis.lock.password}")
-    private String lockpassword;
+    @Autowired
+    RedisApplicationProperties redisApplicationProperties;
 
 
     @Bean(name="prioConnectionFactory")
+    @Primary
     JedisConnectionFactory jedisConnectionFactoryForPrioDatabase() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(priohost);
-        redisStandaloneConfiguration.setPassword(priopassword);
-        redisStandaloneConfiguration.setPort(prioport);
+        redisStandaloneConfiguration.setHostName(redisApplicationProperties.redis_prio_host);
+        redisStandaloneConfiguration.setPassword(redisApplicationProperties.redis_prio_pw);
+        redisStandaloneConfiguration.setPort(Integer.parseInt(redisApplicationProperties.redis_prio_port));
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
@@ -46,41 +34,25 @@ public class RedisConfig {
     @Bean(name="lockConnectionFactory")
     JedisConnectionFactory jedisConnectionFactoryForLockDatabase() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-        redisStandaloneConfiguration.setHostName(lockhost);
-        redisStandaloneConfiguration.setPassword(lockpassword);
-        redisStandaloneConfiguration.setPort(lockport);
+        redisStandaloneConfiguration.setHostName(redisApplicationProperties.redis_lock_host);
+        redisStandaloneConfiguration.setPassword(redisApplicationProperties.redis_lock_pw);
+        redisStandaloneConfiguration.setPort(Integer.parseInt(redisApplicationProperties.redis_lock_port));
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
     @Bean(name="prioRedisTemplate")
     @Primary
-    public RedisTemplate<String, Object> prioRedisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, RedisTask> prioRedisTemplate() {
+        RedisTemplate<String, RedisTask> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForPrioDatabase());
         return template;
     }
 
     @Bean(name="lockRedisTemplate")
-    public RedisTemplate<String, Object> lockRedisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, String> lockRedisTemplate() {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
         return template;
-    }*/
-
-    @Bean
-    JedisConnectionFactory jedisConnectionFactory() {
-        return new JedisConnectionFactory();
     }
-
-    @Bean
-    public RedisTemplate<String, Object> redisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactory());
-        return template;
-    }
-
-
-
-
 
 }

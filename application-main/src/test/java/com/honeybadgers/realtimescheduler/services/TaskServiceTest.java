@@ -1,12 +1,10 @@
 package com.honeybadgers.realtimescheduler.services;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.Task;
-import com.honeybadgers.realtimescheduler.model.RedisTask;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository2;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
-import org.apache.logging.log4j.core.pattern.AbstractStyleNameConverter;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,12 +28,6 @@ public class TaskServiceTest {
 
     @MockBean
     private TaskPostgresRepository taskPostgresRepository;
-
-    @MockBean
-    private TaskRedisRepository taskRedisRepository;
-
-    @MockBean
-    private TaskRedisRepository2 taskRedisRepository2;
 
     @Autowired
     private TaskService service;
@@ -90,16 +82,6 @@ public class TaskServiceTest {
         long higherPrio = service.calculatePriority(newTaskHigherPrio);
         Assert.assertTrue(higherPrio > prio);
 
-
-    }
-
-    @Test(expected = RuntimeException.class)
-    public void testScheduleTask() {
-        Task t = new Task();
-        t.setId("TEST");
-        TaskService spy = spy(service);
-        spy.scheduleTask(t);
-        //verify(taskRedisRepository).save(any());
 
     }
 
