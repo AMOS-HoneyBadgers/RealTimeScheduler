@@ -1,0 +1,46 @@
+name: build and deploy pipeline for managementapi
+
+
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'master'
+    paths:
+      - 'application-apis/managementapi/**'
+      - 'application-models/**'
+      - 'application-queuecommunication/**'
+  pull_request:
+    branches: 
+      - 'master'
+  release:
+    types:
+      - created
+  
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    # Build your app here
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 1.11
+      - name: Build with Maven
+        run: mvn -B clean package -DskipTests
+      - name: Maven Verify with SonarScan
+        run: mvn -B clean verify sonar:sonar
+        working-directory: ./application-apis/managementapi
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      - name: cloud foundry for managementapi project
+        uses: citizen-of-planet-earth/cf-cli-action@master
+        with:
+            cf_api: ${{ secrets.CF_API }}
+            cf_username: ${{ secrets.CF_LOGIN }}
+            cf_password: ${{ secrets.CF_PASS }}
+            cf_org: CCC
+            cf_space: AMOS-EDI
+            command: push managementapi-amos
