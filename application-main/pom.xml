@@ -35,8 +35,6 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-
-
         <!-- https://mvnrepository.com/artifact/it.ozimov/embedded-redis -->
         <dependency>
             <groupId>it.ozimov</groupId>
