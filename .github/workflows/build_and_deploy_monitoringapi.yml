@@ -12,6 +12,9 @@ on:
   pull_request:
     branches: 
       - 'master'
+    paths:
+      - 'application-apis/monitoringapi/**'
+      - 'application-models/**'
   release:
     types:
       - created

@@ -13,6 +13,10 @@ on:
   pull_request:
     branches: 
       - 'master'
+    paths:
+      - 'application-main/**'
+      - 'application-models/**'
+      - 'application-queuecommunication/**'
   release:
     types:
       - created
