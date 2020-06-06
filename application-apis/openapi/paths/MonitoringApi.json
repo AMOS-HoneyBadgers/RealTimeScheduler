@@ -79,8 +79,8 @@
           "name": "group_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string",
+            "format": "uuid"
           },
           "required": true
         }

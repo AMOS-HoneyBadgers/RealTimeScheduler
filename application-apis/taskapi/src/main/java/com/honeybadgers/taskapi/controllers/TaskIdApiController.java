@@ -8,6 +8,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
 import java.util.Optional;
+import java.util.UUID;
+
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:25.874+02:00[Europe/Berlin]")
 
 @Controller
@@ -29,7 +31,7 @@ public class TaskIdApiController implements TaskIdApi {
     }
 
     @Override
-    public ResponseEntity<TaskModel> taskIdGet(Long taskId) {
+    public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
         logger.info("Test taskIdGet with taskId: {}", () -> taskId);
         return ResponseEntity.ok(new TaskModel());
     }

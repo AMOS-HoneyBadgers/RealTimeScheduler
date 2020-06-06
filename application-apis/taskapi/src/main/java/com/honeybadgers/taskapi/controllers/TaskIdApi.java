@@ -8,6 +8,7 @@ package com.honeybadgers.taskapi.controllers;
 import com.honeybadgers.taskapi.models.ErrorModel;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
+import java.util.UUID;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:47.558+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:30:52.032+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "{task_Id}", description = "the {task_Id} API")
@@ -58,7 +59,7 @@ public interface TaskIdApi {
     @RequestMapping(value = "/{task_Id}",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    default ResponseEntity<TaskModel> taskIdDelete(@ApiParam(value = "",required=true) @PathVariable("task_Id") Long taskId) {
+    default ResponseEntity<TaskModel> taskIdDelete(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -92,7 +93,7 @@ public interface TaskIdApi {
     @RequestMapping(value = "/{task_Id}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<TaskModel> taskIdGet(@ApiParam(value = "",required=true) @PathVariable("task_Id") Long taskId) {
+    default ResponseEntity<TaskModel> taskIdGet(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -130,7 +131,7 @@ public interface TaskIdApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    default ResponseEntity<ResponseModel> taskIdPost(@ApiParam(value = "",required=true) @PathVariable("task_Id") Long taskId,@ApiParam(value = "Task object" ,required=true )  @Valid @RequestBody TaskModel taskModel) {
+    default ResponseEntity<ResponseModel> taskIdPost(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId,@ApiParam(value = "Task object" ,required=true )  @Valid @RequestBody TaskModel taskModel) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

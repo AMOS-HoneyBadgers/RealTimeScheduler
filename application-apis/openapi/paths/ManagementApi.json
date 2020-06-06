@@ -1,21 +1,21 @@
 {
   "TaskStart": {
     "put": {
-      "description": "Start scheduling all task assigned to group with given group_Id",
+      "description": "Start scheduling task with given task_Id",
       "parameters": [
         {
-          "name": "group_Id",
+          "name": "task_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string",
+            "format": "uuid"
           },
           "required": true
         }
       ],
       "responses": {
         "200": {
-          "description": "All tasks in group successfully queued for scheduling",
+          "description": "Task successfully queued for scheduling",
           "content": {
             "application/json": {
               "schema": {
@@ -25,7 +25,7 @@
           }
         },
         "404": {
-          "description": "Error - group_Id not found",
+          "description": "Error - task_Id not found",
           "content": {
             "application/json": {
               "schema": {
@@ -47,9 +47,9 @@
   },
   "TaskStop": {
     "put": {
-      "description": "Stop scheduling all task assigned to group with given group_Id",
+      "description": "Stop scheduling task with given task_Id",
       "requestBody": {
-        "description": "new task object",
+        "description": "DateTime body which indicates, when to resume scheduling",
         "required": false,
         "content": {
           "application/json": {
@@ -61,18 +61,18 @@
       },
       "parameters": [
         {
-          "name": "group_Id",
+          "name": "task_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string",
+            "format": "uuid"
           },
           "required": true
         }
       ],
       "responses": {
         "200": {
-          "description": "All tasks in group successfully stopped scheduling",
+          "description": "Task successfully stopped scheduling",
           "content": {
             "application/json": {
               "schema": {
@@ -82,7 +82,7 @@
           }
         },
         "404": {
-          "description": "Error - group_Id not found",
+          "description": "Error - task_Id not found",
           "content": {
             "application/json": {
               "schema": {
@@ -110,8 +110,8 @@
           "name": "group_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string",
+            "format": "uuid"
           },
           "required": true
         }
@@ -152,7 +152,7 @@
     "put": {
       "description": "Stop scheduling all task assigned to group with given group_Id",
       "requestBody": {
-        "description": "new task object",
+        "description": "DateTime body which indicates, when to resume scheduling",
         "required": false,
         "content": {
           "application/json": {
@@ -167,8 +167,8 @@
           "name": "group_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string",
+            "format": "uuid"
           },
           "required": true
         }
@@ -234,7 +234,7 @@
     "put": {
       "description": "Stop scheduler",
       "requestBody": {
-        "description": "new task object",
+        "description": "DateTime body which indicates, when to resume scheduling",
         "required": false,
         "content": {
           "application/json": {

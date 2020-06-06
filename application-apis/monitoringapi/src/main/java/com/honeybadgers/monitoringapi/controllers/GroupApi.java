@@ -7,6 +7,7 @@ package com.honeybadgers.monitoringapi.controllers;
 
 import com.honeybadgers.monitoringapi.models.ErrorModel;
 import com.honeybadgers.monitoringapi.models.InlineResponse200;
+import java.util.UUID;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:48.075+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:32:35.876+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "group", description = "the group API")
@@ -88,7 +89,7 @@ public interface GroupApi {
     @RequestMapping(value = "/group/{group_Id}/tasks",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<InlineResponse200> groupGroupIdTasksGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<InlineResponse200> groupGroupIdTasksGet(@ApiParam(value = "",required=true) @PathVariable("group_Id") UUID groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
