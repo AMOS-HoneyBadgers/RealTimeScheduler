@@ -80,7 +80,7 @@ public class SchedulerService implements ISchedulerService {
                 sender.sendTaskToDispatcher(tasks.get(i).getId());
             }
         } catch(IndexOutOfBoundsException e) {
-            System.out.println("passt scho" + e.getMessage());
+            logger.info("passt scho" + e.getMessage());
         }
 
 
