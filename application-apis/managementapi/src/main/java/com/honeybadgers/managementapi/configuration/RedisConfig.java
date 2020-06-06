@@ -26,8 +26,8 @@ public class RedisConfig {
     }
 
     @Bean(name="lockRedisTemplate")
-    public RedisTemplate<String, Object> lockRedisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, String> lockRedisTemplate() {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
         return template;
     }
