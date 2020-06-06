@@ -65,7 +65,6 @@ public class SchedulerService implements ISchedulerService {
         if(redisTask == null){
             redisTask = createRedisTask(taskId);
         }
-
         Task task = taskService.getTaskById(taskId).orElse(null);
         if(task == null)
             throw new RuntimeException("task could not be found in database");
