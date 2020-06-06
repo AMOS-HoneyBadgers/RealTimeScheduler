@@ -33,14 +33,14 @@ jobs:
         run: mvn -B clean verify sonar:sonar
         working-directory: ./application-apis/taskapi
         env:
-           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
       - name: cloud foundry for taskapi project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
-            cf_api: ${{ secrets.CF_API }}
-            cf_username: ${{ secrets.CF_LOGIN }}
-            cf_password: ${{ secrets.CF_PASS }}
-            cf_org: CCC
-            cf_space: AMOS-EDI
-            command: push taskapi-amos
+          cf_api: ${{ secrets.CF_API }}
+          cf_username: ${{ secrets.CF_LOGIN }}
+          cf_password: ${{ secrets.CF_PASS }}
+          cf_org: CCC
+          cf_space: AMOS-EDI
+          command: push taskapi-amos
