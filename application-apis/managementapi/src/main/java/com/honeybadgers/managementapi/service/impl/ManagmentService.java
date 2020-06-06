@@ -26,11 +26,11 @@ public class ManagmentService implements IManagmentService {
 
     @Override
     public void pauseTask(Long task, OffsetDateTime resumeDate) {
-        RedisTask taskPaused = stateRepository.findById(task.toString()).orElse(null);
+        /*RedisTask taskPaused = stateRepository.findById(task).orElse(null);
 
         if(taskPaused == null){
 
-        }
+        }*/
 
     }
 
