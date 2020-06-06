@@ -85,7 +85,6 @@ public class SchedulerService implements ISchedulerService {
             logger.info("passt scho" + e.getMessage());
         }
 
-
         logger.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
     }
 }
