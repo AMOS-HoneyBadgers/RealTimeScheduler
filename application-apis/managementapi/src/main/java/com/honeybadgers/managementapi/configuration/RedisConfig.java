@@ -8,16 +8,23 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+
+import javax.sql.DataSource;
+import java.sql.SQLException;
 
 @Configuration
+@EnableTransactionManagement
 @EnableRedisRepositories(basePackages = "com.honeybadgers.managementapi")
 public class RedisConfig {
 
     @Autowired
     RedisApplicationProperties redisApplicationProperties;
 
-    @Bean(name="lockConnectionFactory")
-    JedisConnectionFactory jedisConnectionFactoryForLockDatabase() {
+    @Bean
+    JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
         redisStandaloneConfiguration.setHostName(redisApplicationProperties.redis_lock_host);
         redisStandaloneConfiguration.setPassword(redisApplicationProperties.redis_lock_pw);
@@ -25,11 +32,18 @@ public class RedisConfig {
         return new JedisConnectionFactory(redisStandaloneConfiguration);
     }
 
-    @Bean(name="lockRedisTemplate")
-    public RedisTemplate<String, String> lockRedisTemplate() {
+    @Bean
+    public RedisTemplate<String, String> redisTemplate() {
         RedisTemplate<String, String> template = new RedisTemplate<>();
-        template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
+        template.setConnectionFactory(jedisConnectionFactory());
+        template.setEnableTransactionSupport(true);
         return template;
     }
+
+    /* TODO needed for transaction https://docs.spring.io/spring-data/data-redis/docs/current/reference/html/#tx
+    @Bean
+    public PlatformTransactionManager transactionManager(DataSource dataSource) throws SQLException {
+        return new DataSourceTransactionManager(dataSource);
+    }*/
 
 }

@@ -1,5 +1,6 @@
 package com.honeybadgers.managementapi.controllers;
 
+import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ResponseModel;
 import com.honeybadgers.managementapi.service.IManagementService;
@@ -41,11 +42,7 @@ public class TaskApiController implements TaskApi {
         response.setCode("200");
         response.setMessage("Success");
 
-        try{
-            managmentService.resumeTask(taskId);
-        }catch(Exception e){
-
-        }
+        managmentService.resumeTask(taskId);
 
         return ResponseEntity.ok(response);
     }
@@ -57,9 +54,11 @@ public class TaskApiController implements TaskApi {
         response.setMessage("Success");
 
         try{
-            managmentService.pauseTask(taskId, dateTimeBody.getResumeDateTime());
-        }catch(Exception e){
-
+            managmentService.pauseTask(taskId, dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
+        }catch(LockException e){
+            response.setCode("400");
+            response.setMessage("Task with taskId=" + taskId.toString() + " already paused!");
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
