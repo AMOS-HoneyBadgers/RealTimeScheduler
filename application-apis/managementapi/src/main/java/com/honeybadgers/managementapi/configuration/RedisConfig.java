@@ -1,5 +1,6 @@
 package com.honeybadgers.managementapi.configuration;
 
+import com.honeybadgers.models.RedisLock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -33,8 +34,8 @@ public class RedisConfig {
     }
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate() {
-        RedisTemplate<String, String> template = new RedisTemplate<>();
+    public RedisTemplate<String, RedisLock> redisTemplate() {
+        RedisTemplate<String, RedisLock> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
         template.setEnableTransactionSupport(true);
         return template;

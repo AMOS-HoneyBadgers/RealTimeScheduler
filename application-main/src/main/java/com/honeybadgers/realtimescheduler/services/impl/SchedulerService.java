@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
@@ -63,20 +64,20 @@ public class SchedulerService implements ISchedulerService {
     public boolean isTaskLocked(String taskId) {
         // TODO check if scheduler or any group (INCLUDING PARENTS!!!) is locked
         String lockId = LOCKREDIS_TASK_PREFIX + taskId;
-        String lock = lockRedisRepository.findById(lockId).orElse(null);
+        RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
     }
 
     @Override
     public boolean isGroupLocked(String groupId) {
         String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
-        String lock = lockRedisRepository.findById(lockId).orElse(null);
+        RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
     }
 
     @Override
     public boolean isSchedulerLocked() {
-        String lock = lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS).orElse(null);
+        RedisLock lock = lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS).orElse(null);
         return lock != null;
     }
 

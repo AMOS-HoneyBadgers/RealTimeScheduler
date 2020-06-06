@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.config;
 
+import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.RedisTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -47,8 +48,8 @@ public class RedisConfig {
     }
 
     @Bean(name="lockRedisTemplate")
-    public RedisTemplate<String, String> lockRedisTemplate() {
-        RedisTemplate<String, String> template = new RedisTemplate<>();
+    public RedisTemplate<String, RedisLock> lockRedisTemplate() {
+        RedisTemplate<String, RedisLock> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
         return template;
     }
