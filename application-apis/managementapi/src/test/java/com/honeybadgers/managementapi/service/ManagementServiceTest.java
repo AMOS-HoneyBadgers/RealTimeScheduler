@@ -4,6 +4,7 @@ package com.honeybadgers.managementapi.service;
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.repository.StateRepository;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
+import com.honeybadgers.models.RedisLock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import org.mockito.Mockito;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -40,7 +42,9 @@ public class ManagementServiceTest {
 
     @Test
     public void testPauseScheduler_locked() {
-        Mockito.when(stateRepository.findById(SCHEDULER_ALIAS)).thenReturn(Optional.of(SCHEDULER_ALIAS));
+        RedisLock lockObj = new RedisLock();
+        lockObj.setId(SCHEDULER_ALIAS);
+        Mockito.when(stateRepository.findById(SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
         assertThrows(LockException.class, () -> service.pauseScheduler(null));
     }
 
@@ -62,7 +66,9 @@ public class ManagementServiceTest {
     public void testPauseTask_locked() {
         UUID taskId = UUID.randomUUID();
         String lockId = TASK_PREFIX + taskId.toString();
-        Mockito.when(stateRepository.findById(lockId)).thenReturn(Optional.of(lockId));
+        RedisLock lockObj = new RedisLock();
+        lockObj.setId(lockId);
+        Mockito.when(stateRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
         assertThrows(LockException.class, () -> service.pauseTask(taskId, null));
     }
 
@@ -86,7 +92,9 @@ public class ManagementServiceTest {
     public void testPauseGroup_locked() {
         String groupId = "GROUPID";
         String lockId = GROUP_PREFIX + groupId;
-        Mockito.when(stateRepository.findById(lockId)).thenReturn(Optional.of(lockId));
+        RedisLock lockObj = new RedisLock();
+        lockObj.setId(lockId);
+        Mockito.when(stateRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
         assertThrows(LockException.class, () -> service.pauseGroup(groupId, null));
     }
 

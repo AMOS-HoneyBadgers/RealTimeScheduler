@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
+import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -31,6 +33,9 @@ public class TestController {
     @Autowired
     ICommunication sender;
 
+    @Autowired
+    LockRedisRepository lockRedisRepository;
+
     @GetMapping("/testtask/{priority}")
     public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
 
@@ -49,5 +54,23 @@ public class TestController {
     public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
         sender.sendTaskToTasksQueue(task);
         return ResponseEntity.ok("sent task " + task);
+    }
+
+    @PostMapping("/test/lock")
+    public ResponseEntity<?> testLockRedis() {
+        RedisLock lock = new RedisLock();
+        lock.setId("TASK:" + UUID.randomUUID().toString());
+        lock.setResume_date(LocalDateTime.now());
+        lockRedisRepository.save(lock);
+
+        log.warn("######################### SAVED " + lock.toString());
+
+        RedisLock get = lockRedisRepository.findById(lock.getId()).orElse(null);
+        if(get == null)
+            log.warn("######################### FAILURE!!");
+        else
+            log.warn("######################### SUCCESS: " + get.toString());
+
+        return ResponseEntity.ok().build();
     }
 }

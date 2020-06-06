@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
@@ -63,7 +64,9 @@ public class SchedulerServiceTest {
     public void testIsTaskLocked_NotLocked() {
         String taskId = UUID.randomUUID().toString();
         String lockId = LOCKREDIS_TASK_PREFIX + taskId;
-        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockId));
+        RedisLock lockObj = new RedisLock();
+        lockObj.setId(lockId);
+        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
 
         assertTrue(service.isTaskLocked(taskId));
     }
@@ -81,7 +84,9 @@ public class SchedulerServiceTest {
     public void testIsGroupLocked_NotLocked() {
         String groupId = "GROUPID";
         String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
-        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockId));
+        RedisLock lockObj = new RedisLock();
+        lockObj.setId(lockId);
+        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
 
         assertTrue(service.isGroupLocked(groupId));
     }
@@ -97,7 +102,9 @@ public class SchedulerServiceTest {
 
     @Test
     public void testIsSchedulerLocked_NotLocked() {
-        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.of(LOCKREDIS_SCHEDULER_ALIAS));
+        RedisLock lockObj = new RedisLock();
+        lockObj.setId(LOCKREDIS_SCHEDULER_ALIAS);
+        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
 
         assertTrue(service.isSchedulerLocked());
     }
