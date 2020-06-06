@@ -10,7 +10,11 @@ public interface ISchedulerService {
 
     RedisTask createRedisTask(String taskId);
 
-    boolean checkTaskOnLocked(String taskId);
+    boolean isTaskLocked(String taskId);
+
+    boolean isGroupLocked(String groupId);
+
+    boolean isSchedulerLocked();
 
     void scheduleTask(String taskId);
 

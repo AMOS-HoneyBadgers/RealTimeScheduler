@@ -15,6 +15,7 @@ public class ManagementService implements IManagementService {
 
 
     // These prefixes are for the case, that a group exists with id='SCHEDULER_LOCK_ALIAS'
+    // HAVE TO BE THE SAME AS IN SchedulerService IN realtimescheduler-main!!!!!!!!!!!!!
     public static final String SCHEDULER_ALIAS = "SCHEDULER_LOCK_ALIAS";
     public static final String TASK_PREFIX = "TASK:";
     public static final String GROUP_PREFIX = "GROUP:";

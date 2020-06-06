@@ -21,6 +21,14 @@ public class SchedulerService implements ISchedulerService {
 
     static final Logger logger = LogManager.getLogger(SchedulerService.class);
 
+
+    // These prefixes are for the case, that a group exists with id='SCHEDULER_LOCK_ALIAS'
+    // HAVE TO BE THE SAME AS IN ManagementService IN managementapi!!!!!!!!!!!!!
+    public static final String LOCKREDIS_SCHEDULER_ALIAS = "SCHEDULER_LOCK_ALIAS";
+    public static final String LOCKREDIS_TASK_PREFIX = "TASK:";
+    public static final String LOCKREDIS_GROUP_PREFIX = "GROUP:";
+
+
     @Autowired
     TaskRedisRepository taskRedisRepository;
 
@@ -52,8 +60,23 @@ public class SchedulerService implements ISchedulerService {
     }
 
     @Override
-    public boolean checkTaskOnLocked(String taskId) {
-        String lock = lockRedisRepository.findById(taskId).orElse(null);
+    public boolean isTaskLocked(String taskId) {
+        // TODO check if scheduler or any group (INCLUDING PARENTS!!!) is locked
+        String lockId = LOCKREDIS_TASK_PREFIX + taskId;
+        String lock = lockRedisRepository.findById(lockId).orElse(null);
+        return lock != null;
+    }
+
+    @Override
+    public boolean isGroupLocked(String groupId) {
+        String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        String lock = lockRedisRepository.findById(lockId).orElse(null);
+        return lock != null;
+    }
+
+    @Override
+    public boolean isSchedulerLocked() {
+        String lock = lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS).orElse(null);
         return lock != null;
     }
 
@@ -76,14 +99,18 @@ public class SchedulerService implements ISchedulerService {
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
 
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
-        // TODO locks, activeTimes, workingDays, ...
-        try {
-            for(int i = 0; i < 100; i++) {
-                sender.sendTaskToDispatcher(tasks.get(i).getId());
+        if(!isSchedulerLocked()) {
+            // scheduler not locked -> can send
+            try {
+                for(int i = 0; i < 100; i++) {
+                    // TODO locks, activeTimes, workingDays, ...
+                    sender.sendTaskToDispatcher(tasks.get(i).getId());
+                }
+            } catch(IndexOutOfBoundsException e) {
+                logger.info("passt scho" + e.getMessage());
             }
-        } catch(IndexOutOfBoundsException e) {
-            logger.info("passt scho" + e.getMessage());
-        }
+        } else
+            logger.info("Scheduler is locked!");
 
         logger.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
     }

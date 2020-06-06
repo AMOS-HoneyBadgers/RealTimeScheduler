@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.honeybadgers.realtimescheduler.services.impl.SchedulerService.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.spy;
@@ -59,18 +60,52 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void testCheckTaskOnLocked_NotLocked() {
+    public void testIsTaskLocked_NotLocked() {
         String taskId = UUID.randomUUID().toString();
-        when(lockRedisRepository.findById(taskId)).thenReturn(Optional.of(taskId));
+        String lockId = LOCKREDIS_TASK_PREFIX + taskId;
+        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockId));
 
-        assertTrue(service.checkTaskOnLocked(taskId));
+        assertTrue(service.isTaskLocked(taskId));
     }
 
     @Test
-    public void testCheckTaskOnLocked_Locked() {
+    public void testIsTaskLocked_Locked() {
         String taskId = UUID.randomUUID().toString();
-        when(lockRedisRepository.findById(taskId)).thenReturn(Optional.empty());
+        String lockId = LOCKREDIS_TASK_PREFIX + taskId;
+        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.empty());
 
-        assertFalse(service.checkTaskOnLocked(taskId));
+        assertFalse(service.isTaskLocked(taskId));
+    }
+
+    @Test
+    public void testIsGroupLocked_NotLocked() {
+        String groupId = "GROUPID";
+        String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockId));
+
+        assertTrue(service.isGroupLocked(groupId));
+    }
+
+    @Test
+    public void testIsGroupLocked_Locked() {
+        String groupId = "GROUPID";
+        String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.empty());
+
+        assertFalse(service.isGroupLocked(groupId));
+    }
+
+    @Test
+    public void testIsSchedulerLocked_NotLocked() {
+        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.of(LOCKREDIS_SCHEDULER_ALIAS));
+
+        assertTrue(service.isSchedulerLocked());
+    }
+
+    @Test
+    public void testIsSchedulerLocked_Locked() {
+        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
+
+        assertFalse(service.isSchedulerLocked());
     }
 }
