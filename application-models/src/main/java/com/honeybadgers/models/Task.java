@@ -28,6 +28,7 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Task {
+
     @Id
     @Column(name = "id", unique = true, nullable = false)
     private String id;
