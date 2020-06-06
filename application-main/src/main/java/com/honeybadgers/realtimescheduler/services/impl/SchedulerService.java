@@ -33,6 +33,8 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     ICommunication sender;
 
+
+    @Override
     public RedisTask createRedisTask(String taskId){
         RedisTask redisTask = new RedisTask();
         redisTask.setId(taskId);
