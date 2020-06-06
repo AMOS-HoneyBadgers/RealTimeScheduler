@@ -85,6 +85,22 @@ public class TaskServiceTest {
     @Test
     public void testCreateTask_primaryKeyViolation() {
 
+        Task alreadyInTask = new Task();
+        alreadyInTask.setId("AlreadyExistingUUID");
+
+        when(taskRepository.findById(any(String.class))).thenReturn(Optional.of(alreadyInTask));
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(UUID.randomUUID());
+        restModel.setGroupId("testGroup");
+
+        Exception e = assertThrows(JpaException.class, () -> taskService.createTask(restModel));
+        assertEquals("Primary or unique constraint failed!", e.getMessage());
+    }
+
+    @Test
+    public void testCreateTask_JpaException() {
+
         DataIntegrityViolationException vio = new DataIntegrityViolationException("primary key violation");
 
         when(taskRepository.save(any(Task.class))).thenThrow(vio);
@@ -94,7 +110,7 @@ public class TaskServiceTest {
         restModel.setGroupId("testGroup");
 
         Exception e = assertThrows(JpaException.class, () -> taskService.createTask(restModel));
-        assertEquals("Primary or unique constraint failed!", e.getMessage());
+        assertEquals("DataIntegrityViolation on save new task!", e.getMessage());
     }
 
     @Test

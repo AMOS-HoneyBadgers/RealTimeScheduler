@@ -38,6 +38,12 @@ public class TaskService implements ITaskService {
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
         Task newTask = new Task();
+
+        Task checkTask = taskRepository.findById(restModel.getId().toString()).orElse(null);
+        if( checkTask != null ){
+            throw new JpaException("Primary or unique constraint failed!");
+        }
+
         newTask.setId(restModel.getId().toString());
         Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
         // foreign key is declared as NOT NULL -> throw JpaException now because it will be thrown on save(newTask) anyway
@@ -109,21 +115,10 @@ public class TaskService implements ITaskService {
         try {
             taskRepository.save(newTask);
         } catch (DataIntegrityViolationException e) {
-            if (e.getMessage() != null) {
-                logger.error("DataIntegrityViolation while trying to add new Task: \n" + e.getMessage());
-                if (e.getMessage().contains("primary")) {
-                    throw new JpaException("Primary or unique constraint failed!");
-                } else {
-                    throw new JpaException(e.getMessage());
-                }
-            } else {
-                // exception has no message (should not happen but just in case)
-                logger.error("DataIntegrityViolation on save new task!");
-                logger.error(e.getStackTrace());
-                throw new JpaException("DataIntegrityViolation on save new task!");
-            }
+            logger.error("DataIntegrityViolation on save new task!");
+            logger.error(e.getStackTrace());
+            throw new JpaException("DataIntegrityViolation on save new task!");
         }
-
         return newTask;
     }
 

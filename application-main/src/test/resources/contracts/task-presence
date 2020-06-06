@@ -1,0 +1,7 @@
+label: task-is-sent
+input:
+  triggeredBy: sendTaskToTasksQueue()
+outputMessage:
+  sentTo: tasks.exchange
+
+
