@@ -27,7 +27,7 @@ public class ListenerTest {
     TaskConsumerRabbit service;
 
     @Test
-    public void verifyBookOrderedEventContract() throws Exception {
+    public void verifyTaskSendViaQueueWorks() throws Exception {
         stubTrigger.trigger("task-push");
         assertThat(service.count > 0);
     }
