@@ -37,6 +37,8 @@ jobs:
           java-version: 1.11
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
+      - name: Install with Maven
+        run: mvn install -DskipTests
       - name: Maven Verify with SonarScan
         run: mvn -B clean verify sonar:sonar
         env:
