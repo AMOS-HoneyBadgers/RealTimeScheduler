@@ -1,4 +1,4 @@
-package realtimescheduler;
+package com.honeybadgers.realtimescheduler.services;
 
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -14,6 +14,12 @@ public class TaskConsumerRabbit {
     public void receiveTask(String message) {
         System.out.println("Received message '{}'" + message);
         count = count++;
+        logger.info("Received message '{}'" + message);
+    }
+
+    @RabbitListener(queues="priority", containerFactory = "priorityContainerFactory")
+    public void receiveTaskQueueModel(TaskQueueModel message) {
+        logger.info("Received message '{}'" + message.toString());
     }
 
 }
