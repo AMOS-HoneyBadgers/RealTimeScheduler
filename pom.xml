@@ -174,10 +174,8 @@
         <module>application-apis</module>
         <module>application-models</module>
         <module>application-queuecommunication</module>
-        <module>taskiapi-integrationtests</module>
         <module>application-main-integrationtests</module>
-        <module>realtimescheduler-consumer</module>
-        <module>application-main-consumer</module>
+        <module>task-consumer</module>
     </modules>
 
     <build>
@@ -228,7 +226,7 @@
                                         <limit>
                                             <counter>METHOD</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>60%</minimum>
+                                            <minimum>0%</minimum>
                                         </limit>
                                     </limits>
                                 </rule>

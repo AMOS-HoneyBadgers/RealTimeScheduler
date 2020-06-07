@@ -1,7 +1,9 @@
-package com.honeybadgers.realtimescheduler.config;
+package com.honeybadgers.consumer;
 
-import com.honeybadgers.realtimescheduler.services.TaskConsumerRabbit;
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.Declarables;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,14 +11,15 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQEventConsumerConfiguration {
 
-    @Value("${dispatch.rabbitmq.tasksqueue}")
-    private String taskqueue;
 
-    @Value("${dispatch.rabbitmq.tasksroutingkey}")
-    private String tasksroutingkey;
+    private String taskqueue = "tasks";
 
-    @Value("${dispatch.rabbitmq.tasksexchange}")
-    String tasksExchange;
+
+    private String tasksroutingkey = "tasks.routingkey";
+
+
+    String tasksExchange = "tasks.exchange";
+
 
     @Bean
     public Declarables topicBindings() {

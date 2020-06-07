@@ -1,0 +1,9 @@
+label: task-push
+input:
+    triggeredBy: sendTasksToTasksQueue()
+outputMessage:
+    sentTo: tasks.exchange
+    body:
+        user: amadeus
+    headers:
+        contentType: application/json
