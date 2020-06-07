@@ -8,6 +8,7 @@ package com.honeybadgers.managementapi.controllers;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ErrorModel;
 import com.honeybadgers.managementapi.models.ResponseModel;
+import java.util.UUID;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -29,7 +30,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-05T20:04:35.677+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:10:06.339+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "task", description = "the task API")
@@ -41,24 +42,24 @@ public interface TaskApi {
 
     /**
      * PUT /task/{task_Id}/start
-     * Start scheduling all task assigned to group with given group_Id
+     * Start scheduling task with given task_Id
      *
-     * @param groupId  (required)
-     * @return All tasks in group successfully queued for scheduling (status code 200)
-     *         or Error - group_Id not found (status code 404)
+     * @param taskId  (required)
+     * @return Task successfully queued for scheduling (status code 200)
+     *         or Error - task_Id not found (status code 404)
      *         or Unauthorized (status code 401)
      */
-    @ApiOperation(value = "", nickname = "taskTaskIdStartPut", notes = "Start scheduling all task assigned to group with given group_Id", response = ResponseModel.class, authorizations = {
+    @ApiOperation(value = "", nickname = "taskTaskIdStartPut", notes = "Start scheduling task with given task_Id", response = ResponseModel.class, authorizations = {
         @Authorization(value = "basicAuth")
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "All tasks in group successfully queued for scheduling", response = ResponseModel.class),
-        @ApiResponse(code = 404, message = "Error - group_Id not found", response = ErrorModel.class),
+        @ApiResponse(code = 200, message = "Task successfully queued for scheduling", response = ResponseModel.class),
+        @ApiResponse(code = 404, message = "Error - task_Id not found", response = ErrorModel.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorModel.class) })
     @RequestMapping(value = "/task/{task_Id}/start",
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> taskTaskIdStartPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<ResponseModel> taskTaskIdStartPut(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -75,26 +76,26 @@ public interface TaskApi {
 
     /**
      * PUT /task/{task_Id}/stop
-     * Stop scheduling all task assigned to group with given group_Id
+     * Stop scheduling task with given task_Id
      *
-     * @param groupId  (required)
-     * @param dateTimeBody new task object (optional)
-     * @return All tasks in group successfully stopped scheduling (status code 200)
-     *         or Error - group_Id not found (status code 404)
+     * @param taskId  (required)
+     * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
+     * @return Task successfully stopped scheduling (status code 200)
+     *         or Error - task_Id not found (status code 404)
      *         or Unauthorized (status code 401)
      */
-    @ApiOperation(value = "", nickname = "taskTaskIdStopPut", notes = "Stop scheduling all task assigned to group with given group_Id", response = ResponseModel.class, authorizations = {
+    @ApiOperation(value = "", nickname = "taskTaskIdStopPut", notes = "Stop scheduling task with given task_Id", response = ResponseModel.class, authorizations = {
         @Authorization(value = "basicAuth")
     }, tags={  })
     @ApiResponses(value = { 
-        @ApiResponse(code = 200, message = "All tasks in group successfully stopped scheduling", response = ResponseModel.class),
-        @ApiResponse(code = 404, message = "Error - group_Id not found", response = ErrorModel.class),
+        @ApiResponse(code = 200, message = "Task successfully stopped scheduling", response = ResponseModel.class),
+        @ApiResponse(code = 404, message = "Error - task_Id not found", response = ErrorModel.class),
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorModel.class) })
     @RequestMapping(value = "/task/{task_Id}/stop",
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> taskTaskIdStopPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId,@ApiParam(value = "new task object"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
+    default ResponseEntity<ResponseModel> taskTaskIdStopPut(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId,@ApiParam(value = "DateTime body which indicates, when to resume scheduling"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

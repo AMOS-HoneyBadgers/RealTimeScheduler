@@ -1,7 +1,7 @@
 package com.honeybadgers.realtimescheduler.config;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import com.honeybadgers.models.RedisLock;
+import com.honeybadgers.models.RedisTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -41,15 +41,15 @@ public class RedisConfig {
 
     @Bean(name="prioRedisTemplate")
     @Primary
-    public RedisTemplate<String, Object> prioRedisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, RedisTask> prioRedisTemplate() {
+        RedisTemplate<String, RedisTask> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForPrioDatabase());
         return template;
     }
 
     @Bean(name="lockRedisTemplate")
-    public RedisTemplate<String, Object> lockRedisTemplate() {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, RedisLock> lockRedisTemplate() {
+        RedisTemplate<String, RedisLock> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
         return template;
     }

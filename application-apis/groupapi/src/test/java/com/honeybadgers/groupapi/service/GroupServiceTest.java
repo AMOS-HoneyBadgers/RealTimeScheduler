@@ -83,7 +83,10 @@ public class GroupServiceTest {
     public void testCreateGroup_primaryViolation(){
         DataIntegrityViolationException vio = new DataIntegrityViolationException("primary key violation");
 
-        when(groupRepository.save(any(Group.class))).thenThrow(vio);
+        Group alreadyInGroup = new Group();
+        alreadyInGroup.setId("TestGroupAlreadyExists");
+
+        when(groupRepository.findById(any(String.class))).thenReturn(Optional.of(alreadyInGroup));
 
         GroupModel restGroup = new GroupModel();
         restGroup.setId("TestGroup");
@@ -91,6 +94,20 @@ public class GroupServiceTest {
 
         Exception e = assertThrows(JpaException.class, () -> groupService.createGroup(restGroup));
         assertEquals("Primary or unique constraint failed!", e.getMessage());
+    }
+
+    @Test
+    public void testCreateGroup_JpaException(){
+        DataIntegrityViolationException vio = new DataIntegrityViolationException("primary key violation");
+
+        when(groupRepository.save(any(Group.class))).thenThrow(vio);
+
+        GroupModel restGroup = new GroupModel();
+        restGroup.setId("TestGroup");
+        restGroup.setPriority(100);
+
+        Exception e = assertThrows(JpaException.class, () -> groupService.createGroup(restGroup));
+        assertEquals("DataIntegrityViolation on save new group!", e.getMessage());
     }
 
     @Test

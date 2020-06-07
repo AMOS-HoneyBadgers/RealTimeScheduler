@@ -16,6 +16,8 @@ import org.springframework.web.context.request.NativeWebRequest;
 import javax.validation.Valid;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.UUID;
+
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T15:31:54.117+02:00[Europe/Berlin]")
 
 @Controller
@@ -53,7 +55,7 @@ public class GroupIdApiController implements GroupIdApi {
         response.setMessage("Success");
 
         try {
-            groupService.updateGroup(groupId, groupModel);
+            groupService.updateGroup(groupId.toString(), groupModel);
         } catch (JpaException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());

@@ -13,7 +13,7 @@ import javax.validation.constraints.*;
 /**
  * DateTimeBody
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-05T20:02:38.582+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:10:06.339+02:00[Europe/Berlin]")
 
 public class DateTimeBody   {
   @JsonProperty("resume_date_time")
@@ -29,7 +29,8 @@ public class DateTimeBody   {
    * DateTime, when to resume after being stopped
    * @return resumeDateTime
   */
-  @ApiModelProperty(value = "DateTime, when to resume after being stopped")
+  @ApiModelProperty(required = true, value = "DateTime, when to resume after being stopped")
+  @NotNull
 
   @Valid
 
