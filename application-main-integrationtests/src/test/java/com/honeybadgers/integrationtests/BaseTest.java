@@ -2,7 +2,6 @@ package com.honeybadgers.integrationtests;
 
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.realtimescheduler.RealtimeschedulerApplication;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,15 +13,15 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.inject.Inject;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = RealtimeschedulerApplication.class, webEnvironment = SpringBootTest.WebEnvironment.NONE)
-//@SpringBootTest
+
+@SpringBootTest
 @AutoConfigureMessageVerifier
 public abstract class BaseTest {
 
     @Autowired
     private ICommunication sender;
 
-    protected void sendTasksToTasksQueue() {
+    protected void testsendTasksToTasksQueue() {
         sender.sendTaskToTasksQueue("id12312");
     }
 }

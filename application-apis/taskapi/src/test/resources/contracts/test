@@ -1,9 +1,0 @@
-label: user-goes-online
-input:
-  triggeredBy: onUserIsOnline()
-outputMessage:
-  sentTo: user-presence
-  body:
-    user: amadeus
-  headers:
-    contentType: application/json
