@@ -176,6 +176,8 @@
         <module>application-queuecommunication</module>
         <module>taskiapi-integrationtests</module>
         <module>application-main-integrationtests</module>
+        <module>realtimescheduler-consumer</module>
+        <module>application-main-consumer</module>
     </modules>
 
     <build>
