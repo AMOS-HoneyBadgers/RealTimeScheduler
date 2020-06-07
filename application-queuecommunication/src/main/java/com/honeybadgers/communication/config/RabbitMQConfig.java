@@ -111,14 +111,6 @@ public class RabbitMQConfig {
     Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange")DirectExchange exchange) {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
-    @Bean
-    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(dispatcherqueue);
-
-        return container;
-    }
 
     @Bean
     SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory) {
@@ -129,8 +121,15 @@ public class RabbitMQConfig {
         return container;
     }
 
-    @Bean
+    /*@Bean
     public SimpleRabbitListenerContainerFactory taskcontainerfactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
+        return factory;
+    }*/
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory dispatchcontainerfactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         return factory;

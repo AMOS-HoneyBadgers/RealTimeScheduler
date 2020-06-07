@@ -31,7 +31,7 @@ public class FeedbackConsumer {
         System.out.println("Received feedback from dispatcher '{}'" + message);
         System.out.println("Step 4: ");
 
-        //Thread.sleep((long) Math.random() * ((10000 - 1000) + 1) + 1000);
+
         RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
         // if capacity can not be found, something went wrong in the startup of the scheduler
         if(capacity == null){
