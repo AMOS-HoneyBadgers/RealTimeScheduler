@@ -1,0 +1,14 @@
+Contract.make {
+    description("Example messaging contract")
+    label 'task-push'
+    input {
+        triggeredBy('sendTasksToTasksQueue()')
+    }
+    outputMessage {
+        sentTo 'tasks.exchange'
+        body(["customerId": $(regex("[0-9]*"))])
+        headers {
+            messagingContentType(applicationJson())
+        }
+    }
+}
