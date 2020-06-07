@@ -67,6 +67,7 @@ public class RabbitMQConfig {
     Queue tasksqueue() {
         return new Queue(tasksqueue, false);
     }
+
     @Qualifier("priorityqueue")
     @Bean
     Queue priorityqueue() {
@@ -85,7 +86,7 @@ public class RabbitMQConfig {
         return new DirectExchange(feedbackExchange);
     }
 
-    @Qualifier("tasksExchange")
+    @Qualifier("tasks.exchange")
     @Bean
     DirectExchange tasksexchange() {
         return new DirectExchange(tasksExchange);
@@ -106,7 +107,7 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(feedbackqueue).to(exchange).with(feedbackroutingkey);
     }
     @Bean
-    Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange")DirectExchange exchange) {
+    Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasks.exchange")DirectExchange exchange) {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
     @Bean
