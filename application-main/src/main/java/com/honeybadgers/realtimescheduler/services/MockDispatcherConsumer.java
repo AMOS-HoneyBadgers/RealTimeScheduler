@@ -1,7 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.communication.model.TaskQueueModel;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
