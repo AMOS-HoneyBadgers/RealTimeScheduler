@@ -34,6 +34,12 @@ public class SchedulerService implements ISchedulerService {
     @Value("${dispatcher.capacity.id}")
     String dispatcherCapacityId;
 
+    @Value("${dispatcher.capacity}")
+    String dispatcherCapacity;
+
+    @Value("${scheduler.trigger}")
+    String scheduler_trigger;
+
     @Autowired
     TaskRedisRepository taskRedisRepository;
 
@@ -87,6 +93,12 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String taskId) {
+        //Special case: gets trigger from feedback -> TODO in new QUEUE
+        if(taskId.equals(scheduler_trigger)) {
+            sendTaskstoDispatcher(this.getAllRedisTasksAndSort());
+            return;
+        }
+
         // TODO Transaction
         logger.info("Step 2: search for task in Redis DB");
         RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
@@ -108,34 +120,38 @@ public class SchedulerService implements ISchedulerService {
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if(!isSchedulerLocked()) {
             // scheduler not locked -> can send
-            try {
-                for(int i = 0; i < 100; i++) {
+            System.out.println("Step 4: send Tasks to dispatcher");
+            sendTaskstoDispatcher(tasks);
 
-                    // TODO Transaction cause of Race conditon
-                    // Search for capacity and set value -1
-                    RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
-                    if(capacity == null)
-                        throw new RuntimeException("ERROR dispatcher capacity was not found in redis database");
-
-                    logger.info("current capacity of dispatcher: +" + capacity.getCapacity());
-
-                    // If there is no capacity, we wont send any tasks to dispatcher anymore
-                    if(capacity.getCapacity() < 1)
-                        break;
-
-                    // else we decrease capacity and send task to dispatcher
-                    capacity.setCapacity(capacity.getCapacity()-1);
-                    lockRedisRepository.save(capacity);
-
-                    // TODO locks, activeTimes, workingDays, ...
-                    sender.sendTaskToDispatcher(tasks.get(i).getId());
-                }
-            } catch(IndexOutOfBoundsException e) {
-                logger.info("passt scho" + e.getMessage());
-            }
         } else
             logger.info("Scheduler is locked!");
 
         logger.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
+    }
+
+    private void sendTaskstoDispatcher(List<RedisTask> tasks) {
+        try {
+            for(int i = 0; i < Integer.parseInt(dispatcherCapacity); i++) {
+                // TODO Transaction cause of Race conditon
+                // Search for capacity and set value -1
+                RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
+                if(capacity == null)
+                    throw new RuntimeException("ERROR dispatcher capacity was not found in redis database");
+
+                logger.info("current capacity of dispatcher: +" + capacity.getCapacity());
+
+                // If there is no capacity, we wont send any tasks to dispatcher anymore
+                if(capacity.getCapacity() < 1)
+                    break;
+
+                // TODO locks, activeTimes, workingDays, ...
+                // else we decrease capacity and send task to dispatcher
+                capacity.setCapacity(capacity.getCapacity()-1);
+                lockRedisRepository.save(capacity);
+                sender.sendTaskToDispatcher(tasks.get(i).getId());
+            }
+        } catch(IndexOutOfBoundsException e) {
+            logger.info("passt scho" + e.getMessage());
+        }
     }
 }

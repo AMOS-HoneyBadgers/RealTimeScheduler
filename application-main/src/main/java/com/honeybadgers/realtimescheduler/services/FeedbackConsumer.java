@@ -26,10 +26,12 @@ public class FeedbackConsumer {
     @Value("${dispatcher.capacity.id}")
     String dispatcherCapacityId;
 
+    @Value("${scheduler.trigger}")
+    String scheduler_trigger;
+
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String message) throws InterruptedException {
-        System.out.println("Received feedback from dispatcher '{}'" + message);
-        System.out.println("Step 4: ");
+        System.out.println("Step 4: Received feedback from dispatcher");
 
 
         RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
@@ -43,7 +45,9 @@ public class FeedbackConsumer {
         capacity.setCapacity(capacity.getCapacity()+1);
         lockRedisRepository.save(capacity);
 
-        // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered
+        System.out.println("Step 5: Increased capacity");
 
+        // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered in a new QUEUE atm just workaround
+        sender.sendTaskToTasksQueue(scheduler_trigger);
     }
 }
