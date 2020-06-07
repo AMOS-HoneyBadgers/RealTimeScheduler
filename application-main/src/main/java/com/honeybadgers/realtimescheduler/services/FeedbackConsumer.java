@@ -43,5 +43,7 @@ public class FeedbackConsumer {
         capacity.setCapacity(capacity.getCapacity()+1);
         lockRedisRepository.save(capacity);
 
+        // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered
+
     }
 }

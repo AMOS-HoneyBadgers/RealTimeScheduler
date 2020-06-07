@@ -32,7 +32,7 @@ public class RealtimeschedulerApplication {
     @EventListener(ApplicationReadyEvent.class)
     public void initializeCapacityAfterStartup() {
         // Initialize Capacity only when there is no capazity present
-        RedisLock capacity = redisRepository.findById("Capacity").orElse(null);
+        RedisLock capacity = redisRepository.findById(dispatcherCapacityId).orElse(null);
         if(capacity == null){
             capacity = new RedisLock();
             capacity.setId(dispatcherCapacityId);

@@ -11,6 +11,7 @@ import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -24,11 +25,14 @@ public class SchedulerService implements ISchedulerService {
 
 
     // These prefixes are for the case, that a group exists with id='SCHEDULER_LOCK_ALIAS'
-    // HAVE TO BE THE SAME AS IN ManagementService IN managementapi!!!!!!!!!!!!!
+    // HAVE TO BE THE SAME AS IN ManagementService IN managementapi!!!!!!!!!!!!! mach halt bitte noch mehr Ausrufezeichen
     public static final String LOCKREDIS_SCHEDULER_ALIAS = "SCHEDULER_LOCK_ALIAS";
     public static final String LOCKREDIS_TASK_PREFIX = "TASK:";
     public static final String LOCKREDIS_GROUP_PREFIX = "GROUP:";
 
+
+    @Value("${dispatcher.capacity.id}")
+    String dispatcherCapacityId;
 
     @Autowired
     TaskRedisRepository taskRedisRepository;
@@ -106,6 +110,23 @@ public class SchedulerService implements ISchedulerService {
             // scheduler not locked -> can send
             try {
                 for(int i = 0; i < 100; i++) {
+
+                    // TODO Transaction cause of Race conditon
+                    // Search for capacity and set value -1
+                    RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
+                    if(capacity == null)
+                        throw new RuntimeException("ERROR dispatcher capacity was not found in redis database");
+
+                    logger.info("current capacity of dispatcher: +" + capacity.getCapacity());
+
+                    // If there is no capacity, we wont send any tasks to dispatcher anymore
+                    if(capacity.getCapacity() < 1)
+                        break;
+
+                    // else we decrease capacity and send task to dispatcher
+                    capacity.setCapacity(capacity.getCapacity()-1);
+                    lockRedisRepository.save(capacity);
+
                     // TODO locks, activeTimes, workingDays, ...
                     sender.sendTaskToDispatcher(tasks.get(i).getId());
                 }
