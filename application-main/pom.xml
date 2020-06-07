@@ -35,7 +35,11 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-contract-verifier</artifactId>
+            <scope>test</scope>
+        </dependency>
 
         <!-- https://mvnrepository.com/artifact/it.ozimov/embedded-redis -->
         <dependency>
@@ -54,6 +58,12 @@
             <groupId>com.honeybadgers</groupId>
             <artifactId>application-models</artifactId>
             <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>redis.clients</groupId>
+            <artifactId>jedis</artifactId>
+            <version>3.1.0</version>
+            <type>jar</type>
         </dependency>
         <dependency>
             <groupId>com.honeybadgers</groupId>
@@ -80,7 +90,20 @@
                <groupId>org.springframework.boot</groupId>
                <artifactId>spring-boot-maven-plugin</artifactId>
                <inherited>false</inherited>
+                <configuration>
+                    <classifier>exec</classifier>
+                </configuration>
            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-contract-maven-plugin</artifactId>
+                <version>2.0.2.RELEASE</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <baseClassForTests>com.honeybadgers.integrationtests.BaseTest</baseClassForTests>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
 
