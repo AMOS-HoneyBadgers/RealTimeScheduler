@@ -70,6 +70,7 @@
         <module>managementapi</module>
         <module>monitoringapi</module>
         <module>taskapi</module>
+        <module>taskapi-integrationtests</module>
     </modules>
 
     <build>
