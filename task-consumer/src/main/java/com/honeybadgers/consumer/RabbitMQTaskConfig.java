@@ -17,14 +17,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @EnableAutoConfiguration
 @ComponentScan(basePackages = "com.honeybadgers.consumer")
-public class RabbitMQConfig {
+public class RabbitMQTaskConfig {
 
-    @Value("${dispatch.rabbitmq.tasksqueue}")
-    String tasksqueue;
-    @Value("${dispatch.rabbitmq.tasksexchange}")
-    String tasksExchange;
-    private String tasksroutingkey;
-
+    private String tasksqueue = "tasks";
+    private String tasksExchange = "tasks.exchange";
+    private String tasksroutingkey = "tasks.routingkey";
 
     @Qualifier("taskqueue")
     @Bean

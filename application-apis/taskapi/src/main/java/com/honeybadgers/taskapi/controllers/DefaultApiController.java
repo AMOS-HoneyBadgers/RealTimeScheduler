@@ -72,6 +72,7 @@ public class DefaultApiController implements DefaultApi {
                 taskService.sendTaskToPriorityQueue(taskModel);
             else
                 taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
+
         } catch (UnknownEnumException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());

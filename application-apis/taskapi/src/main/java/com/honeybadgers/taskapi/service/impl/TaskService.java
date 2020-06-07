@@ -142,5 +142,4 @@ public class TaskService implements ITaskService {
         taskQueueModel.setTypeFlagEnum(task.getTypeFlag().getValue());
         sender.sendTaskToPriorityQueue(taskQueueModel);
     }
-
 }
