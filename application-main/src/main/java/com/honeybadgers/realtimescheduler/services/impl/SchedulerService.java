@@ -84,6 +84,7 @@ public class SchedulerService implements ISchedulerService {
     @Override
     public void scheduleTask(String taskId) {
         // TODO Transaction
+        logger.info("Step 2: search for task in Redis DB");
         RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
 
         if(redisTask == null){
@@ -94,6 +95,7 @@ public class SchedulerService implements ISchedulerService {
         if(task == null)
             throw new RuntimeException("task could not be found in database");
 
+        logger.info("Step 3: calculate priority with the Redis Task");
         redisTask.setPriority(taskService.calculatePriority(task));
         taskRedisRepository.save(redisTask);
 

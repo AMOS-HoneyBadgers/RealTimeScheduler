@@ -119,14 +119,7 @@ public class RabbitMQConfig {
 
         return container;
     }
-    @Bean
-    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(feedbackqueue);
 
-        return container;
-    }
     @Bean
     SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory) {
         SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
@@ -148,6 +141,13 @@ public class RabbitMQConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         configurer.configure(factory, connectionFactory);
         factory.setMessageConverter(producerJackson2MessageConverter());
+        return factory;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory feedbackcontainerfactory(ConnectionFactory connectionFactory) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        factory.setConnectionFactory(connectionFactory);
         return factory;
     }
 

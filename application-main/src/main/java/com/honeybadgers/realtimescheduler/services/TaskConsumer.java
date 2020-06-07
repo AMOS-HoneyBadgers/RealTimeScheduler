@@ -17,7 +17,7 @@ public class TaskConsumer {
     @RabbitListener(queues="tasks", containerFactory = "taskcontainerfactory")
     public void receiveTask(String message) {
         System.out.println("Received message '{}'" + message);
-        System.out.println("### Starting with Step:1 Scheduling Task");
+        System.out.println("Step 1: scheduling Task");
         service.scheduleTask(message.toString());
     }
 
@@ -25,5 +25,6 @@ public class TaskConsumer {
     public void receiveTaskQueueModel(TaskQueueModel message) {
         System.out.println("Received message '{}'" + message.toString());
     }
+
 
 }

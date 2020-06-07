@@ -22,11 +22,14 @@ public class RedisLock implements Serializable {
     @JsonSerialize(using = LocalDateTimeSerializer.class)
     LocalDateTime resume_date;
 
+    int capacity = 0;
+
     @Override
     public String toString() {
         return "RedisLock{" +
                 "id='" + id + '\'' +
                 ", resume_date=" + resume_date +
+                ", capacity=" + capacity +
                 '}';
     }
 }
