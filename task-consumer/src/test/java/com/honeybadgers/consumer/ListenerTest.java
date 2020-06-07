@@ -26,10 +26,10 @@ public class ListenerTest {
     @Autowired
     TaskConsumerRabbit service;
 
-    @Test
+    /*@Test
     public void verifyBookOrderedEventContract() throws Exception {
         stubTrigger.trigger("task-push");
         assertThat(service.count > 0);
-    }
+    }*/
 
 }
