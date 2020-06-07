@@ -18,7 +18,7 @@ public class RabbitMQEventConsumerConfiguration {
     RabbitMQApplicationProperties rabbitMQApplicationProperties;
 
     @Bean
-    public Declarables topicBindings() {
+    public Declarables taskTopicBindings() {
         Queue queue = new Queue(rabbitMQApplicationProperties.getTasksqueue());
         DirectExchange topicExchange = new DirectExchange(rabbitMQApplicationProperties.getTasksexchange());
 
@@ -29,6 +29,21 @@ public class RabbitMQEventConsumerConfiguration {
                 .bind(queue)
                 .to(topicExchange)
                 .with(rabbitMQApplicationProperties.getTasksroutingkey())
+        );
+    }
+
+    @Bean
+    public Declarables priorityTopicBindings() {
+        Queue queue = new Queue(rabbitMQApplicationProperties.getPriorityqueue());
+        DirectExchange topicExchange = new DirectExchange(rabbitMQApplicationProperties.getPriorityexchange());
+
+        return new Declarables(
+                queue,
+                topicExchange,
+                BindingBuilder
+                        .bind(queue)
+                        .to(topicExchange)
+                        .with(rabbitMQApplicationProperties.getPriorityroutingkey())
         );
     }
 }

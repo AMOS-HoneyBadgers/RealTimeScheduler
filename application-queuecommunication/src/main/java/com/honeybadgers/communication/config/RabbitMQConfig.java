@@ -3,13 +3,14 @@ package com.honeybadgers.communication.config;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainerFactoryConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -30,18 +31,18 @@ public class RabbitMQConfig {
     @Qualifier("feedbackqueue")
     @Bean
     Queue feedbackqueue() {
-        return new Queue(rabbitMQApplicationProperties.feedbackqueue, false);
+        return new Queue(rabbitMQApplicationProperties.feedbackqueue, true);
     }
 
     @Qualifier("taskqueue")
     @Bean
     Queue tasksqueue() {
-        return new Queue(rabbitMQApplicationProperties.tasksqueue, false);
+        return new Queue(rabbitMQApplicationProperties.tasksqueue, true);
     }
     @Qualifier("priorityqueue")
     @Bean
     Queue priorityqueue() {
-        return new Queue(rabbitMQApplicationProperties.priorityqueue, false);
+        return new Queue(rabbitMQApplicationProperties.priorityqueue, true);
     }
 
     @Qualifier("dispatcherExchange")
@@ -81,34 +82,48 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(rabbitMQApplicationProperties.tasksroutingkey);
     }
     @Bean
-    SimpleMessageListenerContainer dispatchcontainer(ConnectionFactory connectionFactory) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(rabbitMQApplicationProperties.dispatcherqueue);
-
-        return container;
+    Binding prioritybinding(@Qualifier("priorityqueue") Queue priorityqueue, @Qualifier("priorityExchange")DirectExchange exchange) {
+        return BindingBuilder.bind(priorityqueue).to(exchange).with(rabbitMQApplicationProperties.priorityroutingkey);
     }
     @Bean
-    SimpleMessageListenerContainer feedbackcontainer(ConnectionFactory connectionFactory) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(rabbitMQApplicationProperties.feedbackqueue);
-
-        return container;
-    }
-    @Bean
-    SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(rabbitMQApplicationProperties.priorityqueue);
-
-        return container;
-    }
-
-    @Bean
-    public SimpleRabbitListenerContainerFactory taskcontainerfactory(ConnectionFactory connectionFactory) {
+    public SimpleRabbitListenerContainerFactory dispatchcontainerFactory(ConnectionFactory connectionFactory, SimpleRabbitListenerContainerFactoryConfigurer configurer) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
+        configurer.configure(factory, connectionFactory);
+        factory.setMessageConverter(producerJackson2MessageConverter());
         return factory;
+    }
+    @Bean
+    public SimpleRabbitListenerContainerFactory feedbackcontainerFactory(ConnectionFactory connectionFactory, SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        factory.setMessageConverter(producerJackson2MessageConverter());
+        return factory;
+    }
+    @Bean
+    public SimpleRabbitListenerContainerFactory priorityContainerFactory(ConnectionFactory connectionFactory, SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        factory.setMessageConverter(producerJackson2MessageConverter());
+        return factory;
+    }
+
+    @Bean
+    public SimpleRabbitListenerContainerFactory taskcontainerFactory(ConnectionFactory connectionFactory, SimpleRabbitListenerContainerFactoryConfigurer configurer) {
+        SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
+        configurer.configure(factory, connectionFactory);
+        factory.setMessageConverter(producerJackson2MessageConverter());
+        return factory;
+    }
+
+    @Bean
+    public RabbitTemplate rabbitTemplate(final ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(producerJackson2MessageConverter());
+        return rabbitTemplate;
+    }
+
+    @Bean
+    public Jackson2JsonMessageConverter producerJackson2MessageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 }

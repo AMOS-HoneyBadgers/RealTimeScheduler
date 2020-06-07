@@ -23,19 +23,6 @@ import java.util.Map;
 @AllArgsConstructor
 @NoArgsConstructor
 public class TaskQueueModel implements Serializable {
-    @Override
-    public String toString() {
-        return "TaskQueueModel{" +
-                "id='" + id + '\'' +
-                ", groupId='" + groupId + '\'' +
-                ", priority=" + priority +
-                ", deadline=" + deadline +
-                ", typeFlagEnum='" + typeFlagEnum + '\'' +
-                ", retries=" + retries +
-                ", indexNumber=" + indexNumber +
-                ", metaData=" + metaData +
-                '}';
-    }
 
     private String id;
 
@@ -56,5 +43,20 @@ public class TaskQueueModel implements Serializable {
     private Integer indexNumber;
 
     private Map<String, String> metaData;
+
+
+    @Override
+    public String toString() {
+        return "TaskQueueModel{" +
+                "id='" + id + '\'' +
+                ", groupId='" + groupId + '\'' +
+                ", priority=" + priority +
+                ", deadline=" + deadline +
+                ", typeFlagEnum='" + typeFlagEnum + '\'' +
+                ", retries=" + retries +
+                ", indexNumber=" + indexNumber +
+                ", metaData=" + metaData +
+                '}';
+    }
 
 }

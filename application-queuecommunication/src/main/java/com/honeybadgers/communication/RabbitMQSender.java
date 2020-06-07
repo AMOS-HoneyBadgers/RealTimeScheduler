@@ -3,6 +3,8 @@ package com.honeybadgers.communication;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,13 +17,10 @@ import javax.annotation.PostConstruct;
 @Service
 public class RabbitMQSender implements ICommunication {
 
+    static final Logger logger = LogManager.getLogger(RabbitMQSender.class);
+
     @Autowired
     private RabbitTemplate rabbitTemplate;
-
-    @PostConstruct
-    private void setMessageConverter(){
-        rabbitTemplate.setMessageConverter( new Jackson2JsonMessageConverter());
-    }
 
     @Value("${dispatch.rabbitmq.dispatcherexchange}")
     private String dispatcherexchange;
@@ -54,30 +53,30 @@ public class RabbitMQSender implements ICommunication {
     @Override
     public void sendTaskToDispatcher(String task) {
         rabbitTemplate.convertAndSend(dispatcherexchange, dispatcherroutingkey, task);
-        System.out.println("Send task to dispatcher + " + task);
+        logger.info("Send task to dispatcher + " + task);
     }
 
     public String sendFeedbackToScheduler(String feedback) {
         rabbitTemplate.convertAndSend(feedbackExchange, feedbackroutingkey, feedback);
-        System.out.println("Send feedback to Scheduler = " + feedback);
+        logger.info("Send feedback to Scheduler = " + feedback);
         return "test";
     }
 
     @Override
     public void sendTaskToTasksQueue(String task) {
         rabbitTemplate.convertAndSend(tasksExchange, tasksroutingkey, task);
-        System.out.println("Send task to Taskqueue= " + task);
+        logger.info("Send task to Taskqueue= " + task);
     }
 
     @Override
     public void sendGroupToTasksQueue(String group) {
         rabbitTemplate.convertAndSend(tasksExchange, tasksroutingkey, group);
-        System.out.println("Send group Taskqueue= " + group);
+        logger.info("Send group Taskqueue= " + group);
     }
 
     @Override
     public void sendTaskToPriorityQueue(TaskQueueModel task) {
         rabbitTemplate.convertAndSend(priorityExchange, priorityroutingkey, task);
-        System.out.println("Send task to Priorityqueue= " + task.toString());
+        logger.info("Send task to Priorityqueue= " + task.toString());
     }
 }
