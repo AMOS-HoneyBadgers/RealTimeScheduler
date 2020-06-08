@@ -85,12 +85,13 @@ public class TestController {
 
     @PostMapping("/test/schaub")
     public ResponseEntity<?> testPrioRedis() {
-<<<<<<< HEAD
-
+        log.warn("################## BEFORE GETALL");
+        List<RedisTask> getAll = schedulerService.getAllRedisTasksAndSort();
+        log.info("################## getAll: " + (getAll != null ? getAll.size() : null));
         Iterable<RedisTask> tasks = taskRedisRepository.findAll();
-
-
-        schedulerService.getAllRedisTasksAndSort();
+        List<RedisTask> tasksList = new ArrayList<>();
+        tasks.forEach(tasksList::add);
+        log.info("################## findAll: " + (tasksList != null ? tasksList.size() : null));
 
         return ResponseEntity.ok().build();
     }
@@ -102,16 +103,6 @@ public class TestController {
         if(capacity == null){
             return ResponseEntity.badRequest().build();
         }
-
-=======
-        log.warn("################## BEFORE GETALL");
-        List<RedisTask> getAll = schedulerService.getAllRedisTasksAndSort();
-        log.info("################## getAll: " + (getAll != null ? getAll.size() : null));
-        Iterable<RedisTask> tasks = taskRedisRepository.findAll();
-        List<RedisTask> tasksList = new ArrayList<>();
-        tasks.forEach(tasksList::add);
-        log.info("################## findAll: " + (tasksList != null ? tasksList.size() : null));
->>>>>>> 311e0d2849c6c701ecafafdc4dd4855df144cfab
         return ResponseEntity.ok().build();
     }
 }
