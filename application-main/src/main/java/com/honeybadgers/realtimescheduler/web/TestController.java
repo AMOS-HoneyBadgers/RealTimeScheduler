@@ -82,8 +82,23 @@ public class TestController {
 
     @PostMapping("/test/schaub")
     public ResponseEntity<?> testPrioRedis() {
-        //schedulerService.getAllRedisTasksAndSort();
+
         Iterable<RedisTask> tasks = taskRedisRepository.findAll();
+
+
+        schedulerService.getAllRedisTasksAndSort();
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/test/capacity")
+    public ResponseEntity<?> testRedisCapacity() {
+
+        RedisLock capacity = lockRedisRepository.findById("DISPATCHER_CAPACITY_ID_42").orElse(null);
+        if(capacity == null){
+            return ResponseEntity.badRequest().build();
+        }
+
         return ResponseEntity.ok().build();
     }
 }
