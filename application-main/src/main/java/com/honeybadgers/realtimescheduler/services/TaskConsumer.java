@@ -14,7 +14,7 @@ public class TaskConsumer {
     @Autowired
     SchedulerService service;
 
-    @RabbitListener(queues="tasks", containerFactory = "taskcontainerfactory")
+    @RabbitListener(queues="tasks", containerFactory = "taskcontainerFactory")
     public void receiveTask(String message) {
         System.out.println("Received message '{}'" + message);
         System.out.println("Step 1: scheduling Task");

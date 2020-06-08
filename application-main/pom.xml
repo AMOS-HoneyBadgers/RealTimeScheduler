@@ -64,11 +64,6 @@
             <artifactId>application-queuecommunication</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-        <dependency>
-            <groupId>com.honeybadgers</groupId>
-            <artifactId>task-consumer</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
 
     </dependencies>
 

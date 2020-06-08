@@ -61,18 +61,18 @@ public class RabbitMQConfig {
     @Qualifier("feedbackqueue")
     @Bean
     Queue feedbackqueue() {
-        return new Queue(feedbackqueue, false);
+        return new Queue(feedbackqueue, true);
     }
 
     @Qualifier("taskqueue")
     @Bean
     Queue tasksqueue() {
-        return new Queue(tasksqueue, false);
+        return new Queue(tasksqueue, true);
     }
     @Qualifier("priorityqueue")
     @Bean
     Queue priorityqueue() {
-        return new Queue(priorityqueue, false);
+        return new Queue(priorityqueue, true);
     }
 
     @Qualifier("dispatcherExchange")
@@ -113,25 +113,18 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    SimpleMessageListenerContainer priorityContainer(ConnectionFactory connectionFactory) {
-        SimpleMessageListenerContainer container = new SimpleMessageListenerContainer();
-        container.setConnectionFactory(connectionFactory);
-        container.setQueueNames(priorityqueue);
-
-        return container;
-    }
-
-    /*@Bean
-    public SimpleRabbitListenerContainerFactory taskcontainerfactory(ConnectionFactory connectionFactory) {
+    public SimpleRabbitListenerContainerFactory priorityContainerFactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(producerJackson2MessageConverter());
         return factory;
-    }*/
+    }
 
     @Bean
     public SimpleRabbitListenerContainerFactory dispatchcontainerfactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(producerJackson2MessageConverter());
         return factory;
     }
 
@@ -143,10 +136,13 @@ public class RabbitMQConfig {
         return factory;
     }
 
+
+
     @Bean
     public SimpleRabbitListenerContainerFactory feedbackcontainerfactory(ConnectionFactory connectionFactory) {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
+        factory.setMessageConverter(producerJackson2MessageConverter());
         return factory;
     }
 

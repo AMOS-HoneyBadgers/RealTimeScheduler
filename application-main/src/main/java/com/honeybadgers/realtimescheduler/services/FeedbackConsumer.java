@@ -33,7 +33,6 @@ public class FeedbackConsumer {
     public void receiveFeedbackFromDispatcher(String message) throws InterruptedException {
         System.out.println("Step 5: Received feedback from dispatcher");
 
-
         RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
         // if capacity can not be found, something went wrong in the startup of the scheduler
         if(capacity == null){
@@ -48,7 +47,7 @@ public class FeedbackConsumer {
         System.out.println("Step 6: Increased capacity");
 
         // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered in a new QUEUE atm just workaround
-        sender.sendTaskToTasksQueue(scheduler_trigger);
+        //sender.sendTaskToTasksQueue(scheduler_trigger);
 
         System.out.println("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
     }
