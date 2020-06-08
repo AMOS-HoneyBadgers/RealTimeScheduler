@@ -11,10 +11,13 @@ import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -82,8 +85,13 @@ public class TestController {
 
     @PostMapping("/test/schaub")
     public ResponseEntity<?> testPrioRedis() {
-        //schedulerService.getAllRedisTasksAndSort();
+        log.warn("################## BEFORE GETALL");
+        List<RedisTask> getAll = schedulerService.getAllRedisTasksAndSort();
+        log.info("################## getAll: " + (getAll != null ? getAll.size() : null));
         Iterable<RedisTask> tasks = taskRedisRepository.findAll();
+        List<RedisTask> tasksList = new ArrayList<>();
+        tasks.forEach(tasksList::add);
+        log.info("################## findAll: " + (tasksList != null ? tasksList.size() : null));
         return ResponseEntity.ok().build();
     }
 }
