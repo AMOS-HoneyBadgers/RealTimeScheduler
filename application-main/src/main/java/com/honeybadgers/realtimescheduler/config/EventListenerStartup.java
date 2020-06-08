@@ -25,10 +25,13 @@ public class EventListenerStartup {
         // Initialize Capacity only when there is no capazity present
         RedisLock capacity = redisRepository.findById(dispatcherCapacityId).orElse(null);
         if(capacity == null){
-            System.out.print("####First Step for REDIS DB: initialize capacity value####");
+            System.out.println("####First Step for REDIS DB: initialize capacity value####");
             capacity = new RedisLock();
             capacity.setId(dispatcherCapacityId);
             capacity.setCapacity(Integer.parseInt(dispatcherCapacity));
+            redisRepository.save(capacity);
         }
+        else
+            System.out.println("disspatchercapacity was initalized already");
     }
 }
