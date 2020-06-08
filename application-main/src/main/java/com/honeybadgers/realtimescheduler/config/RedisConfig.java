@@ -10,6 +10,8 @@ import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
 @EnableRedisRepositories(basePackages = "com.honeybadgers.realtimescheduler")
@@ -44,6 +46,8 @@ public class RedisConfig {
     public RedisTemplate<String, RedisTask> prioRedisTemplate() {
         RedisTemplate<String, RedisTask> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForPrioDatabase());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;
     }
 
@@ -51,6 +55,9 @@ public class RedisConfig {
     public RedisTemplate<String, RedisLock> lockRedisTemplate() {
         RedisTemplate<String, RedisLock> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
+
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;
     }
 
