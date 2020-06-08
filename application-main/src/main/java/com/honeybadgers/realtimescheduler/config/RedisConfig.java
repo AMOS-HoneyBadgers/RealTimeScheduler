@@ -44,6 +44,7 @@ public class RedisConfig {
     public RedisTemplate<String, RedisTask> prioRedisTemplate() {
         RedisTemplate<String, RedisTask> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForPrioDatabase());
+        //template.setStringSerializer();
         return template;
     }
 

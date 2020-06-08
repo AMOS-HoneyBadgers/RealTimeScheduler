@@ -104,6 +104,7 @@ public class SchedulerService implements ISchedulerService {
         RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
 
         if(redisTask == null){
+            logger.info("no task found, creating new");
             redisTask = createRedisTask(taskId);
         }
 
@@ -112,8 +113,12 @@ public class SchedulerService implements ISchedulerService {
             throw new RuntimeException("task could not be found in database");
 
         logger.info("Step 3: calculate priority with the Redis Task");
+        logger.info("redistask is: " + redisTask.toString());
         redisTask.setPriority(taskService.calculatePriority(task));
+        logger.info("prio was calculated, now at: + " + redisTask.getPriority());
+
         taskRedisRepository.save(redisTask);
+
 
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
 
@@ -125,8 +130,6 @@ public class SchedulerService implements ISchedulerService {
 
         } else
             logger.info("Scheduler is locked!");
-
-        logger.info("Task-id: " + redisTask.getId() + ", priority: " + redisTask.getPriority());
     }
 
     private void sendTaskstoDispatcher(List<RedisTask> tasks) {

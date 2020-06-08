@@ -3,9 +3,11 @@ package com.honeybadgers.realtimescheduler.web;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
+import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -36,17 +38,21 @@ public class TestController {
     @Autowired
     LockRedisRepository lockRedisRepository;
 
+    @Autowired
+    TaskRedisRepository taskRedisRepository;
+
+
     @GetMapping("/testtask/{priority}")
     public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
 
-        Task task = new Task();
+        /*Task task = new Task();
         task.setPriority(Integer.parseInt(priority));
         task.setId(UUID.randomUUID().toString());
         task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
 
 
-        schedulerService.scheduleTask(task.getId());
-        //sender.sendTaskToDispatcher(task.getId());
+        schedulerService.scheduleTask(task.getId());*/
+        sender.sendTaskToDispatcher("assassasa");
         return ResponseEntity.ok().build();
     }
 
@@ -71,6 +77,13 @@ public class TestController {
         else
             log.warn("######################### SUCCESS: " + get.toString());
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/test/schaub")
+    public ResponseEntity<?> testPrioRedis() {
+        //schedulerService.getAllRedisTasksAndSort();
+        Iterable<RedisTask> tasks = taskRedisRepository.findAll();
         return ResponseEntity.ok().build();
     }
 }
