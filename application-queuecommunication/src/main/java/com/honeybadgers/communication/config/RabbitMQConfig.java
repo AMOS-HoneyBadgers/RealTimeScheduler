@@ -55,7 +55,7 @@ public class RabbitMQConfig {
     @Qualifier("dispatcherqueue")
     @Bean
     Queue dispatcherqueue() {
-        return new Queue(dispatcherqueue, false);
+        return new Queue(dispatcherqueue, true);
     }
 
     @Qualifier("feedbackqueue")
