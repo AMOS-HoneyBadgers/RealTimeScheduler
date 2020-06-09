@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.realtimescheduler.repository;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.RedisLock;

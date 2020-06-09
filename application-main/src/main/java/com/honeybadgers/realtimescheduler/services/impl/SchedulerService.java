@@ -132,7 +132,7 @@ public class SchedulerService implements ISchedulerService {
             logger.info("Scheduler is locked!");
     }
 
-    private void sendTaskstoDispatcher(List<RedisTask> tasks) {
+    public void sendTaskstoDispatcher(List<RedisTask> tasks) {
         try {
             for(int i = 0; i < Integer.parseInt(dispatcherCapacity); i++) {
                 // TODO Transaction cause of Race conditon

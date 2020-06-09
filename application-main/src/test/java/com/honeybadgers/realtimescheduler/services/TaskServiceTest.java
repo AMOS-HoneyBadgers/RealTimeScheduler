@@ -58,6 +58,13 @@ public class TaskServiceTest {
     }
 
     @Test
+    public void testGetTaskById() {
+        TaskService spy = spy(service);
+        spy.getTaskById("123");
+        verify(taskPostgresRepository).findById("123");
+    }
+
+    @Test
     public void testCalculatePriority() {
         Task newTask = new Task();
         newTask.setId("TEST");

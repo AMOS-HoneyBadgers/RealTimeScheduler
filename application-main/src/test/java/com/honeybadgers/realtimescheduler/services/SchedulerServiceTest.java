@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.RedisLock;
+import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
@@ -13,14 +14,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.honeybadgers.realtimescheduler.services.impl.SchedulerService.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = SchedulerService.class)
@@ -36,7 +38,6 @@ public class SchedulerServiceTest {
     private LockRedisRepository lockRedisRepository;
 
     @MockBean
-
     private ICommunication sender;
 
     @Autowired
@@ -114,5 +115,35 @@ public class SchedulerServiceTest {
         when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
 
         assertFalse(service.isSchedulerLocked());
+    }
+
+
+    @Test(expected = RuntimeException.class)
+    public void sendTasksToDispatcherCantFindCapacityThrowsRuntimeException() {
+        SchedulerService spy = spy(service);
+        when(lockRedisRepository.findById(any())).thenReturn(null);
+        spy.sendTaskstoDispatcher(any());
+
+    }
+
+    @Test
+    public void sendTasksToDispatcher() {
+        RedisLock test = new RedisLock();
+        test.setId("ass");
+        test.setCapacity(1);
+
+        RedisTask task1 = new RedisTask();
+        task1.setId("123");
+        task1.setPriority(5);
+        List<RedisTask> tasks = new ArrayList<RedisTask>();
+        tasks.add(task1);
+
+        SchedulerService spy = spy(service);
+        when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
+        spy.sendTaskstoDispatcher(tasks);
+
+        assertEquals(test.getCapacity(), 0);
+        verify(lockRedisRepository).save(any());
+        verify(sender).sendTaskToDispatcher(task1.getId());
     }
 }
