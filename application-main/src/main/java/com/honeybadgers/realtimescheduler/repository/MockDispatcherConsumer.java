@@ -21,6 +21,6 @@ public class MockDispatcherConsumer {
         Thread.sleep((long) Math.random() * ((10000 - 1000) + 1) + 1000);
 
         // Send feedback back to scheduler
-        //sender.sendFeedbackToScheduler(message);
+        sender.sendFeedbackToScheduler(message);
     }
 }

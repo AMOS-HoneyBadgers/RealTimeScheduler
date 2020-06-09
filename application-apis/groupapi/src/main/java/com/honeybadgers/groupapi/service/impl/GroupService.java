@@ -32,6 +32,7 @@ public class GroupService implements IGroupService {
 
     @Autowired
     TaskRepository taskRepository;
+
     @Autowired
     ICommunication sender;
 

@@ -147,14 +147,20 @@ public class SchedulerService implements ISchedulerService {
                 if(capacity.getCapacity() < 1)
                     break;
 
+
+
                 // TODO locks, activeTimes, workingDays, ...
                 // else we decrease capacity and send task to dispatcher and delete from repository
-                // TODO delete TASK from repository after it was send
                 // TODO handle when dispatcher sends negative feedback
+                // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
+
+                RedisTask currentTask = tasks.get(i);
                 capacity.setCapacity(capacity.getCapacity()-1);
                 lockRedisRepository.save(capacity);
-                //taskRedisRepository.del
-                sender.sendTaskToDispatcher(tasks.get(i).getId());
+                System.out.println("deleting task from redis database");
+
+                taskRedisRepository.deleteById(currentTask.getId());
+                sender.sendTaskToDispatcher(currentTask.getId());
             }
         } catch(IndexOutOfBoundsException e) {
             logger.info("passt scho" + e.getMessage());
