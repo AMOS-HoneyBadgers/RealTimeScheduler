@@ -10,6 +10,7 @@ import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -43,6 +44,9 @@ public class SchedulerServiceTest {
     @Autowired
     private SchedulerService service;
 
+    @Value("${dispatcher.capacity.id}")
+    String dispatcherCapacityId;
+
 
     @Test
     public void testGetAllTasksAndSort() {
@@ -51,14 +55,61 @@ public class SchedulerServiceTest {
     }
 
     // TODO TEST ANPASSEN
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testScheduleTask() {
         Task t = new Task();
         t.setId("TEST");
+        t.setPriority(42);
+
+        RedisTask redisTask = new RedisTask();
+        redisTask.setId(t.getId());
+        RedisLock capacity = new RedisLock();
+        capacity.setCapacity(50);
+        SchedulerService spy = spy(service);
+        when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
+        when(lockRedisRepository.findById(dispatcherCapacityId)).thenReturn(Optional.of(capacity));
+        spy.scheduleTask(t.getId());
+
+        verify(taskRedisRepository).save(any());
+        verify(taskService).calculatePriority(t);
+        verify(spy).getAllRedisTasksAndSort();
+
+    }
+    @Test(expected = RuntimeException.class)
+    public void testIfTaskNotFoundThenThrow(){
+        Task t = new Task();
+        t.setId("TEST");
+        t.setPriority(42);
+        when(taskService.getTaskById(t.getId())).thenReturn(null);
         SchedulerService spy = spy(service);
         spy.scheduleTask(t.getId());
-        //verify(taskRedisRepository).save(any());
+    }
+    @Test
+    public void testIfSchedulerIsLockedDontSend(){
+        //if scheduler is locked then don't do anything
+        Task t = new Task();
+        t.setId("TEST");
+        t.setPriority(42);
+        when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
+        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.of(new RedisLock()));
+        SchedulerService spy = spy(service);
+        spy.scheduleTask(t.getId());
+        verify(spy, times(0)).sendTaskstoDispatcher(any());
+    }
 
+    @Test
+    public void testIfSchedulerGetsSpecialTrigger(){
+        //if scheduler is locked then don't do anything
+        Task t = new Task();
+        t.setId("SPECIAL_TRIGGER");
+
+        RedisLock capacity = new RedisLock();
+        capacity.setCapacity(50);
+        when(lockRedisRepository.findById(dispatcherCapacityId)).thenReturn(Optional.of(capacity));
+
+        SchedulerService spy = spy(service);
+        spy.scheduleTask(t.getId());
+        verify(spy).sendTaskstoDispatcher(any());
     }
 
     @Test
@@ -77,7 +128,6 @@ public class SchedulerServiceTest {
         String taskId = UUID.randomUUID().toString();
         String lockId = LOCKREDIS_TASK_PREFIX + taskId;
         when(lockRedisRepository.findById(lockId)).thenReturn(Optional.empty());
-
         assertFalse(service.isTaskLocked(taskId));
     }
 
@@ -123,7 +173,6 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
         when(lockRedisRepository.findById(any())).thenReturn(null);
         spy.sendTaskstoDispatcher(any());
-
     }
 
     @Test
