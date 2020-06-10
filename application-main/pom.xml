@@ -35,8 +35,6 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-
-
         <!-- https://mvnrepository.com/artifact/it.ozimov/embedded-redis -->
         <dependency>
             <groupId>it.ozimov</groupId>
@@ -61,6 +59,12 @@
             <version>3.1.0</version>
             <type>jar</type>
         </dependency>
+        <dependency>
+            <groupId>com.honeybadgers</groupId>
+            <artifactId>application-queuecommunication</artifactId>
+            <version>0.0.1-SNAPSHOT</version>
+        </dependency>
+
     </dependencies>
 
     <dependencyManagement>

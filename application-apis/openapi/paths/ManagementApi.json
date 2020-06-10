@@ -1,4 +1,107 @@
 {
+  "TaskStart": {
+    "put": {
+      "description": "Start scheduling task with given task_Id",
+      "parameters": [
+        {
+          "name": "task_Id",
+          "in": "path",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "required": true
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Task successfully queued for scheduling",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ResponseModel"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Error - task_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ErrorModel"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../ManagementApi.json#/components/responses/401"
+        }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
+    }
+  },
+  "TaskStop": {
+    "put": {
+      "description": "Stop scheduling task with given task_Id",
+      "requestBody": {
+        "description": "DateTime body which indicates, when to resume scheduling",
+        "required": false,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../ManagementApi.json#/components/schemas/DateTimeBody"
+            }
+          }
+        }
+      },
+      "parameters": [
+        {
+          "name": "task_Id",
+          "in": "path",
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "required": true
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Task successfully stopped scheduling",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ResponseModel"
+              }
+            }
+          }
+        },
+        "404": {
+          "description": "Error - task_Id not found",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "../ManagementApi.json#/components/schemas/ErrorModel"
+              }
+            }
+          }
+        },
+        "401": {
+          "$ref": "../ManagementApi.json#/components/responses/401"
+        }
+      },
+      "security": [
+        {
+          "basicAuth": []
+        }
+      ]
+    }
+  },
   "GroupStart": {
     "put": {
       "description": "Start scheduling all task assigned to group with given group_Id",
@@ -7,8 +110,7 @@
           "name": "group_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           },
           "required": true
         }
@@ -48,13 +150,23 @@
   "GroupStop": {
     "put": {
       "description": "Stop scheduling all task assigned to group with given group_Id",
+      "requestBody": {
+        "description": "DateTime body which indicates, when to resume scheduling",
+        "required": false,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../ManagementApi.json#/components/schemas/DateTimeBody"
+            }
+          }
+        }
+      },
       "parameters": [
         {
           "name": "group_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           },
           "required": true
         }
@@ -119,6 +231,17 @@
   "SchedulerStop": {
     "put": {
       "description": "Stop scheduler",
+      "requestBody": {
+        "description": "DateTime body which indicates, when to resume scheduling",
+        "required": false,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "../ManagementApi.json#/components/schemas/DateTimeBody"
+            }
+          }
+        }
+      },
       "responses": {
         "200": {
           "description": "Scheduler successfully stopped",

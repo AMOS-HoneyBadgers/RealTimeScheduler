@@ -8,6 +8,7 @@ import com.honeybadgers.taskapi.service.ITaskService;
 import com.honeybadgers.taskapi.utils.TestUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -46,8 +47,8 @@ public class DefaultApiControllerTest {
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isOk());
 
-        verify(taskservice, only())
-        .createTask(any(TaskModel.class));
+        verify(taskservice).createTask(any(TaskModel.class));
+        verify(taskservice).sendTaskToTaskEventQueue(Mockito.anyString());
     }
 
     @Test
@@ -64,7 +65,7 @@ public class DefaultApiControllerTest {
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isBadRequest());
 
-        verify(taskservice, only())
+        verify(taskservice)
                 .createTask(any(TaskModel.class));
     }
 
@@ -82,7 +83,7 @@ public class DefaultApiControllerTest {
                 .content(TestUtils.convertObjectToJsonBytes(testModel)))
                 .andExpect(status().isBadRequest());
 
-        verify(taskservice, only())
+        verify(taskservice)
                 .createTask(any(TaskModel.class));
     }
 

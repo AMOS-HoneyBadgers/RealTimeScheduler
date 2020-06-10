@@ -79,8 +79,7 @@
           "name": "group_Id",
           "in": "path",
           "schema": {
-            "type": "integer",
-            "format": "int64"
+            "type": "string"
           },
           "required": true
         }

@@ -5,6 +5,7 @@
  */
 package com.honeybadgers.managementapi.controllers;
 
+import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ErrorModel;
 import com.honeybadgers.managementapi.models.ResponseModel;
 import io.swagger.annotations.*;
@@ -28,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-29T17:06:47.871+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:10:06.339+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "group", description = "the group API")
@@ -57,7 +58,7 @@ public interface GroupApi {
     @RequestMapping(value = "/group/{group_Id}/start",
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> groupGroupIdStartPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<ResponseModel> groupGroupIdStartPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -77,6 +78,7 @@ public interface GroupApi {
      * Stop scheduling all task assigned to group with given group_Id
      *
      * @param groupId  (required)
+     * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
      * @return All tasks in group successfully stopped scheduling (status code 200)
      *         or Error - group_Id not found (status code 404)
      *         or Unauthorized (status code 401)
@@ -90,8 +92,9 @@ public interface GroupApi {
         @ApiResponse(code = 401, message = "Unauthorized", response = ErrorModel.class) })
     @RequestMapping(value = "/group/{group_Id}/stop",
         produces = { "application/json" }, 
+        consumes = { "application/json" },
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> groupGroupIdStopPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") Long groupId) {
+    default ResponseEntity<ResponseModel> groupGroupIdStopPut(@ApiParam(value = "",required=true) @PathVariable("group_Id") String groupId,@ApiParam(value = "DateTime body which indicates, when to resume scheduling"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

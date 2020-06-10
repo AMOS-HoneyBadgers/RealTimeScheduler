@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.model;
+package com.honeybadgers.models;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -13,4 +13,12 @@ public class RedisTask implements Serializable {
 
     private String id;
     private long priority;
+
+    @Override
+    public String toString() {
+        return "RedisTask{" +
+                "id='" + id + '\'' +
+                ", priority=" + priority +
+                '}';
+    }
 }
