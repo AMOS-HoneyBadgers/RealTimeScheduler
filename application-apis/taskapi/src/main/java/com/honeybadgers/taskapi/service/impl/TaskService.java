@@ -25,7 +25,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Service
+
 public class TaskService implements ITaskService {
 
     static final Logger logger = LogManager.getLogger(TaskService.class);
@@ -160,29 +160,5 @@ public class TaskService implements ITaskService {
         taskQueueModel.setTypeFlagEnum(task.getTypeFlag().getValue());
         sender.sendTaskToPriorityQueue(taskQueueModel);
     }
-
-    private TaskModel convertTaskToTaskmodel(Task task) {
-        TaskModel taskmodel = new TaskModel();
-
-        taskmodel.setId(UUID.fromString(task.getId()));
-        taskmodel.setGroupId(task.getGroup().getId());
-        taskmodel.setPriority(task.getPriority());
-       // taskmodel.setActiveTimes(task.getActiveTimeFrames());
-       // taskmodel.setWorkingDays(task.getWorkingDays());
-       // taskmodel.setStatus(task.getStatus());
-       // taskmodel.setMode();
-      //  taskmodel.setTypeFlag();
-        //taskmodel.setForce();
-        taskmodel.setRetries(task.getRetries());
-        //taskmodel.setPaused();
-        taskmodel.setIndexNumber(task.getIndexNumber());
-       // taskmodel.setDeadline(task.getDeadline());
-       // taskmodel.setMeta(task.getMetaData());
-
-
-        return taskmodel;
-    }
-
-
 
 }
