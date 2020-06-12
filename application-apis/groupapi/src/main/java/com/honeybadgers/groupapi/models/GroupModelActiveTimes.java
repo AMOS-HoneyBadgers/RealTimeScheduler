@@ -19,6 +19,9 @@ public class GroupModelActiveTimes {
         return this;
     }
 
+    public GroupModelActiveTimes() {
+    }
+
     public GroupModelActiveTimes(ActiveTimes activeTimes) {
         this.from = activeTimes.getFrom();
         this.to = activeTimes.getTo();
