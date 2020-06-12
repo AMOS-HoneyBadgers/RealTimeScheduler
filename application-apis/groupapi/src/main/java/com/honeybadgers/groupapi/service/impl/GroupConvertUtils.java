@@ -40,7 +40,9 @@ public class GroupConvertUtils implements IGroupConvertUtils {
 
         Group newGroup = new Group();
         newGroup.setId(groupModel.getId());
-        Group parent = groupRepository.findById(groupModel.getParentId()).orElse(null);
+        Group parent = null;
+        if(groupModel.getParentId() != null)
+            parent = groupRepository.findById(groupModel.getParentId()).orElse(null);
         // check if parent was found if specified
         if(groupModel.getParentId() != null && parent == null)
             throw new NoSuchElementException("Parent Group does not exist");
@@ -58,9 +60,11 @@ public class GroupConvertUtils implements IGroupConvertUtils {
         newGroup.setModeEnum(ModeEnum.getFromString(groupModel.getMode().getValue()));
         newGroup.setTypeFlagEnum(TypeFlagEnum.getFromString(groupModel.getTypeFlag().getValue()));
 
-        newGroup.setPriority(groupModel.getPriority());
+        if(groupModel.getPriority() != null)
+            newGroup.setPriority(groupModel.getPriority());
 
-        newGroup.setPaused(groupModel.getPaused());
+        if(groupModel.getPaused() != null)
+            newGroup.setPaused(groupModel.getPaused());
         newGroup.setParallelismDegree(groupModel.getParallelismDegree());
         newGroup.setLastIndexNumber(groupModel.getLastIndexNumber());
 
@@ -79,8 +83,8 @@ public class GroupConvertUtils implements IGroupConvertUtils {
         model.setDeadline(timestampJpaToRest(group.getDeadline()));
         model.setWorkingDays(intArrayToBoolList(group.getWorkingDays()));
         model.setLastIndexNumber(group.getLastIndexNumber());
-        model.setMode(GroupModel.ModeEnum.fromValue(group.getModeEnum().toString()));
-        model.setTypeFlag(GroupModel.TypeFlagEnum.fromValue(group.getTypeFlagEnum().toString()));
+        model.setMode(GroupModel.ModeEnum.fromValue(group.getModeEnum().toString().toLowerCase()));
+        model.setTypeFlag(GroupModel.TypeFlagEnum.fromValue(group.getTypeFlagEnum().toString().toLowerCase()));
         model.setPriority(group.getPriority());
         model.setPaused(group.isPaused());
         model.setParallelismDegree(group.getParallelismDegree());
