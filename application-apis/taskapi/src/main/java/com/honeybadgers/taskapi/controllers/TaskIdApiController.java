@@ -35,4 +35,18 @@ public class TaskIdApiController implements TaskIdApi {
         logger.info("Test taskIdGet with taskId: {}", () -> taskId);
         return ResponseEntity.ok(new TaskModel());
     }
+
+    /**
+     * DELETE /{task_Id}
+     * Delete task from Database
+     *
+     * @param taskId (required)
+     * @return Task was deleted successfully (status code 200)
+     * or Error while deleting task - task_id not found (status code 404)
+     * or Unauthorized (status code 401)
+     */
+    @Override
+    public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
+        return null;
+    }
 }

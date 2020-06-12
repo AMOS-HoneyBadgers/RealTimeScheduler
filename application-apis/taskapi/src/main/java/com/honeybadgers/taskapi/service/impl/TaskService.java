@@ -13,12 +13,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 
 import java.sql.Timestamp;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -34,6 +38,19 @@ public class TaskService implements ITaskService {
 
     @Autowired
     ICommunication sender;
+
+    @Override
+    public List<TaskModel> getAllTasks() {
+        List<TaskModel> taskModelList = new LinkedList<TaskModel>();
+
+       // Pageable PageXwithTwentyElements = PageRequest.of(0, 20);
+        //taskRepository.findAll(PageXwithTwentyElements);
+        List<Task> taskList = taskRepository.findAll();
+
+
+
+        return taskModelList;
+    }
 
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
@@ -122,6 +139,7 @@ public class TaskService implements ITaskService {
         return newTask;
     }
 
+
     @Override
     public void sendTaskToTaskEventQueue(String taskId) {
         sender.sendTaskToTasksQueue(taskId);
@@ -142,4 +160,29 @@ public class TaskService implements ITaskService {
         taskQueueModel.setTypeFlagEnum(task.getTypeFlag().getValue());
         sender.sendTaskToPriorityQueue(taskQueueModel);
     }
+
+    private TaskModel convertTaskToTaskmodel(Task task) {
+        TaskModel taskmodel = new TaskModel();
+
+        taskmodel.setId(UUID.fromString(task.getId()));
+        taskmodel.setGroupId(task.getGroup().getId());
+        taskmodel.setPriority(task.getPriority());
+       // taskmodel.setActiveTimes(task.getActiveTimeFrames());
+       // taskmodel.setWorkingDays(task.getWorkingDays());
+       // taskmodel.setStatus(task.getStatus());
+       // taskmodel.setMode();
+      //  taskmodel.setTypeFlag();
+        //taskmodel.setForce();
+        taskmodel.setRetries(task.getRetries());
+        //taskmodel.setPaused();
+        taskmodel.setIndexNumber(task.getIndexNumber());
+       // taskmodel.setDeadline(task.getDeadline());
+       // taskmodel.setMeta(task.getMetaData());
+
+
+        return taskmodel;
+    }
+
+
+
 }
