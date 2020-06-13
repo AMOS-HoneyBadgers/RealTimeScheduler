@@ -1,9 +1,11 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.Group;
 import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.models.Task;
+import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SchedulerService implements ISchedulerService {
@@ -52,6 +55,9 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     ICommunication sender;
 
+    @Autowired
+    GroupPostgresRepository groupPostgresRepository;
+
 
     @Override
     public RedisTask createRedisTask(String taskId){
@@ -68,6 +74,27 @@ public class SchedulerService implements ISchedulerService {
         Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
 
         return sortedList;
+    }
+
+    public int getLimitFromGroup(String groupId) {
+        int minLimit;
+
+        Group childGroup = groupPostgresRepository.findById(groupId).orElse(null);
+        if(childGroup == null)
+            throw new RuntimeException("no group found for id +" + groupId);
+
+        minLimit = childGroup.getParallelismDegree();
+
+        while(childGroup.getParentGroup() != null) {
+            Group parentGroup = groupPostgresRepository.findById(childGroup.getParentGroup().getId()).orElse(null);
+            if(parentGroup == null)
+                break;
+
+            minLimit = Math.min(minLimit, parentGroup.getParallelismDegree());
+            childGroup = parentGroup;
+        }
+
+        return minLimit;
     }
 
     @Override
@@ -93,6 +120,19 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String taskId) {
+
+        try {
+            UUID id = UUID.fromString(taskId);
+            logger.info(id);
+        } catch(Exception e) {
+            logger.info(e.getMessage());
+            return;
+        }
+
+        if(taskId.startsWith("Test"))
+            return;
+
+
         //Special case: gets trigger from feedback -> TODO in new QUEUE
         if(taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(this.getAllRedisTasksAndSort());
@@ -135,6 +175,7 @@ public class SchedulerService implements ISchedulerService {
     public void sendTaskstoDispatcher(List<RedisTask> tasks) {
         try {
             for(int i = 0; i < Integer.parseInt(dispatcherCapacity); i++) {
+
                 // TODO Transaction cause of Race conditon
                 // Search for capacity and set value -1
                 RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
@@ -160,6 +201,7 @@ public class SchedulerService implements ISchedulerService {
                 System.out.println("deleting task from redis database");
 
                 taskRedisRepository.deleteById(currentTask.getId());
+
                 sender.sendTaskToDispatcher(currentTask.getId());
             }
         } catch(IndexOutOfBoundsException e) {

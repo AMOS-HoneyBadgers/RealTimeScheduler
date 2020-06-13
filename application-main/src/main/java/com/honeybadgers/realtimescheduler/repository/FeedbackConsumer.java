@@ -40,13 +40,13 @@ public class FeedbackConsumer {
         }
 
         // Race condition TODO Transaction
-        // When the scheduler receives Feedback, the increase capacity by value X
+        // When the scheduler receives Feedback, the increase capacity by 1
         capacity.setCapacity(capacity.getCapacity()+1);
         lockRedisRepository.save(capacity);
         System.out.println("Step 6: Increased capacity is now at :" + capacity.getCapacity());
 
 
-
+        // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
         // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered in a new QUEUE atm just workaround
         //sender.sendTaskToTasksQueue(scheduler_trigger);
         System.out.println("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
