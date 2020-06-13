@@ -62,9 +62,11 @@ public class SchedulerServiceTest {
     // TODO TEST ANPASSEN
     @Test
     public void testScheduleTask() {
+        Group group = createGroupTestObject();
         Task t = new Task();
         t.setId("TEST");
         t.setPriority(42);
+        t.setGroup(group);
 
         RedisTask redisTask = new RedisTask();
         redisTask.setId(t.getId());
@@ -91,10 +93,13 @@ public class SchedulerServiceTest {
     }
     @Test
     public void testIfSchedulerIsLockedDontSend(){
+        Group group = createGroupTestObject();
         //if scheduler is locked then don't do anything
         Task t = new Task();
         t.setId("TEST");
         t.setPriority(42);
+        t.setGroup(group);
+
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.of(new RedisLock()));
         SchedulerService spy = spy(service);
@@ -184,7 +189,7 @@ public class SchedulerServiceTest {
     public void sendTasksToDispatcher() {
         RedisLock test = new RedisLock();
         test.setId("ass");
-        test.setCurrentTasks(1);
+        test.setCurrentTasks(0);
 
         RedisTask task1 = new RedisTask();
         task1.setId("123");
@@ -192,18 +197,23 @@ public class SchedulerServiceTest {
         List<RedisTask> tasks = new ArrayList<RedisTask>();
         tasks.add(task1);
 
-        Group group = new Group();
-        group.setId("456");
-        group.setParallelismDegree(10);
-        group.setParentGroup(null);
+        Group group = createGroupTestObject();
 
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(any())).thenReturn(group);
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
         spy.sendTaskstoDispatcher(tasks);
 
-        assertEquals(test.getCurrentTasks(), 2);
+        assertEquals(test.getCurrentTasks(), 1);
         verify(lockRedisRepository).save(any());
         verify(sender).sendTaskToDispatcher(task1.getId());
+    }
+
+    private Group createGroupTestObject() {
+        Group group = new Group();
+        group.setId("456");
+        group.setParallelismDegree(10);
+        group.setParentGroup(null);
+        return group;
     }
 }
