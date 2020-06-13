@@ -4,7 +4,9 @@ import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.ResponseModel;
+import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
+import com.honeybadgers.models.Group;
 import com.honeybadgers.models.UnknownEnumException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +15,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T15:31:54.117+02:00[Europe/Berlin]")
 
 @Controller
@@ -22,6 +27,9 @@ public class DefaultApiController implements DefaultApi {
 
     @Autowired
     IGroupService groupService;
+
+    @Autowired
+    IGroupConvertUtils convertUtils;
 
     private final NativeWebRequest request;
 
@@ -62,5 +70,13 @@ public class DefaultApiController implements DefaultApi {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<List<GroupModel>> rootGet() {
+
+        List<Group> groups = groupService.getAllGroups();
+
+        return ResponseEntity.ok(groups.stream().map(group -> convertUtils.groupJpaToRest(group)).collect(Collectors.toList()));
     }
 }
