@@ -49,10 +49,6 @@ public class SchedulerServiceTest {
     @Autowired
     private SchedulerService service;
 
-    @Value("${dispatcher.capacity.id}")
-    String dispatcherCapacityId;
-
-
     @Test
     public void testGetAllTasksAndSort() {
         // TODO IMPLEMENT @Christoff and @Stan
@@ -75,7 +71,6 @@ public class SchedulerServiceTest {
         capacity.setCurrentTasks(50);
         SchedulerService spy = spy(service);
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
-        when(lockRedisRepository.findById(dispatcherCapacityId)).thenReturn(Optional.of(capacity));
         spy.scheduleTask(t.getId());
 
         verify(taskRedisRepository).save(any());
