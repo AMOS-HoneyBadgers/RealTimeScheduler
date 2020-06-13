@@ -12,12 +12,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
+import java.util.NoSuchElementException;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -49,13 +51,41 @@ public class TaskIdApiControllerTest {
     @Test
     public void testGetTaskByIdNotFound() throws Exception {
         UUID taskId = UUID.randomUUID();
+        when(taskservice.getTaskById(taskId)).thenThrow(new NoSuchElementException());
+
         mvc.perform(get("/api/task/" + taskId.toString())
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
+
+        verify(taskservice).getTaskById(taskId);
     }
 
     @Test
-    public void testDeleteTaskById(){
+    public void testDeleteTaskById() throws Exception {
+        UUID taskId = UUID.randomUUID();
+        when(taskservice.deleteTask(taskId)).thenReturn(new TaskModel().id(taskId));
 
+        MvcResult mvcResult = mvc.perform(delete("/api/task/" + taskId.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andReturn();
+
+        verify(taskservice).deleteTask(taskId);
+
+        String response = mvcResult.getResponse().getContentAsString();
+        assertTrue(response.contains(taskId.toString()));
     }
+
+    @Test
+    public void testDeleteTaskByIdNotFound() throws Exception {
+        UUID taskId = UUID.randomUUID();
+        when(taskservice.deleteTask(taskId)).thenThrow(new NoSuchElementException());
+
+         mvc.perform(delete("/api/task/" + taskId.toString())
+                .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound());
+
+        verify(taskservice).deleteTask(taskId);
+    }
+
 }

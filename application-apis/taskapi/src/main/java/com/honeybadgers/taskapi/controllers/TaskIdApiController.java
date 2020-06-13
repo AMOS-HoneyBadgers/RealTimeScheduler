@@ -93,7 +93,7 @@ public class TaskIdApiController implements TaskIdApi {
         try{
             restModel = taskservice.deleteTask(taskId);
         }catch(NoSuchElementException e){
-            ResponseEntity.notFound().build();
+           return ResponseEntity.notFound().build();
         }
 
         return ResponseEntity.ok(restModel);
