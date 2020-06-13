@@ -77,8 +77,9 @@ public class SchedulerServiceTest {
         verify(spy).getAllRedisTasksAndSort();
 
     }
+
     @Test(expected = RuntimeException.class)
-    public void testIfTaskNotFoundThenThrow(){
+    public void testIfTaskNotFoundThenThrow() {
         Task t = new Task();
         t.setId("TEST");
         t.setPriority(42);
@@ -86,8 +87,9 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
         spy.scheduleTask(t.getId());
     }
+
     @Test
-    public void testIfSchedulerIsLockedDontSend(){
+    public void testIfSchedulerIsLockedDontSend() {
         Group group = createGroupTestObject();
         //if scheduler is locked then don't do anything
         Task t = new Task();
@@ -219,7 +221,7 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void testGetActiveTimesForTaskOnlyTaskHasActiveTimes(){
+    public void testGetActiveTimesForTask_OnlyTaskHasActiveTimes() {
 
         Task task = new Task();
         task.setId("TEST");
@@ -230,27 +232,77 @@ public class SchedulerServiceTest {
         task.setGroup(parentGroup);
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
-
         Assert.assertEquals(spy.getActiveTimesForTask(task), activeTimes);
     }
 
     @Test
-    public void testCheckIfTaskIsInActiveTimeOnlyTaskHasActiveTime(){
-
-        // TODO
+    public void testGetActiveTimesForTask_TaskAndParentHaveActiveTimes() {
+        //prepare Task
         Task task = new Task();
+        task.setId("TEST");
+        List<ActiveTimes> activeTimes = new ArrayList<ActiveTimes>();
+        ActiveTimes taskaktivetime = new ActiveTimes();
+        taskaktivetime.setFrom(new Time(100));
+        taskaktivetime.setTo(new Time(200));
+        activeTimes.add(taskaktivetime);
+        task.setActiveTimeFrames(activeTimes);
+        //prepare ParentGroup
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        List<ActiveTimes> parentactiveTimes = new ArrayList<>();
+        parentGroup.setActiveTimeFrames(parentactiveTimes);
+        //setParentGroup for task
+        task.setGroup(parentGroup);
+        //Act
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+        //Arrange active times of parent group must be returned
+        Assert.assertEquals(spy.getActiveTimesForTask(task), parentactiveTimes);
+    }
+
+    @Test
+    public void testGetActiveTimesForTask_TaskParentAndGrandParentHaveActiveTimes() {
+        //prepare Task
+        Task task = new Task();
+        task.setId("TEST");
+        List<ActiveTimes> activeTimes = new ArrayList<ActiveTimes>();
+        ActiveTimes taskaktivetime = new ActiveTimes();
+        taskaktivetime.setFrom(new Time(100));
+        taskaktivetime.setTo(new Time(200));
+        activeTimes.add(taskaktivetime);
+        task.setActiveTimeFrames(activeTimes);
+        //prepare ParentGroup
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        List<ActiveTimes> parentactiveTimes = new ArrayList<>();
+        ActiveTimes parentactiveTime = new ActiveTimes();
+        parentactiveTime.setFrom(new Time(400));
+        parentactiveTime.setTo(new Time(600));
+        parentactiveTimes.add(parentactiveTime);
+        parentGroup.setActiveTimeFrames(parentactiveTimes);
+        //prepare GrandParentGroup
+        Group grandparentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        List<ActiveTimes> grandparentactiveTimes = new ArrayList<>();
+        ActiveTimes grandparentactiveTime = new ActiveTimes();
+        grandparentactiveTime.setFrom(new Time(800));
+        grandparentactiveTime.setTo(new Time(1000));
+        grandparentactiveTimes.add(grandparentactiveTime);
+        grandparentGroup.setActiveTimeFrames(grandparentactiveTimes);
+        //setParentGroup for task
+        task.setGroup(parentGroup);
+        parentGroup.setParentGroup(grandparentGroup);
+        //Act
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+        when(groupService.getGroupById(parentGroup.getParentGroup().getId())).thenReturn(grandparentGroup);
+        //Arrange active times of grandparent group must be returned
+        Assert.assertEquals(spy.getActiveTimesForTask(task), grandparentactiveTimes);
 
     }
 
     @Test
-    public void testCheckIfTaskIsInActiveTimeTaskAndGroupHasActiveTime(){
-
-        // TODO
-        Task task = new Task();
-
-    }
-    @Test
-    public void testCheckIfTaskIsInActiveTimeGroupAndParentGroupHasActiveTime(){
+    public void testCheckIfTaskIsInActiveTimeGroupAndParentGroupHasActiveTime() {
 
         // TODO
         Task task = new Task();
