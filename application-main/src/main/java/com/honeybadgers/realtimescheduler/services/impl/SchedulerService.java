@@ -72,7 +72,6 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public boolean isTaskLocked(String taskId) {
-        // TODO check if scheduler or any group (INCLUDING PARENTS!!!) is locked
         String lockId = LOCKREDIS_TASK_PREFIX + taskId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
@@ -125,7 +124,7 @@ public class SchedulerService implements ISchedulerService {
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if(!isSchedulerLocked()) {
             // scheduler not locked -> can send
-            System.out.println("Step 4: send Tasks to dispatcher");
+            logger.info("Step 4: send Tasks to dispatcher");
             sendTaskstoDispatcher(tasks);
 
         } else
@@ -144,23 +143,35 @@ public class SchedulerService implements ISchedulerService {
                 logger.info("current capacity of dispatcher: +" + capacity.getCapacity());
 
                 // If there is no capacity, we wont send any tasks to dispatcher anymore
-                if(capacity.getCapacity() < 1)
+                if(capacity.getCapacity() < 1) {
+                    logger.debug("Capacity reached! -> break;");
                     break;
-
-
+                }
 
                 // TODO locks, activeTimes, workingDays, ...
-                // else we decrease capacity and send task to dispatcher and delete from repository
                 // TODO handle when dispatcher sends negative feedback
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
 
+                // else we decrease capacity and send task to dispatcher and delete from repository
                 RedisTask currentTask = tasks.get(i);
+
+                // check if task is paused
+                if(isTaskLocked(currentTask.getId())) {
+                    logger.debug("Task with id " + currentTask.getId() + " is currently paused!");
+                    continue;
+                }
+
                 capacity.setCapacity(capacity.getCapacity()-1);
                 lockRedisRepository.save(capacity);
-                System.out.println("deleting task from redis database");
+                logger.debug("Updated capacity to: " + capacity.getCapacity());
 
-                taskRedisRepository.deleteById(currentTask.getId());
+                // sending to queue
                 sender.sendTaskToDispatcher(currentTask.getId());
+                logger.info("Sent task to dispatcher queue");
+
+                // delete from scheduling repository
+                taskRedisRepository.deleteById(currentTask.getId());
+                logger.info("Deleted task from redis database");
             }
         } catch(IndexOutOfBoundsException e) {
             logger.info("passt scho" + e.getMessage());
