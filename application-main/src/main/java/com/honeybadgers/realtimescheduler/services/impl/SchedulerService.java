@@ -187,22 +187,25 @@ public class SchedulerService implements ISchedulerService {
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
 
                 RedisTask currentTask = tasks.get(i);
-
                 String groupParlallelName = "GROUP_PREFIX_PARLELLISM_CURRENT_TASKS_RUNNING_FOR_GROUP" + currentTask.getGroupid();
 
+
+                // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
                 RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
                 if(currentParallelismDegree == null)
-                    createGroupParallelismTracker(groupParlallelName);
-
-                // If there is no capacity, we wont send any tasks to dispatcher anymore
-                if(capacity.getCapacity() < 1)
-                    break;
+                    currentParallelismDegree = createGroupParallelismTracker(groupParlallelName);
 
 
-                capacity.setCapacity(capacity.getCapacity()-1);
-                lockRedisRepository.save(capacity);
-                System.out.println("deleting task from redis database");
+                // get Limit and compare if we are allowed to send new Tasks to Dispatcher
+                int limit = getLimitFromGroup(currentTask.getGroupid());
+                if(currentParallelismDegree.getCurrentTasks() >= limit)
+                    return;
 
+                // Task will be send to dispatcher, change currentTasks + 1
+                currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
+                lockRedisRepository.save(currentParallelismDegree);
+
+                logger.info("deleting task from redis database");
                 taskRedisRepository.deleteById(currentTask.getId());
 
                 sender.sendTaskToDispatcher(currentTask.getId());
@@ -212,9 +215,10 @@ public class SchedulerService implements ISchedulerService {
         }
     }
 
-    private void createGroupParallelismTracker(String id) {
+    private RedisLock createGroupParallelismTracker(String id) {
         RedisLock curr = new RedisLock();
         curr.setId(id);
         lockRedisRepository.save(curr);
+        return curr;
     }
 }
