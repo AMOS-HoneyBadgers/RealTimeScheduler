@@ -31,8 +31,9 @@ public class FeedbackConsumer {
 
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String message) throws InterruptedException {
-        System.out.println("Step 5: Received feedback from dispatcher");
         // Race condition TODO Transaction
+        // TODO HANDLE NEGATIVE FEEDBACK
+        System.out.println("Step 5: Received feedback from dispatcher");
 
         Task currentTask = service.getTaskById(message).orElse(null);
         if(currentTask == null)
@@ -45,7 +46,12 @@ public class FeedbackConsumer {
             throw new RuntimeException("no parlallelismdegree found in redis database for task:   " + message);
 
         // When the scheduler receives Feedback, the tasks is finished and current running tasks can be decreased by 1
-        currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() - 1);
+        // is not allowed to be 0 according to datev requirements, check here
+        if(currentParallelismDegree.getCurrentTasks() -1 >= 0 )
+            currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() - 1);
+        else
+            currentParallelismDegree.setCurrentTasks(0);
+
         lockRedisRepository.save(currentParallelismDegree);
         System.out.println("Step 6: Decreased current_tasks is now at :" + currentParallelismDegree.getCurrentTasks());
 
