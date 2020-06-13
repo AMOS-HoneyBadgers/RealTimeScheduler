@@ -61,8 +61,14 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public RedisTask createRedisTask(String taskId){
+        Task currentTask = taskService.getTaskById(taskId).orElse(null);
+        if(currentTask == null)
+            throw new RuntimeException("could not find task with id:" + currentTask);
+
         RedisTask redisTask = new RedisTask();
         redisTask.setId(taskId);
+        redisTask.setGroupid(currentTask.getGroup().getId());
+        
         return redisTask;
     }
 
@@ -178,9 +184,7 @@ public class SchedulerService implements ISchedulerService {
 
                 // TODO Transaction cause of Race conditon
                 // Search for capacity and set value -1
-                RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
-                if(capacity == null)
-                    throw new RuntimeException("ERROR dispatcher capacity was not found in redis database");
+
 
                 logger.info("current capacity of dispatcher: +" + capacity.getCapacity());
 
@@ -191,11 +195,18 @@ public class SchedulerService implements ISchedulerService {
 
 
                 // TODO locks, activeTimes, workingDays, ...
-                // else we decrease capacity and send task to dispatcher and delete from repository
                 // TODO handle when dispatcher sends negative feedback
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
 
                 RedisTask currentTask = tasks.get(i);
+
+                //RedisLock currentParallelismDegree = lockRedisRepository.findById(currentTask).orElse(null);
+                if(capacity == null)
+                    throw new RuntimeException("ERROR dispatcher capacity was not found in redis database");
+
+
+
+
                 capacity.setCapacity(capacity.getCapacity()-1);
                 lockRedisRepository.save(capacity);
                 System.out.println("deleting task from redis database");
