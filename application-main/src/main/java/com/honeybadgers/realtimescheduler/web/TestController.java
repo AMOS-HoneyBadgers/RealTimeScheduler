@@ -2,6 +2,8 @@ package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
+import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -43,6 +45,9 @@ public class TestController {
 
     @Autowired
     TaskRedisRepository taskRedisRepository;
+
+    @Autowired
+    GroupPostgresRepository groupPostgresRepository;
 
 
     @GetMapping("/testtask/{priority}")
@@ -94,6 +99,26 @@ public class TestController {
         log.info("################## findAll: " + (tasksList != null ? tasksList.size() : null));
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/test/ancestor")
+    public ResponseEntity<?> testAncestorQuery() {
+        log.warn("################## BEFORE QUERY");
+
+        List<Group> allGroups = groupPostgresRepository.findAll();
+        if(allGroups.size() == 0) {
+            log.info("NO GROUPS IN DB -> TEST IMPOSSIBLE!");
+            return ResponseEntity.badRequest().body("NO GROUPS IN DB -> TEST IMPOSSIBLE!");
+        }
+        GroupAncestorModel ancestorModel = groupPostgresRepository.getAllAncestorIdsFromGroup(allGroups.get(0).getId()).orElse(null);
+        if(ancestorModel == null) {
+            log.info("QUERY RETURNED NULL -> FAILURE (took first Id from DB -> ancestorModel should not be null)");
+            return ResponseEntity.badRequest().body("QUERY RETURNED NULL -> FAILURE");
+        }
+
+        log.info("################## QUERY RET: " + ancestorModel.toString());
+
+        return ResponseEntity.ok(ancestorModel);
     }
 
     @PostMapping("/test/capacity")

@@ -10,6 +10,7 @@ import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
 import javax.persistence.Column;
+import java.util.Arrays;
 
 @TypeDefs({
         @TypeDef(name = "string-array", typeClass = StringArrayType.class)
@@ -26,4 +27,12 @@ public class GroupAncestorModel {
     @Type(type = "string-array")
     @Column(name = "ancestors", columnDefinition = "character varying[]")
     private String[] ancestors;
+
+    @Override
+    public String toString() {
+        return "GroupAncestorModel{" +
+                "id='" + id + '\'' +
+                ", ancestors=" + Arrays.toString(ancestors) +
+                '}';
+    }
 }

@@ -170,17 +170,6 @@ public class SchedulerServiceTest {
         assertFalse(service.isSchedulerLocked());
     }
 
-
-    @Test
-    public void sendTasksToDispatcher_cantFindCapacity() {
-        when(lockRedisRepository.findById(any())).thenReturn(Optional.empty());
-
-        Exception e = assertThrows(RuntimeException.class, () -> service.sendTaskstoDispatcher(any()));
-
-        assertNotNull(e);
-        assertEquals("ERROR dispatcher capacity was not found in redis database", e.getMessage());
-    }
-
     @Test
     public void sendTasksToDispatcher() {
         RedisLock test = new RedisLock();
@@ -217,7 +206,7 @@ public class SchedulerServiceTest {
     public void sendTasksToDispatcher_taskPaused() {
         RedisLock test = new RedisLock();
         test.setId("ass");
-        test.setCapacity(1);
+        test.setCurrentTasks(0);
 
         RedisTask task1 = new RedisTask();
         task1.setId("123");
@@ -240,7 +229,7 @@ public class SchedulerServiceTest {
         spy.sendTaskstoDispatcher(tasks);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
-        assertEquals(1, test.getCapacity());
+        assertEquals(0, test.getCurrentTasks());
         verify(lockRedisRepository, never()).save(any());
         verify(sender, never()).sendTaskToDispatcher(task1.getId());
         verify(taskRedisRepository, never()).deleteById(task1.getId());
@@ -250,7 +239,7 @@ public class SchedulerServiceTest {
     public void sendTasksToDispatcher_groupPaused() {
         RedisLock test = new RedisLock();
         test.setId("ass");
-        test.setCapacity(1);
+        test.setCurrentTasks(0);
 
         RedisTask task1 = new RedisTask();
         task1.setId("123");
@@ -274,7 +263,7 @@ public class SchedulerServiceTest {
         spy.sendTaskstoDispatcher(tasks);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
-        assertEquals(1, test.getCapacity());
+        assertEquals(0, test.getCurrentTasks());
         verify(lockRedisRepository, never()).save(any());
         verify(sender, never()).sendTaskToDispatcher(task1.getId());
         verify(taskRedisRepository, never()).deleteById(task1.getId());

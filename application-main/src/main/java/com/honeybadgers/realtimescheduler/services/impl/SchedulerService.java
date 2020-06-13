@@ -5,8 +5,6 @@ import com.honeybadgers.models.Group;
 import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.models.Task;
-import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
-import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -21,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class SchedulerService implements ISchedulerService {
@@ -158,7 +155,6 @@ public class SchedulerService implements ISchedulerService {
 
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
 
-        // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if(!isSchedulerLocked()) {
             // scheduler not locked -> can send
             logger.info("Step 4: send Tasks to dispatcher");
@@ -177,8 +173,8 @@ public class SchedulerService implements ISchedulerService {
                 // TODO handle when dispatcher sends negative feedback
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
                 RedisTask currentTask = tasks.get(i);
-                logger.info("Checking task and groups on paused.");
 
+                logger.info("Checking task and groups on paused.");
                 // check if task is paused
                 if(isTaskLocked(currentTask.getId())) {
                     logger.info("Task with id " + currentTask.getId() + " is currently paused!");
@@ -202,8 +198,8 @@ public class SchedulerService implements ISchedulerService {
                 if(pausedFound)
                     continue;
 
+                logger.info("Checking parallelism degree.");
                 String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
-
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
                 RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
@@ -224,7 +220,6 @@ public class SchedulerService implements ISchedulerService {
                 logger.info("current_tasks is now increased to : " + currentParallelismDegree.getCurrentTasks());
                 lockRedisRepository.save(currentParallelismDegree);
 
-                logger.info("deleting task from redis database");
                 // sending to queue
                 sender.sendTaskToDispatcher(currentTask.getId());
                 logger.info("Sent task to dispatcher queue");
