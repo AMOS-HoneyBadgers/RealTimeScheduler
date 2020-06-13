@@ -73,6 +73,7 @@ public class TaskServiceTest {
         assertEquals(3, restModelList.size());
     }
 
+
     @Test
     public void testCreateTask() throws JpaException, UnknownEnumException, CreationException {
 
