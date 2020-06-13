@@ -9,18 +9,20 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 import org.hibernate.annotations.TypeDefs;
 
-import javax.persistence.Column;
+import javax.persistence.*;
 import java.util.Arrays;
 
 @TypeDefs({
         @TypeDef(name = "string-array", typeClass = StringArrayType.class)
 })
+@Entity
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class GroupAncestorModel {
 
+    @Id
     @Column(name="id", unique = true, nullable = false)
     private String id;
 

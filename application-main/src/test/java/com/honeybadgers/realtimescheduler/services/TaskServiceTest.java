@@ -3,7 +3,7 @@ package com.honeybadgers.realtimescheduler.services;
 import com.honeybadgers.models.Group;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
-import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
+import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.junit.Assert;
@@ -33,7 +33,7 @@ public class TaskServiceTest {
     private TaskPostgresRepository taskPostgresRepository;
 
     @MockBean
-    private GroupPostgresRepository groupPostgresRepository;
+    GroupAncestorRepository groupAncestorRepository;
 
     @Autowired
     private TaskService service;
@@ -130,7 +130,7 @@ public class TaskServiceTest {
         ancestorModel.setAncestors(new String[] {parent.getId()});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
-        when(groupPostgresRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
+        when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
 
         List<String> groups = service.getRecursiveGroupsOfTask(task.getId());
 
@@ -202,7 +202,7 @@ public class TaskServiceTest {
         ancestorModel.setAncestors(new String[] {parent.getId()});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
-        when(groupPostgresRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
+        when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
 
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 
@@ -229,7 +229,7 @@ public class TaskServiceTest {
         ancestorModel.setAncestors(new String[] {parent.getId(), null});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
-        when(groupPostgresRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
+        when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
 
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 

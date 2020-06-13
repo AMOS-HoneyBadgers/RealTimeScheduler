@@ -6,17 +6,16 @@ import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +25,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/data")        // only initialize if one of the given profiles is active
 @Slf4j
+@EntityScan(basePackages = {"com.honeybadgers.models", "com.honeybadgers.realtimescheduler.model"})
 public class TestController {
 
     @Autowired
@@ -47,7 +47,7 @@ public class TestController {
     TaskRedisRepository taskRedisRepository;
 
     @Autowired
-    GroupPostgresRepository groupPostgresRepository;
+    GroupAncestorRepository groupAncestorRepository;
 
 
     @GetMapping("/testtask/{priority}")
@@ -101,19 +101,14 @@ public class TestController {
         return ResponseEntity.ok().build();
     }
 
-    @PostMapping("/test/ancestor")
-    public ResponseEntity<?> testAncestorQuery() {
+    @PostMapping("/test/ancestor/{groupId}")
+    public ResponseEntity<?> testAncestorQuery(@PathVariable(value = "groupId") final String groupId) {
         log.warn("################## BEFORE QUERY");
 
-        List<Group> allGroups = groupPostgresRepository.findAll();
-        if(allGroups.size() == 0) {
-            log.info("NO GROUPS IN DB -> TEST IMPOSSIBLE!");
-            return ResponseEntity.badRequest().body("NO GROUPS IN DB -> TEST IMPOSSIBLE!");
-        }
-        GroupAncestorModel ancestorModel = groupPostgresRepository.getAllAncestorIdsFromGroup(allGroups.get(0).getId()).orElse(null);
+        GroupAncestorModel ancestorModel = groupAncestorRepository.getAllAncestorIdsFromGroup(groupId).orElse(null);
         if(ancestorModel == null) {
-            log.info("QUERY RETURNED NULL -> FAILURE (took first Id from DB -> ancestorModel should not be null)");
-            return ResponseEntity.badRequest().body("QUERY RETURNED NULL -> FAILURE");
+            log.info("QUERY RETURNED NULL -> FAILURE/GROUPID INVALID");
+            return ResponseEntity.badRequest().body("QUERY RETURNED NULL -> FAILURE/GROUPID INVALID");
         }
 
         log.info("################## QUERY RET: " + ancestorModel.toString());

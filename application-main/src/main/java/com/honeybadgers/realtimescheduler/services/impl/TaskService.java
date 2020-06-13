@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
@@ -26,7 +27,7 @@ public class TaskService implements ITaskService {
     TaskPostgresRepository taskPostgresRepository;
 
     @Autowired
-    GroupPostgresRepository groupPostgresRepository;
+    GroupAncestorRepository groupAncestorRepository;
 
     @Value("${com.realtimescheduler.scheduler.priority.deadline-modifier}")
     double deadlineModifier;
@@ -57,7 +58,7 @@ public class TaskService implements ITaskService {
         if(task.getGroup() == null)
             throw new IllegalStateException("CRITICAL: found task with taskId " + taskId + " which has no group -> THIS SHOULD NOT HAVE HAPPENED (DB enforces this)!");
 
-        GroupAncestorModel ancestorModel = groupPostgresRepository.getAllAncestorIdsFromGroup(task.getGroup().getId()).orElse(null);
+        GroupAncestorModel ancestorModel = groupAncestorRepository.getAllAncestorIdsFromGroup(task.getGroup().getId()).orElse(null);
         if(ancestorModel == null) {
             logger.info("Found no ancestor model for group with groupId " + task.getGroup().getId());
             return new ArrayList<>();
