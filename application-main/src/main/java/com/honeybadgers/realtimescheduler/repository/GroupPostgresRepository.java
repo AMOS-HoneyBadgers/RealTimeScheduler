@@ -19,6 +19,6 @@ public interface GroupPostgresRepository extends JpaRepository<Group, String> {
      * @param groupId groupId you want to have all ancestors of
      * @return GroupAncestorModel containing id of wanted group and String[] of the ids of all ancestors
      */
-    @Query(value = "WITH RECURSIVE tree AS (SELECT id, ARRAY[]::CHARACTER VARYING[] AS ancestorsFROM public.group WHERE parent_id IS NULLUNION ALLSELECT g.id, t.ancestors || g.parent_idFROM public.group as g, tree as tWHERE g.parent_id = t.id) SELECT * FROM tree WHERE id=?1", nativeQuery = true)
+    @Query(value = "WITH RECURSIVE tree AS (SELECT id, ARRAY[]::CHARACTER VARYING[] AS ancestors FROM public.group WHERE parent_id IS NULL UNION ALL SELECT g.id, t.ancestors || g.parent_id FROM public.group as g, tree as t WHERE g.parent_id = t.id) SELECT * FROM tree WHERE id=?1", nativeQuery = true)
     Optional<GroupAncestorModel> getAllAncestorIdsFromGroup(String groupId);
 }

@@ -164,7 +164,7 @@ public class SchedulerService implements ISchedulerService {
                     logger.info("Task with id " + currentTask.getId() + " is currently paused!");
                     continue;
                 }
-                // get group with ancestors
+                // get group with ancestors (IllegalArgExc not needed to be caught, because currentTask.getId() cannot be null)
                 List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
                 // check groups on paused

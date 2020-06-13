@@ -48,6 +48,8 @@ public class TaskService implements ITaskService {
     @Transactional
     public List<String> getRecursiveGroupsOfTask(String taskId) {
         // TODO transactions
+        if(taskId == null)
+            throw new IllegalArgumentException("taskId must not be null!");
         Task task = getTaskById(taskId).orElse(null);
         if(task == null)
             throw new NoSuchElementException("Task with taskId " + taskId + " not found!");
@@ -61,13 +63,15 @@ public class TaskService implements ITaskService {
             return new ArrayList<>();
         }
         // assert, that the ancestor model contains no null values
-        assert ancestorModel.getId() != null && ancestorModel.getAncestors() != null;
+        if(ancestorModel.getId() == null || ancestorModel.getAncestors() == null)
+            throw new IllegalStateException("AncestorModel received from repository contains null values!");
 
-        List<String> groups = Collections.singletonList(ancestorModel.getId());
+        List<String> groups = new ArrayList<>(Collections.singletonList(ancestorModel.getId()));
         groups.addAll(Arrays.asList(ancestorModel.getAncestors()));
 
         // assert, that list will not contain null
-        assert !groups.contains(null);
+        if(groups.contains(null))
+            throw new IllegalStateException("Ancestor list contains null values!");
         logger.info("Found " + groups.size() + " groups/ancestors for taskId " + taskId);
         return groups;
     }
