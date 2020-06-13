@@ -56,8 +56,7 @@ public class FeedbackConsumer {
         System.out.println("Step 6: Decreased current_tasks is now at :" + currentParallelismDegree.getCurrentTasks());
 
         // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
-        // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered in a new QUEUE atm just workaround
-        //sender.sendTaskToTasksQueue(scheduler_trigger);
+        sender.sendTaskToTasksQueue(scheduler_trigger);
         System.out.println("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
     }
 }

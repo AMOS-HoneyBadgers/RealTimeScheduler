@@ -125,7 +125,7 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String taskId) {
-        //Special case: gets trigger from feedback -> TODO in new QUEUE
+        //Special case: gets trigger from feedback -> TODO in new QUEUE if necessary
         if(taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(this.getAllRedisTasksAndSort());
             return;
@@ -185,8 +185,11 @@ public class SchedulerService implements ISchedulerService {
 
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
                 int limit = getLimitFromGroup(currentTask.getGroupid());
-                if(currentParallelismDegree.getCurrentTasks() >= limit)
-                    return;
+                if(currentParallelismDegree.getCurrentTasks() >= limit) {
+                    logger.info("limit for parallelism is reached, no more tasks for this group can be accepted by dispatcher");
+                    continue;
+                }
+
 
                 // Task will be send to dispatcher, change currentTasks + 1
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
