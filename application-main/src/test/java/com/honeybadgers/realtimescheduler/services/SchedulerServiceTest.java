@@ -15,10 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.honeybadgers.realtimescheduler.services.impl.SchedulerService.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -168,11 +165,14 @@ public class SchedulerServiceTest {
     }
 
 
-    @Test(expected = RuntimeException.class)
-    public void sendTasksToDispatcherCantFindCapacityThrowsRuntimeException() {
-        SchedulerService spy = spy(service);
-        when(lockRedisRepository.findById(any())).thenReturn(null);
-        spy.sendTaskstoDispatcher(any());
+    @Test
+    public void sendTasksToDispatcher_cantFindCapacity() {
+        when(lockRedisRepository.findById(any())).thenReturn(Optional.empty());
+
+        Exception e = assertThrows(RuntimeException.class, () -> service.sendTaskstoDispatcher(any()));
+
+        assertNotNull(e);
+        assertEquals("ERROR dispatcher capacity was not found in redis database", e.getMessage());
     }
 
     @Test
@@ -189,10 +189,85 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
+
+        // mock everything related to isPaused
+        when(lockRedisRepository.findById(LOCKREDIS_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
+        when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>());
+
+        doNothing().when(taskRedisRepository).deleteById(task1.getId());
+
         spy.sendTaskstoDispatcher(tasks);
 
-        assertEquals(test.getCapacity(), 0);
+        assertEquals(0, test.getCapacity());
         verify(lockRedisRepository).save(any());
         verify(sender).sendTaskToDispatcher(task1.getId());
+        verify(taskRedisRepository).deleteById(task1.getId());
+    }
+
+    @Test
+    public void sendTasksToDispatcher_taskPaused() {
+        RedisLock test = new RedisLock();
+        test.setId("ass");
+        test.setCapacity(1);
+
+        RedisTask task1 = new RedisTask();
+        task1.setId("123");
+        task1.setPriority(5);
+        List<RedisTask> tasks = new ArrayList<RedisTask>();
+        tasks.add(task1);
+
+        RedisLock taskLock = new RedisLock();
+        taskLock.setId(LOCKREDIS_TASK_PREFIX + task1.getId());
+
+        SchedulerService spy = spy(service);
+        when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
+
+        // mock everything related to isPaused
+        when(lockRedisRepository.findById(taskLock.getId())).thenReturn(Optional.of(taskLock));
+        when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>());
+
+        doNothing().when(taskRedisRepository).deleteById(task1.getId());
+
+        spy.sendTaskstoDispatcher(tasks);
+
+        // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
+        assertEquals(1, test.getCapacity());
+        verify(lockRedisRepository, never()).save(any());
+        verify(sender, never()).sendTaskToDispatcher(task1.getId());
+        verify(taskRedisRepository, never()).deleteById(task1.getId());
+    }
+
+    @Test
+    public void sendTasksToDispatcher_groupPaused() {
+        RedisLock test = new RedisLock();
+        test.setId("ass");
+        test.setCapacity(1);
+
+        RedisTask task1 = new RedisTask();
+        task1.setId("123");
+        task1.setPriority(5);
+        List<RedisTask> tasks = new ArrayList<RedisTask>();
+        tasks.add(task1);
+
+        RedisLock groupLock = new RedisLock();
+        groupLock.setId(LOCKREDIS_GROUP_PREFIX + "testGroup");
+
+        SchedulerService spy = spy(service);
+        when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
+
+        // mock everything related to isPaused
+        when(lockRedisRepository.findById(LOCKREDIS_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
+        when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>(Collections.singleton("testGroup")));
+        when(lockRedisRepository.findById(groupLock.getId())).thenReturn(Optional.of(groupLock));
+
+        doNothing().when(taskRedisRepository).deleteById(task1.getId());
+
+        spy.sendTaskstoDispatcher(tasks);
+
+        // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
+        assertEquals(1, test.getCapacity());
+        verify(lockRedisRepository, never()).save(any());
+        verify(sender, never()).sendTaskToDispatcher(task1.getId());
+        verify(taskRedisRepository, never()).deleteById(task1.getId());
     }
 }
