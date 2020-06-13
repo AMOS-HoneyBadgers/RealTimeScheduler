@@ -68,6 +68,7 @@ public class SchedulerServiceTest {
         t.setPriority(42);
         t.setGroup(group);
 
+
         RedisTask redisTask = new RedisTask();
         redisTask.setId(t.getId());
         RedisLock capacity = new RedisLock();
