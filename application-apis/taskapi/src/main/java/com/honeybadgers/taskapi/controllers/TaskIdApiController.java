@@ -1,5 +1,6 @@
 package com.honeybadgers.taskapi.controllers;
 
+import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -7,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
+
+import javax.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,10 +33,35 @@ public class TaskIdApiController implements TaskIdApi {
         return Optional.ofNullable(request);
     }
 
+    /**
+     * GET /{task_Id}
+     * Return task by task_Id from Database
+     *
+     * @param taskId (required)
+     * @return Task was returned successfully (status code 200)
+     * or Error while retrieving task - task_Id not found (status code 404)
+     * or Unauthorized (status code 401)
+     */
     @Override
     public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
         logger.info("Test taskIdGet with taskId: {}", () -> taskId);
         return ResponseEntity.ok(new TaskModel());
+    }
+
+    /**
+     * POST /{task_Id}
+     * Update task in Database
+     *
+     * @param taskId    (required)
+     * @param taskModel Task object (required)
+     * @return New task was updated successfully (status code 200)
+     * or Error while updating task - invalid task model (status code 400)
+     * or Error while updating task - task_id not found (status code 404)
+     * or Unauthorized (status code 401)
+     */
+    @Override
+    public ResponseEntity<ResponseModel> taskIdPost(UUID taskId, @Valid TaskModel taskModel) {
+        return null;
     }
 
     /**

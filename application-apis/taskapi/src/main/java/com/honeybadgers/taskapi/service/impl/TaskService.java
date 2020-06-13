@@ -8,6 +8,7 @@ import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.repository.GroupRepository;
 import com.honeybadgers.taskapi.repository.TaskRepository;
+import com.honeybadgers.taskapi.service.ITaskConvertUtils;
 import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -39,15 +40,20 @@ public class TaskService implements ITaskService {
     @Autowired
     ICommunication sender;
 
+    @Autowired
+    ITaskConvertUtils converter;
+
     @Override
     public List<TaskModel> getAllTasks() {
-        List<TaskModel> taskModelList = new LinkedList<TaskModel>();
-
+        List<TaskModel> taskModelList;
        // Pageable PageXwithTwentyElements = PageRequest.of(0, 20);
         //taskRepository.findAll(PageXwithTwentyElements);
         List<Task> taskList = taskRepository.findAll();
 
-
+        taskModelList = taskList.stream().map(t -> {
+            TaskModel restModel = converter.taskJpaToRest(t);
+            return restModel;
+        }).collect(Collectors.toList());
 
         return taskModelList;
     }

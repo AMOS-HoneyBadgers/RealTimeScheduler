@@ -18,6 +18,9 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
     @Override
     public TaskModel taskJpaToRest(Task task) {
+        if(task == null)
+            return null;
+
         TaskModel taskmodel = new TaskModel();
 
         taskmodel.setId(UUID.fromString(task.getId()));

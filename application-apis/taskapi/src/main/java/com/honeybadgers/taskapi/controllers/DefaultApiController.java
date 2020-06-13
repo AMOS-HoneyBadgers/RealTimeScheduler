@@ -54,9 +54,7 @@ public class DefaultApiController implements DefaultApi {
      */
     @Override
     public ResponseEntity<List<TaskModel>> rootGet() {
-
         List<TaskModel> list = taskService.getAllTasks();
-
         return ResponseEntity.ok(list);
     }
 
