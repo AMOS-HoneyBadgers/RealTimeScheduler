@@ -142,6 +142,15 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public TaskModel getTaskById(UUID taskid) {
+        Task task = taskRepository.findById(taskid.toString()).orElse(null);
+        if(task == null)
+            throw new NoSuchElementException("No existing Task with ID: " + taskid);
+
+        return converter.taskJpaToRest(task);
+    }
+
+    @Override
     public TaskModel deleteTask(UUID taskid) {
         Task task = taskRepository.findById(taskid.toString()).orElse(null);
         if(task == null)
@@ -150,6 +159,7 @@ public class TaskService implements ITaskService {
         taskRepository.deleteById(taskid.toString());
         return converter.taskJpaToRest(task);
     }
+
 
     @Override
     public void sendTaskToTaskEventQueue(String taskId) {

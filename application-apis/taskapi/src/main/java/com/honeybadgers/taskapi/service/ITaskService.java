@@ -18,6 +18,7 @@ public interface ITaskService {
     Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
     List<TaskModel> getAllTasks();
     TaskModel deleteTask(UUID taskid);
+    TaskModel getTaskById(UUID taskid);
     void sendTaskToTaskEventQueue(String taskId);
     //TODO specify which type should be sent to the dispatcher
     void sendTaskToPriorityQueue(TaskModel task);

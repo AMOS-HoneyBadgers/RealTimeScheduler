@@ -146,6 +146,31 @@ public class TaskServiceTest {
     }
 
     @Test
+    public void getTaskById(){
+        Task task = generateFullTask(0);
+        TaskModel taskmodel = new TaskModel();
+        taskmodel.setId(UUID.fromString(task.getId()));
+
+        when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+        when(converter.taskJpaToRest(task)).thenReturn(taskmodel);
+
+        TaskModel requestedTask = taskService.deleteTask(UUID.fromString(task.getId()));
+
+        assertNotNull(requestedTask);
+        assertEquals(task.getId(), requestedTask.getId().toString());
+    }
+
+    @Test
+    public void getNonExistingTaskByI(){
+        UUID id = UUID.randomUUID();
+        when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.deleteTask(id));
+        assertNotNull(e);
+        assertEquals("No existing Task with ID: " + id, e.getMessage());
+    }
+
+    @Test
     public void testDeleteTask(){
         Task task = generateFullTask(0);
         TaskModel taskmodel = new TaskModel();

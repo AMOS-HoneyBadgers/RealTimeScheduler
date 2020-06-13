@@ -50,10 +50,15 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
-        
+        TaskModel restModel = null;
 
-        logger.info("Test taskIdGet with taskId: {}", () -> taskId);
-        return ResponseEntity.ok(new TaskModel());
+        try{
+            restModel = taskservice.getTaskById(taskId);
+        }catch(NoSuchElementException e){
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(restModel);
     }
 
     /**
@@ -83,10 +88,6 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
-        ResponseModel response = new ResponseModel();
-        response.setCode("200");
-        response.setMessage("Success");
-
         TaskModel restModel = null;
 
         try{
