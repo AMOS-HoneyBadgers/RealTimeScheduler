@@ -13,12 +13,14 @@ public class RedisTask implements Serializable {
 
     private String id;
     private long priority;
+    private String groupid;
 
     @Override
     public String toString() {
         return "RedisTask{" +
                 "id='" + id + '\'' +
                 ", priority=" + priority +
+                ", groupid=" + groupid +
                 '}';
     }
 }

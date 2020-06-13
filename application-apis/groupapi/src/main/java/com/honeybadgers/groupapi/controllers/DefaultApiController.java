@@ -57,7 +57,7 @@ public class DefaultApiController implements DefaultApi {
 
         try {
             groupService.createGroup(groupModel);
-            groupService.sendGroupToTaskEventQueue(groupModel.getId());
+            //groupService.sendGroupToTaskEventQueue(groupModel.getId());
         } catch (UnknownEnumException e) {
             // Should never happen, due to GroupModel being validated (validates, if model is of Enum)
             response.setCode("400");

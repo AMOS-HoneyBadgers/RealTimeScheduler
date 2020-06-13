@@ -18,7 +18,7 @@ public class MockDispatcherConsumer {
         System.out.println("Received message in Mock Dispatcher'{}'" + message);
 
         // Mock Feedback, sleep between 1 and 10 seconds until feedback is sent back to the dispatcher
-        Thread.sleep((long) Math.random() * ((10000 - 1000) + 1) + 1000);
+        Thread.sleep((long) Math.random() * ((20000 - 10000) + 1) + 10000);
 
         // Send feedback back to scheduler
         sender.sendFeedbackToScheduler(message);

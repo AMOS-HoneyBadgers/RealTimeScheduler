@@ -1,12 +1,15 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.Group;
 import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
@@ -18,6 +21,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class SchedulerService implements ISchedulerService {
@@ -32,11 +36,8 @@ public class SchedulerService implements ISchedulerService {
     public static final String LOCKREDIS_GROUP_PREFIX = "GROUP:";
 
 
-    @Value("${dispatcher.capacity.id}")
-    String dispatcherCapacityId;
-
-    @Value("${dispatcher.capacity}")
-    String dispatcherCapacity;
+    @Value("${scheduler.group.runningtasks}")
+    String LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS;
 
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
@@ -53,11 +54,20 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     ICommunication sender;
 
+    @Autowired
+    IGroupService groupService;
+
 
     @Override
     public RedisTask createRedisTask(String taskId){
+        Task currentTask = taskService.getTaskById(taskId).orElse(null);
+        if(currentTask == null)
+            throw new RuntimeException("could not find task with id:" + currentTask);
+
         RedisTask redisTask = new RedisTask();
         redisTask.setId(taskId);
+        redisTask.setGroupid(currentTask.getGroup().getId());
+
         return redisTask;
     }
 
@@ -69,6 +79,28 @@ public class SchedulerService implements ISchedulerService {
         Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
 
         return sortedList;
+    }
+
+    public int getLimitFromGroup(String groupId) {
+        int minLimit;
+
+        Group childGroup = groupService.getGroupById(groupId);
+        if(childGroup == null || childGroup.getParallelismDegree() == null)
+            throw new RuntimeException("no group or parlellismdegree found for id +" + groupId);
+
+        minLimit = childGroup.getParallelismDegree();
+
+        while(childGroup.getParentGroup() != null) {
+            Group parentGroup = groupService.getGroupById(childGroup.getParentGroup().getId());
+            if(parentGroup == null)
+                break;
+
+            minLimit = Math.min(minLimit, parentGroup.getParallelismDegree());
+            childGroup = parentGroup;
+        }
+
+        logger.info("limit is now at: " + minLimit);
+        return minLimit;
     }
 
     @Override
@@ -97,7 +129,7 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String taskId) {
-        //Special case: gets trigger from feedback -> TODO in new QUEUE
+        //Special case: gets trigger from feedback -> TODO in new QUEUE if necessary
         if(taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(this.getAllRedisTasksAndSort());
             return;
@@ -138,21 +170,9 @@ public class SchedulerService implements ISchedulerService {
 
     public void sendTaskstoDispatcher(List<RedisTask> tasks) {
         try {
-            for(int i = 0; i < Integer.parseInt(dispatcherCapacity); i++) {
+            for(int i = 0; i < 100; i++) {
+
                 // TODO Transaction cause of Race conditon
-                // Search for capacity and set value -1
-                RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
-                if(capacity == null)
-                    throw new RuntimeException("ERROR dispatcher capacity was not found in redis database");
-
-                logger.info("current capacity of dispatcher: +" + capacity.getCapacity());
-
-                // If there is no capacity, we wont send any tasks to dispatcher anymore
-                if(capacity.getCapacity() < 1) {
-                    logger.debug("Capacity reached! -> break;");
-                    break;
-                }
-
                 // TODO locks, activeTimes, workingDays, ...
                 // TODO handle when dispatcher sends negative feedback
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
@@ -182,12 +202,29 @@ public class SchedulerService implements ISchedulerService {
                 if(pausedFound)
                     continue;
 
+                String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
-                // decrease capacity, send task to dispatcher and delete from repository
-                capacity.setCapacity(capacity.getCapacity()-1);
-                lockRedisRepository.save(capacity);
-                logger.info("Updated capacity to: " + capacity.getCapacity());
 
+                // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
+                RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
+                if(currentParallelismDegree == null)
+                    currentParallelismDegree = createGroupParallelismTracker(groupParlallelName);
+
+
+                // get Limit and compare if we are allowed to send new Tasks to Dispatcher
+                int limit = getLimitFromGroup(currentTask.getGroupid());
+                if(currentParallelismDegree.getCurrentTasks() >= limit) {
+                    logger.info("limit for parallelism is reached, no more tasks for this group can be accepted by dispatcher");
+                    continue;
+                }
+
+
+                // Task will be send to dispatcher, change currentTasks + 1
+                currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
+                logger.info("current_tasks is now increased to : " + currentParallelismDegree.getCurrentTasks());
+                lockRedisRepository.save(currentParallelismDegree);
+
+                logger.info("deleting task from redis database");
                 // sending to queue
                 sender.sendTaskToDispatcher(currentTask.getId());
                 logger.info("Sent task to dispatcher queue");
@@ -199,5 +236,12 @@ public class SchedulerService implements ISchedulerService {
         } catch(IndexOutOfBoundsException e) {
             logger.info("passt scho" + e.getMessage());
         }
+    }
+
+    private RedisLock createGroupParallelismTracker(String id) {
+        RedisLock curr = new RedisLock();
+        curr.setId(id);
+        lockRedisRepository.save(curr);
+        return curr;
     }
 }

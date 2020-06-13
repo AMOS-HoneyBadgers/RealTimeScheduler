@@ -18,9 +18,14 @@ public class TaskConsumer {
 
     @RabbitListener(queues="tasks", containerFactory = "taskcontainerFactory")
     public void receiveTask(String message) {
-        System.out.println("Received message in TaskConsumer with id: '{}'" + message);
+        System.out.println("Received message in TaskConsumer with id:" + message);
         System.out.println("Step 1: scheduling Task");
-        service.scheduleTask(message);
+        try {
+            service.scheduleTask(message);
+        } catch(Exception e) {
+            System.out.println(e.getMessage());
+        }
+
     }
 
     @RabbitListener(queues="priority", containerFactory = "priorityContainerFactory")
