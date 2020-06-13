@@ -4,6 +4,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.models.Task;
+import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
@@ -72,6 +73,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public boolean isTaskLocked(String taskId) {
+        if (taskId == null)
+            throw new IllegalArgumentException("Given taskId was null!");
         String lockId = LOCKREDIS_TASK_PREFIX + taskId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
@@ -79,6 +82,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public boolean isGroupLocked(String groupId) {
+        if (groupId == null)
+            throw new IllegalArgumentException("Given groupId was null!");
         String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
@@ -151,19 +156,37 @@ public class SchedulerService implements ISchedulerService {
                 // TODO locks, activeTimes, workingDays, ...
                 // TODO handle when dispatcher sends negative feedback
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
-
-                // else we decrease capacity and send task to dispatcher and delete from repository
                 RedisTask currentTask = tasks.get(i);
+                logger.info("Checking task and groups on paused.");
 
                 // check if task is paused
                 if(isTaskLocked(currentTask.getId())) {
-                    logger.debug("Task with id " + currentTask.getId() + " is currently paused!");
+                    logger.info("Task with id " + currentTask.getId() + " is currently paused!");
                     continue;
                 }
+                // get group with ancestors
+                List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
+                // check groups on paused
+                boolean pausedFound = false;
+                for (String groupId : groupsOfTask) {
+                    // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
+                    if(isGroupLocked(groupId)) {
+                        // group is paused -> break inner loop for checking group on paused
+                        pausedFound = true;
+                        logger.info("Found paused group with groupId " + groupId);
+                        break;
+                    }
+                }
+                // paused found in inner loop -> continue outer loop
+                if(pausedFound)
+                    continue;
+
+
+                // decrease capacity, send task to dispatcher and delete from repository
                 capacity.setCapacity(capacity.getCapacity()-1);
                 lockRedisRepository.save(capacity);
-                logger.debug("Updated capacity to: " + capacity.getCapacity());
+                logger.info("Updated capacity to: " + capacity.getCapacity());
 
                 // sending to queue
                 sender.sendTaskToDispatcher(currentTask.getId());

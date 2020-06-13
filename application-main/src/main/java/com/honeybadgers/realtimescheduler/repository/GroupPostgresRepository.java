@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface GroupPostgresRepository extends JpaRepository<Group, String> {
@@ -19,5 +20,5 @@ public interface GroupPostgresRepository extends JpaRepository<Group, String> {
      * @return GroupAncestorModel containing id of wanted group and String[] of the ids of all ancestors
      */
     @Query(value = "WITH RECURSIVE tree AS (SELECT id, ARRAY[]::CHARACTER VARYING[] AS ancestorsFROM public.group WHERE parent_id IS NULLUNION ALLSELECT g.id, t.ancestors || g.parent_idFROM public.group as g, tree as tWHERE g.parent_id = t.id) SELECT * FROM tree WHERE id=?1", nativeQuery = true)
-    GroupAncestorModel getAllAncestorIdsFromGroup(String groupId);
+    Optional<GroupAncestorModel> getAllAncestorIdsFromGroup(String groupId);
 }
