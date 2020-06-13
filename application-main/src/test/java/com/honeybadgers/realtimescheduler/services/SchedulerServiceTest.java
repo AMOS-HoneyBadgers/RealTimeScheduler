@@ -194,10 +194,16 @@ public class SchedulerServiceTest {
         tasks.add(task1);
 
         Group group = createGroupTestObject();
+        Task task = new Task();
+        task.setId("TEST");
+        task.setGroup(group);
+        task.setActiveTimeFrames(null);
 
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(any())).thenReturn(group);
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
+
         spy.sendTaskstoDispatcher(tasks);
 
         assertEquals(test.getCurrentTasks(), 1);

@@ -16,6 +16,8 @@ import org.springframework.stereotype.Service;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -219,13 +221,18 @@ public class SchedulerService implements ISchedulerService {
         Date to = new Date();
         List<ActiveTimes> activeTimes = new ArrayList<ActiveTimes>();
         SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
+        DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
         try {
-            current = parser.parse(LocalDate.now().toString());
+            current = parser.parse(dateTimeFormatter.format(LocalDateTime.now()));
         } catch (ParseException e) {
             e.printStackTrace();
         }
 
         activeTimes = getActiveTimesForTask(task);
+        if(activeTimes == null){
+            return true;
+        }
         for(ActiveTimes activeTime : activeTimes){
             try {
                 from = parser.parse(activeTime.getFrom().toString());
