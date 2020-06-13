@@ -34,11 +34,8 @@ public class SchedulerService implements ISchedulerService {
     public static final String LOCKREDIS_GROUP_PREFIX = "GROUP:";
 
 
-    @Value("${dispatcher.capacity.id}")
-    String dispatcherCapacityId;
-
-    @Value("${dispatcher.capacity}")
-    String dispatcherCapacity;
+    @Value("${scheduler.group.runningtasks}")
+    String LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS;
 
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
@@ -179,7 +176,7 @@ public class SchedulerService implements ISchedulerService {
 
     public void sendTaskstoDispatcher(List<RedisTask> tasks) {
         try {
-            for(int i = 0; i < Integer.parseInt(dispatcherCapacity); i++) {
+            for(int i = 0; i < 100; i++) {
 
                 // TODO Transaction cause of Race conditon
                 // TODO locks, activeTimes, workingDays, ...
@@ -187,7 +184,7 @@ public class SchedulerService implements ISchedulerService {
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
 
                 RedisTask currentTask = tasks.get(i);
-                String groupParlallelName = "GROUP_PREFIX_PARLELLISM_CURRENT_TASKS_RUNNING_FOR_GROUP" + currentTask.getGroupid();
+                String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0

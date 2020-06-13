@@ -18,12 +18,6 @@ public class FeedbackConsumer {
     @Autowired
     public LockRedisRepository lockRedisRepository;
 
-    @Value("${dispatcher.capacity}")
-    String dispatcherCapacity;
-
-    @Value("${dispatcher.capacity.id}")
-    String dispatcherCapacityId;
-
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
@@ -31,17 +25,17 @@ public class FeedbackConsumer {
     public void receiveFeedbackFromDispatcher(String message) throws InterruptedException {
         System.out.println("Step 5: Received feedback from dispatcher");
 
-        RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
+        /*RedisLock capacity = lockRedisRepository.findById(dispatcherCapacityId).orElse(null);
         // if capacity can not be found, something went wrong in the startup of the scheduler
         if(capacity == null){
             throw new RuntimeException("capacity could not be found in database");
-        }
+        }*
 
         // Race condition TODO Transaction
         // When the scheduler receives Feedback, the increase capacity by 1
         capacity.setCurrentTasks(capacity.getCurrentTasks()+1);
         lockRedisRepository.save(capacity);
-        System.out.println("Step 6: Increased capacity is now at :" + capacity.getCurrentTasks());
+        System.out.println("Step 6: Increased capacity is now at :" + capacity.getCurrentTasks());*/
 
 
         // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
