@@ -2,14 +2,17 @@ package com.honeybadgers.taskapi.controllers;
 
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
+import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +25,9 @@ public class TaskIdApiController implements TaskIdApi {
     final static Logger logger = LogManager.getLogger(TaskIdApiController.class);
 
     private final NativeWebRequest request;
+
+    @Autowired
+    ITaskService taskservice;
 
     @org.springframework.beans.factory.annotation.Autowired
     public TaskIdApiController(NativeWebRequest request) {
@@ -44,6 +50,8 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
+        
+
         logger.info("Test taskIdGet with taskId: {}", () -> taskId);
         return ResponseEntity.ok(new TaskModel());
     }
@@ -75,6 +83,18 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
-        return null;
+        ResponseModel response = new ResponseModel();
+        response.setCode("200");
+        response.setMessage("Success");
+
+        TaskModel restModel = null;
+
+        try{
+            restModel = taskservice.deleteTask(taskId);
+        }catch(NoSuchElementException e){
+            ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(restModel);
     }
 }

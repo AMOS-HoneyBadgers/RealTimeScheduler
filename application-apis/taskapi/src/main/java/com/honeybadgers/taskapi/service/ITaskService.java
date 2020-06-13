@@ -9,6 +9,7 @@ import com.honeybadgers.taskapi.models.TaskModel;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 
 @Service
@@ -16,6 +17,7 @@ public interface ITaskService {
 
     Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
     List<TaskModel> getAllTasks();
+    TaskModel deleteTask(UUID taskid);
     void sendTaskToTaskEventQueue(String taskId);
     //TODO specify which type should be sent to the dispatcher
     void sendTaskToPriorityQueue(TaskModel task);

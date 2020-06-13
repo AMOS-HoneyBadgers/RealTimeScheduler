@@ -12,6 +12,7 @@ import com.honeybadgers.taskapi.repository.TaskRepository;
 import com.honeybadgers.taskapi.service.impl.TaskService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -142,6 +143,33 @@ public class TaskServiceTest {
 
         Exception e = assertThrows(CreationException.class, () -> taskService.createTask(restModel));
         assertEquals("Group of task has other groups as children: TestGroup, TestGroup2 -> aborting!", e.getMessage());
+    }
+
+    @Test
+    public void testDeleteTask(){
+        Task task = generateFullTask(0);
+        TaskModel taskmodel = new TaskModel();
+        taskmodel.setId(UUID.fromString(task.getId()));
+
+        when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
+        doNothing().when(taskRepository).deleteById(anyString());
+        when(converter.taskJpaToRest(task)).thenReturn(taskmodel);
+
+        TaskModel deletedTask = taskService.deleteTask(UUID.fromString(task.getId()));
+
+        assertNotNull(deletedTask);
+        assertEquals(task.getId(), deletedTask.getId().toString());
+    }
+
+    @Test
+    public void testDeleteNonExistingTask(){
+        UUID id = UUID.randomUUID();
+        when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
+
+        Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.deleteTask(id));
+        assertNotNull(e);
+        assertEquals("No existing Task with ID: " + id, e.getMessage());
+        verify(taskRepository, Mockito.never()).deleteById(anyString());
     }
 
     @Test

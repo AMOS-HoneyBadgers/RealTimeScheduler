@@ -14,15 +14,11 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Service;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 
 import java.sql.Timestamp;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -145,6 +141,15 @@ public class TaskService implements ITaskService {
         return newTask;
     }
 
+    @Override
+    public TaskModel deleteTask(UUID taskid) {
+        Task task = taskRepository.findById(taskid.toString()).orElse(null);
+        if(task == null)
+            throw new NoSuchElementException("No existing Task with ID: " + taskid);
+
+        taskRepository.deleteById(taskid.toString());
+        return converter.taskJpaToRest(task);
+    }
 
     @Override
     public void sendTaskToTaskEventQueue(String taskId) {
