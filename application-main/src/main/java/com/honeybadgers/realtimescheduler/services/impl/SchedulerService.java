@@ -98,6 +98,7 @@ public class SchedulerService implements ISchedulerService {
             childGroup = parentGroup;
         }
 
+        logger.info("limit is now at: " + minLimit);
         return minLimit;
     }
 
@@ -156,7 +157,7 @@ public class SchedulerService implements ISchedulerService {
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if(!isSchedulerLocked()) {
             // scheduler not locked -> can send
-            System.out.println("Step 4: send Tasks to dispatcher");
+            logger.info("Step 4: send Tasks to dispatcher");
             sendTaskstoDispatcher(tasks);
 
         } else
@@ -189,6 +190,7 @@ public class SchedulerService implements ISchedulerService {
 
                 // Task will be send to dispatcher, change currentTasks + 1
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
+                logger.info("current_tasks is now increased to : " + currentParallelismDegree.getCurrentTasks());
                 lockRedisRepository.save(currentParallelismDegree);
 
                 logger.info("deleting task from redis database");

@@ -56,7 +56,6 @@ public class TaskRedisRepository implements CrudRepository<RedisTask, String> {
     @Override
     public Iterable<RedisTask> findAll() {
         Iterable<RedisTask> tasks = hashOperations.values(KEY);
-        log.warn("########################## findAll IN REPRO: " + tasks.toString());
         return tasks;
     }
 
