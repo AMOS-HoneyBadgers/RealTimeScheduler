@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 @Service
 public interface IConvertUtils {
-
     /**
      * Returns the given timestamp as OffsetDateTime with UTC as ZoneOffset
      * @param timestamp timestamp to be converted
