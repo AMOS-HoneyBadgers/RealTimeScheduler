@@ -192,6 +192,9 @@
                 <version>2.19.1</version>
                 <configuration>
                     <argLine>${surefireArgLine}</argLine>
+                    <!-- Found this in case the normal JUnit tests in application-model keep 'failing'/will not be 'found'
+                    <reuseForks>false</reuseForks>
+                    <forkCount>1</forkCount>-->
                 </configuration>
             </plugin>
 

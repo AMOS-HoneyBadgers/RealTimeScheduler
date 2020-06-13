@@ -1,9 +1,10 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.Group;
 import com.honeybadgers.models.Task;
+import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -18,8 +19,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -28,6 +31,9 @@ public class TaskServiceTest {
 
     @MockBean
     private TaskPostgresRepository taskPostgresRepository;
+
+    @MockBean
+    GroupAncestorRepository groupAncestorRepository;
 
     @Autowired
     private TaskService service;
@@ -103,6 +109,132 @@ public class TaskServiceTest {
         Mockito.when(taskPostgresRepository.findAll()).thenReturn(tasks);
         List<Task> returnedTasks = service.getAllTasks();
         Assert.assertEquals(tasks, returnedTasks);
+    }
+
+    @Test
+    public void testGetRecursiveGroupsOfTask() {
+
+        Group parent = new Group();
+        parent.setId("testGroupParent");
+
+        Group group = new Group();
+        group.setId("testGroup");
+        group.setParentGroup(parent);
+
+        Task task = new Task();
+        task.setId("test");
+        task.setGroup(group);
+
+        GroupAncestorModel ancestorModel = new GroupAncestorModel();
+        ancestorModel.setId(group.getId());
+        ancestorModel.setAncestors(new String[] {parent.getId()});
+
+        when(service.getTaskById("test")).thenReturn(Optional.of(task));
+        when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
+
+        List<String> groups = service.getRecursiveGroupsOfTask(task.getId());
+
+        assertNotNull(groups);
+        assertEquals(2, groups.size());
+        assertArrayEquals(new String[]{group.getId(), parent.getId()}, groups.toArray());
+    }
+
+    @Test
+    public void testGetRecursiveGroupsOfTask_nullInput() {
+
+        Exception e = assertThrows(IllegalArgumentException.class, () -> service.getRecursiveGroupsOfTask(null));
+
+        assertNotNull(e);
+        assertEquals("taskId must not be null!", e.getMessage());
+    }
+
+    @Test
+    public void testGetRecursiveGroupsOfTask_notFound() {
+
+        Group parent = new Group();
+        parent.setId("testGroupParent");
+
+        Group group = new Group();
+        group.setId("testGroup");
+        group.setParentGroup(parent);
+
+        Task task = new Task();
+        task.setId("test");
+        task.setGroup(group);
+
+        when(service.getTaskById("test")).thenReturn(Optional.empty());
+
+        Exception e = assertThrows(NoSuchElementException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
+
+        assertNotNull(e);
+        assertEquals("Task with taskId " + task.getId() + " not found!", e.getMessage());
+    }
+
+    @Test
+    public void testGetRecursiveGroupsOfTask_noGroupERROR() {
+
+        Task task = new Task();
+        task.setId("test");
+
+        when(service.getTaskById("test")).thenReturn(Optional.of(task));
+
+        Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
+
+        assertNotNull(e);
+        assertEquals("CRITICAL: found task with taskId " + task.getId() + " which has no group -> THIS SHOULD NOT HAVE HAPPENED (DB enforces this)!", e.getMessage());
+    }
+
+    @Test
+    public void testGetRecursiveGroupsOfTask_invalidAncestorModel() {
+
+        Group parent = new Group();
+        parent.setId("testGroupParent");
+
+        Group group = new Group();
+        group.setId("testGroup");
+        group.setParentGroup(parent);
+
+        Task task = new Task();
+        task.setId("test");
+        task.setGroup(group);
+
+        GroupAncestorModel ancestorModel = new GroupAncestorModel();
+        ancestorModel.setAncestors(new String[] {parent.getId()});
+
+        when(service.getTaskById("test")).thenReturn(Optional.of(task));
+        when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
+
+        Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
+
+        assertNotNull(e);
+        assertEquals("AncestorModel received from repository contains null values!", e.getMessage());
+    }
+
+    @Test
+    public void testGetRecursiveGroupsOfTask_invalidReturn() {
+
+        Group parent = new Group();
+        parent.setId("testGroupParent");
+
+        Group group = new Group();
+        group.setId("testGroup");
+        group.setParentGroup(parent);
+
+        Task task = new Task();
+        task.setId("test");
+        task.setGroup(group);
+
+        GroupAncestorModel ancestorModel = new GroupAncestorModel();
+        ancestorModel.setId(group.getId());
+        ancestorModel.setAncestors(new String[] {parent.getId(), null});
+
+        when(service.getTaskById("test")).thenReturn(Optional.of(task));
+        when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
+
+        Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
+
+        assertNotNull(e);
+        assertEquals("Ancestor list contains null values!", e.getMessage());
     }
   
 }

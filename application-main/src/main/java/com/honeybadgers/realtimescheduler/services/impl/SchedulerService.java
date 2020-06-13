@@ -5,7 +5,6 @@ import com.honeybadgers.models.Group;
 import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.RedisTask;
 import com.honeybadgers.models.Task;
-import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -20,7 +19,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class SchedulerService implements ISchedulerService {
@@ -104,7 +102,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public boolean isTaskLocked(String taskId) {
-        // TODO check if scheduler or any group (INCLUDING PARENTS!!!) is locked
+        if (taskId == null)
+            throw new IllegalArgumentException("Given taskId was null!");
         String lockId = LOCKREDIS_TASK_PREFIX + taskId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
@@ -112,6 +111,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public boolean isGroupLocked(String groupId) {
+        if (groupId == null)
+            throw new IllegalArgumentException("Given groupId was null!");
         String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
@@ -154,7 +155,6 @@ public class SchedulerService implements ISchedulerService {
 
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
 
-        // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if(!isSchedulerLocked()) {
             // scheduler not locked -> can send
             logger.info("Step 4: send Tasks to dispatcher");
@@ -172,10 +172,34 @@ public class SchedulerService implements ISchedulerService {
                 // TODO locks, activeTimes, workingDays, ...
                 // TODO handle when dispatcher sends negative feedback
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
-
                 RedisTask currentTask = tasks.get(i);
-                String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
+                logger.info("Checking task and groups on paused.");
+                // check if task is paused
+                if(isTaskLocked(currentTask.getId())) {
+                    logger.info("Task with id " + currentTask.getId() + " is currently paused!");
+                    continue;
+                }
+                // get group with ancestors (IllegalArgExc not needed to be caught, because currentTask.getId() cannot be null)
+                List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
+
+                // check groups on paused
+                boolean pausedFound = false;
+                for (String groupId : groupsOfTask) {
+                    // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
+                    if(isGroupLocked(groupId)) {
+                        // group is paused -> break inner loop for checking group on paused
+                        pausedFound = true;
+                        logger.info("Found paused group with groupId " + groupId);
+                        break;
+                    }
+                }
+                // paused found in inner loop -> continue outer loop
+                if(pausedFound)
+                    continue;
+
+                logger.info("Checking parallelism degree.");
+                String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
                 RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
@@ -196,10 +220,13 @@ public class SchedulerService implements ISchedulerService {
                 logger.info("current_tasks is now increased to : " + currentParallelismDegree.getCurrentTasks());
                 lockRedisRepository.save(currentParallelismDegree);
 
-                logger.info("deleting task from redis database");
-                taskRedisRepository.deleteById(currentTask.getId());
-
+                // sending to queue
                 sender.sendTaskToDispatcher(currentTask.getId());
+                logger.info("Sent task to dispatcher queue");
+
+                // delete from scheduling repository
+                taskRedisRepository.deleteById(currentTask.getId());
+                logger.info("Deleted task from redis database");
             }
         } catch(IndexOutOfBoundsException e) {
             logger.info("passt scho" + e.getMessage());

@@ -13,6 +13,8 @@ public interface ITaskService {
 
     Optional<Task> getTaskById(String id);
 
+    List<String> getRecursiveGroupsOfTask(String taskId);
+
     void uploadTask(Task task);
 
     void deleteTask(String id);
