@@ -65,7 +65,11 @@ public class GroupConvertUtils implements IGroupConvertUtils {
 
         if(groupModel.getPaused() != null)
             newGroup.setPaused(groupModel.getPaused());
-        newGroup.setParallelismDegree(groupModel.getParallelismDegree());
+
+        if(groupModel.getParallelismDegree() != null)
+            newGroup.setParallelismDegree(groupModel.getParallelismDegree());
+        else
+            newGroup.setParallelismDegree(1);
         newGroup.setLastIndexNumber(groupModel.getLastIndexNumber());
 
         return newGroup;

@@ -84,8 +84,8 @@ public class SchedulerService implements ISchedulerService {
         int minLimit;
 
         Group childGroup = groupService.getGroupById(groupId);
-        if(childGroup == null)
-            throw new RuntimeException("no group found for id +" + groupId);
+        if(childGroup == null || childGroup.getParallelismDegree() == null)
+            throw new RuntimeException("no group or parlellismdegree found for id +" + groupId);
 
         minLimit = childGroup.getParallelismDegree();
 
