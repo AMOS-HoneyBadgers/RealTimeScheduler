@@ -19,6 +19,14 @@ public class GroupModelActiveTimes {
         return this;
     }
 
+    public GroupModelActiveTimes() {
+    }
+
+    public GroupModelActiveTimes(ActiveTimes activeTimes) {
+        this.from = activeTimes.getFrom();
+        this.to = activeTimes.getTo();
+    }
+
     /**
      * Get to
      * @return to
@@ -96,7 +104,11 @@ public class GroupModelActiveTimes {
     }
 
 
-
+    /**
+     * convert this to jpa model
+     * Constructor not possible, because this class is not accessible in the jpa class
+     * @return this as jpa model
+     */
     public ActiveTimes getAsJpaModel() {
         ActiveTimes active = new ActiveTimes();
         active.setFrom(this.from);
