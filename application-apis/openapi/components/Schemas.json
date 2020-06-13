@@ -177,7 +177,8 @@
       "parallelism_degree": {
         "description": "[only with mode = parallel] Number of tasks allowed to be executed at the same time",
         "type": "integer",
-        "minimum": 1
+        "minimum": 1,
+        "default": 1
       }
     }
   },
