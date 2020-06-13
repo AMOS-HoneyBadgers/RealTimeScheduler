@@ -8,6 +8,7 @@ import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
@@ -53,7 +54,7 @@ public class SchedulerService implements ISchedulerService {
     ICommunication sender;
 
     @Autowired
-    GroupPostgresRepository groupPostgresRepository;
+    IGroupService groupService;
 
 
     @Override
@@ -82,14 +83,14 @@ public class SchedulerService implements ISchedulerService {
     public int getLimitFromGroup(String groupId) {
         int minLimit;
 
-        Group childGroup = groupPostgresRepository.findById(groupId).orElse(null);
+        Group childGroup = groupService.getGroupById(groupId);
         if(childGroup == null)
             throw new RuntimeException("no group found for id +" + groupId);
 
         minLimit = childGroup.getParallelismDegree();
 
         while(childGroup.getParentGroup() != null) {
-            Group parentGroup = groupPostgresRepository.findById(childGroup.getParentGroup().getId()).orElse(null);
+            Group parentGroup = groupService.getGroupById(childGroup.getParentGroup().getId());
             if(parentGroup == null)
                 break;
 
@@ -123,18 +124,6 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String taskId) {
-        try {
-            UUID id = UUID.fromString(taskId);
-            logger.info(id);
-        } catch(Exception e) {
-            logger.info(e.getMessage());
-            return;
-        }
-
-        if(taskId.startsWith("Test"))
-            return;
-
-
         //Special case: gets trigger from feedback -> TODO in new QUEUE
         if(taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(this.getAllRedisTasksAndSort());

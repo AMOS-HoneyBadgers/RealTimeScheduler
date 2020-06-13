@@ -40,7 +40,7 @@ public class FeedbackConsumer {
             throw new RuntimeException("could not find tasks in postgre database");
 
         // Get Current Running Tasks from Redis Database, throw exception if it wasnt found
-        String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroup().getId());
+        String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroup().getId();
         RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
         if(currentParallelismDegree == null)
             throw new RuntimeException("no parlallelismdegree found in redis database for task:   " + message);
