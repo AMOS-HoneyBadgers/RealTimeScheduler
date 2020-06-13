@@ -247,7 +247,7 @@ public class SchedulerService implements ISchedulerService {
         }
         return false;
     }
-    private List<ActiveTimes> getActiveTimesForTask(Task task){
+    public List<ActiveTimes> getActiveTimesForTask(Task task){
 
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
 

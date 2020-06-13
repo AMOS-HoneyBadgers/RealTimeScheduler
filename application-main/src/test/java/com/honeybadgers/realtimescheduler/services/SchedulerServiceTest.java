@@ -1,14 +1,12 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.Group;
-import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.RedisTask;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.*;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.impl.GroupService;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -218,4 +217,44 @@ public class SchedulerServiceTest {
         group.setParentGroup(null);
         return group;
     }
+
+    @Test
+    public void testGetActiveTimesForTaskOnlyTaskHasActiveTimes(){
+
+        Task task = new Task();
+        task.setId("TEST");
+        List<ActiveTimes> activeTimes = new ArrayList<ActiveTimes>();
+        task.setActiveTimeFrames(activeTimes);
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        task.setGroup(parentGroup);
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+
+        Assert.assertEquals(spy.getActiveTimesForTask(task), activeTimes);
+    }
+
+    @Test
+    public void testCheckIfTaskIsInActiveTimeOnlyTaskHasActiveTime(){
+
+        // TODO
+        Task task = new Task();
+
+    }
+
+    @Test
+    public void testCheckIfTaskIsInActiveTimeTaskAndGroupHasActiveTime(){
+
+        // TODO
+        Task task = new Task();
+
+    }
+    @Test
+    public void testCheckIfTaskIsInActiveTimeGroupAndParentGroupHasActiveTime(){
+
+        // TODO
+        Task task = new Task();
+
+    }
+
 }
