@@ -28,7 +28,7 @@ public class EventListenerStartup {
             System.out.println("####First Step for REDIS DB: initialize capacity value####");
             capacity = new RedisLock();
             capacity.setId(dispatcherCapacityId);
-            capacity.setCapacity(Integer.parseInt(dispatcherCapacity));
+            capacity.setCurrentTasks(Integer.parseInt(dispatcherCapacity));
             redisRepository.save(capacity);
         }
         else

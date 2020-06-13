@@ -64,7 +64,7 @@ public class SchedulerServiceTest {
         RedisTask redisTask = new RedisTask();
         redisTask.setId(t.getId());
         RedisLock capacity = new RedisLock();
-        capacity.setCapacity(50);
+        capacity.setCurrentTasks(50);
         SchedulerService spy = spy(service);
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         when(lockRedisRepository.findById(dispatcherCapacityId)).thenReturn(Optional.of(capacity));
@@ -104,7 +104,7 @@ public class SchedulerServiceTest {
         t.setId("SPECIAL_TRIGGER");
 
         RedisLock capacity = new RedisLock();
-        capacity.setCapacity(50);
+        capacity.setCurrentTasks(50);
         when(lockRedisRepository.findById(dispatcherCapacityId)).thenReturn(Optional.of(capacity));
 
         SchedulerService spy = spy(service);
@@ -179,7 +179,7 @@ public class SchedulerServiceTest {
     public void sendTasksToDispatcher() {
         RedisLock test = new RedisLock();
         test.setId("ass");
-        test.setCapacity(1);
+        test.setCurrentTasks(1);
 
         RedisTask task1 = new RedisTask();
         task1.setId("123");
@@ -191,7 +191,7 @@ public class SchedulerServiceTest {
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
         spy.sendTaskstoDispatcher(tasks);
 
-        assertEquals(test.getCapacity(), 0);
+        assertEquals(test.getCurrentTasks(), 0);
         verify(lockRedisRepository).save(any());
         verify(sender).sendTaskToDispatcher(task1.getId());
     }

@@ -2,8 +2,6 @@ package com.honeybadgers.realtimescheduler.repository;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.RedisTask;
-import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,9 +39,9 @@ public class FeedbackConsumer {
 
         // Race condition TODO Transaction
         // When the scheduler receives Feedback, the increase capacity by 1
-        capacity.setCapacity(capacity.getCapacity()+1);
+        capacity.setCurrentTasks(capacity.getCurrentTasks()+1);
         lockRedisRepository.save(capacity);
-        System.out.println("Step 6: Increased capacity is now at :" + capacity.getCapacity());
+        System.out.println("Step 6: Increased capacity is now at :" + capacity.getCurrentTasks());
 
 
         // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE

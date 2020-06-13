@@ -68,7 +68,7 @@ public class SchedulerService implements ISchedulerService {
         RedisTask redisTask = new RedisTask();
         redisTask.setId(taskId);
         redisTask.setGroupid(currentTask.getGroup().getId());
-        
+
         return redisTask;
     }
 
@@ -126,7 +126,6 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String taskId) {
-
         try {
             UUID id = UUID.fromString(taskId);
             logger.info(id);
@@ -183,28 +182,21 @@ public class SchedulerService implements ISchedulerService {
             for(int i = 0; i < Integer.parseInt(dispatcherCapacity); i++) {
 
                 // TODO Transaction cause of Race conditon
-                // Search for capacity and set value -1
-
-
-                logger.info("current capacity of dispatcher: +" + capacity.getCapacity());
-
-                // If there is no capacity, we wont send any tasks to dispatcher anymore
-                if(capacity.getCapacity() < 1)
-                    break;
-
-
-
                 // TODO locks, activeTimes, workingDays, ...
                 // TODO handle when dispatcher sends negative feedback
                 // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
 
                 RedisTask currentTask = tasks.get(i);
 
-                //RedisLock currentParallelismDegree = lockRedisRepository.findById(currentTask).orElse(null);
-                if(capacity == null)
-                    throw new RuntimeException("ERROR dispatcher capacity was not found in redis database");
+                String groupParlallelName = "GROUP_PREFIX_PARLELLISM_CURRENT_TASKS_RUNNING_FOR_GROUP" + currentTask.getGroupid();
 
+                RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
+                if(currentParallelismDegree == null)
+                    createGroupParallelismTracker(groupParlallelName);
 
+                // If there is no capacity, we wont send any tasks to dispatcher anymore
+                if(capacity.getCapacity() < 1)
+                    break;
 
 
                 capacity.setCapacity(capacity.getCapacity()-1);
@@ -218,5 +210,11 @@ public class SchedulerService implements ISchedulerService {
         } catch(IndexOutOfBoundsException e) {
             logger.info("passt scho" + e.getMessage());
         }
+    }
+
+    private void createGroupParallelismTracker(String id) {
+        RedisLock curr = new RedisLock();
+        curr.setId(id);
+        lockRedisRepository.save(curr);
     }
 }
