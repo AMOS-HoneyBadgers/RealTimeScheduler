@@ -15,9 +15,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
+import org.junit.jupiter.api.Assertions;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.UUID;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,6 +40,32 @@ public class DefaultApiControllerTest {
 
     @MockBean
     ITaskService taskservice;
+
+
+    @Test
+    public void testGetAllTasks() throws Exception {
+        List<TaskModel> tasks = new LinkedList<TaskModel>();
+
+        TaskModel taskmodel = new TaskModel();
+        UUID uuid = UUID.randomUUID();
+        taskmodel.setId(uuid);
+        taskmodel.setGroupId("TestGroup");
+        taskmodel.setPriority(100);
+        tasks.add(taskmodel);
+
+        when(taskservice.getAllTasks()).thenReturn(tasks);
+
+        MvcResult mvcResult = mvc.perform(get("/api/task/")
+        .contentType(MediaType.APPLICATION_JSON))
+        .andExpect(status().isOk())
+        .andReturn();
+
+        verify(taskservice).getAllTasks();
+
+        String response = mvcResult.getResponse().getContentAsString();
+        assertTrue(response.contains("TestGroup"));
+        assertTrue(response.contains(uuid.toString()));
+    }
 
 
     @Test

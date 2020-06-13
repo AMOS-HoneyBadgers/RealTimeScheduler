@@ -8,20 +8,21 @@ import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.repository.GroupRepository;
 import com.honeybadgers.taskapi.repository.TaskRepository;
+import com.honeybadgers.taskapi.service.ITaskConvertUtils;
 import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.stereotype.Service;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
-@Service
+
 public class TaskService implements ITaskService {
 
     static final Logger logger = LogManager.getLogger(TaskService.class);
@@ -34,6 +35,24 @@ public class TaskService implements ITaskService {
 
     @Autowired
     ICommunication sender;
+
+    @Autowired
+    ITaskConvertUtils converter;
+
+    @Override
+    public List<TaskModel> getAllTasks() {
+        List<TaskModel> taskModelList;
+       // Pageable PageXwithTwentyElements = PageRequest.of(0, 20);
+        //taskRepository.findAll(PageXwithTwentyElements);
+        List<Task> taskList = taskRepository.findAll();
+
+        taskModelList = taskList.stream().map(t -> {
+            TaskModel restModel = converter.taskJpaToRest(t);
+            return restModel;
+        }).collect(Collectors.toList());
+
+        return taskModelList;
+    }
 
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
@@ -123,6 +142,26 @@ public class TaskService implements ITaskService {
     }
 
     @Override
+    public TaskModel getTaskById(UUID taskid) {
+        Task task = taskRepository.findById(taskid.toString()).orElse(null);
+        if(task == null)
+            throw new NoSuchElementException("No existing Task with ID: " + taskid);
+
+        return converter.taskJpaToRest(task);
+    }
+
+    @Override
+    public TaskModel deleteTask(UUID taskid) {
+        Task task = taskRepository.findById(taskid.toString()).orElse(null);
+        if(task == null)
+            throw new NoSuchElementException("No existing Task with ID: " + taskid);
+
+        taskRepository.deleteById(taskid.toString());
+        return converter.taskJpaToRest(task);
+    }
+
+
+    @Override
     public void sendTaskToTaskEventQueue(String taskId) {
         sender.sendTaskToTasksQueue(taskId);
     }
@@ -142,4 +181,5 @@ public class TaskService implements ITaskService {
         taskQueueModel.setTypeFlagEnum(task.getTypeFlag().getValue());
         sender.sendTaskToPriorityQueue(taskQueueModel);
     }
+
 }

@@ -18,6 +18,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:25.874+02:00[Europe/Berlin]")
@@ -45,6 +46,19 @@ public class DefaultApiController implements DefaultApi {
     }
 
     /**
+     * GET /
+     * Get all tasks stored in Database
+     *
+     * @return OK - List of tasks (status code 200)
+     * or Unauthorized (status code 401)
+     */
+    @Override
+    public ResponseEntity<List<TaskModel>> rootGet() {
+        List<TaskModel> list = taskService.getAllTasks();
+        return ResponseEntity.ok(list);
+    }
+
+    /**
      * Creation of new Task
      *
      * @param taskModel new task object (required)
@@ -53,8 +67,6 @@ public class DefaultApiController implements DefaultApi {
 
     @Override
     public ResponseEntity<ResponseModel> rootPost(@Valid TaskModel taskModel) {
-
-        logger.info("Hi");
 
         ResponseModel response = new ResponseModel();
         response.setCode("200");
