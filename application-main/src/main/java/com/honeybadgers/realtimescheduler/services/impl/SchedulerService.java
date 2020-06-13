@@ -1,11 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.Group;
-import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.RedisTask;
-import com.honeybadgers.models.Task;
-import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
+import com.honeybadgers.models.*;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -17,10 +13,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.UUID;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.*;
 
 @Service
 public class SchedulerService implements ISchedulerService {
@@ -153,6 +149,7 @@ public class SchedulerService implements ISchedulerService {
 
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
 
+
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if(!isSchedulerLocked()) {
             // scheduler not locked -> can send
@@ -165,6 +162,7 @@ public class SchedulerService implements ISchedulerService {
 
     public void sendTaskstoDispatcher(List<RedisTask> tasks) {
         try {
+            // TODO: Change this to the size of the tasks list
             for(int i = 0; i < 100; i++) {
 
                 // TODO Transaction cause of Race conditon
@@ -181,6 +179,13 @@ public class SchedulerService implements ISchedulerService {
                 if(currentParallelismDegree == null)
                     currentParallelismDegree = createGroupParallelismTracker(groupParlallelName);
 
+                // Get ActiveTimes for Task and check if it is allowed to be dispatched
+                Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
+                if(task == null){
+                    throw new RuntimeException("Task not found in Postgre Database");
+                }
+                if(!checkIfTaskIsInActiveTime(task))
+                    return;
 
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
                 int limit = getLimitFromGroup(currentTask.getGroupid());
@@ -206,5 +211,59 @@ public class SchedulerService implements ISchedulerService {
         curr.setId(id);
         lockRedisRepository.save(curr);
         return curr;
+    }
+
+    private boolean checkIfTaskIsInActiveTime(Task task){
+        Date current = new Date();
+        Date from = new Date();
+        Date to = new Date();
+        List<ActiveTimes> activeTimes = new ArrayList<ActiveTimes>();
+        SimpleDateFormat parser = new SimpleDateFormat("HH:mm:ss");
+        try {
+            current = parser.parse(LocalDate.now().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        activeTimes = getActiveTimesForTask(task);
+        for(ActiveTimes activeTime : activeTimes){
+            try {
+                from = parser.parse(activeTime.getFrom().toString());
+                to = parser.parse(activeTime.getTo().toString());
+                if(current.before(to) && current.after(from)){
+                    return true;
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+
+        }
+        return false;
+    }
+    private List<ActiveTimes> getActiveTimesForTask(Task task){
+
+        List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
+
+        Group parentGroup = groupService.getGroupById(task.getGroup().getId());
+        if(parentGroup == null)
+            return activeTimes;
+
+        List<ActiveTimes> activeTimesTemp = parentGroup.getActiveTimeFrames();
+        if(activeTimesTemp != null){
+            activeTimes = activeTimesTemp;
+        }
+
+        while(parentGroup.getParentGroup() != null) {
+            parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
+            if(parentGroup == null)
+                break;
+
+            activeTimesTemp = parentGroup.getActiveTimeFrames();
+            if(activeTimesTemp != null){
+                activeTimes = activeTimesTemp;
+            }
+        }
+        return activeTimes;
+
     }
 }
