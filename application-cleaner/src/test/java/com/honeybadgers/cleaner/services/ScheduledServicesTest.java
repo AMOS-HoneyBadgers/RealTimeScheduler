@@ -35,6 +35,7 @@ public class ScheduledServicesTest {
     LockRepository lockRepository;
 
     ArrayList<RedisLock> list;
+    RedisLock paraLock;
 
     @Before
     public void createMocks() {
@@ -49,10 +50,15 @@ public class ScheduledServicesTest {
         RedisLock lock3 = new RedisLock();
         lock3.setId("3");
 
+        paraLock = new RedisLock();
+        paraLock.setId("GROUP_PREFIX_PARLELLISM_CURRENT_TASKS_RUNNING_FOR_GROUP:HALLO");
+        paraLock.setResume_date(LocalDateTime.now().minusMinutes(1));
+
         list = new ArrayList<RedisLock>();
         list.add(lock1);
         list.add(lock2);
         list.add(lock3);
+        list.add(paraLock);
 
         when(lockRepository.findAll()).thenReturn((Iterable<RedisLock>) list);
         doNothing().when(lockRepository).delete(any());
@@ -67,7 +73,8 @@ public class ScheduledServicesTest {
         Thread.sleep(200);
 
         verify(lockRepository).findAll();
-        verify(lockRepository).delete(list.get(1));
+        verify(lockRepository, times(1)).delete(list.get(1));
+        verify(lockRepository, never()).delete(paraLock);
 
         RedisLock lockNew = new RedisLock();
         lockNew.setResume_date(LocalDateTime.now().minusMinutes(1));
@@ -80,6 +87,7 @@ public class ScheduledServicesTest {
 
         Thread.sleep(1000);
 
-        verify(lockRepository).delete(lockNew);
+        verify(lockRepository, times(1)).delete(lockNew);
+        verify(lockRepository, never()).delete(paraLock);
     }
 }

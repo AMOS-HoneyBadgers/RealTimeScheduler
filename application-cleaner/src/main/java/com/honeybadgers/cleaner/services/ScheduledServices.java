@@ -18,6 +18,8 @@ public class ScheduledServices {
 
     static final Logger logger = LogManager.getLogger(ScheduledServices.class);
 
+    public static final String LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS = "GROUP_PREFIX_PARLELLISM_CURRENT_TASKS_RUNNING_FOR_GROUP";
+
     @Autowired
     LockRepository lockRepository;
 
@@ -31,6 +33,12 @@ public class ScheduledServices {
             for (RedisLock redisLock : paused) {
                 if(redisLock.getResume_date() == null)
                     continue;
+
+                // assert, that this is no parallelismObject which has a resume_date by mistake
+                if(redisLock.getId().startsWith(LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS)) {
+                    logger.warn("Found parallelism redisLock object with resume date: " + redisLock.toString());
+                    continue;
+                }
 
                 if(redisLock.getResume_date().isBefore(LocalDateTime.now())) {
                     logger.info("Deleting lock with id " + redisLock.getId());
