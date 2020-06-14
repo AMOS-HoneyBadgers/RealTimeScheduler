@@ -223,6 +223,7 @@
                         </goals>
                     </execution>
 
+
                     <execution>
                         <id>coverage-check</id>
                         <goals>
