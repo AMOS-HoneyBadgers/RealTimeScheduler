@@ -1,7 +1,6 @@
-package com.honeybadgers.cleaner.services.impl;
+package com.honeybadgers.cleaner.services;
 
 import com.honeybadgers.cleaner.repository.LockRepository;
-import com.honeybadgers.cleaner.services.IScheduledServices;
 import com.honeybadgers.models.RedisLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,16 +10,14 @@ import org.springframework.scheduling.annotation.Scheduled;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 
-public class ScheduledServices implements IScheduledServices {
+public class ScheduledServices {
 
     static final Logger logger = LogManager.getLogger(ScheduledServices.class);
 
     @Autowired
     LockRepository lockRepository;
 
-    @Override
     @Scheduled(fixedRateString = "${cleaner.paused.fixedRate}", initialDelayString = "${cleaner.paused.initialDelay}")
     public void cleanPausedLocks() {
         // TODO: for optimisation write custom query which gets all where resume_date != null (REQUIRES COMPLETE IMPL OF CRUDREPOS.)
