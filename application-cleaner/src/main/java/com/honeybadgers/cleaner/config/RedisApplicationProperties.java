@@ -1,4 +1,4 @@
-package com.honeybadgers.managementapi.configuration;
+package com.honeybadgers.cleaner.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
