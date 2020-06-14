@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
+import com.honeybadgers.models.utils.IConvertUtils;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -57,9 +58,9 @@ public class SchedulerService implements ISchedulerService {
 
 
     @Override
-    public RedisTask createRedisTask(String taskId){
+    public RedisTask createRedisTask(String taskId) {
         Task currentTask = taskService.getTaskById(taskId).orElse(null);
-        if(currentTask == null)
+        if (currentTask == null)
             throw new RuntimeException("could not find task with id:" + currentTask);
 
         RedisTask redisTask = new RedisTask();
@@ -70,7 +71,7 @@ public class SchedulerService implements ISchedulerService {
     }
 
     @Override
-    public List<RedisTask> getAllRedisTasksAndSort(){
+    public List<RedisTask> getAllRedisTasksAndSort() {
         Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();
         List<RedisTask> sortedList = new ArrayList<RedisTask>();
         redisTasks.forEach(sortedList::add);
@@ -83,14 +84,14 @@ public class SchedulerService implements ISchedulerService {
         int minLimit;
 
         Group childGroup = groupService.getGroupById(groupId);
-        if(childGroup == null)
+        if (childGroup == null)
             throw new RuntimeException("no group found for id +" + groupId);
 
         minLimit = childGroup.getParallelismDegree();
 
-        while(childGroup.getParentGroup() != null) {
+        while (childGroup.getParentGroup() != null) {
             Group parentGroup = groupService.getGroupById(childGroup.getParentGroup().getId());
-            if(parentGroup == null)
+            if (parentGroup == null)
                 break;
 
             minLimit = Math.min(minLimit, parentGroup.getParallelismDegree());
@@ -124,7 +125,7 @@ public class SchedulerService implements ISchedulerService {
     @Override
     public void scheduleTask(String taskId) {
         //Special case: gets trigger from feedback -> TODO in new QUEUE
-        if(taskId.equals(scheduler_trigger)) {
+        if (taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(this.getAllRedisTasksAndSort());
             return;
         }
@@ -133,13 +134,13 @@ public class SchedulerService implements ISchedulerService {
         logger.info("Step 2: search for task in Redis DB");
         RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
 
-        if(redisTask == null){
+        if (redisTask == null) {
             logger.info("no task found, creating new");
             redisTask = createRedisTask(taskId);
         }
 
         Task task = taskService.getTaskById(taskId).orElse(null);
-        if(task == null)
+        if (task == null)
             throw new RuntimeException("task could not be found in database");
 
         logger.info("Step 3: calculate priority with the Redis Task");
@@ -154,7 +155,7 @@ public class SchedulerService implements ISchedulerService {
 
 
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
-        if(!isSchedulerLocked()) {
+        if (!isSchedulerLocked()) {
             // scheduler not locked -> can send
             System.out.println("Step 4: send Tasks to dispatcher");
             sendTaskstoDispatcher(tasks);
@@ -166,7 +167,7 @@ public class SchedulerService implements ISchedulerService {
     public void sendTaskstoDispatcher(List<RedisTask> tasks) {
         try {
             // TODO: Change this to the size of the tasks list
-            for(int i = 0; i < 100; i++) {
+            for (int i = 0; i < 100; i++) {
 
                 // TODO Transaction cause of Race conditon
                 // TODO locks, activeTimes, workingDays, ...
@@ -179,20 +180,22 @@ public class SchedulerService implements ISchedulerService {
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
                 RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
-                if(currentParallelismDegree == null)
+                if (currentParallelismDegree == null)
                     currentParallelismDegree = createGroupParallelismTracker(groupParlallelName);
 
                 // Get ActiveTimes for Task and check if it is allowed to be dispatched
                 Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
-                if(task == null){
+                if (task == null) {
                     throw new RuntimeException("Task not found in Postgre Database");
                 }
-                if(!checkIfTaskIsInActiveTime(task))
+                if (!checkIfTaskIsInActiveTime(task))
+                    return;
+                if (!checkIfTaskIsInWorkingDays(task))
                     return;
 
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
                 int limit = getLimitFromGroup(currentTask.getGroupid());
-                if(currentParallelismDegree.getCurrentTasks() >= limit)
+                if (currentParallelismDegree.getCurrentTasks() >= limit)
                     return;
 
                 // Task will be send to dispatcher, change currentTasks + 1
@@ -204,10 +207,24 @@ public class SchedulerService implements ISchedulerService {
 
                 sender.sendTaskToDispatcher(currentTask.getId());
             }
-        } catch(IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             logger.info("passt scho" + e.getMessage());
         }
     }
+
+    public boolean checkIfTaskIsInWorkingDays(Task task) {
+        Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
+        int dayofweek = calendar.get(Calendar.DAY_OF_WEEK);
+        logger.log(Level.ERROR,dayofweek);
+        ConvertUtils convertUtils = new ConvertUtils();
+        List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(task.getWorkingDays());
+        logger.log(Level.ERROR,workingdaybools);
+        if(workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBools(dayofweek)))
+            return true;
+        return false;
+    }
+
+
 
     private RedisLock createGroupParallelismTracker(String id) {
         RedisLock curr = new RedisLock();
@@ -216,7 +233,7 @@ public class SchedulerService implements ISchedulerService {
         return curr;
     }
 
-    public boolean checkIfTaskIsInActiveTime(Task task){
+    public boolean checkIfTaskIsInActiveTime(Task task) {
         Date current = new Date();
         Date from = new Date();
         Date to = new Date();
@@ -231,14 +248,14 @@ public class SchedulerService implements ISchedulerService {
         }
 
         activeTimes = getActiveTimesForTask(task);
-        if(activeTimes == null){
+        if (activeTimes == null) {
             return true;
         }
-        for(ActiveTimes activeTime : activeTimes){
+        for (ActiveTimes activeTime : activeTimes) {
             try {
                 from = parser.parse(activeTime.getFrom().toString());
                 to = parser.parse(activeTime.getTo().toString());
-                if(current.before(to) && current.after(from)){
+                if (current.before(to) && current.after(from)) {
                     return true;
                 }
             } catch (ParseException e) {
@@ -248,31 +265,31 @@ public class SchedulerService implements ISchedulerService {
         }
         return false;
     }
-    public List<ActiveTimes> getActiveTimesForTask(Task task){
+
+    public List<ActiveTimes> getActiveTimesForTask(Task task) {
 
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
-        Group parentGroup=null;
+        Group parentGroup = null;
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
+        } catch (NullPointerException e) {
+            logger.log(Level.INFO, "parentgroup from " + task.getId() + " is null \n" + e.getMessage());
         }
-        catch (NullPointerException e){
-            logger.log(Level.INFO,"parentgroup from "+task.getId()+" is null \n"+e.getMessage());
-        }
-        if(parentGroup == null)
+        if (parentGroup == null)
             return activeTimes;
 
         List<ActiveTimes> activeTimesTemp = parentGroup.getActiveTimeFrames();
-        if(activeTimesTemp != null){
+        if (activeTimesTemp != null) {
             activeTimes = activeTimesTemp;
         }
 
-        while(parentGroup.getParentGroup() != null) {
+        while (parentGroup.getParentGroup() != null) {
             parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
-            if(parentGroup == null)
+            if (parentGroup == null)
                 break;
 
             activeTimesTemp = parentGroup.getActiveTimeFrames();
-            if(activeTimesTemp != null){
+            if (activeTimesTemp != null) {
                 activeTimes = activeTimesTemp;
             }
         }

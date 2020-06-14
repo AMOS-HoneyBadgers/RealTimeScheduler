@@ -316,6 +316,7 @@ public class SchedulerServiceTest {
         when(groupService.getGroupById(any())).thenReturn(null);
         Assert.assertEquals(true, spy.checkIfTaskIsInActiveTime(task));
     }
+
     @Test
     public void testCheckIfTaskIsInActiveTime_ReturnsFalse() {
         Task task = new Task();
@@ -328,6 +329,23 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(any())).thenReturn(null);
         Assert.assertEquals(false, spy.checkIfTaskIsInActiveTime(task));
+    }
+
+    @Test
+    public void testcheckIfTaskIsInWorkingDays_returnsTrue() {
+        Task task = new Task();
+        int[] workingdays = new int[]{1,1,1,1,1,1,1};
+        task.setWorkingDays(workingdays);
+        SchedulerService spy = spy(service);
+        Assert.assertEquals(true,spy.checkIfTaskIsInWorkingDays(task));
+    }
+    @Test
+    public void testcheckIfTaskIsInWorkingDays_returnsFalse() {
+        Task task = new Task();
+        int[] workingdays = new int[]{0,0,0,0,0,0,0};
+        task.setWorkingDays(workingdays);
+        SchedulerService spy = spy(service);
+        Assert.assertEquals(false,spy.checkIfTaskIsInWorkingDays(task));
     }
 
 }
