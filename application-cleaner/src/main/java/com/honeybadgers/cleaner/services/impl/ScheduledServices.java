@@ -1,0 +1,46 @@
+package com.honeybadgers.cleaner.services.impl;
+
+import com.honeybadgers.cleaner.repository.LockRepository;
+import com.honeybadgers.cleaner.services.IScheduledServices;
+import com.honeybadgers.models.RedisLock;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+
+import java.time.LocalDateTime;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+
+public class ScheduledServices implements IScheduledServices {
+
+    static final Logger logger = LogManager.getLogger(ScheduledServices.class);
+
+    @Autowired
+    LockRepository lockRepository;
+
+    @Override
+    @Scheduled(fixedRateString = "${cleaner.paused.fixedRate}", initialDelayString = "${cleaner.paused.initialDelay}")
+    public void cleanPausedLocks() {
+        // TODO: for optimisation write custom query which gets all where resume_date != null (REQUIRES COMPLETE IMPL OF CRUDREPOS.)
+        try {
+            logger.info("Starting paused cleanup!");
+            Iterable<RedisLock> paused = lockRepository.findAll();
+            logger.info("Checking " + ((Collection<?>) paused).size() + " locks on resume_date");
+            for (RedisLock redisLock : paused) {
+                if(redisLock.getResume_date() == null)
+                    continue;
+
+                if(redisLock.getResume_date().isAfter(LocalDateTime.now())) {
+                    logger.info("Deleting lock with id " + redisLock.getId());
+                    lockRepository.delete(redisLock);
+                }
+            }
+            logger.info("Finished paused cleanup!");
+        } catch (Exception e) {
+            logger.error("Caught exception in cleanPausedLocks:");
+            logger.error(Arrays.deepToString(e.getStackTrace()));
+        }
+    }
+}

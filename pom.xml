@@ -179,6 +179,7 @@
         <module>application-main</module>
         <module>application-apis</module>
         <module>application-models</module>
+        <module>application-cleaner</module>
         <module>application-queuecommunication</module>
         <module>application-main-integrationtests</module>
         <module>task-consumer</module>
