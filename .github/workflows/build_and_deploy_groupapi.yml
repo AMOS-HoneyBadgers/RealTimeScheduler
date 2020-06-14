@@ -11,7 +11,8 @@ on:
       - 'application-models/**'
       - 'application-queuecommunication/**'
   pull_request:
-    branches: 
+    branches:
+      - 'develop'
       - 'master'
     paths:
       - 'application-apis/groupapi/**'

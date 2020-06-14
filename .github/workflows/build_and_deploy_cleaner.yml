@@ -1,4 +1,4 @@
-name: build and deploy pipeline for managementapi
+name: build and deploy pipeline for scheduler
 
 
 on:
@@ -7,17 +7,15 @@ on:
       - 'develop'
       - 'master'
     paths:
-      - 'application-apis/managementapi/**'
+      - 'application-cleaner/**'
       - 'application-models/**'
-      - 'application-queuecommunication/**'
   pull_request:
     branches:
       - 'develop'
       - 'master'
     paths:
-      - 'application-apis/managementapi/**'
+      - 'application-cleaner/**'
       - 'application-models/**'
-      - 'application-queuecommunication/**'
   release:
     types:
       - created
@@ -47,7 +45,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      - name: cloud foundry for managementapi project
+      - name: cloud foundry for cleaner project
         uses: citizen-of-planet-earth/cf-cli-action@master
         with:
           cf_api: ${{ secrets.CF_API }}
@@ -55,4 +53,4 @@ jobs:
           cf_password: ${{ secrets.CF_PASS }}
           cf_org: CCC
           cf_space: AMOS-EDI
-          command: push managementapi-amos
+          command: push cleaner-amos

@@ -10,7 +10,8 @@ on:
       - 'application-apis/monitoringapi/**'
       - 'application-models/**'
   pull_request:
-    branches: 
+    branches:
+      - 'develop'
       - 'master'
     paths:
       - 'application-apis/monitoringapi/**'
