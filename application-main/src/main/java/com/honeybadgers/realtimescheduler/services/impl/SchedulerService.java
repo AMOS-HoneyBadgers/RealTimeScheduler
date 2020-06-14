@@ -22,6 +22,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
+import static com.honeybadgers.models.ModeEnum.Sequential;
+
 @Service
 public class SchedulerService implements ISchedulerService {
 
@@ -130,6 +132,7 @@ public class SchedulerService implements ISchedulerService {
             return;
         }
 
+
         // TODO Transaction
         logger.info("Step 2: search for task in Redis DB");
         RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
@@ -192,7 +195,8 @@ public class SchedulerService implements ISchedulerService {
                     return;
                 if (!checkIfTaskIsInWorkingDays(task))
                     return;
-
+                if (!sequentialCheck(task))
+                    return;
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
                 int limit = getLimitFromGroup(currentTask.getGroupid());
                 if (currentParallelismDegree.getCurrentTasks() >= limit)
@@ -212,13 +216,22 @@ public class SchedulerService implements ISchedulerService {
         }
     }
 
+    public boolean sequentialCheck(Task task) {
+        if (task.getModeEnum() == Sequential) {
+            Group parentgroup = task.getGroup();
+            if (!(task.getIndexNumber() == parentgroup.getLastIndexNumber()))
+                return false;
+        }
+        return true;
+    }
+
     public boolean checkIfTaskIsInWorkingDays(Task task) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int dayofweek = calendar.get(Calendar.DAY_OF_WEEK);
         ConvertUtils convertUtils = new ConvertUtils();
-        int[] workingdays= getActualWorkingDaysForTask(task);
+        int[] workingdays = getActualWorkingDaysForTask(task);
         List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(workingdays);
-        if(workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBools(dayofweek)))
+        if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBools(dayofweek)))
             return true;
         return false;
     }

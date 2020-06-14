@@ -410,5 +410,19 @@ public class SchedulerServiceTest {
         //Arrange active times of grandparent group must be returned
         Assert.assertEquals(spy.getActualWorkingDaysForTask(task), grandparentworkingdays);
     }
+    @Test
+    public void testsequentialCheck(){
+        //Arrange
+        Task task = new Task();
+        task.setModeEnum(ModeEnum.Sequential);
+        task.setIndexNumber(0);
+        Group parentgroup = new Group();
+        parentgroup.setLastIndexNumber(0);
+        task.setGroup(parentgroup);
+        //Act
+        SchedulerService spy = spy(service);
+        //Assert
+        Assert.assertEquals(true,spy.sequentialCheck(task));
+    }
 
 }
