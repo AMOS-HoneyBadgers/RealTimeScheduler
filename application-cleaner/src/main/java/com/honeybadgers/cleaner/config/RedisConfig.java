@@ -26,6 +26,7 @@ public class RedisConfig {
     @Autowired
     RedisApplicationProperties redisApplicationProperties;
 
+
     @Bean
     JedisConnectionFactory jedisConnectionFactory() {
         RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
