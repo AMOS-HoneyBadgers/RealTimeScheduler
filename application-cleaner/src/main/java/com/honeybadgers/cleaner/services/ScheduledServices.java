@@ -21,7 +21,7 @@ public class ScheduledServices {
     @Autowired
     LockRepository lockRepository;
 
-    @Scheduled(fixedRateString = "${cleaner.paused.fixedRate}", initialDelayString = "${cleaner.paused.initialDelay}")
+    @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
         // TODO: for optimisation write custom query which gets all where resume_date != null (REQUIRES COMPLETE IMPL OF CRUDREPOS.)
         try {
@@ -32,7 +32,7 @@ public class ScheduledServices {
                 if(redisLock.getResume_date() == null)
                     continue;
 
-                if(redisLock.getResume_date().isAfter(LocalDateTime.now())) {
+                if(redisLock.getResume_date().isBefore(LocalDateTime.now())) {
                     logger.info("Deleting lock with id " + redisLock.getId());
                     lockRepository.delete(redisLock);
                 }
