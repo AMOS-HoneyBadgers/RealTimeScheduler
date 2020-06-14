@@ -6,6 +6,8 @@ import com.honeybadgers.models.ModeEnum;
 import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +32,10 @@ public class FeedbackConsumer {
 
     @Autowired
     TaskService service;
+
+    @Autowired
+    GroupPostgresRepository groupPostgresRepository;
+    static final Logger logger = LogManager.getLogger(FeedbackConsumer.class);
 
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String id) throws InterruptedException {
@@ -60,13 +66,15 @@ public class FeedbackConsumer {
         //TODO is it necessary to do this also for all grandparent groups??
         if(currentTask.getModeEnum()== ModeEnum.Sequential){
             Group group = currentTask.getGroup();
+            logger.info("update index Number of group"+group.getId());
             group.setLastIndexNumber(group.getLastIndexNumber()+1);
+            groupPostgresRepository.save(group);
         }
-        System.out.println("Step 6: Decreased current_tasks is now at :" + currentParallelismDegree.getCurrentTasks());
+        logger.info("Step 6: Decreased current_tasks is now at :" + currentParallelismDegree.getCurrentTasks());
 
         // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
         // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered in a new QUEUE atm just workaround
-        //sender.sendTaskToTasksQueue(scheduler_trigger);
-        System.out.println("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
+        sender.sendTaskToTasksQueue(scheduler_trigger);
+        logger.info("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
     }
 }

@@ -2,7 +2,6 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
-import com.honeybadgers.models.utils.IConvertUtils;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -17,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -155,7 +153,7 @@ public class SchedulerService implements ISchedulerService {
 
 
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
-
+        logger.log(Level.INFO, tasks);
 
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if (!isSchedulerLocked()) {
@@ -188,20 +186,26 @@ public class SchedulerService implements ISchedulerService {
 
                 // Get ActiveTimes for Task and check if it is allowed to be dispatched
                 Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
+                logger.log(Level.INFO, "Task:");
+                logger.log(Level.INFO, task.getId());
                 if (task == null) {
                     throw new RuntimeException("Task not found in Postgre Database");
                 }
+                logger.log(Level.INFO, "checkIfTaskIsInActiveTime");
                 if (!checkIfTaskIsInActiveTime(task))
-                    return;
+                    continue;
+                logger.log(Level.INFO, "checkIfTaskIsInWorkingDays");
                 if (!checkIfTaskIsInWorkingDays(task))
-                    return;
-                if (!sequentialCheck(task))
-                    return;
+                    continue;
+                logger.log(Level.INFO, "sequentialCheck");
+                if (sequentialHasToWait(task))
+                    continue;
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
+                logger.log(Level.INFO, "parallelismdegree");
                 int limit = getLimitFromGroup(currentTask.getGroupid());
                 if (currentParallelismDegree.getCurrentTasks() >= limit)
-                    return;
-
+                    continue;
+                logger.log(Level.INFO, "task should now be sent to dispatcher");
                 // Task will be send to dispatcher, change currentTasks + 1
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
                 lockRedisRepository.save(currentParallelismDegree);
@@ -212,17 +216,22 @@ public class SchedulerService implements ISchedulerService {
                 sender.sendTaskToDispatcher(currentTask.getId());
             }
         } catch (IndexOutOfBoundsException e) {
-            logger.info("passt scho" + e.getMessage());
+            //in case inputtask list is smaller than foor loop size
+            logger.info("in case inputtask list is smaller than foor loop size. Size:" + e.getMessage());
         }
     }
 
-    public boolean sequentialCheck(Task task) {
+    public boolean sequentialHasToWait(Task task) {
         if (task.getModeEnum() == Sequential) {
+            logger.info("task getIndexNumber " + task.getIndexNumber());
             Group parentgroup = task.getGroup();
-            if (!(task.getIndexNumber() == parentgroup.getLastIndexNumber()))
+            logger.info("parentgroup lastindexnumber " + parentgroup.getLastIndexNumber());
+            if (task.getIndexNumber() == parentgroup.getLastIndexNumber()+1)
                 return false;
+            else
+                return true;
         }
-        return true;
+        return false;
     }
 
     public boolean checkIfTaskIsInWorkingDays(Task task) {
@@ -274,6 +283,7 @@ public class SchedulerService implements ISchedulerService {
     }
 
     public boolean checkIfTaskIsInActiveTime(Task task) {
+
         Date current = new Date();
         Date from = new Date();
         Date to = new Date();
@@ -286,9 +296,10 @@ public class SchedulerService implements ISchedulerService {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-
         activeTimes = getActiveTimesForTask(task);
-        if (activeTimes == null) {
+
+        logger.log(Level.INFO, activeTimes);
+        if (activeTimes == null || activeTimes.isEmpty()) {
             return true;
         }
         for (ActiveTimes activeTime : activeTimes) {
@@ -309,6 +320,8 @@ public class SchedulerService implements ISchedulerService {
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
 
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
+        logger.log(Level.INFO, "activetimes");
+        logger.log(Level.INFO, activeTimes);
         Group parentGroup = null;
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
@@ -319,7 +332,9 @@ public class SchedulerService implements ISchedulerService {
             return activeTimes;
 
         List<ActiveTimes> activeTimesTemp = parentGroup.getActiveTimeFrames();
-        if (activeTimesTemp != null) {
+        logger.log(Level.INFO, "parentactivetimes");
+        logger.log(Level.INFO, activeTimesTemp);
+        if (activeTimesTemp != null && !(activeTimesTemp.isEmpty())) {
             activeTimes = activeTimesTemp;
         }
 
@@ -329,7 +344,7 @@ public class SchedulerService implements ISchedulerService {
                 break;
 
             activeTimesTemp = parentGroup.getActiveTimeFrames();
-            if (activeTimesTemp != null) {
+            if (activeTimesTemp != null && !(activeTimesTemp.isEmpty())) {
                 activeTimes = activeTimesTemp;
             }
         }

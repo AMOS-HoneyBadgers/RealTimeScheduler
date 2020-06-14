@@ -4,20 +4,17 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.*;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
-import com.honeybadgers.realtimescheduler.services.impl.GroupService;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Time;
 import java.time.LocalTime;
-import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -252,6 +249,10 @@ public class SchedulerServiceTest {
         Group parentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
         List<ActiveTimes> parentactiveTimes = new ArrayList<>();
+        ActiveTimes parenttaskaktivetime = new ActiveTimes();
+        taskaktivetime.setFrom(new Time(800));
+        taskaktivetime.setTo(new Time(1200));
+        parentactiveTimes.add(parenttaskaktivetime);
         parentGroup.setActiveTimeFrames(parentactiveTimes);
         //setParentGroup for task
         task.setGroup(parentGroup);
@@ -259,7 +260,8 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
         //Arrange active times of parent group must be returned
-        Assert.assertEquals(spy.getActiveTimesForTask(task), parentactiveTimes);
+        List<ActiveTimes> res = spy.getActiveTimesForTask(task);
+        Assert.assertEquals(res , parentactiveTimes);
     }
 
     @Test
@@ -299,7 +301,8 @@ public class SchedulerServiceTest {
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
         when(groupService.getGroupById(parentGroup.getParentGroup().getId())).thenReturn(grandparentGroup);
         //Arrange active times of grandparent group must be returned
-        Assert.assertEquals(spy.getActiveTimesForTask(task), grandparentactiveTimes);
+        List<ActiveTimes> res = spy.getActiveTimesForTask(task);
+        Assert.assertEquals(res, grandparentactiveTimes);
 
     }
 
@@ -415,14 +418,15 @@ public class SchedulerServiceTest {
         //Arrange
         Task task = new Task();
         task.setModeEnum(ModeEnum.Sequential);
-        task.setIndexNumber(0);
+        //the index number of the parentgroup starts at 0 and the indexnumber of the task must be one higher
+        task.setIndexNumber(1);
         Group parentgroup = new Group();
         parentgroup.setLastIndexNumber(0);
         task.setGroup(parentgroup);
         //Act
         SchedulerService spy = spy(service);
         //Assert
-        Assert.assertEquals(true,spy.sequentialCheck(task));
+        Assert.assertEquals(false,spy.sequentialHasToWait(task));
     }
 
 }
