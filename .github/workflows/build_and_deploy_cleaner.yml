@@ -1,4 +1,4 @@
-name: build and deploy pipeline for scheduler
+name: build and deploy pipeline for cleaner
 
 
 on:
