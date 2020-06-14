@@ -171,7 +171,7 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void sendTasksToDispatcher() {
+    public void testSendTasksToDispatcher() {
         RedisLock test = new RedisLock();
         test.setId("ass");
         test.setCurrentTasks(0);
@@ -200,6 +200,10 @@ public class SchedulerServiceTest {
         verify(lockRedisRepository).save(any());
         verify(sender).sendTaskToDispatcher(task1.getId());
         verify(taskRedisRepository).deleteById(task1.getId());
+        verify(lockRedisRepository,times(2)).findById(any());
+        verify(spy).getLimitFromGroup(any());
+
+
     }
 
     @Test
@@ -267,6 +271,49 @@ public class SchedulerServiceTest {
         verify(lockRedisRepository, never()).save(any());
         verify(sender, never()).sendTaskToDispatcher(task1.getId());
         verify(taskRedisRepository, never()).deleteById(task1.getId());
+    }
+
+    @Test
+    public void testGetLimitFromGroup() {
+
+        Group group1 = createGroupTestObject();
+        group1.setParallelismDegree(15);
+        group1.setId("1");
+
+        Group group2 = createGroupTestObject();
+        group2.setParallelismDegree(10);
+        group2.setId("2");
+
+        Group group3 = createGroupTestObject();
+        group3.setParallelismDegree(5);
+        group3.setId("3");
+
+        group1.setParentGroup(group2);
+        group2.setParentGroup(group3);
+
+        when(groupService.getGroupById("1")).thenReturn(group1);
+        when(groupService.getGroupById("2")).thenReturn(group2);
+        when(groupService.getGroupById("3")).thenReturn(group3);
+
+        SchedulerService spy = spy(service);
+        int limit = spy.getLimitFromGroup(group1.getId());
+        assertEquals(limit,5);
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void testRuntimeExceptionInGetLimitFromGroup() {
+        when(groupService.getGroupById(any())).thenReturn(null);
+        SchedulerService spy = spy(service);
+        spy.getLimitFromGroup("as12");
+    }
+    @Test()
+    public void testCreateGroupParlellismTracker() {
+
+        SchedulerService spy = spy(service);
+        RedisLock testlock = spy.createGroupParallelismTracker("123");
+
+        assertEquals(testlock.getId(),"123");
+        verify(lockRedisRepository).save(any());
     }
 
     private Group createGroupTestObject() {
