@@ -60,6 +60,7 @@ public class ScheduledServicesTest {
 
         Thread.sleep(25000);
 
+
         verify(lockRepository).findAll();
         verify(lockRepository).delete(list.get(1));
     }
