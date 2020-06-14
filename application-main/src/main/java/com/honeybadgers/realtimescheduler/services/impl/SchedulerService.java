@@ -7,6 +7,7 @@ import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -215,7 +216,7 @@ public class SchedulerService implements ISchedulerService {
         return curr;
     }
 
-    private boolean checkIfTaskIsInActiveTime(Task task){
+    public boolean checkIfTaskIsInActiveTime(Task task){
         Date current = new Date();
         Date from = new Date();
         Date to = new Date();
@@ -250,8 +251,13 @@ public class SchedulerService implements ISchedulerService {
     public List<ActiveTimes> getActiveTimesForTask(Task task){
 
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
-
-        Group parentGroup = groupService.getGroupById(task.getGroup().getId());
+        Group parentGroup=null;
+        try {
+            parentGroup = groupService.getGroupById(task.getGroup().getId());
+        }
+        catch (NullPointerException e){
+            logger.log(Level.INFO,"parentgroup from "+task.getId()+" is null \n"+e.getMessage());
+        }
         if(parentGroup == null)
             return activeTimes;
 

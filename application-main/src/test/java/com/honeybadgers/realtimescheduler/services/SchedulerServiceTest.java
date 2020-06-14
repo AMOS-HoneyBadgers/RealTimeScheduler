@@ -16,6 +16,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Time;
+import java.time.LocalTime;
+import java.time.temporal.TemporalField;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -302,11 +304,30 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void testCheckIfTaskIsInActiveTimeGroupAndParentGroupHasActiveTime() {
-
-        // TODO
+    public void testCheckIfTaskIsInActiveTime_ReturnsTrue() {
         Task task = new Task();
-
+        ActiveTimes activeTimes = new ActiveTimes();
+        activeTimes.setFrom(java.sql.Time.valueOf(LocalTime.now().minusSeconds(100)));
+        activeTimes.setTo(java.sql.Time.valueOf(LocalTime.now().plusSeconds(100)));
+        List<ActiveTimes> activeTimesList = new ArrayList<ActiveTimes>();
+        activeTimesList.add(activeTimes);
+        task.setActiveTimeFrames(activeTimesList);
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(any())).thenReturn(null);
+        Assert.assertEquals(true, spy.checkIfTaskIsInActiveTime(task));
+    }
+    @Test
+    public void testCheckIfTaskIsInActiveTime_ReturnsFalse() {
+        Task task = new Task();
+        ActiveTimes activeTimes = new ActiveTimes();
+        activeTimes.setFrom(java.sql.Time.valueOf(LocalTime.now().plusSeconds(100)));
+        activeTimes.setTo(java.sql.Time.valueOf(LocalTime.now().plusSeconds(100)));
+        List<ActiveTimes> activeTimesList = new ArrayList<ActiveTimes>();
+        activeTimesList.add(activeTimes);
+        task.setActiveTimeFrames(activeTimesList);
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(any())).thenReturn(null);
+        Assert.assertEquals(false, spy.checkIfTaskIsInActiveTime(task));
     }
 
 }
