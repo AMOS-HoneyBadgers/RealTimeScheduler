@@ -347,5 +347,68 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
         Assert.assertEquals(false,spy.checkIfTaskIsInWorkingDays(task));
     }
+    @Test
+    public void testgetActualWorkingDaysForTask_OnlyTaskHasWorkingDays(){
+        //TODO check if it is correct that if a parent has no working days the working days of the task are relevant
+        Task task = new Task();
+        task.setId("TEST");
+        int[] workingDays = new int[]{0,0,0,0,0,0,0};
+        task.setWorkingDays(workingDays);
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        task.setGroup(parentGroup);
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+        Assert.assertEquals(spy.getActualWorkingDaysForTask(task), workingDays);
+    }
+    @Test
+    public void testgetActualWorkingDaysForTask_TaskAndParentHaveWorkingDays(){
+        //TODO check if it is correct that if a parent has  working days the working days of the parent are relevant
+        //prepare Task
+        Task task = new Task();
+        task.setId("TEST");
+        int[] workingdays = new int[]{0,0,0,0,0,0,0};
+        task.setWorkingDays(workingdays);
+        //prepare ParentGroup
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        int[] parentworkingdays = new int[]{0,0,0,0,0,1,0};
+        parentGroup.setWorkingDays(parentworkingdays);
+        //setParentGroup for task
+        task.setGroup(parentGroup);
+        //Act
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+        //Arrange active times of parent group must be returned
+        Assert.assertEquals(spy.getActualWorkingDaysForTask(task), parentworkingdays);
+    }
+    @Test
+    public void testgetActualWorkingDaysForTask_Task_ParentAndGrandparentHaveWorkingDays(){
+        //TODO check if it is correct that if a grandparent has  working days the working days of the grandparent are relevant
+        //prepare Task
+        Task task = new Task();
+        task.setId("TEST");
+        int[] workingdays = new int[]{0,0,0,0,0,0,0};
+        task.setWorkingDays(workingdays);
+        //prepare ParentGroup
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        int[] parentworkingdays = new int[]{0,0,0,0,0,1,0};
+        parentGroup.setWorkingDays(parentworkingdays);
+        //prepare GrandParentGroup
+        Group grandparentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        int[] grandparentworkingdays = new int[]{0,0,0,0,0,1,0};
+        grandparentGroup.setWorkingDays(grandparentworkingdays);
+        //setParentGroup for task
+        task.setGroup(parentGroup);
+        parentGroup.setParentGroup(grandparentGroup);
+        //Act
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+        when(groupService.getGroupById(parentGroup.getParentGroup().getId())).thenReturn(grandparentGroup);
+        //Arrange active times of grandparent group must be returned
+        Assert.assertEquals(spy.getActualWorkingDaysForTask(task), grandparentworkingdays);
+    }
 
 }

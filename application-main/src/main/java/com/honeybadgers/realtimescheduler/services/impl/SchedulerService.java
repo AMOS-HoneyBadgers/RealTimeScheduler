@@ -215,15 +215,42 @@ public class SchedulerService implements ISchedulerService {
     public boolean checkIfTaskIsInWorkingDays(Task task) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int dayofweek = calendar.get(Calendar.DAY_OF_WEEK);
-        logger.log(Level.ERROR,dayofweek);
         ConvertUtils convertUtils = new ConvertUtils();
-        List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(task.getWorkingDays());
-        logger.log(Level.ERROR,workingdaybools);
+        int[] workingdays= getActualWorkingDaysForTask(task);
+        List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(workingdays);
         if(workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBools(dayofweek)))
             return true;
         return false;
     }
 
+    public int[] getActualWorkingDaysForTask(Task task) {
+        int[] workingDays = task.getWorkingDays();
+        Group parentGroup = null;
+        try {
+            parentGroup = groupService.getGroupById(task.getGroup().getId());
+        } catch (NullPointerException e) {
+            logger.log(Level.INFO, "parentgroup from " + task.getId() + " is null \n" + e.getMessage());
+        }
+        if (parentGroup == null)
+            return workingDays;
+
+        int[] workingDaysTemp = parentGroup.getWorkingDays();
+        if (workingDaysTemp != null) {
+            workingDays = workingDaysTemp;
+        }
+
+        while (parentGroup.getParentGroup() != null) {
+            parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
+            if (parentGroup == null)
+                break;
+
+            workingDaysTemp = parentGroup.getWorkingDays();
+            if (workingDaysTemp != null) {
+                workingDays = workingDaysTemp;
+            }
+        }
+        return workingDays;
+    }
 
 
     private RedisLock createGroupParallelismTracker(String id) {
