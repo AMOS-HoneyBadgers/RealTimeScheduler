@@ -236,7 +236,7 @@
                                         <limit>
                                             <counter>METHOD</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>80%</minimum>
+                                            <minimum>50%</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -263,6 +263,7 @@
                     </excludes>
                     <includes>
                         <!-- Include subpackage of models -->
+                        <include>com/honeybadgers/realtimescheduler/services/**/*</include>
                         <include>com/honeybadgers/models/utils/**/*</include>
                     </includes>
                 </configuration>

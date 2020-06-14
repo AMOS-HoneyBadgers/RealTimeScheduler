@@ -180,6 +180,8 @@ public class SchedulerService implements ISchedulerService {
                     logger.info("Task with id " + currentTask.getId() + " is currently paused!");
                     continue;
                 }
+
+                // TODO BITTE AUSLAGERN DIE METHOD WIRD HIER VIEL ZU LANG
                 // get group with ancestors (IllegalArgExc not needed to be caught, because currentTask.getId() cannot be null)
                 List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
@@ -233,7 +235,7 @@ public class SchedulerService implements ISchedulerService {
         }
     }
 
-    private RedisLock createGroupParallelismTracker(String id) {
+    public RedisLock createGroupParallelismTracker(String id) {
         RedisLock curr = new RedisLock();
         curr.setId(id);
         lockRedisRepository.save(curr);

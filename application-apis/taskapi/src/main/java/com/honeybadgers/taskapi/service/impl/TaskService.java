@@ -15,6 +15,7 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
+import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-
+@Service
 public class TaskService implements ITaskService {
 
     static final Logger logger = LogManager.getLogger(TaskService.class);

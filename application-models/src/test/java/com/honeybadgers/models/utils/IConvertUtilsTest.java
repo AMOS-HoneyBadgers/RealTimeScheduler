@@ -25,7 +25,7 @@ public class IConvertUtilsTest {
         // OffsetDateTime does not have method to get milliseconds since epoch -> getSecondsSinceEpoch + getNanosOfCurrentSecond concatenated
         long dateTimeAsMilli = Long.parseLong(Long.toString(dateTime.toEpochSecond()) + Long.toString(dateTime.getNano()).substring(0, 3));
         assertEquals(timestamp.getTime(), dateTimeAsMilli);
-    }
+   }
 
     @Test
     public void testTimestampJpaToRest_nullInput() {

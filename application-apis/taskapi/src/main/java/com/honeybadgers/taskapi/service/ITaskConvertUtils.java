@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 
+@Service
 public interface ITaskConvertUtils extends IConvertUtils {
 
      TaskModel taskJpaToRest(Task task);
