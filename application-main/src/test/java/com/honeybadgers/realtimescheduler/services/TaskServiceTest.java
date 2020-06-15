@@ -74,12 +74,12 @@ public class TaskServiceTest {
         long prio = service.calculatePriority(newTask);
 
         // If all Modifier = 1 and const = 1000
-        Assert.assertEquals(50, prio);
+        Assert.assertEquals(980, prio);
 
         // set deadline and check final priority
         newTask.setDeadline(new Timestamp(System.currentTimeMillis() + 100000));
         prio = service.calculatePriority(newTask);
-        Assert.assertTrue(prio > 50);
+        Assert.assertTrue(prio > 980);
 
         // create new Task with lower deadline and check final priority
         Task newTaskHigherPrio = new Task();
