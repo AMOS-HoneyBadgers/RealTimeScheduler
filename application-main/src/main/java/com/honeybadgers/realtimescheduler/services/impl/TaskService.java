@@ -87,7 +87,7 @@ public class TaskService implements ITaskService {
         boolean realtime = task.getTypeFlagEnum() == TypeFlagEnum.Realtime;
         int retries = task.getRetries();
 
-        double prioFactor = (constant * prioModifier)/basePrio;
+        double prioFactor = basePrio == 0 ? 0 : ((constant - basePrio) * prioModifier);
         double realtimeFactor = realtime ? constant/realtimeModifier : 0;
         double retriesFactor = (retries * constant)/retriesModifier;
 
