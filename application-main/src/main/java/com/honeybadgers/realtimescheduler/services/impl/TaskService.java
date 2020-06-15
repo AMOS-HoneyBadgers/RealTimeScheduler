@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.Task;
 import com.honeybadgers.models.RedisTask;
+import com.honeybadgers.models.TypeFlagEnum;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import lombok.extern.slf4j.Slf4j;
@@ -21,6 +22,14 @@ public class TaskService implements ITaskService {
 
     @Value("${com.realtimescheduler.scheduler.priority.deadline-modifier}")
     double deadlineModifier;
+    @Value("${com.realtimescheduler.scheduler.priority.prio-modifier}")
+    double prioModifier;
+    @Value("${com.realtimescheduler.scheduler.priority.realtime-modifier}")
+    double realtimeModifier;
+    @Value("${com.realtimescheduler.scheduler.priority.retries-modifier}")
+    double retriesModifier;
+    @Value("${com.realtimescheduler.scheduler.priority.const}")
+    double constant;
 
     @Value("${com.realtimescheduler.scheduler.priority.deadline-bonus-base-prio-dependant}")
     boolean deadlineBaseDependant;
@@ -45,8 +54,8 @@ public class TaskService implements ITaskService {
         this.taskPostgresRepository.deleteById(id);
     }
 
-    @Override
-    public long calculatePriority(Task task) {
+    //@Override
+    /*public long calculatePriority(Task task) {
         double finalPriority = 0;
         finalPriority = task.getPriority();
         Timestamp deadline = task.getDeadline();
@@ -63,6 +72,27 @@ public class TaskService implements ITaskService {
             }
         }
         return Math.round(finalPriority);
+    }*/
+
+    @Override
+    public long calculatePriority(Task task) {
+
+        double basePrio = task.getPriority();
+        Timestamp deadline = task.getDeadline();
+        //timeDiff in Minuten umrechnen, da sonst Differenz zu klein (finalPriority ändert zu wenig)
+        Date currentTime = new Date(System.currentTimeMillis());
+        // Math.abs(deadline.getTime() - currentTime.getTime()) / (1000.0 * 60.0) = TIME DIFFERENCE
+        double deadlineFactor = deadline == null ? 0 : (constant * deadlineModifier)/(Math.abs(deadline.getTime() - currentTime.getTime()) / (1000.0 * 60.0));
+
+        boolean realtime = task.getTypeFlagEnum() == TypeFlagEnum.Realtime;
+        int retries = task.getRetries();
+
+        double prioFactor = (constant * prioModifier)/basePrio;
+        double realtimeFactor = realtime ? constant/realtimeModifier : 0;
+        double retriesFactor = (retries * constant)/retriesModifier;
+
+        return (long) (deadlineFactor + prioFactor + realtimeFactor - retriesFactor);
+
     }
 
 }
