@@ -1,4 +1,3 @@
-package com.honeybadgers.realtimescheduler.repository;
 package com.honeybadgers.managementapi.repository;
 
 import com.honeybadgers.models.model.RedisLock;
