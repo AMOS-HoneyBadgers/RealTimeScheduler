@@ -4,6 +4,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.honeybadgers.models.ActiveTimes;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.OffsetDateTime;
@@ -16,7 +17,7 @@ import javax.validation.constraints.*;
 /**
  * GroupModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T20:08:19.461+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-13T16:16:45.192661400+02:00[Europe/Berlin]")
 
 public class GroupModel   {
   @JsonProperty("id")
@@ -123,7 +124,7 @@ public class GroupModel   {
   private Integer lastIndexNumber;
 
   @JsonProperty("parallelism_degree")
-  private Integer parallelismDegree;
+  private Integer parallelismDegree = 1;
 
   public GroupModel id(String id) {
     this.id = id;

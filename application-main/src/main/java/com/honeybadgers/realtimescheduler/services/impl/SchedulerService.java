@@ -84,8 +84,8 @@ public class SchedulerService implements ISchedulerService {
         int minLimit;
 
         Group childGroup = groupService.getGroupById(groupId);
-        if (childGroup == null)
-            throw new RuntimeException("no group found for id +" + groupId);
+        if(childGroup == null || childGroup.getParallelismDegree() == null)
+            throw new RuntimeException("no group or parlellismdegree found for id +" + groupId);
 
         minLimit = childGroup.getParallelismDegree();
 
@@ -98,6 +98,7 @@ public class SchedulerService implements ISchedulerService {
             childGroup = parentGroup;
         }
 
+        logger.info("limit is now at: " + minLimit);
         return minLimit;
     }
 
@@ -124,8 +125,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String taskId) {
-        //Special case: gets trigger from feedback -> TODO in new QUEUE
-        if (taskId.equals(scheduler_trigger)) {
+        //Special case: gets trigger from feedback -> TODO in new QUEUE if necessary
+        if(taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(this.getAllRedisTasksAndSort());
             return;
         }
@@ -158,7 +159,7 @@ public class SchedulerService implements ISchedulerService {
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if (!isSchedulerLocked()) {
             // scheduler not locked -> can send
-            System.out.println("Step 4: send Tasks to dispatcher");
+            logger.info("Step 4: send Tasks to dispatcher");
             sendTaskstoDispatcher(tasks);
 
         } else
@@ -208,6 +209,7 @@ public class SchedulerService implements ISchedulerService {
                 logger.log(Level.INFO, "task should now be sent to dispatcher");
                 // Task will be send to dispatcher, change currentTasks + 1
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
+                logger.info("current_tasks is now increased to : " + currentParallelismDegree.getCurrentTasks());
                 lockRedisRepository.save(currentParallelismDegree);
 
                 logger.info("deleting task from redis database");
