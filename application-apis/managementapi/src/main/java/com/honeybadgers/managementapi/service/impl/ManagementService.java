@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.UUID;
 
 import static com.honeybadgers.models.model.Constants.*;
@@ -36,7 +37,7 @@ public class ManagementService implements IManagementService {
         RedisLock toSave = new RedisLock();
         toSave.setId(LOCK_SCHEDULER_ALIAS);
         if(resumeDate != null)
-            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, resumeDate.getOffset()));
+            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
         stateRepository.save(toSave);
     }
 
@@ -57,7 +58,7 @@ public class ManagementService implements IManagementService {
         RedisLock toSave = new RedisLock();
         toSave.setId(id);
         if(resumeDate != null)
-            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, resumeDate.getOffset()));
+            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
         stateRepository.save(toSave);
     }
 
@@ -79,8 +80,7 @@ public class ManagementService implements IManagementService {
         RedisLock toSave = new RedisLock();
         toSave.setId(id);
         if(resumeDate != null)
-            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, resumeDate.getOffset()));
-        logger.info("############ SAVING: " + toSave.toString());
+            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
         stateRepository.save(toSave);
     }
 

@@ -40,7 +40,10 @@ public class ScheduledServices {
                     continue;
                 }
 
-                if(redisLock.getResume_date().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
+                logger.info("resume date is at: " + redisLock.getResume_date().toString());
+                LocalDateTime now = LocalDateTime.now(ZoneOffset.UTC);
+                logger.info("current time is at: " + now.toString());
+                if(redisLock.getResume_date().isBefore(now)) {
                     logger.info("Deleting lock with id " + redisLock.getId());
                     lockRepository.delete(redisLock);
                 }
