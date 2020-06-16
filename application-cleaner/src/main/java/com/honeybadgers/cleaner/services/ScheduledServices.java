@@ -13,12 +13,12 @@ import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collection;
 
+import static com.honeybadgers.models.model.Constants.LOCK_GROUP_PREFIX_RUNNING_TASKS;
+
 @Component
 public class ScheduledServices {
 
     static final Logger logger = LogManager.getLogger(ScheduledServices.class);
-
-    public static final String LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS = "GROUP_PREFIX_PARLELLISM_CURRENT_TASKS_RUNNING_FOR_GROUP";
 
     @Autowired
     LockRepository lockRepository;
@@ -35,7 +35,7 @@ public class ScheduledServices {
                     continue;
 
                 // assert, that this is no parallelismObject which has a resume_date by mistake
-                if(redisLock.getId().startsWith(LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS)) {
+                if(redisLock.getId().startsWith(LOCK_GROUP_PREFIX_RUNNING_TASKS)) {
                     logger.warn("Found parallelism redisLock object with resume date: " + redisLock.toString());
                     continue;
                 }

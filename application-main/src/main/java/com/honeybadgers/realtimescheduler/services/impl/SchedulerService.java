@@ -28,9 +28,6 @@ public class SchedulerService implements ISchedulerService {
     static final Logger logger = LogManager.getLogger(SchedulerService.class);
 
 
-    @Value("${scheduler.group.runningtasks}")
-    String LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS;
-
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
@@ -199,7 +196,7 @@ public class SchedulerService implements ISchedulerService {
 
                 // TODO refactor zusammen legen mit group lock checker
                 logger.info("Checking parallelism degree.");
-                String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
+                String groupParlallelName = LOCK_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
                 RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
