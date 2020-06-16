@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.repository;
+package com.honeybadgers.managementapi.repository;
 
 import com.honeybadgers.models.model.RedisLock;
 import lombok.extern.slf4j.Slf4j;

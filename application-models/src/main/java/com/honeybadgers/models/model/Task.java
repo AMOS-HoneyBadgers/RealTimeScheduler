@@ -1,4 +1,4 @@
-package com.honeybadgers.models;
+package com.honeybadgers.models.model;
 
 import com.vladmihalcea.hibernate.type.array.IntArrayType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;

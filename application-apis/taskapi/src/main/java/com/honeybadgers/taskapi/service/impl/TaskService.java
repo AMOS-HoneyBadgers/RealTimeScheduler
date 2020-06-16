@@ -2,7 +2,7 @@ package com.honeybadgers.taskapi.service.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
-import com.honeybadgers.models.*;
+import com.honeybadgers.models.model.*;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;

@@ -1,6 +1,6 @@
 package com.honeybadgers.taskapi.service;
 
-import com.honeybadgers.models.*;
+import com.honeybadgers.models.model.*;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.awt.event.ActionEvent;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.util.*;

@@ -1,7 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.*;
+import com.honeybadgers.models.model.*;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -20,23 +20,15 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.honeybadgers.models.ModeEnum.Sequential;
+import static com.honeybadgers.models.model.ModeEnum.Sequential;
+
+import static com.honeybadgers.models.model.Constants.*;
 
 @Service
 public class SchedulerService implements ISchedulerService {
 
     static final Logger logger = LogManager.getLogger(SchedulerService.class);
 
-
-    // These prefixes are for the case, that a group exists with id='SCHEDULER_LOCK_ALIAS'
-    // HAVE TO BE THE SAME AS IN ManagementService IN managementapi!!!!!!!!!!!!! mach halt bitte noch mehr Ausrufezeichen
-    public static final String LOCKREDIS_SCHEDULER_ALIAS = "SCHEDULER_LOCK_ALIAS";
-    public static final String LOCKREDIS_TASK_PREFIX = "TASK:";
-    public static final String LOCKREDIS_GROUP_PREFIX = "GROUP:";
-
-
-    @Value("${scheduler.group.runningtasks}")
-    String LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS;
 
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
@@ -106,7 +98,7 @@ public class SchedulerService implements ISchedulerService {
     public boolean isTaskLocked(String taskId) {
         if (taskId == null)
             throw new IllegalArgumentException("Given taskId was null!");
-        String lockId = LOCKREDIS_TASK_PREFIX + taskId;
+        String lockId = LOCK_TASK_PREFIX + taskId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
     }
@@ -115,7 +107,7 @@ public class SchedulerService implements ISchedulerService {
     public boolean isGroupLocked(String groupId) {
         if (groupId == null)
             throw new IllegalArgumentException("Given groupId was null!");
-        String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        String lockId = LOCK_GROUP_PREFIX + groupId;
         logger.info("searching for lockid: " + lockId);
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
@@ -123,7 +115,7 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public boolean isSchedulerLocked() {
-        RedisLock lock = lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS).orElse(null);
+        RedisLock lock = lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
         return lock != null;
     }
 
@@ -157,7 +149,7 @@ public class SchedulerService implements ISchedulerService {
 
 
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
-        logger.log(Level.INFO, tasks);
+        logger.info(tasks);
 
         // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if (!isSchedulerLocked()) {
@@ -210,7 +202,7 @@ public class SchedulerService implements ISchedulerService {
 
                 // TODO refactor zusammen legen mit group lock checker
                 logger.info("Checking parallelism degree.");
-                String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
+                String groupParlallelName = LOCK_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
                 RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
@@ -219,26 +211,26 @@ public class SchedulerService implements ISchedulerService {
 
                 // Get ActiveTimes for Task and check if it is allowed to be dispatched
                 Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
-                logger.log(Level.INFO, "Task:");
-                logger.log(Level.INFO, task.getId());
+                logger.info("Task:");
+                logger.info(task.getId());
                 if (task == null) {
                     throw new RuntimeException("Task not found in Postgre Database");
                 }
-                logger.log(Level.INFO, "checkIfTaskIsInActiveTime");
+                logger.info("checkIfTaskIsInActiveTime");
                 if (!checkIfTaskIsInActiveTime(task))
                     continue;
-                logger.log(Level.INFO, "checkIfTaskIsInWorkingDays");
+                logger.info("checkIfTaskIsInWorkingDays");
                 if (!checkIfTaskIsInWorkingDays(task))
                     continue;
-                logger.log(Level.INFO, "sequentialCheck");
+                logger.info("sequentialCheck");
                 if (sequentialHasToWait(task))
                     continue;
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
-                logger.log(Level.INFO, "parallelismdegree");
+                logger.info("parallelismdegree");
                 int limit = getLimitFromGroup(currentTask.getGroupid());
                 if (currentParallelismDegree.getCurrentTasks() >= limit)
                     continue;
-                logger.log(Level.INFO, "task should now be sent to dispatcher");
+                logger.info("task should now be sent to dispatcher");
                 // Task will be send to dispatcher, change currentTasks + 1
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
                 logger.info("current_tasks is now increased to : " + currentParallelismDegree.getCurrentTasks());
@@ -288,7 +280,7 @@ public class SchedulerService implements ISchedulerService {
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
         } catch (NullPointerException e) {
-            logger.log(Level.INFO, "parentgroup from " + task.getId() + " is null \n" + e.getMessage());
+            logger.info("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
         }
         if (parentGroup == null)
             return workingDays;
@@ -335,7 +327,7 @@ public class SchedulerService implements ISchedulerService {
         }
         activeTimes = getActiveTimesForTask(task);
 
-        logger.log(Level.INFO, activeTimes);
+        logger.info(activeTimes);
         if (activeTimes == null || activeTimes.isEmpty()) {
             return true;
         }
@@ -357,20 +349,20 @@ public class SchedulerService implements ISchedulerService {
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
 
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
-        logger.log(Level.INFO, "activetimes");
-        logger.log(Level.INFO, activeTimes);
+        logger.info("activetimes");
+        logger.info(activeTimes);
         Group parentGroup = null;
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
         } catch (NullPointerException e) {
-            logger.log(Level.INFO, "parentgroup from " + task.getId() + " is null \n" + e.getMessage());
+            logger.info("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
         }
         if (parentGroup == null)
             return activeTimes;
 
         List<ActiveTimes> activeTimesTemp = parentGroup.getActiveTimeFrames();
-        logger.log(Level.INFO, "parentactivetimes");
-        logger.log(Level.INFO, activeTimesTemp);
+        logger.info("parentactivetimes");
+        logger.info(activeTimesTemp);
         if (activeTimesTemp != null && !(activeTimesTemp.isEmpty())) {
             activeTimes = activeTimesTemp;
         }

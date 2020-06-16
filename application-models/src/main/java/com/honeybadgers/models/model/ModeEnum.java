@@ -1,6 +1,4 @@
-package com.honeybadgers.models;
-
-import javax.lang.model.element.UnknownElementException;
+package com.honeybadgers.models.model;
 
 public enum ModeEnum {
     Sequential, Parallel;

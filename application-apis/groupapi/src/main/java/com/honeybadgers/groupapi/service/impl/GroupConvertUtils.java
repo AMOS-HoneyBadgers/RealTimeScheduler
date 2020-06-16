@@ -4,7 +4,7 @@ import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
 import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
-import com.honeybadgers.models.*;
+import com.honeybadgers.models.model.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

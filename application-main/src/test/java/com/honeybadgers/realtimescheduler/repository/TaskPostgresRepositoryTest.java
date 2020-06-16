@@ -1,8 +1,8 @@
 package com.honeybadgers.realtimescheduler.repository;
 
-import com.honeybadgers.models.Group;
-import com.honeybadgers.models.ModeEnum;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.ModeEnum;
+import com.honeybadgers.models.model.Task;
 import com.honeybadgers.realtimescheduler.config.H2TestConfig;
 import org.junit.Before;
 import org.junit.Test;

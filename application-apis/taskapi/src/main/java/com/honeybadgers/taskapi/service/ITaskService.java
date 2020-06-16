@@ -1,8 +1,7 @@
 package com.honeybadgers.taskapi.service;
 
-import com.honeybadgers.communication.model.TaskQueueModel;
-import com.honeybadgers.models.Task;
-import com.honeybadgers.models.UnknownEnumException;
+import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;

@@ -1,16 +1,13 @@
 package com.honeybadgers.cleaner.services;
 
 
-import com.honeybadgers.cleaner.repository.LockRepository;
-import com.honeybadgers.models.RedisLock;
-import lombok.extern.slf4j.Slf4j;
+import com.honeybadgers.cleaner.repository.LockRedisRepository;
+import com.honeybadgers.models.model.RedisLock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -18,9 +15,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Iterator;
 
 import static org.mockito.Mockito.*;
 
@@ -33,7 +27,7 @@ public class ScheduledServicesTest {
     ScheduledServices service;
 
     @MockBean
-    LockRepository lockRepository;
+    LockRedisRepository lockRedisRepository;
 
     ArrayList<RedisLock> list;
     RedisLock paraLock;
@@ -61,21 +55,21 @@ public class ScheduledServicesTest {
         list.add(lock3);
         list.add(paraLock);
 
-        when(lockRepository.findAll()).thenReturn((Iterable<RedisLock>) list);
-        doNothing().when(lockRepository).delete(any());
+        when(lockRedisRepository.findAll()).thenReturn((Iterable<RedisLock>) list);
+        doNothing().when(lockRedisRepository).deleteById(any());
     }
 
     @Test
     public void testSchedulerCleaner_twoIterations() throws InterruptedException {
-        verify(lockRepository,never()).findAll();
-        verify(lockRepository,never()).delete(any(RedisLock.class));
+        verify(lockRedisRepository,never()).findAll();
+        verify(lockRedisRepository,never()).deleteById(anyString());
 
         // wait for initial delay
         Thread.sleep(200);
 
-        verify(lockRepository).findAll();
-        verify(lockRepository, times(1)).delete(list.get(1));
-        verify(lockRepository, never()).delete(paraLock);
+        verify(lockRedisRepository).findAll();
+        verify(lockRedisRepository, times(1)).deleteById(list.get(1).getId());
+        verify(lockRedisRepository, never()).deleteById(paraLock.getId());
 
         RedisLock lockNew = new RedisLock();
         lockNew.setResume_date(LocalDateTime.now(ZoneOffset.UTC).minusMinutes(1));
@@ -84,11 +78,11 @@ public class ScheduledServicesTest {
         list = new ArrayList<RedisLock>();
         list.add(lockNew);
 
-        when(lockRepository.findAll()).thenReturn((Iterable<RedisLock>) list);
+        when(lockRedisRepository.findAll()).thenReturn((Iterable<RedisLock>) list);
 
         Thread.sleep(1000);
 
-        verify(lockRepository, times(1)).delete(lockNew);
-        verify(lockRepository, never()).delete(paraLock);
+        verify(lockRedisRepository, times(1)).deleteById(lockNew.getId());
+        verify(lockRedisRepository, never()).deleteById(paraLock.getId());
     }
 }

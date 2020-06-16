@@ -3,14 +3,13 @@ package com.honeybadgers.groupapi.service;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.repository.TaskRepository;
-import com.honeybadgers.models.Task;
-import com.honeybadgers.models.utils.IConvertUtils;
+import com.honeybadgers.models.model.Task;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.honeybadgers.models.Group;
+import com.honeybadgers.models.model.Group;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.models.UnknownEnumException;
+import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.service.impl.GroupService;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,7 +21,6 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;

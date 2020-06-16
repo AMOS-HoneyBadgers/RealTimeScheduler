@@ -1,10 +1,10 @@
 package com.honeybadgers.realtimescheduler.repository;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.Group;
-import com.honeybadgers.models.ModeEnum;
-import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.ModeEnum;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -14,9 +14,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import static com.honeybadgers.models.model.Constants.LOCK_GROUP_PREFIX_RUNNING_TASKS;
+
 @Component
 @EnableRabbit
 public class FeedbackConsumer {
+
+    static final Logger logger = LogManager.getLogger(FeedbackConsumer.class);
 
     @Autowired
     public ICommunication sender;
@@ -24,18 +28,14 @@ public class FeedbackConsumer {
     @Autowired
     public LockRedisRepository lockRedisRepository;
 
+    @Autowired
+    GroupPostgresRepository groupPostgresRepository;
+
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
-    @Value("${scheduler.group.runningtasks}")
-    String LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS;
-
     @Autowired
     TaskService service;
-
-    @Autowired
-    GroupPostgresRepository groupPostgresRepository;
-    static final Logger logger = LogManager.getLogger(FeedbackConsumer.class);
 
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String id) throws InterruptedException {
@@ -48,7 +48,7 @@ public class FeedbackConsumer {
             throw new RuntimeException("could not find tasks in postgre database");
 
         // Get Current Running Tasks from Redis Database, throw exception if it wasnt found
-        String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroup().getId();
+        String groupParlallelName = LOCK_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroup().getId();
         RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
         if(currentParallelismDegree == null)
             throw new RuntimeException("no parlallelismdegree found in redis database for task:   " + id);

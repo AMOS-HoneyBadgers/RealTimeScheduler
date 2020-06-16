@@ -3,8 +3,8 @@ package com.honeybadgers.groupapi.service;
 import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.models.Group;
-import com.honeybadgers.models.UnknownEnumException;
+import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.UnknownEnumException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
