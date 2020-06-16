@@ -73,8 +73,8 @@ public class TestController {
     @PostMapping("/test/lock")
     public ResponseEntity<?> testLockRedis() {
         RedisLock lock = new RedisLock();
-        lock.setId("TASK:" + UUID.randomUUID().toString());
-        lock.setResume_date(LocalDateTime.now());
+        lock.setId("GROUP:TestGroup12");
+        //lock.setResume_date(LocalDateTime.now());
         lockRedisRepository.save(lock);
 
         log.warn("######################### SAVED " + lock.toString());

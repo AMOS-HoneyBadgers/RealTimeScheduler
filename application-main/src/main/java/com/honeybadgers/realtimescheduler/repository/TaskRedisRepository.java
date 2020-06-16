@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 public class TaskRedisRepository implements CrudRepository<RedisTask, String> {
 
-    private static final String KEY = "REDISTASK";
+    private static final String KEY = "RedisTask";
 
     @Autowired
     @Qualifier("prioRedisTemplate")

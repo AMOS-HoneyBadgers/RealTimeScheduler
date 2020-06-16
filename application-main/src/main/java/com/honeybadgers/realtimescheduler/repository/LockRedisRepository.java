@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 public class LockRedisRepository implements CrudRepository<RedisLock, String> {
 
-    private static final String KEY = "LOCK";
+    private static final String KEY = "RedisLock";
 
     @Autowired
     @Qualifier("lockRedisTemplate")

@@ -114,6 +114,7 @@ public class SchedulerService implements ISchedulerService {
         if (groupId == null)
             throw new IllegalArgumentException("Given groupId was null!");
         String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        logger.info("searching for lockid: " + lockId);
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
     }
@@ -189,6 +190,7 @@ public class SchedulerService implements ISchedulerService {
                 boolean pausedFound = false;
                 for (String groupId : groupsOfTask) {
                     // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
+                    logger.info("searching lock for groupid : " + groupId);
                     if(isGroupLocked(groupId)) {
                         // group is paused -> break inner loop for checking group on paused
                         pausedFound = true;
