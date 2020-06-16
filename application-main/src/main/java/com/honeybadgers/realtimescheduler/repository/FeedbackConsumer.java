@@ -1,9 +1,13 @@
 package com.honeybadgers.realtimescheduler.repository;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.Group;
+import com.honeybadgers.models.ModeEnum;
 import com.honeybadgers.models.RedisLock;
 import com.honeybadgers.models.Task;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
