@@ -19,7 +19,6 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 
 @Configuration
-@EnableTransactionManagement
 @EnableRedisRepositories(basePackages = "com.honeybadgers.managementapi")
 public class RedisConfig {
 
@@ -39,7 +38,7 @@ public class RedisConfig {
     public RedisTemplate<String, RedisLock> redisTemplate() {
         RedisTemplate<String, RedisLock> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactory());
-        template.setEnableTransactionSupport(true);
+        //template.setEnableTransactionSupport(true);
 
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());

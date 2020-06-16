@@ -200,6 +200,7 @@ public class SchedulerService implements ISchedulerService {
                 if(pausedFound)
                     continue;
 
+                // TODO refactor zusammen legen mit group lock checker
                 logger.info("Checking parallelism degree.");
                 String groupParlallelName = LOCKREDIS_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
