@@ -2,6 +2,7 @@ package com.honeybadgers.managementapi.service;
 
 
 import com.honeybadgers.managementapi.exception.LockException;
+import com.honeybadgers.managementapi.repository.LockRedisRepository;
 import com.honeybadgers.managementapi.repository.StateRepository;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
 import com.honeybadgers.models.model.RedisLock;
@@ -28,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 public class ManagementServiceTest {
 
     @MockBean
-    StateRepository stateRepository;
+    LockRedisRepository stateRepository;
 
     @Autowired
     ManagementService service;

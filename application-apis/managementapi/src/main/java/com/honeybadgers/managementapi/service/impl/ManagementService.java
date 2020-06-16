@@ -1,6 +1,7 @@
 package com.honeybadgers.managementapi.service.impl;
 
 import com.honeybadgers.managementapi.exception.LockException;
+import com.honeybadgers.managementapi.repository.LockRedisRepository;
 import com.honeybadgers.managementapi.repository.StateRepository;
 import com.honeybadgers.managementapi.service.IManagementService;
 import com.honeybadgers.models.model.RedisLock;
@@ -23,8 +24,11 @@ public class ManagementService implements IManagementService {
     static final Logger logger = LogManager.getLogger(ManagementService.class);
 
 
+    /*@Autowired
+    StateRepository stateRepository;*/
+
     @Autowired
-    StateRepository stateRepository;
+    LockRedisRepository stateRepository;
 
     @Override
     @Transactional

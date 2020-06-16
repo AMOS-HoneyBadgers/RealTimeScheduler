@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.web;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.RedisLock;
 import com.honeybadgers.models.model.RedisTask;
+import com.honeybadgers.realtimescheduler.config.RedisApplicationProperties;
 import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
@@ -49,6 +50,9 @@ public class TestController {
     @Autowired
     GroupAncestorRepository groupAncestorRepository;
 
+    @Autowired
+    RedisApplicationProperties redisApplicationProperties;
+
 
     @GetMapping("/testtask/{priority}")
     public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
@@ -72,6 +76,26 @@ public class TestController {
 
     @PostMapping("/test/lock")
     public ResponseEntity<?> testLockRedis() {
+
+        log.info("########################## REDIS PROP: " + redisApplicationProperties.toString());
+
+        RedisLock lock = new RedisLock();
+        lock.setId("GROUP:TestGroup9");
+
+        log.warn("######################### TRYING TO FIND " + lock.toString());
+
+        RedisLock get = lockRedisRepository.findById(lock.getId()).orElse(null);
+        if(get == null)
+            log.warn("######################### FAILURE!!");
+        else
+            log.warn("######################### SUCCESS: " + get.toString());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/test/lock2")
+    public ResponseEntity<?> testLockRedis2() {
+
         RedisLock lock = new RedisLock();
         lock.setId("GROUP:TestGroup12");
         //lock.setResume_date(LocalDateTime.now());
