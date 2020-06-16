@@ -211,18 +211,18 @@ public class SchedulerService implements ISchedulerService {
 
                 // Get ActiveTimes for Task and check if it is allowed to be dispatched
                 Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
-                logger.log(Level.INFO, "Task:");
-                logger.log(Level.INFO, task.getId());
+                logger.info("Task:");
+                logger.info(task.getId());
                 if (task == null) {
                     throw new RuntimeException("Task not found in Postgre Database");
                 }
-                logger.log(Level.INFO, "checkIfTaskIsInActiveTime");
+                logger.info("checkIfTaskIsInActiveTime");
                 if (!checkIfTaskIsInActiveTime(task))
                     continue;
-                logger.log(Level.INFO, "checkIfTaskIsInWorkingDays");
+                logger.info("checkIfTaskIsInWorkingDays");
                 if (!checkIfTaskIsInWorkingDays(task))
                     continue;
-                logger.log(Level.INFO, "sequentialCheck");
+                logger.info("sequentialCheck");
                 if (sequentialHasToWait(task))
                     continue;
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
@@ -280,7 +280,7 @@ public class SchedulerService implements ISchedulerService {
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
         } catch (NullPointerException e) {
-            logger.log(Level.INFO, "parentgroup from " + task.getId() + " is null \n" + e.getMessage());
+            logger.info("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
         }
         if (parentGroup == null)
             return workingDays;
@@ -327,7 +327,7 @@ public class SchedulerService implements ISchedulerService {
         }
         activeTimes = getActiveTimesForTask(task);
 
-        logger.log(Level.INFO, activeTimes);
+        logger.info(activeTimes);
         if (activeTimes == null || activeTimes.isEmpty()) {
             return true;
         }
@@ -349,20 +349,20 @@ public class SchedulerService implements ISchedulerService {
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
 
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
-        logger.log(Level.INFO, "activetimes");
-        logger.log(Level.INFO, activeTimes);
+        logger.info("activetimes");
+        logger.info(activeTimes);
         Group parentGroup = null;
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
         } catch (NullPointerException e) {
-            logger.log(Level.INFO, "parentgroup from " + task.getId() + " is null \n" + e.getMessage());
+            logger.info("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
         }
         if (parentGroup == null)
             return activeTimes;
 
         List<ActiveTimes> activeTimesTemp = parentGroup.getActiveTimeFrames();
-        logger.log(Level.INFO, "parentactivetimes");
-        logger.log(Level.INFO, activeTimesTemp);
+        logger.info("parentactivetimes");
+        logger.info(activeTimesTemp);
         if (activeTimesTemp != null && !(activeTimesTemp.isEmpty())) {
             activeTimes = activeTimesTemp;
         }
