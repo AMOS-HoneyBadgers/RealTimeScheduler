@@ -188,11 +188,10 @@ public class SchedulerService implements ISchedulerService {
                 boolean pausedFound = false;
                 for (String groupId : groupsOfTask) {
                     // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
-                    logger.info("searching lock for groupid : " + groupId);
                     if(isGroupLocked(groupId)) {
                         // group is paused -> break inner loop for checking group on paused
                         pausedFound = true;
-                        logger.info("Found paused group with groupId " + groupId);
+                        logger.debug("Found paused group with groupId " + groupId);
                         break;
                     }
                 }
@@ -211,22 +210,20 @@ public class SchedulerService implements ISchedulerService {
 
                 // Get ActiveTimes for Task and check if it is allowed to be dispatched
                 Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
-                logger.info("Task:");
-                logger.info(task.getId());
                 if (task == null) {
                     throw new RuntimeException("Task not found in Postgre Database");
                 }
-                logger.info("checkIfTaskIsInActiveTime");
+                logger.debug("checkIfTaskIsInActiveTime");
                 if (!checkIfTaskIsInActiveTime(task))
                     continue;
-                logger.info("checkIfTaskIsInWorkingDays");
+                logger.debug("checkIfTaskIsInWorkingDays");
                 if (!checkIfTaskIsInWorkingDays(task))
                     continue;
-                logger.info("sequentialCheck");
+                logger.debug("sequentialCheck");
                 if (sequentialHasToWait(task))
                     continue;
                 // get Limit and compare if we are allowed to send new Tasks to Dispatcher
-                logger.info("parallelismdegree");
+                logger.debug("parallelismdegree");
                 int limit = getLimitFromGroup(currentTask.getGroupid());
                 if (currentParallelismDegree.getCurrentTasks() >= limit)
                     continue;
@@ -252,9 +249,9 @@ public class SchedulerService implements ISchedulerService {
 
     public boolean sequentialHasToWait(Task task) {
         if (task.getModeEnum() == Sequential) {
-            logger.info("task getIndexNumber " + task.getIndexNumber());
+            logger.debug("task getIndexNumber " + task.getIndexNumber());
             Group parentgroup = task.getGroup();
-            logger.info("parentgroup lastindexnumber " + parentgroup.getLastIndexNumber());
+            logger.debug("parentgroup lastindexnumber " + parentgroup.getLastIndexNumber());
             if (task.getIndexNumber() == parentgroup.getLastIndexNumber()+1)
                 return false;
             else
@@ -276,11 +273,12 @@ public class SchedulerService implements ISchedulerService {
 
     public int[] getActualWorkingDaysForTask(Task task) {
         int[] workingDays = task.getWorkingDays();
+        //TODO: Refactor to if else
         Group parentGroup = null;
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
         } catch (NullPointerException e) {
-            logger.info("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
+            logger.debug("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
         }
         if (parentGroup == null)
             return workingDays;
@@ -349,8 +347,8 @@ public class SchedulerService implements ISchedulerService {
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
 
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
-        logger.info("activetimes");
-        logger.info(activeTimes);
+        logger.debug(activeTimes);
+        //TODO: Refactor to if else
         Group parentGroup = null;
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());
@@ -361,8 +359,7 @@ public class SchedulerService implements ISchedulerService {
             return activeTimes;
 
         List<ActiveTimes> activeTimesTemp = parentGroup.getActiveTimeFrames();
-        logger.info("parentactivetimes");
-        logger.info(activeTimesTemp);
+        logger.debug(activeTimesTemp);
         if (activeTimesTemp != null && !(activeTimesTemp.isEmpty())) {
             activeTimes = activeTimesTemp;
         }
