@@ -1,10 +1,10 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.Group;
-import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.RedisTask;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.RedisTask;
+import com.honeybadgers.models.model.Task;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -20,17 +20,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.honeybadgers.models.model.Constants.*;
+
 @Service
 public class SchedulerService implements ISchedulerService {
 
     static final Logger logger = LogManager.getLogger(SchedulerService.class);
-
-
-    // These prefixes are for the case, that a group exists with id='SCHEDULER_LOCK_ALIAS'
-    // HAVE TO BE THE SAME AS IN ManagementService IN managementapi!!!!!!!!!!!!! mach halt bitte noch mehr Ausrufezeichen
-    public static final String LOCKREDIS_SCHEDULER_ALIAS = "SCHEDULER_LOCK_ALIAS";
-    public static final String LOCKREDIS_TASK_PREFIX = "TASK:";
-    public static final String LOCKREDIS_GROUP_PREFIX = "GROUP:";
 
 
     @Value("${scheduler.group.runningtasks}")
@@ -104,7 +99,7 @@ public class SchedulerService implements ISchedulerService {
     public boolean isTaskLocked(String taskId) {
         if (taskId == null)
             throw new IllegalArgumentException("Given taskId was null!");
-        String lockId = LOCKREDIS_TASK_PREFIX + taskId;
+        String lockId = LOCK_TASK_PREFIX + taskId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
     }
@@ -113,14 +108,14 @@ public class SchedulerService implements ISchedulerService {
     public boolean isGroupLocked(String groupId) {
         if (groupId == null)
             throw new IllegalArgumentException("Given groupId was null!");
-        String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        String lockId = LOCK_GROUP_PREFIX + groupId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
     }
 
     @Override
     public boolean isSchedulerLocked() {
-        RedisLock lock = lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS).orElse(null);
+        RedisLock lock = lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
         return lock != null;
     }
 

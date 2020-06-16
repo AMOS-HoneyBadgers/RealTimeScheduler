@@ -1,4 +1,4 @@
-package com.honeybadgers.models;
+package com.honeybadgers.models.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;

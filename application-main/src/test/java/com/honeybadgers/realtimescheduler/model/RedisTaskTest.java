@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.model;
 
-import com.honeybadgers.models.RedisTask;
+import com.honeybadgers.models.model.RedisTask;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 

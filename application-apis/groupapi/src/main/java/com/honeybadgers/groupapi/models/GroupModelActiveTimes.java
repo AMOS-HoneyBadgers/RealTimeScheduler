@@ -1,7 +1,7 @@
 package com.honeybadgers.groupapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.honeybadgers.models.ActiveTimes;
+import com.honeybadgers.models.model.ActiveTimes;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.sql.Time;

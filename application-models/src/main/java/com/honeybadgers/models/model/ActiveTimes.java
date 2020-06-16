@@ -1,4 +1,4 @@
-package com.honeybadgers.models;
+package com.honeybadgers.models.model;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

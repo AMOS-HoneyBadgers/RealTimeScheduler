@@ -30,7 +30,9 @@ public interface IConvertUtils {
     default Timestamp timestampRestToJpa(OffsetDateTime offsetDateTime) {
         if(offsetDateTime == null)
             return null;
-        return Timestamp.valueOf(offsetDateTime.toLocalDateTime());
+        // get input as milliseconds since epoch
+        long dateTimeAsMilli = Long.parseLong(Long.toString(offsetDateTime.toEpochSecond()) + Long.toString(offsetDateTime.getNano()).substring(0, 3));
+        return new Timestamp(dateTimeAsMilli);
     }
 
     /**

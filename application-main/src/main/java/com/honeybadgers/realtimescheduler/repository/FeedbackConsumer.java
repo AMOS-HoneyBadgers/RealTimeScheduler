@@ -1,8 +1,8 @@
 package com.honeybadgers.realtimescheduler.repository;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.Task;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;

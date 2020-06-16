@@ -1,24 +1,23 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.Group;
-import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.RedisTask;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.RedisTask;
+import com.honeybadgers.models.model.Task;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
-import com.honeybadgers.realtimescheduler.services.impl.GroupService;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
 
+import static com.honeybadgers.models.model.Constants.*;
 import static com.honeybadgers.realtimescheduler.services.impl.SchedulerService.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
@@ -94,7 +93,7 @@ public class SchedulerServiceTest {
         t.setGroup(group);
 
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
-        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.of(new RedisLock()));
+        when(lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(new RedisLock()));
         SchedulerService spy = spy(service);
         spy.scheduleTask(t.getId());
         verify(spy, times(0)).sendTaskstoDispatcher(any());
@@ -118,7 +117,7 @@ public class SchedulerServiceTest {
     @Test
     public void testIsTaskLocked_NotLocked() {
         String taskId = UUID.randomUUID().toString();
-        String lockId = LOCKREDIS_TASK_PREFIX + taskId;
+        String lockId = LOCK_TASK_PREFIX + taskId;
         RedisLock lockObj = new RedisLock();
         lockObj.setId(lockId);
         when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
@@ -129,7 +128,7 @@ public class SchedulerServiceTest {
     @Test
     public void testIsTaskLocked_Locked() {
         String taskId = UUID.randomUUID().toString();
-        String lockId = LOCKREDIS_TASK_PREFIX + taskId;
+        String lockId = LOCK_TASK_PREFIX + taskId;
         when(lockRedisRepository.findById(lockId)).thenReturn(Optional.empty());
         assertFalse(service.isTaskLocked(taskId));
     }
@@ -137,7 +136,7 @@ public class SchedulerServiceTest {
     @Test
     public void testIsGroupLocked_NotLocked() {
         String groupId = "GROUPID";
-        String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        String lockId = LOCK_GROUP_PREFIX + groupId;
         RedisLock lockObj = new RedisLock();
         lockObj.setId(lockId);
         when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
@@ -148,7 +147,7 @@ public class SchedulerServiceTest {
     @Test
     public void testIsGroupLocked_Locked() {
         String groupId = "GROUPID";
-        String lockId = LOCKREDIS_GROUP_PREFIX + groupId;
+        String lockId = LOCK_GROUP_PREFIX + groupId;
         when(lockRedisRepository.findById(lockId)).thenReturn(Optional.empty());
 
         assertFalse(service.isGroupLocked(groupId));
@@ -157,15 +156,15 @@ public class SchedulerServiceTest {
     @Test
     public void testIsSchedulerLocked_NotLocked() {
         RedisLock lockObj = new RedisLock();
-        lockObj.setId(LOCKREDIS_SCHEDULER_ALIAS);
-        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
+        lockObj.setId(LOCK_SCHEDULER_ALIAS);
+        when(lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
 
         assertTrue(service.isSchedulerLocked());
     }
 
     @Test
     public void testIsSchedulerLocked_Locked() {
-        when(lockRedisRepository.findById(LOCKREDIS_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
+        when(lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
 
         assertFalse(service.isSchedulerLocked());
     }
@@ -189,7 +188,7 @@ public class SchedulerServiceTest {
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
 
         // mock everything related to isPaused
-        when(lockRedisRepository.findById(LOCKREDIS_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
+        when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
         when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>());
 
         doNothing().when(taskRedisRepository).deleteById(task1.getId());
@@ -219,7 +218,7 @@ public class SchedulerServiceTest {
         tasks.add(task1);
 
         RedisLock taskLock = new RedisLock();
-        taskLock.setId(LOCKREDIS_TASK_PREFIX + task1.getId());
+        taskLock.setId(LOCK_TASK_PREFIX + task1.getId());
 
         SchedulerService spy = spy(service);
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
@@ -252,13 +251,13 @@ public class SchedulerServiceTest {
         tasks.add(task1);
 
         RedisLock groupLock = new RedisLock();
-        groupLock.setId(LOCKREDIS_GROUP_PREFIX + "testGroup");
+        groupLock.setId(LOCK_GROUP_PREFIX + "testGroup");
 
         SchedulerService spy = spy(service);
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
 
         // mock everything related to isPaused
-        when(lockRedisRepository.findById(LOCKREDIS_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
+        when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
         when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>(Collections.singleton("testGroup")));
         when(lockRedisRepository.findById(groupLock.getId())).thenReturn(Optional.of(groupLock));
 

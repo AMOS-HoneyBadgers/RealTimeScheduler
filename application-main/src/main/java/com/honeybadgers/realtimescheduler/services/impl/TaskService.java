@@ -1,13 +1,10 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.models.Task;
-import com.honeybadgers.models.RedisTask;
+import com.honeybadgers.models.model.Task;
 import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
-import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

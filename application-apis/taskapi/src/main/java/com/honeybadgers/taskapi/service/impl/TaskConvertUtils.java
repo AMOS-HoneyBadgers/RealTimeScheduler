@@ -1,7 +1,7 @@
 package com.honeybadgers.taskapi.service.impl;
 
-import com.honeybadgers.models.ActiveTimes;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.ActiveTimes;
+import com.honeybadgers.models.model.Task;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;

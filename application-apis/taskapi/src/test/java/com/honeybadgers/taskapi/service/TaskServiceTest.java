@@ -1,8 +1,7 @@
 package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.communication.model.TaskQueueModel;
-import com.honeybadgers.models.*;
+import com.honeybadgers.models.model.*;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
@@ -12,9 +11,7 @@ import com.honeybadgers.taskapi.repository.TaskRepository;
 import com.honeybadgers.taskapi.service.impl.TaskService;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.jupiter.api.function.Executable;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -22,12 +19,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.validation.Valid;
 import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;

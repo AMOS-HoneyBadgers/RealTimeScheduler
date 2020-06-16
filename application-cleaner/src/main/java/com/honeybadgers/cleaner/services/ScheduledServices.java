@@ -1,15 +1,15 @@
 package com.honeybadgers.cleaner.services;
 
 import com.honeybadgers.cleaner.repository.LockRepository;
-import com.honeybadgers.models.RedisLock;
+import com.honeybadgers.models.model.RedisLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -40,7 +40,7 @@ public class ScheduledServices {
                     continue;
                 }
 
-                if(redisLock.getResume_date().isBefore(LocalDateTime.now())) {
+                if(redisLock.getResume_date().isBefore(LocalDateTime.now(ZoneOffset.UTC))) {
                     logger.info("Deleting lock with id " + redisLock.getId());
                     lockRepository.delete(redisLock);
                 }

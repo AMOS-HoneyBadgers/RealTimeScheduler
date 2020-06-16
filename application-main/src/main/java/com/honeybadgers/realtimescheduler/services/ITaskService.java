@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.Task;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
