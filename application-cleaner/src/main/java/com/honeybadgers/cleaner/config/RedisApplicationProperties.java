@@ -17,12 +17,20 @@ public class RedisApplicationProperties {
     String redis_lock_pw;
     String redis_lock_port = "0";           // To prevent NullPointerException when Integer.parseInt()
 
+    String redis_prio_host;
+    String redis_prio_pw;
+    String redis_prio_port = "0";           // To prevent NullPointerException when Integer.parseInt()
+
+
     @Override
     public String toString() {
         return "RedisApplicationProperties{" +
                 "redis_lock_host='" + redis_lock_host + '\'' +
                 ", redis_lock_pw='" + redis_lock_pw + '\'' +
                 ", redis_lock_port='" + redis_lock_port + '\'' +
+                ", redis_prio_host='" + redis_prio_host + '\'' +
+                ", redis_prio_pw='" + redis_prio_pw + '\'' +
+                ", redis_prio_port='" + redis_prio_port + '\'' +
                 '}';
     }
 }

@@ -1,6 +1,6 @@
 package com.honeybadgers.cleaner.services;
 
-import com.honeybadgers.cleaner.repository.LockRepository;
+import com.honeybadgers.cleaner.repository.LockRedisRepository;
 import com.honeybadgers.models.model.RedisLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -21,14 +21,14 @@ public class ScheduledServices {
     static final Logger logger = LogManager.getLogger(ScheduledServices.class);
 
     @Autowired
-    LockRepository lockRepository;
+    LockRedisRepository lockRedisRepository;
 
     @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
         // TODO: for optimisation write custom query which gets all where resume_date != null (REQUIRES COMPLETE IMPL OF CRUDREPOS.)
         try {
             logger.info("Starting paused cleanup!");
-            Iterable<RedisLock> paused = lockRepository.findAll();
+            Iterable<RedisLock> paused = lockRedisRepository.findAll();
             logger.info("Checking " + ((Collection<?>) paused).size() + " locks on resume_date");
             for (RedisLock redisLock : paused) {
                 if(redisLock.getResume_date() == null)
@@ -45,7 +45,7 @@ public class ScheduledServices {
                 logger.info("current time is at: " + now.toString());
                 if(redisLock.getResume_date().isBefore(now)) {
                     logger.info("Deleting lock with id " + redisLock.getId());
-                    lockRepository.delete(redisLock);
+                    lockRedisRepository.deleteById(redisLock.getId());
                 }
             }
             logger.info("Finished paused cleanup!");

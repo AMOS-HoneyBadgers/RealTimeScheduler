@@ -2,7 +2,6 @@ package com.honeybadgers.managementapi.service.impl;
 
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.repository.LockRedisRepository;
-import com.honeybadgers.managementapi.repository.StateRepository;
 import com.honeybadgers.managementapi.service.IManagementService;
 import com.honeybadgers.models.model.RedisLock;
 import org.apache.logging.log4j.LogManager;
@@ -24,16 +23,13 @@ public class ManagementService implements IManagementService {
     static final Logger logger = LogManager.getLogger(ManagementService.class);
 
 
-    /*@Autowired
-    StateRepository stateRepository;*/
-
     @Autowired
-    LockRedisRepository stateRepository;
+    LockRedisRepository lockRedisRepository;
 
     @Override
     @Transactional
     public void pauseScheduler(OffsetDateTime resumeDate) throws LockException{
-        RedisLock lockObj = stateRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
+        RedisLock lockObj = lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
 
         if(lockObj != null)
             throw new LockException("Already locked!");
@@ -42,19 +38,19 @@ public class ManagementService implements IManagementService {
         toSave.setId(LOCK_SCHEDULER_ALIAS);
         if(resumeDate != null)
             toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
-        stateRepository.save(toSave);
+        lockRedisRepository.save(toSave);
     }
 
     @Override
     public void resumeScheduler() {
-        stateRepository.deleteById(LOCK_SCHEDULER_ALIAS);
+        lockRedisRepository.deleteById(LOCK_SCHEDULER_ALIAS);
     }
 
     @Override
     @Transactional
     public void pauseTask(UUID taskId, OffsetDateTime resumeDate) throws LockException{
         String id = LOCK_TASK_PREFIX + taskId.toString();
-        RedisLock lockId = stateRepository.findById(id).orElse(null);
+        RedisLock lockId = lockRedisRepository.findById(id).orElse(null);
 
         if(lockId != null)
             throw new LockException("Already locked!");
@@ -63,20 +59,20 @@ public class ManagementService implements IManagementService {
         toSave.setId(id);
         if(resumeDate != null)
             toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
-        stateRepository.save(toSave);
+        lockRedisRepository.save(toSave);
     }
 
     @Override
     public void resumeTask(UUID taskId) {
         String id = LOCK_TASK_PREFIX + taskId.toString();
-        stateRepository.deleteById(id);
+        lockRedisRepository.deleteById(id);
     }
 
     @Override
     @Transactional
     public void pauseGroup(String groupId, OffsetDateTime resumeDate) throws LockException{
         String id = LOCK_GROUP_PREFIX + groupId;
-        RedisLock lockId = stateRepository.findById(id).orElse(null);
+        RedisLock lockId = lockRedisRepository.findById(id).orElse(null);
 
         if(lockId != null)
             throw new LockException("Already locked!");
@@ -85,13 +81,13 @@ public class ManagementService implements IManagementService {
         toSave.setId(id);
         if(resumeDate != null)
             toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
-        stateRepository.save(toSave);
+        lockRedisRepository.save(toSave);
     }
 
     @Override
     public void resumeGroup(String grouId) {
         String id = LOCK_GROUP_PREFIX + grouId;
-        stateRepository.deleteById(id);
+        lockRedisRepository.deleteById(id);
     }
 
 

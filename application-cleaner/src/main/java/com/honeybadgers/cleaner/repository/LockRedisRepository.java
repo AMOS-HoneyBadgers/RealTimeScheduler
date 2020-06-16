@@ -1,4 +1,4 @@
-package com.honeybadgers.managementapi.repository;
+package com.honeybadgers.cleaner.repository;
 
 import com.honeybadgers.models.model.RedisLock;
 import lombok.extern.slf4j.Slf4j;
