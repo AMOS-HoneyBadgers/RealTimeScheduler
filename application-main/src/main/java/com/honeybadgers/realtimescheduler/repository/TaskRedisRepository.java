@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.repository;
 
-import com.honeybadgers.models.RedisTask;
+import com.honeybadgers.models.model.RedisTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 public class TaskRedisRepository implements CrudRepository<RedisTask, String> {
 
-    private static final String KEY = "REDISTASK";
+    private static final String KEY = "RedisTask";
 
     @Autowired
     @Qualifier("prioRedisTemplate")
@@ -56,7 +56,6 @@ public class TaskRedisRepository implements CrudRepository<RedisTask, String> {
     @Override
     public Iterable<RedisTask> findAll() {
         Iterable<RedisTask> tasks = hashOperations.values(KEY);
-        log.warn("########################## findAll IN REPRO: " + tasks.toString());
         return tasks;
     }
 

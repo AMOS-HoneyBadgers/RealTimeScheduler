@@ -1,4 +1,4 @@
-package com.honeybadgers.models;
+package com.honeybadgers.models.model;
 
 public enum TaskStatusEnum {
     Waiting, Scheduled, Dispatched, Finished;

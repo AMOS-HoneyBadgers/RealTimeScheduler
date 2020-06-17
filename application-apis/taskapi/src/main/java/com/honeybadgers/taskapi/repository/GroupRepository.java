@@ -1,6 +1,6 @@
 package com.honeybadgers.taskapi.repository;
 
-import com.honeybadgers.models.Group;
+import com.honeybadgers.models.model.Group;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

@@ -1,7 +1,7 @@
 package com.honeybadgers.groupapi.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.honeybadgers.models.ActiveTimes;
+import com.honeybadgers.models.model.ActiveTimes;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.sql.Time;
@@ -17,6 +17,14 @@ public class GroupModelActiveTimes {
     public GroupModelActiveTimes to(Time to) {
         this.to = to;
         return this;
+    }
+
+    public GroupModelActiveTimes() {
+    }
+
+    public GroupModelActiveTimes(ActiveTimes activeTimes) {
+        this.from = activeTimes.getFrom();
+        this.to = activeTimes.getTo();
     }
 
     /**
@@ -96,7 +104,11 @@ public class GroupModelActiveTimes {
     }
 
 
-
+    /**
+     * convert this to jpa model
+     * Constructor not possible, because this class is not accessible in the jpa class
+     * @return this as jpa model
+     */
     public ActiveTimes getAsJpaModel() {
         ActiveTimes active = new ActiveTimes();
         active.setFrom(this.from);

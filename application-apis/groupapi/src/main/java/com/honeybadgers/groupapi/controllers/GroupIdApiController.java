@@ -3,8 +3,10 @@ package com.honeybadgers.groupapi.controllers;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.ResponseModel;
+import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
-import com.honeybadgers.models.UnknownEnumException;
+import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.UnknownEnumException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +18,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 import javax.validation.Valid;
 import java.util.NoSuchElementException;
 import java.util.Optional;
-import java.util.UUID;
 
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T15:31:54.117+02:00[Europe/Berlin]")
 
@@ -28,6 +29,9 @@ public class GroupIdApiController implements GroupIdApi {
 
     @Autowired
     IGroupService groupService;
+
+    @Autowired
+    IGroupConvertUtils convertUtils;
 
     final static Logger logger = LogManager.getLogger(GroupIdApiController.class);
 
@@ -44,8 +48,15 @@ public class GroupIdApiController implements GroupIdApi {
     @Override
     public ResponseEntity<GroupModel> groupIdIdGet(String groupId) {
 
-        logger.info("Test groupIdGet with taskId: {}", () -> groupId);
-        return ResponseEntity.ok(new GroupModel());
+        Group group;
+
+        try {
+            group = groupService.getGroupById(groupId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
     }
 
     @Override
@@ -71,5 +82,19 @@ public class GroupIdApiController implements GroupIdApi {
         }
 
         return ResponseEntity.ok(response);
+    }
+
+    @Override
+    public ResponseEntity<GroupModel> groupIdIdDelete(String groupId) {
+
+        Group group;
+
+        try {
+            group = groupService.deleteGroup(groupId);
+        } catch (NoSuchElementException e) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
     }
 }

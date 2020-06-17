@@ -1,20 +1,22 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.*;
+import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.RedisTask;
+import com.honeybadgers.realtimescheduler.config.RedisApplicationProperties;
+import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +26,7 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/data")        // only initialize if one of the given profiles is active
 @Slf4j
+@EntityScan(basePackages = {"com.honeybadgers.models", "com.honeybadgers.realtimescheduler.model"})
 public class TestController {
 
     @Autowired
@@ -43,6 +46,12 @@ public class TestController {
 
     @Autowired
     TaskRedisRepository taskRedisRepository;
+
+    @Autowired
+    GroupAncestorRepository groupAncestorRepository;
+
+    @Autowired
+    RedisApplicationProperties redisApplicationProperties;
 
 
     @GetMapping("/testtask/{priority}")
@@ -67,9 +76,29 @@ public class TestController {
 
     @PostMapping("/test/lock")
     public ResponseEntity<?> testLockRedis() {
+
+        log.info("########################## REDIS PROP: " + redisApplicationProperties.toString());
+
         RedisLock lock = new RedisLock();
-        lock.setId("TASK:" + UUID.randomUUID().toString());
-        lock.setResume_date(LocalDateTime.now());
+        lock.setId("GROUP:TestGroup9");
+
+        log.warn("######################### TRYING TO FIND " + lock.toString());
+
+        RedisLock get = lockRedisRepository.findById(lock.getId()).orElse(null);
+        if(get == null)
+            log.warn("######################### FAILURE!!");
+        else
+            log.warn("######################### SUCCESS: " + get.toString());
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/test/lock2")
+    public ResponseEntity<?> testLockRedis2() {
+
+        RedisLock lock = new RedisLock();
+        lock.setId("GROUP:TestGroup12");
+        //lock.setResume_date(LocalDateTime.now());
         lockRedisRepository.save(lock);
 
         log.warn("######################### SAVED " + lock.toString());
@@ -94,6 +123,21 @@ public class TestController {
         log.info("################## findAll: " + (tasksList != null ? tasksList.size() : null));
 
         return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/test/ancestor/{groupId}")
+    public ResponseEntity<?> testAncestorQuery(@PathVariable(value = "groupId") final String groupId) {
+        log.warn("################## BEFORE QUERY");
+
+        GroupAncestorModel ancestorModel = groupAncestorRepository.getAllAncestorIdsFromGroup(groupId).orElse(null);
+        if(ancestorModel == null) {
+            log.info("QUERY RETURNED NULL -> FAILURE/GROUPID INVALID");
+            return ResponseEntity.badRequest().body("QUERY RETURNED NULL -> FAILURE/GROUPID INVALID");
+        }
+
+        log.info("################## QUERY RET: " + ancestorModel.toString());
+
+        return ResponseEntity.ok(ancestorModel);
     }
 
     @PostMapping("/test/capacity")

@@ -1,10 +1,9 @@
 package com.honeybadgers.taskapi.models;
 
-import com.honeybadgers.models.ActiveTimes;
+import com.honeybadgers.models.model.ActiveTimes;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Time;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 

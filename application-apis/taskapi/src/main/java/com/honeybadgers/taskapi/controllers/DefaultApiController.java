@@ -1,23 +1,21 @@
 package com.honeybadgers.taskapi.controllers;
 
-import com.honeybadgers.models.UnknownEnumException;
+import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
-import com.honeybadgers.taskapi.models.ErrorModel;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
+import java.util.List;
 import java.util.Optional;
 
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:25.874+02:00[Europe/Berlin]")
@@ -28,7 +26,6 @@ public class DefaultApiController implements DefaultApi {
 
     @Autowired
     ITaskService taskService;
-
 
     static final Logger logger = LogManager.getLogger(DefaultApiController.class);
 
@@ -45,6 +42,19 @@ public class DefaultApiController implements DefaultApi {
     }
 
     /**
+     * GET /
+     * Get all tasks stored in Database
+     *
+     * @return OK - List of tasks (status code 200)
+     * or Unauthorized (status code 401)
+     */
+    @Override
+    public ResponseEntity<List<TaskModel>> rootGet() {
+        List<TaskModel> list = taskService.getAllTasks();
+        return ResponseEntity.ok(list);
+    }
+
+    /**
      * Creation of new Task
      *
      * @param taskModel new task object (required)
@@ -53,8 +63,6 @@ public class DefaultApiController implements DefaultApi {
 
     @Override
     public ResponseEntity<ResponseModel> rootPost(@Valid TaskModel taskModel) {
-
-        logger.info("Hi");
 
         ResponseModel response = new ResponseModel();
         response.setCode("200");

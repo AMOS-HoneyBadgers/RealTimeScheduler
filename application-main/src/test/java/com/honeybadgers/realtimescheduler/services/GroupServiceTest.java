@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.models.Group;
+import com.honeybadgers.models.model.Group;
 import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.impl.GroupService;
 import org.junit.Assert;

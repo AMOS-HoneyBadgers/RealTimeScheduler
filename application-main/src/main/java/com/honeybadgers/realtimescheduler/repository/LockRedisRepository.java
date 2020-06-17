@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.repository;
 
-import com.honeybadgers.models.RedisLock;
+import com.honeybadgers.models.model.RedisLock;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,7 +16,7 @@ import java.util.Optional;
 @Slf4j
 public class LockRedisRepository implements CrudRepository<RedisLock, String> {
 
-    private static final String KEY = "LOCK";
+    private static final String KEY = "RedisLock";
 
     @Autowired
     @Qualifier("lockRedisTemplate")

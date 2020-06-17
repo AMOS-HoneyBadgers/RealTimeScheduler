@@ -1,7 +1,7 @@
 package com.honeybadgers.realtimescheduler.config;
 
-import com.honeybadgers.models.RedisLock;
-import com.honeybadgers.models.RedisTask;
+import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.RedisTask;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

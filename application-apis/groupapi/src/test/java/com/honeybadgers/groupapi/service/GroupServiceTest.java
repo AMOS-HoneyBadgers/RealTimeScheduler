@@ -3,13 +3,13 @@ package com.honeybadgers.groupapi.service;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.repository.TaskRepository;
-import com.honeybadgers.models.Task;
+import com.honeybadgers.models.model.Task;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.honeybadgers.models.Group;
+import com.honeybadgers.models.model.Group;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.models.UnknownEnumException;
+import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.service.impl.GroupService;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,10 +21,10 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -39,6 +39,9 @@ public class GroupServiceTest {
 
     @MockBean
     ICommunication sender;
+
+    @MockBean
+    IGroupConvertUtils convertUtils;
 
     @Autowired
     IGroupService groupService;
@@ -68,6 +71,7 @@ public class GroupServiceTest {
     public void testCreateGroup() throws JpaException, UnknownEnumException, CreationException {
 
         when(taskRepository.findAllByGroupId("parentGroup")).thenReturn(new ArrayList<>());
+        when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenReturn(new Group());
 
         GroupModel restGroup = new GroupModel();
         restGroup.setId("TestGroup");
@@ -97,10 +101,11 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testCreateGroup_JpaException(){
+    public void testCreateGroup_JpaException() throws UnknownEnumException {
         DataIntegrityViolationException vio = new DataIntegrityViolationException("primary key violation");
 
         when(groupRepository.save(any(Group.class))).thenThrow(vio);
+        when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenReturn(new Group());
 
         GroupModel restGroup = new GroupModel();
         restGroup.setId("TestGroup");
@@ -111,13 +116,14 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testCreateGroup_parentChildrenViolation(){
+    public void testCreateGroup_parentChildrenViolation() throws UnknownEnumException {
 
         Task child = new Task();
         child.setId("TestTask");
         Task child2 = new Task();
         child2.setId("TestTask2");
         when(taskRepository.findAllByGroupId("parentGroup")).thenReturn(Arrays.asList(child, child2));
+        when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenReturn(new Group());
 
         GroupModel restGroup = new GroupModel();
         restGroup.setId("TestGroup");
@@ -137,6 +143,13 @@ public class GroupServiceTest {
         restGroup.setPriority(100);
         restGroup.setParentId("parentGroup");
 
+        Group parentGroup = new Group();
+        parentGroup.setId("parentGroup");
+        Group mockGroup = new Group();
+        mockGroup.setPriority(restGroup.getPriority());
+        mockGroup.setParentGroup(parentGroup);
+        when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenReturn(mockGroup);
+
         Group group = groupService.updateGroup(group_id, restGroup);
 
         assertNotNull(group);
@@ -146,6 +159,8 @@ public class GroupServiceTest {
 
     @Test
     public void testGroupUpdate_GroupNotFound() throws JpaException, UnknownEnumException {
+
+        when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenReturn(new Group());
 
         String group_id = "testGroupNotFound";
         GroupModel restGroup = new GroupModel();
@@ -159,6 +174,8 @@ public class GroupServiceTest {
     @Test
     public void testGroupUpdate_ParentGroupNotFound() throws JpaException, UnknownEnumException {
 
+        when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenThrow(new NoSuchElementException("Parent Group does not exist"));
+
         String group_id = "testGroup";
         GroupModel restGroup = new GroupModel();
         restGroup.setId("testGroup");
@@ -167,6 +184,58 @@ public class GroupServiceTest {
 
         Exception e = assertThrows(NoSuchElementException.class, () -> groupService.updateGroup(group_id, restGroup));
         assertEquals("Parent Group does not exist", e.getMessage());
+    }
+
+    @Test
+    public void testGetAllGroups() {
+        when(groupRepository.findAll()).thenReturn(new ArrayList<>());
+
+        List<Group> groups = groupService.getAllGroups();
+
+        assertNotNull(groups);
+        assertEquals(0, groups.size());
+    }
+
+    @Test
+    public void testGetGroupById() {
+
+        Group group = groupService.getGroupById("testGroup");
+
+        assertNotNull(group);
+        assertEquals("testGroup", group.getId());
+    }
+
+    @Test
+    public void testGetGroupById_NotFound() {
+
+        when(groupRepository.findById("gg")).thenReturn(Optional.empty());
+
+        Exception e = assertThrows(NoSuchElementException.class, () -> groupService.getGroupById("gg"));
+        assertNotNull(e);
+        assertEquals("Group with groupId gg not found!", e.getMessage());
+    }
+
+    @Test
+    public void testDeleteGroup() {
+
+        doNothing().when(groupRepository).deleteById("testGroup");
+
+        Group group = groupService.deleteGroup("testGroup");
+
+        assertNotNull(group);
+        assertEquals("testGroup", group.getId());
+    }
+
+    @Test
+    public void testDeleteGroup_NotFound() {
+
+        doNothing().when(groupRepository).deleteById("testGroup");
+
+        when(groupRepository.findById("testGroup")).thenReturn(Optional.empty());
+
+        Exception e = assertThrows(NoSuchElementException.class, () -> groupService.deleteGroup("testGroup"));
+        assertNotNull(e);
+        assertEquals("Group with groupId testGroup not found!", e.getMessage());
     }
 
 }
