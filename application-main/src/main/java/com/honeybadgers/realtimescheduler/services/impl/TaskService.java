@@ -37,7 +37,6 @@ public class TaskService implements ITaskService {
     double retriesModifier;
     @Value("${com.realtimescheduler.scheduler.priority.const}")
     double constant;
-
     @Value("${com.realtimescheduler.scheduler.priority.deadline-bonus-base-prio-dependant}")
     boolean deadlineBaseDependant;
 
@@ -53,33 +52,34 @@ public class TaskService implements ITaskService {
 
     @Override
     @Transactional
+    // TODO transactions
     public List<String> getRecursiveGroupsOfTask(String taskId) {
-        // TODO transactions
         if(taskId == null)
             throw new IllegalArgumentException("taskId must not be null!");
+
         Task task = getTaskById(taskId).orElse(null);
         if(task == null)
             throw new NoSuchElementException("Task with taskId " + taskId + " not found!");
-        // just for savety: check that group is not null (THIS SHOULD NEVER HAPPEN, because DB enforces task.group IS NOT NULL)
+
         if(task.getGroup() == null)
-            throw new IllegalStateException("CRITICAL: found task with taskId " + taskId + " which has no group -> THIS SHOULD NOT HAVE HAPPENED (DB enforces this)!");
+            throw new IllegalStateException("CRITICAL: found task with taskId " + taskId + " which has no group!");
 
         GroupAncestorModel ancestorModel = groupAncestorRepository.getAllAncestorIdsFromGroup(task.getGroup().getId()).orElse(null);
-        if(ancestorModel == null) {
-            logger.info("Found no ancestor model for group with groupId " + task.getGroup().getId());
+        if(ancestorModel == null)
             return new ArrayList<>();
-        }
-        // assert, that the ancestor model contains no null values
+
+        // Assert, that the ancestor model contains no null values
         if(ancestorModel.getId() == null || ancestorModel.getAncestors() == null)
-            throw new IllegalStateException("AncestorModel received from repository contains null values!");
+            throw new IllegalStateException("AncestorModel received from repository contains null values for taskId: " + taskId);
 
         List<String> groups = new ArrayList<>(Collections.singletonList(ancestorModel.getId()));
         groups.addAll(Arrays.asList(ancestorModel.getAncestors()));
 
-        // assert, that list will not contain null
+        // Assert, that list will not contain null
         if(groups.contains(null))
-            throw new IllegalStateException("Ancestor list contains null values!");
-        logger.info("Found " + groups.size() + " groups/ancestors for taskId " + taskId);
+            throw new IllegalStateException("Ancestor list contains null values for taskId: " + taskId);
+
+        logger.debug("Found " + groups.size() + " groups for taskId " + taskId);
         return groups;
     }
 
@@ -93,34 +93,12 @@ public class TaskService implements ITaskService {
         this.taskPostgresRepository.deleteById(id);
     }
 
-    //@Override
-    /*public long calculatePriority(Task task) {
-        double finalPriority = 0;
-        finalPriority = task.getPriority();
-        Timestamp deadline = task.getDeadline();
-        if(deadline != null){
-            Date currentTime = new Date(System.currentTimeMillis());
-            //timeDiff in Minuten umrechnen, da sonst Differenz zu klein (finalPriority ändert zu wenig)
-            double timeDiff = Math.abs(deadline.getTime() - currentTime.getTime()) / (1000.0 * 60.0);
-            logger.info("timediff: " + timeDiff);
-            if(deadlineBaseDependant) {
-                // the higher the base-prio, the higher it will be increased by same timediff
-                finalPriority += ((deadlineModifier * finalPriority) / timeDiff);
-            } else {
-                finalPriority += (deadlineModifier/timeDiff);
-            }
-        }
-        return Math.round(finalPriority);
-    }*/
-
     @Override
     public long calculatePriority(Task task) {
-
         double basePrio = task.getPriority();
         Timestamp deadline = task.getDeadline();
-        //timeDiff in Minuten umrechnen, da sonst Differenz zu klein (finalPriority ändert zu wenig)
+
         Date currentTime = new Date(System.currentTimeMillis());
-        // Math.abs(deadline.getTime() - currentTime.getTime()) / (1000.0 * 60.0) = TIME DIFFERENCE
         double deadlineFactor = deadline == null ? 0 : (constant * deadlineModifier)/(Math.abs(deadline.getTime() - currentTime.getTime()) / (1000.0 * 60.0));
 
         boolean realtime = task.getTypeFlagEnum() == TypeFlagEnum.Realtime;
@@ -131,7 +109,5 @@ public class TaskService implements ITaskService {
         double retriesFactor = (retries * constant)/retriesModifier;
 
         return (long) (deadlineFactor + prioFactor + realtimeFactor - retriesFactor);
-
     }
-
 }

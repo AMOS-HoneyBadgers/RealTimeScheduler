@@ -7,7 +7,6 @@ import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -266,7 +265,7 @@ public class SchedulerService implements ISchedulerService {
         ConvertUtils convertUtils = new ConvertUtils();
         int[] workingdays = getActualWorkingDaysForTask(task);
         List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(workingdays);
-        if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBools(dayofweek)))
+        if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBooleans(dayofweek)))
             return true;
         return false;
     }
