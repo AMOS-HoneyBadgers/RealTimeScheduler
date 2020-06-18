@@ -28,7 +28,6 @@ public class SchedulerService implements ISchedulerService {
 
     static final Logger logger = LogManager.getLogger(SchedulerService.class);
 
-
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
@@ -47,12 +46,11 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     IGroupService groupService;
 
-
     @Override
     public RedisTask createRedisTask(String taskId) {
         Task currentTask = taskService.getTaskById(taskId).orElse(null);
         if (currentTask == null)
-            throw new RuntimeException("could not find task with id:" + currentTask);
+            throw new RuntimeException("could not find task with id:" + taskId);
 
         RedisTask redisTask = new RedisTask();
         redisTask.setId(taskId);
@@ -64,6 +62,9 @@ public class SchedulerService implements ISchedulerService {
     @Override
     public List<RedisTask> getAllRedisTasksAndSort() {
         Iterable<RedisTask> redisTasks = taskRedisRepository.findAll();
+        if(redisTasks == null)
+            throw new RuntimeException("could not find any redisTasks in repo");
+
         List<RedisTask> sortedList = new ArrayList<RedisTask>();
         redisTasks.forEach(sortedList::add);
         Collections.sort(sortedList, (o1, o2) -> o1.getPriority() > o2.getPriority() ? -1 : (o1.getPriority() < o2.getPriority()) ? 1 : 0);
@@ -89,14 +90,15 @@ public class SchedulerService implements ISchedulerService {
             childGroup = parentGroup;
         }
 
-        logger.info("limit is now at: " + minLimit);
+        logger.debug("limit for groupid: " + groupId + "is now at: " + minLimit);
         return minLimit;
     }
 
     @Override
     public boolean isTaskLocked(String taskId) {
         if (taskId == null)
-            throw new IllegalArgumentException("Given taskId was null!");
+            throw new IllegalArgumentException("Method isTaskLocked: given taskId is null!");
+
         String lockId = LOCK_TASK_PREFIX + taskId;
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
@@ -105,9 +107,9 @@ public class SchedulerService implements ISchedulerService {
     @Override
     public boolean isGroupLocked(String groupId) {
         if (groupId == null)
-            throw new IllegalArgumentException("Given groupId was null!");
+            throw new IllegalArgumentException("Method isGroupLocked: given groupId is null!");
+
         String lockId = LOCK_GROUP_PREFIX + groupId;
-        logger.info("searching for lockid: " + lockId);
         RedisLock lock = lockRedisRepository.findById(lockId).orElse(null);
         return lock != null;
     }

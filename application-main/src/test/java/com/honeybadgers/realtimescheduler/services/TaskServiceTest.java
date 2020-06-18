@@ -242,7 +242,7 @@ public class TaskServiceTest {
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 
         assertNotNull(e);
-        assertEquals("CRITICAL: found task with taskId " + task.getId() + " which has no group -> THIS SHOULD NOT HAVE HAPPENED (DB enforces this)!", e.getMessage());
+        assertEquals("CRITICAL: found task with taskId test which has no group!", e.getMessage());
     }
 
     @Test
@@ -268,7 +268,7 @@ public class TaskServiceTest {
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 
         assertNotNull(e);
-        assertEquals("AncestorModel received from repository contains null values!", e.getMessage());
+        assertEquals("AncestorModel received from repository contains null values for taskId: test", e.getMessage());
     }
 
     @Test
@@ -295,7 +295,7 @@ public class TaskServiceTest {
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 
         assertNotNull(e);
-        assertEquals("Ancestor list contains null values!", e.getMessage());
+        assertEquals("Ancestor list contains null values for taskId: test", e.getMessage());
     }
   
 }
