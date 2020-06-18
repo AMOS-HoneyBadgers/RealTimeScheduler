@@ -269,7 +269,6 @@ public class SchedulerService implements ISchedulerService {
     public RedisLock createGroupParallelismTracker(String id) {
         RedisLock curr = new RedisLock();
         curr.setId(id);
-        lockRedisRepository.save(curr);
         return curr;
     }
 
@@ -283,25 +282,21 @@ public class SchedulerService implements ISchedulerService {
 
         try {
             current = parser.parse(dateTimeFormatter.format(LocalDateTime.now()));
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        activeTimes = getActiveTimesForTask(task);
 
-        if (activeTimes == null || activeTimes.isEmpty()) {
-            return true;
-        }
-        for (ActiveTimes activeTime : activeTimes) {
-            try {
+            activeTimes = getActiveTimesForTask(task);
+
+            if (activeTimes == null || activeTimes.isEmpty())
+                return true;
+
+            for (ActiveTimes activeTime : activeTimes) {
                 from = parser.parse(activeTime.getFrom().toString());
                 to = parser.parse(activeTime.getTo().toString());
                 if (current.before(to) && current.after(from)) {
                     return true;
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
-
+        } catch(ParseException pe) {
+            logger.error(pe.getMessage());
         }
         logger.info("task with id: " + task.getId() + "is not sent due to ActiveTimes");
         return false;

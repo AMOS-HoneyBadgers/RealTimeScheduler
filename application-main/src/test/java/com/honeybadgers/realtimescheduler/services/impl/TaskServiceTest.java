@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
