@@ -304,34 +304,24 @@ public class SchedulerService implements ISchedulerService {
 
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
-        logger.debug(activeTimes);
-        //TODO: ASK DATEV IF HANDLE LIKE WORKING_DAYS
-        Group parentGroup = null;
-        try {
-            parentGroup = groupService.getGroupById(task.getGroup().getId());
-        } catch (NullPointerException e) {
-            logger.info("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
-        }
-        if (parentGroup == null)
+        if(activeTimes != null)
             return activeTimes;
 
-        List<ActiveTimes> activeTimesTemp = parentGroup.getActiveTimeFrames();
-        logger.debug(activeTimesTemp);
-        if (activeTimesTemp != null && !(activeTimesTemp.isEmpty())) {
-            activeTimes = activeTimesTemp;
-        }
+        if(task.getGroup() == null)
+            throw new RuntimeException("parentgroup from " + task.getId() + " is null");
 
-        while (parentGroup.getParentGroup() != null) {
-            parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
-            if (parentGroup == null)
+        Group parentGroup = groupService.getGroupById(task.getGroup().getId());
+
+        while (parentGroup != null) {
+            if (parentGroup.getActiveTimeFrames() != null)
+                return parentGroup.getActiveTimeFrames();
+
+            if(parentGroup.getParentGroup() == null)
                 break;
 
-            activeTimesTemp = parentGroup.getActiveTimeFrames();
-            if (activeTimesTemp != null && !(activeTimesTemp.isEmpty())) {
-                activeTimes = activeTimesTemp;
-            }
+            parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
         }
-        return activeTimes;
 
+        return new ArrayList<>();
     }
 }

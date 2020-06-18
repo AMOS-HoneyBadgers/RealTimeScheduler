@@ -232,13 +232,11 @@ public class SchedulerServiceTest {
         when(groupService.getGroupById(any())).thenReturn(group);
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
         when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
-        when(lockRedisRepository.findById("456")).thenReturn(Optional.empty());
+        when(lockRedisRepository.findById(LOCK_GROUP_PREFIX+"456")).thenReturn(Optional.empty());
         doNothing().when(taskRedisRepository).deleteById(task1.getId());
-
 
         // mock everything related to isPaused
         when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
-        when(taskService.getRecursiveGroupsOfTask(any())).thenReturn(groupList);
         when(taskService.getRecursiveGroupsOfTask(any())).thenReturn(groupList);
 
         spy.sendTaskstoDispatcher(tasks);
@@ -433,37 +431,36 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void testGetActiveTimesForTask_TaskAndParentHaveActiveTimes() {
+    public void testGetActiveTimesForTask_TaskHasNoActiveTimesAndParentHaveActiveTimes() {
         //prepare Task
         Task task = new Task();
         task.setId("TEST");
-        List<ActiveTimes> activeTimes = new ArrayList<ActiveTimes>();
-        ActiveTimes taskaktivetime = new ActiveTimes();
-        taskaktivetime.setFrom(new Time(100));
-        taskaktivetime.setTo(new Time(200));
-        activeTimes.add(taskaktivetime);
-        task.setActiveTimeFrames(activeTimes);
+        task.setActiveTimeFrames(null);
+
         //prepare ParentGroup
         Group parentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
         List<ActiveTimes> parentactiveTimes = new ArrayList<>();
         ActiveTimes parenttaskaktivetime = new ActiveTimes();
-        taskaktivetime.setFrom(new Time(800));
-        taskaktivetime.setTo(new Time(1200));
+        parenttaskaktivetime.setFrom(new Time(800));
+        parenttaskaktivetime.setTo(new Time(1200));
         parentactiveTimes.add(parenttaskaktivetime);
         parentGroup.setActiveTimeFrames(parentactiveTimes);
+
         //setParentGroup for task
         task.setGroup(parentGroup);
+
         //Act
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
-        //Arrange active times of parent group must be returned
+
+        //Arrange
         List<ActiveTimes> res = spy.getActiveTimesForTask(task);
         Assert.assertEquals(res , parentactiveTimes);
     }
 
     @Test
-    public void testGetActiveTimesForTask_TaskParentAndGrandParentHaveActiveTimes() {
+    public void testGetActiveTimesForTask_TaskAndParentAndGrandparentHasActiveTimes_receivesTaskActiveTimes() {
         //prepare Task
         Task task = new Task();
         task.setId("TEST");
@@ -473,6 +470,7 @@ public class SchedulerServiceTest {
         taskaktivetime.setTo(new Time(200));
         activeTimes.add(taskaktivetime);
         task.setActiveTimeFrames(activeTimes);
+
         //prepare ParentGroup
         Group parentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
@@ -482,6 +480,7 @@ public class SchedulerServiceTest {
         parentactiveTime.setTo(new Time(600));
         parentactiveTimes.add(parentactiveTime);
         parentGroup.setActiveTimeFrames(parentactiveTimes);
+
         //prepare GrandParentGroup
         Group grandparentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
@@ -491,17 +490,47 @@ public class SchedulerServiceTest {
         grandparentactiveTime.setTo(new Time(1000));
         grandparentactiveTimes.add(grandparentactiveTime);
         grandparentGroup.setActiveTimeFrames(grandparentactiveTimes);
+
         //setParentGroup for task
         task.setGroup(parentGroup);
         parentGroup.setParentGroup(grandparentGroup);
+
         //Act
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
         when(groupService.getGroupById(parentGroup.getParentGroup().getId())).thenReturn(grandparentGroup);
-        //Arrange active times of grandparent group must be returned
-        List<ActiveTimes> res = spy.getActiveTimesForTask(task);
-        Assert.assertEquals(res, grandparentactiveTimes);
 
+        //Arrange
+        List<ActiveTimes> res = spy.getActiveTimesForTask(task);
+        Assert.assertEquals(res, activeTimes);
+    }
+
+    @Test
+    public void testGetActiveTimesForTask_TaskAndParentAndGrandparentDontHaveActiveTimes_ExpectedEmptyList() {
+        //prepare Task
+        Task task = new Task();
+        task.setId("TEST");
+
+        //prepare ParentGroup
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+
+        //prepare GrandParentGroup
+        Group grandparentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+
+        //setParentGroup for task
+        task.setGroup(parentGroup);
+        parentGroup.setParentGroup(grandparentGroup);
+
+        //Act
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+        when(groupService.getGroupById(parentGroup.getParentGroup().getId())).thenReturn(grandparentGroup);
+
+        //Arrange
+        List<ActiveTimes> res = spy.getActiveTimesForTask(task);
+        Assert.assertEquals(res.size(), new ArrayList<>().size());
     }
 
     @Test
