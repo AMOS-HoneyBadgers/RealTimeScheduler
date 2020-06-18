@@ -50,6 +50,9 @@ public class RabbitMQSender implements ICommunication {
         this.rabbitTemplate = template;
     }
 
+    /**
+     * This Method is for testing purposes only, in productive environment, this has to be replaced with real Dispatcher Queue
+     */
     @Override
     public void sendTaskToDispatcher(String task) {
         rabbitTemplate.convertAndSend(dispatcherexchange, dispatcherroutingkey, task);

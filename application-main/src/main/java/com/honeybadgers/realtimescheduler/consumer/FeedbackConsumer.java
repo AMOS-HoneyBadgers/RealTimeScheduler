@@ -1,10 +1,12 @@
-package com.honeybadgers.realtimescheduler.repository;
+package com.honeybadgers.realtimescheduler.consumer;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.RedisLock;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.ModeEnum;
+import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
+import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -37,16 +39,35 @@ public class FeedbackConsumer {
     @Autowired
     TaskService service;
 
+    // TODO Transaction
+    // TODO HANDLE NEGATIVE FEEDBACK
+    // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String id) throws InterruptedException {
-        // Race condition TODO Transaction
-        // TODO HANDLE NEGATIVE FEEDBACK
-        System.out.println("Step 5: Received feedback from dispatcher");
+        logger.info("Step 5: Received feedback from dispatcher");
 
         Task currentTask = service.getTaskById(id).orElse(null);
         if(currentTask == null)
             throw new RuntimeException("could not find tasks in postgre database");
 
+        checkAndSetParallelismDegree(id, currentTask);
+
+        if(currentTask.getModeEnum()== ModeEnum.Sequential)
+            checkAndSetSequentialAndIndexNumber(currentTask);
+
+        sender.sendTaskToTasksQueue(scheduler_trigger);
+        logger.info("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
+    }
+
+    //TODO is it necessary to do this also for all grandparent groups??
+    public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
+        Group group = currentTask.getGroup();
+        logger.info("update index Number of group"+group.getId());
+        group.setLastIndexNumber(group.getLastIndexNumber()+1);
+        groupPostgresRepository.save(group);
+    }
+
+    public void checkAndSetParallelismDegree(String id, Task currentTask) {
         // Get Current Running Tasks from Redis Database, throw exception if it wasnt found
         String groupParlallelName = LOCK_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroup().getId();
         RedisLock currentParallelismDegree = lockRedisRepository.findById(groupParlallelName).orElse(null);
@@ -60,21 +81,7 @@ public class FeedbackConsumer {
         else
             currentParallelismDegree.setCurrentTasks(0);
 
-        lockRedisRepository.save(currentParallelismDegree);
-
-        //for sequential tasks we increase the indexnumber of the parentgroup by one
-        //TODO is it necessary to do this also for all grandparent groups??
-        if(currentTask.getModeEnum()== ModeEnum.Sequential){
-            Group group = currentTask.getGroup();
-            logger.info("update index Number of group"+group.getId());
-            group.setLastIndexNumber(group.getLastIndexNumber()+1);
-            groupPostgresRepository.save(group);
-        }
         logger.info("Step 6: Decreased current_tasks is now at :" + currentParallelismDegree.getCurrentTasks());
-
-        // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
-        // TODO send Event to Scheduler, so the workflow of scheduling etc. is beeing triggered in a new QUEUE atm just workaround
-        sender.sendTaskToTasksQueue(scheduler_trigger);
-        logger.info("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
+        lockRedisRepository.save(currentParallelismDegree);
     }
 }

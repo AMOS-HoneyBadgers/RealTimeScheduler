@@ -12,8 +12,6 @@ import java.util.Optional;
 public interface TaskPostgresRepository extends JpaRepository<Task, String> {
     Optional<Task> findById(String id);
 
-    List<Task> findAllByPriorityEqualsAndIdNot(int priority, String id);
-
     /**
      * Returns all Tasks which have the given priority and status='Scheduled' ordered by deadline DESC WITH NULLS ON TOP
      * @param priority priority the tasks have to have

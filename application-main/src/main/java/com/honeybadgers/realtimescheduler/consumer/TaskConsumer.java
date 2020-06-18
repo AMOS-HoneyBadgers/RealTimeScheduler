@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.repository;
+package com.honeybadgers.realtimescheduler.consumer;
 
 import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
