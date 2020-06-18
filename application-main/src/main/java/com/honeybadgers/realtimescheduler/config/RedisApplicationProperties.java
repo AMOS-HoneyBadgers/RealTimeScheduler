@@ -15,11 +15,13 @@ public class RedisApplicationProperties {
 
     String redis_lock_host;
     String redis_lock_pw;
-    String redis_lock_port = "0";           // To prevent NullPointerException when Integer.parseInt()
+    // To prevent NullPointerException when Integer.parseInt()
+    String redis_lock_port = "0";
 
     String redis_prio_host;
     String redis_prio_pw;
-    String redis_prio_port = "0";           // To prevent NullPointerException when Integer.parseInt()
+    // To prevent NullPointerException when Integer.parseInt()
+    String redis_prio_port = "0";
 
     @Override
     public String toString() {

@@ -4,7 +4,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.RedisLock;
 import com.honeybadgers.models.model.RedisTask;
 import com.honeybadgers.realtimescheduler.config.RedisApplicationProperties;
-import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
@@ -17,10 +17,8 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController

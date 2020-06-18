@@ -2,7 +2,7 @@ package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
-import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.validation.constraints.AssertTrue;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;

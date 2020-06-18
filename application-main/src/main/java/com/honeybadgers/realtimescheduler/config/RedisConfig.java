@@ -55,7 +55,6 @@ public class RedisConfig {
     public RedisTemplate<String, RedisLock> lockRedisTemplate() {
         RedisTemplate<String, RedisLock> template = new RedisTemplate<>();
         template.setConnectionFactory(jedisConnectionFactoryForLockDatabase());
-
         template.setKeySerializer(new StringRedisSerializer());
         template.setValueSerializer(new GenericJackson2JsonRedisSerializer());
         return template;

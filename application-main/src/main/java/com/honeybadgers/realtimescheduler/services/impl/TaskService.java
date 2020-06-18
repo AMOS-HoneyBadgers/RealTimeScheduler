@@ -1,9 +1,8 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.RedisTask;
 import com.honeybadgers.models.model.TypeFlagEnum;
-import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.ITaskService;

@@ -22,6 +22,7 @@ public interface TaskPostgresRepository extends JpaRepository<Task, String> {
     @Query(value = "SELECT * FROM task WHERE priority=?1 AND (status='Scheduled' OR id=?2) ORDER BY deadline DESC NULLS FIRST, type_flag ASC", nativeQuery = true)
     List<Task> findAllScheduledTasksWithSamePrio(int priority, String ownId);
 
+
     @Query(value = "SELECT * FROM task WHERE status='Dispatched' AND group_id=?1", nativeQuery = true)
     List<Task> findAllDispatchedTasks(String groupId);
 }
