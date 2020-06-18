@@ -72,25 +72,17 @@ public class SchedulerService implements ISchedulerService {
         return sortedList;
     }
 
-    public int getLimitFromGroup(String groupId) {
-        int minLimit;
+    public int getLimitFromGroup(List<String> groupsOfTask, String grpId) {
+        int minLimit = Integer.MAX_VALUE;
 
-        Group childGroup = groupService.getGroupById(groupId);
-        if(childGroup == null || childGroup.getParallelismDegree() == null)
-            throw new RuntimeException("no group or parlellismdegree found for id +" + groupId);
+        for (String groupId : groupsOfTask) {
+            Group currentGroup = groupService.getGroupById(groupId);
+            if(currentGroup == null || currentGroup.getParallelismDegree() == null)
+                continue;
 
-        minLimit = childGroup.getParallelismDegree();
-
-        while (childGroup.getParentGroup() != null) {
-            Group parentGroup = groupService.getGroupById(childGroup.getParentGroup().getId());
-            if (parentGroup == null)
-                break;
-
-            minLimit = Math.min(minLimit, parentGroup.getParallelismDegree());
-            childGroup = parentGroup;
+            minLimit = Math.min(minLimit, currentGroup.getParallelismDegree());
         }
-
-        logger.debug("limit for groupid: " + groupId + "is now at: " + minLimit);
+        logger.debug("limit for groupid: " + grpId + "is now at: " + minLimit);
         return minLimit;
     }
 
@@ -120,88 +112,65 @@ public class SchedulerService implements ISchedulerService {
         return lock != null;
     }
 
+    // TODO Transaction
     @Override
     public void scheduleTask(String taskId) {
-        //Special case: gets trigger from feedback -> TODO in new QUEUE if necessary
+        // Received special trigger from feedback -> sendTasks has to start immediately
         if(taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(this.getAllRedisTasksAndSort());
             return;
         }
 
-        // TODO Transaction
-        logger.info("Step 2: search for task in Redis DB");
+        logger.info("Step 2: search for task in Redis DB with id: " + taskId);
         RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
 
         if (redisTask == null) {
-            logger.info("no task found, creating new");
+            logger.debug("no task with id:" + taskId + " found in redis database, creating new");
             redisTask = createRedisTask(taskId);
         }
 
         Task task = taskService.getTaskById(taskId).orElse(null);
         if (task == null)
-            throw new RuntimeException("task could not be found in database");
+            throw new RuntimeException("task could not be found in database with id: " + taskId);
 
-        logger.info("Step 3: calculate priority with the Redis Task");
-        logger.info("redistask is: " + redisTask.toString());
+        logger.info("Step 3: calculate priority for id: " + taskId);
         redisTask.setPriority(taskService.calculatePriority(task));
-        logger.info("prio was calculated, now at: + " + redisTask.getPriority());
+        logger.info("redistask is: " + redisTask.toString());
 
         taskRedisRepository.save(redisTask);
 
-
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
-        logger.info(tasks);
 
-        // TODO ASK DATEV WIE SCHNELL DIE ABGEARBEITET WERDEN
         if (!isSchedulerLocked()) {
-            // scheduler not locked -> can send
-            logger.info("Step 4: send Tasks to dispatcher");
+            logger.info("Step 4: try and send Tasks to dispatcher");
             sendTaskstoDispatcher(tasks);
 
         } else
             logger.info("Scheduler is locked!");
     }
 
+    // TODO Transaction
+    // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
     public void sendTaskstoDispatcher(List<RedisTask> tasks) {
         try {
-            // TODO: Change this to the size of the tasks list
-            for (int i = 0; i < 100; i++) {
-
-                // TODO Transaction cause of Race conditon
-                // TODO locks, activeTimes, workingDays, ...
-                // TODO handle when dispatcher sends negative feedback
-                // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
-
+            for (int i = 0; i < tasks.size(); i++) {
                 RedisTask currentTask = tasks.get(i);
 
+                Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
+                if (task == null)
+                    throw new RuntimeException("Task not found in Postgre Database for taskid: " + currentTask.getId());
+
                 logger.info("Checking task and groups on paused.");
-                // check if task is paused
                 if(isTaskLocked(currentTask.getId())) {
                     logger.info("Task with id " + currentTask.getId() + " is currently paused!");
                     continue;
                 }
 
-                // TODO BITTE AUSLAGERN DIE METHOD WIRD HIER VIEL ZU LANG
-                // get group with ancestors (IllegalArgExc not needed to be caught, because currentTask.getId() cannot be null)
                 List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
-                // check groups on paused
-                boolean pausedFound = false;
-                for (String groupId : groupsOfTask) {
-                    // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
-                    if(isGroupLocked(groupId)) {
-                        // group is paused -> break inner loop for checking group on paused
-                        pausedFound = true;
-                        logger.debug("Found paused group with groupId " + groupId);
-                        break;
-                    }
-                }
-                // paused found in inner loop -> continue outer loop
-                if(pausedFound)
+                if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask))
                     continue;
 
-                // TODO refactor zusammen legen mit group lock checker
-                logger.info("Checking parallelism degree.");
                 String groupParlallelName = LOCK_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
@@ -209,43 +178,43 @@ public class SchedulerService implements ISchedulerService {
                 if (currentParallelismDegree == null)
                     currentParallelismDegree = createGroupParallelismTracker(groupParlallelName);
 
-                // Get ActiveTimes for Task and check if it is allowed to be dispatched
-                Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
-                if (task == null) {
-                    throw new RuntimeException("Task not found in Postgre Database");
-                }
-                logger.debug("checkIfTaskIsInActiveTime");
-                if (!checkIfTaskIsInActiveTime(task))
-                    continue;
-                logger.debug("checkIfTaskIsInWorkingDays");
-                if (!checkIfTaskIsInWorkingDays(task))
-                    continue;
-                logger.debug("sequentialCheck");
-                if (sequentialHasToWait(task))
-                    continue;
-                // get Limit and compare if we are allowed to send new Tasks to Dispatcher
-                logger.debug("parallelismdegree");
-                int limit = getLimitFromGroup(currentTask.getGroupid());
+                int limit = getLimitFromGroup(groupsOfTask, currentTask.getGroupid());
                 if (currentParallelismDegree.getCurrentTasks() >= limit)
                     continue;
-                logger.info("task should now be sent to dispatcher");
-                // Task will be send to dispatcher, change currentTasks + 1
+
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
-                logger.info("current_tasks is now increased to : " + currentParallelismDegree.getCurrentTasks());
                 lockRedisRepository.save(currentParallelismDegree);
+                logger.info("current_tasks for " + currentParallelismDegree.getId() + "is now at: " + currentParallelismDegree.getCurrentTasks());
 
-                // sending to queue
+                if (!checkIfTaskIsInActiveTime(task) || !checkIfTaskIsInWorkingDays(task) || sequentialHasToWait(task))
+                    continue;
+
                 sender.sendTaskToDispatcher(currentTask.getId());
-                logger.info("Sent task to dispatcher queue");
+                logger.info("Sent task to dispatcher queue for taskid: " + currentTask.getId());
 
-                // delete from scheduling repository
                 taskRedisRepository.deleteById(currentTask.getId());
-                logger.info("Deleted task from redis database");
+                logger.info("Deleted task from redis database for taskid: " + currentTask.getId());
             }
         } catch (IndexOutOfBoundsException e) {
-            //in case inputtask list is smaller than foor loop size
-            logger.info("in case inputtask list is smaller than foor loop size. Size:" + e.getMessage());
+            logger.error(e.getMessage());
         }
+    }
+
+    public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask) {
+        boolean pausedFound = false;
+        for (String groupId : groupsOfTask) {
+            // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
+            if(isGroupLocked(groupId)) {
+                pausedFound = true;
+                logger.debug("Found paused group with groupId " + groupId);
+                break;
+            }
+        }
+
+        if(pausedFound)
+            return true;
+
+        return false;
     }
 
     public boolean sequentialHasToWait(Task task) {
@@ -255,8 +224,10 @@ public class SchedulerService implements ISchedulerService {
             logger.debug("parentgroup lastindexnumber " + parentgroup.getLastIndexNumber());
             if (task.getIndexNumber() == parentgroup.getLastIndexNumber()+1)
                 return false;
-            else
+            else {
+                logger.info("task with id: " + task.getId() + "is not sent due to Sequential");
                 return true;
+            }
         }
         return false;
     }
@@ -269,6 +240,8 @@ public class SchedulerService implements ISchedulerService {
         List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(workingdays);
         if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBooleans(dayofweek)))
             return true;
+
+        logger.info("task with id: " + task.getId() + "is not sent due to workingDays");
         return false;
     }
 
@@ -326,7 +299,6 @@ public class SchedulerService implements ISchedulerService {
         }
         activeTimes = getActiveTimesForTask(task);
 
-        logger.info(activeTimes);
         if (activeTimes == null || activeTimes.isEmpty()) {
             return true;
         }
@@ -342,6 +314,7 @@ public class SchedulerService implements ISchedulerService {
             }
 
         }
+        logger.info("task with id: " + task.getId() + "is not sent due to ActiveTimes");
         return false;
     }
 

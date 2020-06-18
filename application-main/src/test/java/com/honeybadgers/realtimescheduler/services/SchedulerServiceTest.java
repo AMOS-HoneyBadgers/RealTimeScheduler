@@ -55,7 +55,6 @@ public class SchedulerServiceTest {
         service.getAllRedisTasksAndSort();
     }
 
-    // TODO TEST ANPASSEN
     @Test
     public void testScheduleTask() {
         Group group = createGroupTestObject();
@@ -102,21 +101,6 @@ public class SchedulerServiceTest {
         spy.scheduleTask(t.getId());
         verify(spy, times(0)).sendTaskstoDispatcher(any());
     }
-
-   /* @Test
-    public void testIfSchedulerGetsSpecialTrigger(){
-        //if scheduler is locked then don't do anything
-        Task t = new Task();
-        t.setId("SPECIAL_TRIGGER");
-
-        RedisLock capacity = new RedisLock();
-        capacity.setCurrentTasks(50);
-        when(lockRedisRepository.findById(dispatcherCapacityId)).thenReturn(Optional.of(capacity));
-
-        SchedulerService spy = spy(service);
-        spy.scheduleTask(t.getId());
-        verify(spy).sendTaskstoDispatcher(any());
-    }*/
 
     @Test
     public void testIsTaskLocked_NotLocked() {
@@ -210,13 +194,16 @@ public class SchedulerServiceTest {
         verify(sender).sendTaskToDispatcher(task1.getId());
         verify(taskRedisRepository).deleteById(task1.getId());
         verify(lockRedisRepository,times(2)).findById(any());
-        verify(spy).getLimitFromGroup(any());
+        verify(spy).getLimitFromGroup(any(),any());
 
 
     }
 
     @Test
     public void sendTasksToDispatcher_taskPaused() {
+        Task task = new Task();
+        task.setId("123");
+
         RedisLock test = new RedisLock();
         test.setId("ass");
         test.setCurrentTasks(0);
@@ -232,6 +219,7 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
         when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
 
         // mock everything related to isPaused
         when(lockRedisRepository.findById(taskLock.getId())).thenReturn(Optional.of(taskLock));
@@ -250,6 +238,9 @@ public class SchedulerServiceTest {
 
     @Test
     public void sendTasksToDispatcher_groupPaused() {
+        Task task = new Task();
+        task.setId("123");
+
         RedisLock test = new RedisLock();
         test.setId("ass");
         test.setCurrentTasks(0);
@@ -270,6 +261,7 @@ public class SchedulerServiceTest {
         when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
         when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>(Collections.singleton("testGroup")));
         when(lockRedisRepository.findById(groupLock.getId())).thenReturn(Optional.of(groupLock));
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
 
         doNothing().when(taskRedisRepository).deleteById(task1.getId());
 
@@ -300,21 +292,20 @@ public class SchedulerServiceTest {
         group1.setParentGroup(group2);
         group2.setParentGroup(group3);
 
+        List<String> groupsOfTask = new ArrayList<>();
+        groupsOfTask.add(group1.getId());
+        groupsOfTask.add(group2.getId());
+        groupsOfTask.add(group3.getId());
+
         when(groupService.getGroupById("1")).thenReturn(group1);
         when(groupService.getGroupById("2")).thenReturn(group2);
         when(groupService.getGroupById("3")).thenReturn(group3);
 
         SchedulerService spy = spy(service);
-        int limit = spy.getLimitFromGroup(group1.getId());
+        int limit = spy.getLimitFromGroup(groupsOfTask, group1.getId());
         assertEquals(limit,5);
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testRuntimeExceptionInGetLimitFromGroup() {
-        when(groupService.getGroupById(any())).thenReturn(null);
-        SchedulerService spy = spy(service);
-        spy.getLimitFromGroup("as12");
-    }
     @Test()
     public void testCreateGroupParlellismTracker() {
 
