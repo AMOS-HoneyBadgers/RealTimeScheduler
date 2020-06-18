@@ -1,7 +1,9 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.utils.IConvertUtils;
+import org.springframework.stereotype.Service;
 
+@Service
 public class ConvertUtils implements IConvertUtils {
     public int fitDayOfWeekToWorkingDayBooleans(int dayofweek) {
         if (dayofweek > 6)

@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.utils.IConvertUtils;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -160,7 +161,6 @@ public class SchedulerService implements ISchedulerService {
                 if (task == null)
                     throw new RuntimeException("Task not found in Postgre Database for taskid: " + currentTask.getId());
 
-                logger.info("Checking task and groups on paused.");
                 if(isTaskLocked(currentTask.getId())) {
                     logger.info("Task with id " + currentTask.getId() + " is currently paused!");
                     continue;
@@ -201,19 +201,13 @@ public class SchedulerService implements ISchedulerService {
     }
 
     public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask) {
-        boolean pausedFound = false;
         for (String groupId : groupsOfTask) {
             // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
             if(isGroupLocked(groupId)) {
-                pausedFound = true;
                 logger.debug("Found paused group with groupId " + groupId);
-                break;
+                return true;
             }
         }
-
-        if(pausedFound)
-            return true;
-
         return false;
     }
 
@@ -222,6 +216,7 @@ public class SchedulerService implements ISchedulerService {
             logger.debug("task getIndexNumber " + task.getIndexNumber());
             Group parentgroup = task.getGroup();
             logger.debug("parentgroup lastindexnumber " + parentgroup.getLastIndexNumber());
+
             if (task.getIndexNumber() == parentgroup.getLastIndexNumber()+1)
                 return false;
             else {
@@ -235,9 +230,10 @@ public class SchedulerService implements ISchedulerService {
     public boolean checkIfTaskIsInWorkingDays(Task task) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int dayofweek = calendar.get(Calendar.DAY_OF_WEEK);
-        ConvertUtils convertUtils = new ConvertUtils();
         int[] workingdays = getActualWorkingDaysForTask(task);
+        ConvertUtils convertUtils = new ConvertUtils();
         List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(workingdays);
+
         if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBooleans(dayofweek)))
             return true;
 
@@ -247,32 +243,26 @@ public class SchedulerService implements ISchedulerService {
 
     public int[] getActualWorkingDaysForTask(Task task) {
         int[] workingDays = task.getWorkingDays();
-        //TODO: Refactor to if else
-        Group parentGroup = null;
-        try {
-            parentGroup = groupService.getGroupById(task.getGroup().getId());
-        } catch (NullPointerException e) {
-            logger.debug("parentgroup from " + task.getId() + " is null \n" + e.getMessage());
-        }
-        if (parentGroup == null)
+
+        if(workingDays != null)
             return workingDays;
 
-        int[] workingDaysTemp = parentGroup.getWorkingDays();
-        if (workingDaysTemp != null) {
-            workingDays = workingDaysTemp;
-        }
+        if(task.getGroup() == null)
+            throw new RuntimeException("parentgroup from " + task.getId() + " is null");
 
-        while (parentGroup.getParentGroup() != null) {
-            parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
-            if (parentGroup == null)
+        Group parentGroup = groupService.getGroupById(task.getGroup().getId());
+
+        while (parentGroup != null) {
+            if (parentGroup.getWorkingDays() != null)
+                return parentGroup.getWorkingDays();
+
+            if(parentGroup.getParentGroup() == null)
                 break;
 
-            workingDaysTemp = parentGroup.getWorkingDays();
-            if (workingDaysTemp != null) {
-                workingDays = workingDaysTemp;
-            }
+            parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
         }
-        return workingDays;
+
+        return new int[]{1,1,1,1,1,1,1};
     }
 
 

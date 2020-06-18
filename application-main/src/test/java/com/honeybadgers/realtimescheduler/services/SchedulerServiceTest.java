@@ -4,6 +4,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.realtimescheduler.services.impl.ConvertUtils;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import org.junit.Assert;
 import org.junit.Test;
@@ -45,6 +46,9 @@ public class SchedulerServiceTest {
 
     @MockBean
     private IGroupService groupService;
+
+    @MockBean
+    private ConvertUtils convertUtils;
 
     @Autowired
     private SchedulerService service;
@@ -170,6 +174,7 @@ public class SchedulerServiceTest {
         tasks.add(task1);
 
         Group group = createGroupTestObject();
+
         Task task = new Task();
         task.setId("TEST");
         task.setGroup(group);
@@ -321,6 +326,7 @@ public class SchedulerServiceTest {
         group.setId("456");
         group.setParallelismDegree(10);
         group.setParentGroup(null);
+        group.setWorkingDays(new int[]{1,1,1,1,1,1,1});
         return group;
     }
 
@@ -456,58 +462,69 @@ public class SchedulerServiceTest {
         Assert.assertEquals(false,spy.checkIfTaskIsInWorkingDays(task));
     }
     @Test
-    public void testgetActualWorkingDaysForTask_OnlyTaskHasWorkingDays(){
-        //TODO check if it is correct that if a parent has no working days the working days of the task are relevant
+    public void testgetActualWorkingDaysForTask_TaskHasNullWorkingDays_AndParentHasWorkingDays(){
         Task task = new Task();
         task.setId("TEST");
-        int[] workingDays = new int[]{0,0,0,0,0,0,0};
+        int[] workingDays = null;
         task.setWorkingDays(workingDays);
-        Group parentGroup = new Group();
-        parentGroup.setId("TESTPARENTGROUP");
-        task.setGroup(parentGroup);
-        SchedulerService spy = spy(service);
-        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
-        Assert.assertEquals(spy.getActualWorkingDaysForTask(task), workingDays);
-    }
-    @Test
-    public void testgetActualWorkingDaysForTask_TaskAndParentHaveWorkingDays(){
-        //TODO check if it is correct that if a parent has  working days the working days of the parent are relevant
-        //prepare Task
-        Task task = new Task();
-        task.setId("TEST");
-        int[] workingdays = new int[]{0,0,0,0,0,0,0};
-        task.setWorkingDays(workingdays);
-        //prepare ParentGroup
+
         Group parentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
         int[] parentworkingdays = new int[]{0,0,0,0,0,1,0};
         parentGroup.setWorkingDays(parentworkingdays);
-        //setParentGroup for task
         task.setGroup(parentGroup);
-        //Act
+
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
-        //Arrange active times of parent group must be returned
         Assert.assertEquals(spy.getActualWorkingDaysForTask(task), parentworkingdays);
     }
+
     @Test
-    public void testgetActualWorkingDaysForTask_Task_ParentAndGrandparentHaveWorkingDays(){
-        //TODO check if it is correct that if a grandparent has  working days the working days of the grandparent are relevant
+    public void testgetActualWorkingDaysForTask_NoWorkingDaysPresent_GivesAll111111Array(){
+        Task task = new Task();
+        task.setId("TEST");
+        int[] workingDays = null;
+        task.setWorkingDays(workingDays);
+
+        Group parentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        int[] parentworkingdays = null;
+        parentGroup.setWorkingDays(parentworkingdays);
+
+        //prepare GrandParentGroup
+        Group grandparentGroup = new Group();
+        parentGroup.setId("TESTPARENTGROUP");
+        int[] grandparentworkingdays = null;
+        grandparentGroup.setWorkingDays(grandparentworkingdays);
+
+        //setParentGroup for task
+        task.setGroup(parentGroup);
+        parentGroup.setParentGroup(grandparentGroup);
+
+        SchedulerService spy = spy(service);
+        when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
+        Assert.assertArrayEquals(spy.getActualWorkingDaysForTask(task), new int[]{1,1,1,1,1,1,1});
+    }
+    @Test
+    public void testgetActualWorkingDaysForTask_Task_ParentAndGrandparentHaveWorkingDays_AndGivesUsWorkingDaysFromTask(){
         //prepare Task
         Task task = new Task();
         task.setId("TEST");
         int[] workingdays = new int[]{0,0,0,0,0,0,0};
         task.setWorkingDays(workingdays);
+
         //prepare ParentGroup
         Group parentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
         int[] parentworkingdays = new int[]{0,0,0,0,0,1,0};
         parentGroup.setWorkingDays(parentworkingdays);
+
         //prepare GrandParentGroup
         Group grandparentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
         int[] grandparentworkingdays = new int[]{0,0,0,0,0,1,0};
         grandparentGroup.setWorkingDays(grandparentworkingdays);
+
         //setParentGroup for task
         task.setGroup(parentGroup);
         parentGroup.setParentGroup(grandparentGroup);
@@ -516,8 +533,9 @@ public class SchedulerServiceTest {
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
         when(groupService.getGroupById(parentGroup.getParentGroup().getId())).thenReturn(grandparentGroup);
         //Arrange active times of grandparent group must be returned
-        Assert.assertEquals(spy.getActualWorkingDaysForTask(task), grandparentworkingdays);
+        Assert.assertEquals(spy.getActualWorkingDaysForTask(task), workingdays);
     }
+
     @Test
     public void testsequentialCheck(){
         //Arrange
@@ -533,5 +551,4 @@ public class SchedulerServiceTest {
         //Assert
         Assert.assertEquals(false,spy.sequentialHasToWait(task));
     }
-
 }
