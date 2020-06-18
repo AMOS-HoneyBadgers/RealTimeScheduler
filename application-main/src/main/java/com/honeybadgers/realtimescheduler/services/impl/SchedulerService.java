@@ -219,7 +219,7 @@ public class SchedulerService implements ISchedulerService {
             if (task.getIndexNumber() == parentgroup.getLastIndexNumber()+1)
                 return false;
             else {
-                logger.info("task with id: " + task.getId() + "is not sent due to Sequential");
+                logger.info("task with id: " + task.getId() + " is not sent due to Sequential");
                 return true;
             }
         }
@@ -236,7 +236,7 @@ public class SchedulerService implements ISchedulerService {
         if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBooleans(dayofweek)))
             return true;
 
-        logger.info("task with id: " + task.getId() + "is not sent due to workingDays");
+        logger.info("task with id: " + task.getId() + " is not sent due to workingDays");
         return false;
     }
 
@@ -297,7 +297,7 @@ public class SchedulerService implements ISchedulerService {
         } catch(ParseException pe) {
             logger.error(pe.getMessage());
         }
-        logger.info("task with id: " + task.getId() + "is not sent due to ActiveTimes");
+        logger.info("task with id: " + task.getId() + " is not sent due to ActiveTimes");
         return false;
     }
 
