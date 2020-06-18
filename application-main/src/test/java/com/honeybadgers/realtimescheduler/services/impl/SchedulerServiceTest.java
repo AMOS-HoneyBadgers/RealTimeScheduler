@@ -674,13 +674,16 @@ public class SchedulerServiceTest {
         //Arrange
         Task task = new Task();
         task.setModeEnum(ModeEnum.Sequential);
+
         //the index number of the parentgroup starts at 0 and the indexnumber of the task must be one higher
         task.setIndexNumber(1);
         Group parentgroup = new Group();
         parentgroup.setLastIndexNumber(0);
         task.setGroup(parentgroup);
+
         //Act
         SchedulerService spy = spy(service);
+
         //Assert
         Assert.assertFalse(spy.sequentialHasToWait(task));
     }
