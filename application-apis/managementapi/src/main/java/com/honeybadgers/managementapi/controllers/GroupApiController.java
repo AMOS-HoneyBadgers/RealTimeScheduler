@@ -1,10 +1,10 @@
 package com.honeybadgers.managementapi.controllers;
 
-import com.honeybadgers.managementapi.configuration.RedisApplicationProperties;
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ResponseModel;
 import com.honeybadgers.managementapi.service.IManagementService;
+import com.honeybadgers.redis.config.RedisApplicationProperties;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
