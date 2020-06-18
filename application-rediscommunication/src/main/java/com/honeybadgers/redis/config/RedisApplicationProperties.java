@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.config;
+package com.honeybadgers.redis.config;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -2,12 +2,10 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
-import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import com.honeybadgers.realtimescheduler.services.impl.ConvertUtils;
-import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
+import com.honeybadgers.redis.repository.LockRedisRepository;
+import com.honeybadgers.redis.repository.TaskRedisRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.awt.*;
 import java.util.*;
 import java.sql.Time;
 import java.time.LocalTime;
@@ -26,7 +23,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static com.honeybadgers.models.model.Constants.*;
-import static com.honeybadgers.realtimescheduler.services.impl.SchedulerService.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;

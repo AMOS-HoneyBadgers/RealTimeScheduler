@@ -183,6 +183,7 @@
         <module>application-queuecommunication</module>
         <module>application-main-integrationtests</module>
         <module>task-consumer</module>
+        <module>application-rediscommunication</module>
     </modules>
 
     <build>

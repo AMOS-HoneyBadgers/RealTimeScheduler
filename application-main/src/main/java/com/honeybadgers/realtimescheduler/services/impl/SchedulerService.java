@@ -2,12 +2,11 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
-import com.honeybadgers.models.utils.IConvertUtils;
-import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import com.honeybadgers.redis.repository.LockRedisRepository;
+import com.honeybadgers.redis.repository.TaskRedisRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -171,6 +170,9 @@ public class SchedulerService implements ISchedulerService {
                 if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask))
                     continue;
 
+                if (!checkIfTaskIsInActiveTime(task) || !checkIfTaskIsInWorkingDays(task) || sequentialHasToWait(task))
+                    continue;
+
                 String groupParlallelName = LOCK_GROUP_PREFIX_RUNNING_TASKS + currentTask.getGroupid();
 
                 // Get Parlellism Current Task Amount from Database, if it doesnt exist, we initialize with 0
@@ -185,9 +187,6 @@ public class SchedulerService implements ISchedulerService {
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
                 lockRedisRepository.save(currentParallelismDegree);
                 logger.info("current_tasks for " + currentParallelismDegree.getId() + "is now at: " + currentParallelismDegree.getCurrentTasks());
-
-                if (!checkIfTaskIsInActiveTime(task) || !checkIfTaskIsInWorkingDays(task) || sequentialHasToWait(task))
-                    continue;
 
                 sender.sendTaskToDispatcher(currentTask.getId());
                 logger.info("Sent task to dispatcher queue for taskid: " + currentTask.getId());

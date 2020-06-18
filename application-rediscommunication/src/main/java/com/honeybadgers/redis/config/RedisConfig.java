@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.config;
+package com.honeybadgers.redis.config;
 
 import com.honeybadgers.models.model.RedisLock;
 import com.honeybadgers.models.model.RedisTask;
@@ -14,7 +14,7 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 @Configuration
-@EnableRedisRepositories(basePackages = "com.honeybadgers.realtimescheduler")
+@EnableRedisRepositories(basePackages = "com.honeybadgers.redis")
 public class RedisConfig {
 
     @Autowired
