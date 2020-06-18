@@ -274,7 +274,6 @@ public class SchedulerService implements ISchedulerService {
     }
 
     public boolean checkIfTaskIsInActiveTime(Task task) {
-
         Date current = new Date();
         Date from = new Date();
         Date to = new Date();
@@ -309,10 +308,9 @@ public class SchedulerService implements ISchedulerService {
     }
 
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
-
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
         logger.debug(activeTimes);
-        //TODO: Refactor to if else
+        //TODO: ASK DATEV IF HANDLE LIKE WORKING_DAYS
         Group parentGroup = null;
         try {
             parentGroup = groupService.getGroupById(task.getGroup().getId());

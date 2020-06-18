@@ -54,14 +54,6 @@ public class TestController {
 
     @GetMapping("/testtask/{priority}")
     public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
-
-        /*Task task = new Task();
-        task.setPriority(Integer.parseInt(priority));
-        task.setId(UUID.randomUUID().toString());
-        task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
-
-
-        schedulerService.scheduleTask(task.getId());*/
         sender.sendTaskToDispatcher("assassasa");
         return ResponseEntity.ok().build();
     }
