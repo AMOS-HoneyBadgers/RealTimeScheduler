@@ -12,13 +12,13 @@ import org.springframework.stereotype.Component;
 @EnableRabbit
 public class MockDispatcherConsumer {
 
+    static final Logger logger = LogManager.getLogger(MockDispatcherConsumer.class);
+
     /**
      * This Class MockDispatcherConsumer is for testing purposes only, in productive environment, this has to be replaced!
      */
     @Autowired
     public ICommunication sender;
-
-    static final Logger logger = LogManager.getLogger(MockDispatcherConsumer.class);
 
     @RabbitListener(queues="dispatch.queue", containerFactory = "dispatchcontainerfactory")
     public void receiveTaskFromSchedulerMockDispatcher(String message) throws InterruptedException {
