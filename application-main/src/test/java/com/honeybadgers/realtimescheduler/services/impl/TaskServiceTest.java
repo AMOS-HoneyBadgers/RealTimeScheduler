@@ -1,8 +1,8 @@
-package com.honeybadgers.realtimescheduler.services;
+package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
-import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
+import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
@@ -16,7 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import javax.validation.constraints.AssertTrue;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
@@ -243,7 +242,7 @@ public class TaskServiceTest {
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 
         assertNotNull(e);
-        assertEquals("CRITICAL: found task with taskId " + task.getId() + " which has no group -> THIS SHOULD NOT HAVE HAPPENED (DB enforces this)!", e.getMessage());
+        assertEquals("CRITICAL: found task with taskId test which has no group!", e.getMessage());
     }
 
     @Test
@@ -269,7 +268,7 @@ public class TaskServiceTest {
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 
         assertNotNull(e);
-        assertEquals("AncestorModel received from repository contains null values!", e.getMessage());
+        assertEquals("AncestorModel received from repository contains null values for taskId: test", e.getMessage());
     }
 
     @Test
@@ -296,7 +295,7 @@ public class TaskServiceTest {
         Exception e = assertThrows(IllegalStateException.class, () -> service.getRecursiveGroupsOfTask(task.getId()));
 
         assertNotNull(e);
-        assertEquals("Ancestor list contains null values!", e.getMessage());
+        assertEquals("Ancestor list contains null values for taskId: test", e.getMessage());
     }
   
 }

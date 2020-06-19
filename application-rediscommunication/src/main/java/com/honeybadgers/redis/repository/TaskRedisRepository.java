@@ -1,6 +1,6 @@
-package com.honeybadgers.managementapi.repository;
+package com.honeybadgers.redis.repository;
 
-import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.RedisTask;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -14,15 +14,15 @@ import java.util.Optional;
 
 @Repository
 @Slf4j
-public class LockRedisRepository implements CrudRepository<RedisLock, String> {
+public class TaskRedisRepository implements CrudRepository<RedisTask, String> {
 
-    private static final String KEY = "RedisLock";
+    private static final String KEY = "RedisTask";
 
     @Autowired
-    @Qualifier("lockRedisTemplate")
-    RedisTemplate<String, RedisLock> redisTemplate;
+    @Qualifier("prioRedisTemplate")
+    RedisTemplate<String, RedisTask> redisTemplate;
 
-    private HashOperations<String, String, RedisLock> hashOperations;
+    private HashOperations<String, String, RedisTask> hashOperations;
 
     @PostConstruct
     private void init() {
@@ -30,22 +30,22 @@ public class LockRedisRepository implements CrudRepository<RedisLock, String> {
     }
 
     @Override
-    public <S extends RedisLock> S save(S s) {
+    public <S extends RedisTask> S save(S s) {
         hashOperations.put(KEY, s.getId(), s);
         return s;
     }
 
     @Override
-    public <S extends RedisLock> Iterable<S> saveAll(Iterable<S> iterable) {
+    public <S extends RedisTask> Iterable<S> saveAll(Iterable<S> iterable) {
         throw new RuntimeException("NotImplemented!");
     }
 
     @Override
-    public Optional<RedisLock> findById(String s) {
-        RedisLock lock = hashOperations.get(KEY,s);
-        if(lock == null)
+    public Optional<RedisTask> findById(String s) {
+        RedisTask task = hashOperations.get(KEY,s);
+        if(task == null)
             return Optional.empty();
-        return Optional.of(lock);
+        return Optional.of(task);
     }
 
     @Override
@@ -54,12 +54,13 @@ public class LockRedisRepository implements CrudRepository<RedisLock, String> {
     }
 
     @Override
-    public Iterable<RedisLock> findAll() {
-        return hashOperations.entries(KEY).values();
+    public Iterable<RedisTask> findAll() {
+        Iterable<RedisTask> tasks = hashOperations.values(KEY);
+        return tasks;
     }
 
     @Override
-    public Iterable<RedisLock> findAllById(Iterable<String> iterable) {
+    public Iterable<RedisTask> findAllById(Iterable<String> iterable) {
         throw new RuntimeException("NotImplemented!");
     }
 
@@ -74,12 +75,12 @@ public class LockRedisRepository implements CrudRepository<RedisLock, String> {
     }
 
     @Override
-    public void delete(RedisLock redisLock) {
+    public void delete(RedisTask redisTask) {
         throw new RuntimeException("NotImplemented!");
     }
 
     @Override
-    public void deleteAll(Iterable<? extends RedisLock> iterable) {
+    public void deleteAll(Iterable<? extends RedisTask> iterable) {
         throw new RuntimeException("NotImplemented!");
     }
 

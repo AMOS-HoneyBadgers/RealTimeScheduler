@@ -1,9 +1,9 @@
 package com.honeybadgers.realtimescheduler;
 
 import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepositoryTest;
-import com.honeybadgers.realtimescheduler.services.GroupServiceTest;
+import com.honeybadgers.realtimescheduler.services.impl.GroupServiceTest;
 import com.honeybadgers.realtimescheduler.services.RabbitMQSenderTest;
-import com.honeybadgers.realtimescheduler.services.TaskServiceTest;
+import com.honeybadgers.realtimescheduler.services.impl.TaskServiceTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 

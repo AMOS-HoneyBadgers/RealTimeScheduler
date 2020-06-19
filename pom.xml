@@ -183,6 +183,7 @@
         <module>application-queuecommunication</module>
         <module>application-main-integrationtests</module>
         <module>task-consumer</module>
+        <module>application-rediscommunication</module>
     </modules>
 
     <build>
@@ -254,6 +255,7 @@
                         <exclude>com/honeybadgers/realtimescheduler/model/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/exception/**/*</exclude>
                         <exclude>com/honeybadgers/realtimescheduler/web/**/*</exclude>
+                        <exclude>com/honeybadgers/realtimescheduler/consumer/**/*</exclude>
                         <exclude>com/honeybadgers/cleaner/config/**/*</exclude>
                         <exclude>com/honeybadgers/cleaner/repository/**/*</exclude>
                         <exclude>com/honeybadgers/integrationtests/IntegrationtestApplication*</exclude>
