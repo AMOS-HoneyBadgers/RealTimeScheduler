@@ -67,4 +67,4 @@ ALTER TABLE public.task
 
 -- Insert Default group
 
-INSERT INTO public."group" (id, priority, type_flag, mode, parallelism_degree) VALUES ('DEFAULT_GROUP', 1, 'Batch', 'Parallel', 100);
+INSERT INTO public."group" (id, priority, type_flag, mode, parallelism_degree, active_times, working_days) VALUES ('DEFAULT_GROUP', 1, 'Batch', 'Parallel', 100, '[]', ARRAY[1,1,1,1,1,1,1]);
