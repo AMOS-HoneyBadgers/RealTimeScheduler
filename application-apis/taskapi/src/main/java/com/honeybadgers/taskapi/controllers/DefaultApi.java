@@ -29,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:30:52.032+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T09:37:46.835+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "default", description = "the default API")
@@ -59,7 +59,7 @@ public interface DefaultApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"paused\" : false, \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
+                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

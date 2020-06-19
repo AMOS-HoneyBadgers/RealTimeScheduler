@@ -15,7 +15,6 @@ CREATE TABLE "group"
     working_days ARRAY,
     type_flag character varying NOT NULL,
     mode character varying NOT NULL,
-    paused boolean NOT NULL,
     last_index_number bigint,
     parallelism_degree integer
 );
@@ -40,7 +39,6 @@ CREATE TABLE task
     type_flag character varying NOT NULL,
     mode character varying NOT NULL,
     retries integer,
-    paused boolean NOT NULL,
     force boolean NOT NULL,
     index_number bigint,
     meta_data jsonb

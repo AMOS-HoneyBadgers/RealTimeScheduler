@@ -37,7 +37,6 @@ public class TaskConvertUtilsTest {
         int priority = 100;
         int indexNumber = 0;
         boolean force = false;
-        boolean paused = true;
         ModeEnum mode = ModeEnum.Sequential;
         TypeFlagEnum type = TypeFlagEnum.Realtime;
         TaskStatusEnum status = TaskStatusEnum.Scheduled;
@@ -63,7 +62,6 @@ public class TaskConvertUtilsTest {
         exampleTask.setPriority(priority);
         exampleTask.setIndexNumber(indexNumber);
         exampleTask.setForce(force);
-        exampleTask.setPaused(paused);
         exampleTask.setModeEnum(mode);
         exampleTask.setTypeFlagEnum(type);
         exampleTask.setStatus(status);
@@ -80,7 +78,6 @@ public class TaskConvertUtilsTest {
         assertEquals(priority,                        restModel.getPriority().intValue());
         assertEquals(indexNumber,                     restModel.getIndexNumber().intValue());
         assertEquals(force,                           restModel.getForce());
-        assertEquals(paused,                          restModel.getPaused());
         assertEquals(TaskModel.ModeEnum.SEQUENTIAL,   restModel.getMode());
         assertEquals(TaskModel.TypeFlagEnum.REALTIME, restModel.getTypeFlag());
         assertEquals(TaskModel.StatusEnum.SCHEDULED,  restModel.getStatus());

@@ -18,7 +18,7 @@ import javax.validation.constraints.*;
 /**
  * TaskModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:30:52.032+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T09:37:46.835+02:00[Europe/Berlin]")
 
 public class TaskModel   {
   @JsonProperty("id")
@@ -162,9 +162,6 @@ public class TaskModel   {
 
   @JsonProperty("retries")
   private Integer retries = 0;
-
-  @JsonProperty("paused")
-  private Boolean paused = false;
 
   @JsonProperty("force")
   private Boolean force = false;
@@ -399,26 +396,6 @@ public class TaskModel   {
     this.retries = retries;
   }
 
-  public TaskModel paused(Boolean paused) {
-    this.paused = paused;
-    return this;
-  }
-
-  /**
-   * Boolean, which identifies, whereas this group (and all of its tasks) are currently paused
-   * @return paused
-  */
-  @ApiModelProperty(value = "Boolean, which identifies, whereas this group (and all of its tasks) are currently paused")
-
-
-  public Boolean getPaused() {
-    return paused;
-  }
-
-  public void setPaused(Boolean paused) {
-    this.paused = paused;
-  }
-
   public TaskModel force(Boolean force) {
     this.force = force;
     return this;
@@ -509,7 +486,6 @@ public class TaskModel   {
         Objects.equals(this.typeFlag, taskModel.typeFlag) &&
         Objects.equals(this.mode, taskModel.mode) &&
         Objects.equals(this.retries, taskModel.retries) &&
-        Objects.equals(this.paused, taskModel.paused) &&
         Objects.equals(this.force, taskModel.force) &&
         Objects.equals(this.indexNumber, taskModel.indexNumber) &&
         Objects.equals(this.meta, taskModel.meta);
@@ -517,7 +493,7 @@ public class TaskModel   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, groupId, priority, deadline, activeTimes, workingDays, status, typeFlag, mode, retries, paused, force, indexNumber, meta);
+    return Objects.hash(id, groupId, priority, deadline, activeTimes, workingDays, status, typeFlag, mode, retries, force, indexNumber, meta);
   }
 
   @Override
@@ -535,7 +511,6 @@ public class TaskModel   {
     sb.append("    typeFlag: ").append(toIndentedString(typeFlag)).append("\n");
     sb.append("    mode: ").append(toIndentedString(mode)).append("\n");
     sb.append("    retries: ").append(toIndentedString(retries)).append("\n");
-    sb.append("    paused: ").append(toIndentedString(paused)).append("\n");
     sb.append("    force: ").append(toIndentedString(force)).append("\n");
     sb.append("    indexNumber: ").append(toIndentedString(indexNumber)).append("\n");
     sb.append("    meta: ").append(toIndentedString(meta)).append("\n");

@@ -74,11 +74,6 @@
         "minimum": 0,
         "default": 0
       },
-      "paused": {
-        "description": "Boolean, which identifies, whereas this group (and all of its tasks) are currently paused",
-        "type": "boolean",
-        "default": "false"
-      },
       "force": {
         "description": "If set to true: send task directly to dispatcher without scheduling",
         "type": "boolean",
@@ -163,11 +158,6 @@
           "sequential",
           "parallel"
         ]
-      },
-      "paused": {
-        "description": "Boolean, which identifies, whereas this group (and all of its tasks) are currently paused",
-        "type": "boolean",
-        "default": "false"
       },
       "last_index_number": {
         "description": "Index number of last dispatched task of this group",

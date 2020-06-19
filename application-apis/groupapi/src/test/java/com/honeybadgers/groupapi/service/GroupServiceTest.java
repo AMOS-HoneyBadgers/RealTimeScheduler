@@ -52,7 +52,6 @@ public class GroupServiceTest {
         Group group = new Group();
         group.setId("testGroup");
         group.setPriority(50);
-        group.setPaused(false);
 
         Group parentGroup = new Group();
         parentGroup.setId("parentGroup");

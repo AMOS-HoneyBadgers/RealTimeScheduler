@@ -64,9 +64,6 @@ public class Group {
     @Column(name = "mode", nullable = false)
     private ModeEnum modeEnum = ModeEnum.Parallel;
 
-    @Column(name = "paused", nullable = false)
-    private boolean paused = false;
-
     @Min(value = 0)
     @Column(name = "last_index_number")
     private Integer lastIndexNumber;

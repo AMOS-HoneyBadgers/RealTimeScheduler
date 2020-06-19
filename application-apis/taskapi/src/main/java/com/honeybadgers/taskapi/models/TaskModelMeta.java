@@ -12,7 +12,7 @@ import javax.validation.constraints.*;
 /**
  * TaskModelMeta
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-06T19:30:52.032+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T09:37:46.835+02:00[Europe/Berlin]")
 
 public class TaskModelMeta   {
   @JsonProperty("key")

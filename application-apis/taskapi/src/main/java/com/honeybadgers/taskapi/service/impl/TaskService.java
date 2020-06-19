@@ -18,6 +18,7 @@ import com.honeybadgers.taskapi.exceptions.JpaException;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -119,7 +120,6 @@ public class TaskService implements ITaskService {
         // parameters, which have default values defined
         newTask.setForce(restModel.getForce());
         newTask.setRetries(restModel.getRetries());
-        newTask.setPaused(restModel.getPaused());
 
         newTask.setIndexNumber(restModel.getIndexNumber());
         // map OffsetDateTime to Timestamp or use group default
@@ -170,16 +170,11 @@ public class TaskService implements ITaskService {
     @Override
     public void sendTaskToPriorityQueue(TaskModel task) {
         TaskQueueModel taskQueueModel = new TaskQueueModel();
-        if (task.getDeadline() != null)
-            taskQueueModel.setDeadline(Timestamp.valueOf(task.getDeadline().toLocalDateTime()));
         taskQueueModel.setGroupId(task.getGroupId());
         taskQueueModel.setId(task.getId().toString());
-        taskQueueModel.setIndexNumber(task.getIndexNumber());
         if (task.getMeta() != null)
             taskQueueModel.setMetaData(task.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
-        taskQueueModel.setPriority(task.getPriority());
-        taskQueueModel.setRetries(task.getRetries());
-        taskQueueModel.setTypeFlagEnum(task.getTypeFlag().getValue());
+        taskQueueModel.setDispatched(Timestamp.from(Instant.now()));
         sender.sendTaskToPriorityQueue(taskQueueModel);
     }
 
