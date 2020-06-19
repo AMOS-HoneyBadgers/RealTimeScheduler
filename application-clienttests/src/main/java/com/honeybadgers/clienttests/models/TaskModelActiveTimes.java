@@ -1,7 +1,7 @@
 package com.honeybadgers.clienttests.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.honeybadgers.models.model.ActiveTimes;
+//import com.honeybadgers.models.model.ActiveTimes;
 import io.swagger.annotations.ApiModelProperty;
 
 import java.sql.Time;
@@ -95,12 +95,10 @@ public class TaskModelActiveTimes {
         return o.toString().replace("\n", "\n    ");
     }
 
-
-
-    public ActiveTimes getAsJpaModel() {
+    /*public ActiveTimes getAsJpaModel() {
         ActiveTimes active = new ActiveTimes();
         active.setFrom(this.from);
         active.setTo(this.to);
         return active;
-    }
+    }*/
 }

@@ -3,7 +3,6 @@ package com.honeybadgers.clienttests.models;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.honeybadgers.clienttests.models.TaskModelMeta;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.validation.Valid;
