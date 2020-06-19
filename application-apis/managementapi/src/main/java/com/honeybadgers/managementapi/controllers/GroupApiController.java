@@ -23,9 +23,6 @@ public class GroupApiController implements GroupApi {
 
     static final Logger logger = LogManager.getLogger(GroupApiController.class);
 
-    @Autowired
-    RedisApplicationProperties redisApplicationProperties;
-
     private final NativeWebRequest request;
 
     @Autowired
@@ -57,8 +54,6 @@ public class GroupApiController implements GroupApi {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
-
-        logger.info("########################## REDIS PROP: " + redisApplicationProperties.toString());
 
         try{
             managmentService.pauseGroup(groupId, dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
