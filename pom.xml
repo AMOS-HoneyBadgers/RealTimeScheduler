@@ -184,6 +184,7 @@
         <module>application-main-integrationtests</module>
         <module>task-consumer</module>
         <module>application-rediscommunication</module>
+        <module>application-clienttests</module>
     </modules>
 
     <build>
