@@ -33,7 +33,7 @@ public class PerformanceService {
         for(int i = 0; i < count; i++){
             TaskModel taskModel = new TaskModel();
             taskModel.setId(UUID.randomUUID());
-            taskModel.setGroupId("TestGroupRunAlways");
+            taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
             taskModel.setPriority(100);
 
             // build the request
@@ -41,7 +41,7 @@ public class PerformanceService {
 
             // send POST request
             ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
+            System.out.println("TaskNr: " + i);
         }
-
     }
 }
