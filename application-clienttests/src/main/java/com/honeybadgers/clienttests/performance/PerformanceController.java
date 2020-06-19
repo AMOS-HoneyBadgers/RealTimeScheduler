@@ -12,9 +12,9 @@ public class PerformanceController {
     @Autowired
     PerformanceService performanceService;
 
-    @GetMapping("/performance")
-    public ResponseEntity<?> createPerformanceTest() {
-        performanceService.createPostWithObject();
+    @GetMapping("/performance/{count}")
+    public ResponseEntity<?> createPerformanceTest(@PathVariable(value = "count") final int count) {
+        performanceService.createPostWithObject(count);
         return ResponseEntity.ok().build();
     }
 }

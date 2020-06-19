@@ -17,9 +17,9 @@ public class PerformanceService {
 
     private RestTemplate restTemplate;
 
-    public void createPostWithObject() {
+    public void createPostWithObject(int count) {
         restTemplate = new RestTemplate();
-        String url = "taskapi-amos.cfapps.io/api/task";
+        String url = "https://taskapi-amos.cfapps.io/api/task/";
 
         // create headers
         HttpHeaders headers = new HttpHeaders();
@@ -29,15 +29,19 @@ public class PerformanceService {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
 
         // create a post object
-        TaskModel taskModel = new TaskModel();
-        taskModel.setId(UUID.randomUUID());
-        taskModel.setGroupId("TestGroupRunAlways");
-        taskModel.setPriority(100);
 
-        // build the request
-        HttpEntity<TaskModel> entity = new HttpEntity<>(taskModel, headers);
+        for(int i = 0; i < count; i++){
+            TaskModel taskModel = new TaskModel();
+            taskModel.setId(UUID.randomUUID());
+            taskModel.setGroupId("TestGroupRunAlways");
+            taskModel.setPriority(100);
 
-        // send POST request
-        ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
+            // build the request
+            HttpEntity<TaskModel> entity = new HttpEntity<>(taskModel, headers);
+
+            // send POST request
+            ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
+        }
+
     }
 }
