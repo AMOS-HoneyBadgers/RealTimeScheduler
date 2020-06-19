@@ -62,3 +62,9 @@ CREATE TABLE public.task
 
 ALTER TABLE public.task
     OWNER to realtimescheduler;
+
+
+
+-- Insert Default group
+
+INSERT INTO public."group" (id, priority, type_flag, mode, parallelism_degree) VALUES ('DEFAULT_GROUP', 1, 'Batch', 'Parallel', 100);

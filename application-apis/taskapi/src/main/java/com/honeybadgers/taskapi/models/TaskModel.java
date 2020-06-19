@@ -18,7 +18,7 @@ import javax.validation.constraints.*;
 /**
  * TaskModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T09:37:46.835+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T10:08:51.202+02:00[Europe/Berlin]")
 
 public class TaskModel   {
   @JsonProperty("id")
@@ -204,8 +204,7 @@ public class TaskModel   {
    * Id of group this task is assigned to
    * @return groupId
   */
-  @ApiModelProperty(required = true, value = "Id of group this task is assigned to")
-  @NotNull
+  @ApiModelProperty(value = "Id of group this task is assigned to")
 
 @Size(max=128) 
   public String getGroupId() {

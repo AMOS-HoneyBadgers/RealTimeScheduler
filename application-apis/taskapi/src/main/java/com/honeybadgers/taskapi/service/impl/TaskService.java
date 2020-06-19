@@ -24,6 +24,8 @@ import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.honeybadgers.models.model.Constants.DEFAULT_GROUP_ID;
+
 @Service
 public class TaskService implements ITaskService {
 
@@ -66,6 +68,8 @@ public class TaskService implements ITaskService {
         }
 
         newTask.setId(restModel.getId().toString());
+        if(restModel.getGroupId() == null)
+            restModel.setGroupId(DEFAULT_GROUP_ID);
         Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
         // foreign key is declared as NOT NULL -> throw JpaException now because it will be thrown on save(newTask) anyway
         if (group == null)

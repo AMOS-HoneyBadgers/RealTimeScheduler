@@ -2,8 +2,7 @@
   "TaskModel": {
     "type": "object",
     "required": [
-      "id",
-      "group_id"
+      "id"
     ],
     "properties": {
       "id": {
