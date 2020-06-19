@@ -63,9 +63,6 @@ public class GroupConvertUtils implements IGroupConvertUtils {
         if(groupModel.getPriority() != null)
             newGroup.setPriority(groupModel.getPriority());
 
-        if(groupModel.getPaused() != null)
-            newGroup.setPaused(groupModel.getPaused());
-
         if(groupModel.getParallelismDegree() != null)
             newGroup.setParallelismDegree(groupModel.getParallelismDegree());
         else
@@ -90,7 +87,6 @@ public class GroupConvertUtils implements IGroupConvertUtils {
         model.setMode(GroupModel.ModeEnum.fromValue(group.getModeEnum().toString().toLowerCase()));
         model.setTypeFlag(GroupModel.TypeFlagEnum.fromValue(group.getTypeFlagEnum().toString().toLowerCase()));
         model.setPriority(group.getPriority());
-        model.setPaused(group.isPaused());
         model.setParallelismDegree(group.getParallelismDegree());
         return model;
     }

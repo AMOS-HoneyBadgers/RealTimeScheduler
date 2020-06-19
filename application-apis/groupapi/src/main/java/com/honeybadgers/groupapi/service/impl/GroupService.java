@@ -50,7 +50,6 @@ public class GroupService implements IGroupService {
         if (restModel.getParentId() != null) {
             List<Task> taskChildren = taskRepository.findAllByGroupId(restModel.getParentId());
             if (!taskChildren.isEmpty())
-                // TODO perhaps move group of task or sth similar
                 throw new CreationException(
                         "Parent group has tasks as children: " +
                                 taskChildren.stream().map(Task::getId).collect(Collectors.joining(", ")) +
@@ -76,6 +75,20 @@ public class GroupService implements IGroupService {
         if (targetGroup == null) {
             throw new NoSuchElementException("Group does not exist");
         }
+
+        // prevent that parentGroup has tasks (in case the parent group gets changed)
+        if (restModel.getParentId() != null && (targetGroup.getParentGroup() != null && restModel.getParentId().compareToIgnoreCase(targetGroup.getParentGroup().getId()) != 0)) {
+            List<Task> taskChildren = taskRepository.findAllByGroupId(restModel.getParentId());
+            if (!taskChildren.isEmpty())
+                throw new JpaException(
+                        "Parent group has tasks as children: " +
+                                taskChildren.stream().map(Task::getId).collect(Collectors.joining(", ")) +
+                                " -> aborting!"
+                );
+        }
+
+        // prevent changing of id
+        restModel.setId(groupId);
 
         // just use same conversion as for create (does not matter due to "replacing" object with same id)
         targetGroup = convertUtils.groupRestToJpa(restModel);

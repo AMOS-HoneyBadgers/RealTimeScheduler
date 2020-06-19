@@ -230,7 +230,6 @@ public class TaskServiceTest {
         int priority = 100 + diff;
         int indexNumber = 0;
         boolean force = false;
-        boolean paused = true;
         ModeEnum mode = ModeEnum.Sequential;
         TypeFlagEnum type = TypeFlagEnum.Realtime;
         TaskStatusEnum status = TaskStatusEnum.Scheduled;
@@ -256,7 +255,6 @@ public class TaskServiceTest {
         exampleTask.setPriority(priority);
         exampleTask.setIndexNumber(indexNumber);
         exampleTask.setForce(force);
-        exampleTask.setPaused(paused);
         exampleTask.setModeEnum(mode);
         exampleTask.setTypeFlagEnum(type);
         exampleTask.setStatus(status);

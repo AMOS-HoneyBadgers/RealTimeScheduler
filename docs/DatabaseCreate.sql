@@ -12,7 +12,6 @@ CREATE TABLE public."group"
     working_days integer[],
     type_flag character varying COLLATE pg_catalog."default" NOT NULL,
     mode character varying COLLATE pg_catalog."default" NOT NULL,
-    paused boolean NOT NULL,
     last_index_number bigint,
     parallelism_degree integer,
     CONSTRAINT group_pkey PRIMARY KEY (id),
@@ -47,7 +46,6 @@ CREATE TABLE public.task
     type_flag character varying COLLATE pg_catalog."default" NOT NULL,
     mode character varying COLLATE pg_catalog."default" NOT NULL,
     retries integer,
-    paused boolean NOT NULL,
     force boolean NOT NULL,
     index_number bigint,
     meta_data jsonb,
@@ -64,3 +62,9 @@ CREATE TABLE public.task
 
 ALTER TABLE public.task
     OWNER to realtimescheduler;
+
+
+
+-- Insert Default group
+
+INSERT INTO public."group" (id, priority, type_flag, mode, parallelism_degree) VALUES ('DEFAULT_GROUP', 1, 'Batch', 'Parallel', 100);
