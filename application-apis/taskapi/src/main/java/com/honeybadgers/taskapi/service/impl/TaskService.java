@@ -60,81 +60,13 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
-        Task newTask = new Task();
 
         Task checkTask = taskRepository.findById(restModel.getId().toString()).orElse(null);
         if( checkTask != null ){
             throw new JpaException("Primary or unique constraint failed!");
         }
 
-        newTask.setId(restModel.getId().toString());
-        if(restModel.getGroupId() == null)
-            restModel.setGroupId(DEFAULT_GROUP_ID);
-        Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
-        // foreign key is declared as NOT NULL -> throw JpaException now because it will be thrown on save(newTask) anyway
-        if (group == null)
-            throw new JpaException("Group not found!");
-        else {
-            List<Group> groupChildren = groupRepository.findAllByParentGroupId(group.getId());
-            if (!groupChildren.isEmpty())
-                // TODO perhaps move group of task or sth similar
-                throw new CreationException("Group of task has other groups as children: " +
-                        groupChildren.stream().map(Group::getId).collect(Collectors.joining(", ")) +
-                        " -> aborting!");
-        }
-        newTask.setGroup(group);
-
-        // set priority or default prio of group
-        if (restModel.getPriority() != null)
-            newTask.setPriority(restModel.getPriority());
-        else
-            newTask.setPriority(group.getPriority());
-
-        // convert List<TaskModelActiveTimes> to List<ActiveTimes> or use default of group
-        if (restModel.getActiveTimes() != null)
-            newTask.setActiveTimeFrames(restModel.getActiveTimes().stream().map(taskModelActiveTimes -> taskModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
-        else
-            newTask.setActiveTimeFrames(group.getActiveTimeFrames());
-
-        // convert List<Boolean> to int[]
-        if (restModel.getWorkingDays() != null) {
-            newTask.setWorkingDays(restModel.getWorkingDays().stream().mapToInt(value -> {
-                if (value == null)
-                    return 1;
-                // convert boolean to int
-                return (value ? 1 : 0);
-            }).toArray());
-        } else {
-            newTask.setWorkingDays(group.getWorkingDays());
-        }
-
-        // convert Enums using RestEnum.toString and JpaEnum.fromString
-        newTask.setStatus(TaskStatusEnum.getFromString(restModel.getStatus().getValue()));
-        if (restModel.getMode() != null)
-            newTask.setModeEnum(ModeEnum.getFromString(restModel.getMode().getValue()));
-        else
-            // use group default
-            newTask.setModeEnum(group.getModeEnum());
-        if (restModel.getTypeFlag() != null)
-            newTask.setTypeFlagEnum(TypeFlagEnum.getFromString(restModel.getTypeFlag().getValue()));
-        else
-            // use group default
-            newTask.setTypeFlagEnum(group.getTypeFlagEnum());
-
-        // parameters, which have default values defined
-        newTask.setForce(restModel.getForce());
-        newTask.setRetries(restModel.getRetries());
-
-        newTask.setIndexNumber(restModel.getIndexNumber());
-        // map OffsetDateTime to Timestamp or use group default
-        if (restModel.getDeadline() != null)
-            newTask.setDeadline(Timestamp.valueOf(restModel.getDeadline().toLocalDateTime()));
-        else
-            newTask.setDeadline(group.getDeadline());
-
-        // map List<TaskModelMeta> to Map<String, String>
-        if (restModel.getMeta() != null)
-            newTask.setMetaData(restModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
+        Task newTask = converter.taskRestToJpa(restModel);
 
         try {
             taskRepository.save(newTask);
@@ -144,6 +76,31 @@ public class TaskService implements ITaskService {
             throw new JpaException("DataIntegrityViolation on save new task!");
         }
         return newTask;
+    }
+
+    @Override
+    public Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
+
+        Task checkTask = taskRepository.findById(taskId.toString()).orElse(null);
+        if(checkTask == null)
+            throw new NoSuchElementException("No existing Task with id: " + taskId);
+
+        if(checkTask.isForce() == true && restModel.getForce() == false)
+            throw new IllegalStateException("Task " + taskId +  " already bypassed scheduling process. Cannot schedule now");
+
+        restModel.setId(taskId);
+
+        Task updatedTask = converter.taskRestToJpa(restModel);
+
+        try {
+            taskRepository.save(updatedTask);
+        } catch (DataIntegrityViolationException e) {
+            logger.error("DataIntegrityViolation on save new task!");
+            logger.error(e.getStackTrace());
+            throw new JpaException("DataIntegrityViolation on save new task!");
+        }
+
+        return updatedTask;
     }
 
     @Override

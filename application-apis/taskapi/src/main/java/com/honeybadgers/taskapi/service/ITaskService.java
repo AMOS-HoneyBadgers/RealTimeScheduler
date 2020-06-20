@@ -16,6 +16,7 @@ import java.util.UUID;
 public interface ITaskService {
 
     Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
+    Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException;
     List<TaskModel> getAllTasks();
     TaskModel deleteTask(UUID taskid) throws NoSuchElementException;
     TaskModel getTaskById(UUID taskid) throws NoSuchElementException;

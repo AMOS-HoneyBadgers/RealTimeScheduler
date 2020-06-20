@@ -1,5 +1,8 @@
 package com.honeybadgers.taskapi.controllers;
 
+import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.taskapi.exceptions.CreationException;
+import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
@@ -27,7 +30,7 @@ public class TaskIdApiController implements TaskIdApi {
     private final NativeWebRequest request;
 
     @Autowired
-    ITaskService taskservice;
+    ITaskService taskService;
 
     @org.springframework.beans.factory.annotation.Autowired
     public TaskIdApiController(NativeWebRequest request) {
@@ -53,7 +56,7 @@ public class TaskIdApiController implements TaskIdApi {
         TaskModel restModel = null;
 
         try{
-            restModel = taskservice.getTaskById(taskId);
+            restModel = taskService.getTaskById(taskId);
         }catch(NoSuchElementException e){
             return ResponseEntity.notFound().build();
         }
@@ -74,7 +77,36 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<ResponseModel> taskIdPost(UUID taskId, @Valid TaskModel taskModel) {
-        return null;
+
+        ResponseModel response = new ResponseModel();
+        response.setCode("200");
+        response.setMessage("Success");
+
+        if (taskModel == null) {
+            response.setCode("400");
+            response.setMessage("Missing Body");
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        try {
+            taskService.updateTask(taskId, taskModel);
+            //TODO: how to behave
+            if (taskModel.getForce() != null && taskModel.getForce())
+                taskService.sendTaskToPriorityQueue(taskModel);
+            else
+                taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
+
+        } catch (UnknownEnumException e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (JpaException | CreationException | IllegalStateException e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -91,7 +123,7 @@ public class TaskIdApiController implements TaskIdApi {
         TaskModel restModel = null;
 
         try{
-            restModel = taskservice.deleteTask(taskId);
+            restModel = taskService.deleteTask(taskId);
         }catch(NoSuchElementException e){
            return ResponseEntity.notFound().build();
         }
