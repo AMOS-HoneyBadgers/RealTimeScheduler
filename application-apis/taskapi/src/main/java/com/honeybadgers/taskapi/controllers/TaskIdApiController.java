@@ -82,12 +82,6 @@ public class TaskIdApiController implements TaskIdApi {
         response.setCode("200");
         response.setMessage("Success");
 
-        if (taskModel == null) {
-            response.setCode("400");
-            response.setMessage("Missing Body");
-            return ResponseEntity.badRequest().body(response);
-        }
-
         try {
             taskService.updateTask(taskId, taskModel);
             //TODO: how to behave

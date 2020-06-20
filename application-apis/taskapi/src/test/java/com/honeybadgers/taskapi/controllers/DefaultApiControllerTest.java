@@ -1,6 +1,7 @@
 package com.honeybadgers.taskapi.controllers;
 
 
+import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
@@ -83,6 +84,8 @@ public class DefaultApiControllerTest {
         verify(taskservice).sendTaskToTaskEventQueue(Mockito.anyString());
     }
 
+
+
     @Test
     public void testTaskCreate_JpaExceptionWasThrown() throws Exception {
         TaskModel testModel = new TaskModel();
@@ -90,6 +93,24 @@ public class DefaultApiControllerTest {
         testModel.setGroupId("TestGruppe");
 
         JpaException ex = new JpaException("Primary or unique constraint failed!");
+        when(taskservice.createTask(any(TaskModel.class))).thenThrow(ex);
+
+        mvc.perform(post( "/api/task/")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(TestUtils.convertObjectToJsonBytes(testModel)))
+                .andExpect(status().isBadRequest());
+
+        verify(taskservice)
+                .createTask(any(TaskModel.class));
+    }
+
+    @Test
+    public void testTaskCreate_EnumExceptionWasThrown() throws Exception {
+        TaskModel testModel = new TaskModel();
+        testModel.setId(UUID.randomUUID());
+        testModel.setGroupId("TestGruppe");
+
+        UnknownEnumException ex = new UnknownEnumException ("Invalid Enum");
         when(taskservice.createTask(any(TaskModel.class))).thenThrow(ex);
 
         mvc.perform(post( "/api/task/")

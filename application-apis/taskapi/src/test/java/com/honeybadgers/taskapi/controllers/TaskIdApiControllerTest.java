@@ -1,5 +1,6 @@
 package com.honeybadgers.taskapi.controllers;
 
+import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
@@ -65,6 +66,26 @@ public class TaskIdApiControllerTest {
 
         verify(taskservice).updateTask(taskId, testModel);
         verify(taskservice).sendTaskToTaskEventQueue(Mockito.anyString());
+    }
+
+    @Test
+    public void testPostTaskById_EnumExceptionWasThrown() throws Exception {
+        TaskModel testModel = new TaskModel();
+        UUID taskId = UUID.randomUUID();
+        testModel.setId(taskId);
+        testModel.setGroupId("TestGruppe");
+
+        UnknownEnumException ex = new UnknownEnumException ("Invalid Enum");
+        when(taskservice.updateTask(taskId, testModel)).thenThrow(ex);
+
+        mvc.perform(post( "/api/task/" + taskId.toString())
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(TestUtils.convertObjectToJsonBytes(testModel)))
+            .andExpect(status().isBadRequest())
+            .andReturn();
+
+        verify(taskservice)
+                .updateTask(taskId, testModel);
     }
 
     @Test

@@ -303,4 +303,54 @@ public class TaskServiceTest {
         return exampleTask;
     }
 
+    @Test
+    public void testCreateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId = UUID.randomUUID();
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+
+        Task createdTask = new Task();
+        createdTask.setId(taskId.toString());
+
+        when(converter.taskRestToJpa(restModel)).thenReturn(createdTask);
+        when(taskRepository.save(createdTask)).thenThrow(new DataIntegrityViolationException(""));
+
+       assertThrows(JpaException.class, () -> taskService.createTask(restModel));
+    }
+
+    @Test
+    public void testGetTaskById(){
+        UUID id = UUID.randomUUID();
+        Task task = new Task();
+        task.setId(id.toString());
+
+        when(taskRepository.findById(id.toString())).thenReturn(Optional.of(task));
+        taskService.getTaskById(id);
+
+        verify(converter).taskJpaToRest(task);
+    }
+
+    @Test
+    public void testGetTaskById_Exeption(){
+        UUID id = UUID.randomUUID();
+
+        assertThrows(NoSuchElementException.class, () -> taskService.getTaskById(id));
+    }
+
+    @Test
+    public void testupdateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId = UUID.randomUUID();
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+
+        Task createdTask = new Task();
+        createdTask.setId(taskId.toString());
+
+        when(converter.taskRestToJpa(restModel)).thenReturn(createdTask);
+        when(taskRepository.save(createdTask)).thenThrow(new DataIntegrityViolationException(""));
+        when(taskRepository.findById(taskId.toString())).thenReturn(Optional.of(new Task()));
+
+        assertThrows(JpaException.class, () -> taskService.updateTask(taskId, restModel));
+    }
+
 }

@@ -6,9 +6,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class ConvertUtils implements IConvertUtils {
     public int fitDayOfWeekToWorkingDayBooleans(int dayofweek) {
-        if (dayofweek > 6)
+        if (dayofweek > 7)
             throw new IllegalArgumentException("Max size of dayofweek is 6");
 
-        return dayofweek == 0 ? 6 : dayofweek - 1;
+        return dayofweek == 2 ? 6 : dayofweek - 2;
     }
 }
