@@ -3,11 +3,11 @@ package com.honeybadgers.taskapi.service.impl;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
-import com.honeybadgers.taskapi.repository.GroupRepository;
-import com.honeybadgers.taskapi.repository.TaskRepository;
 import com.honeybadgers.taskapi.service.ITaskConvertUtils;
 import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static com.honeybadgers.models.model.Constants.DEFAULT_GROUP_ID;
 
 @Service
 public class TaskService implements ITaskService {

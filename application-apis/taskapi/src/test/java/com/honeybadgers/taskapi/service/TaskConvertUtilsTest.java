@@ -1,19 +1,17 @@
 package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
-import com.honeybadgers.taskapi.repository.GroupRepository;
-import com.honeybadgers.taskapi.repository.TaskRepository;
-import com.honeybadgers.taskapi.service.impl.TaskConvertUtils;
 import com.honeybadgers.taskapi.service.impl.TaskConvertUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;

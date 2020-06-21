@@ -2,8 +2,9 @@ package com.honeybadgers.groupapi.service;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.groupapi.exceptions.CreationException;
-import com.honeybadgers.groupapi.repository.TaskRepository;
 import com.honeybadgers.models.model.Task;
+import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,7 +14,6 @@ import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.service.impl.GroupService;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import com.honeybadgers.groupapi.repository.GroupRepository;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 

@@ -2,11 +2,11 @@ package com.honeybadgers.groupapi.service;
 
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
-import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.service.impl.GroupConvertUtils;
 import com.honeybadgers.models.model.ActiveTimes;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

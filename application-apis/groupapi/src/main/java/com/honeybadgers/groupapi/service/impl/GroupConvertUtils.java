@@ -2,9 +2,9 @@ package com.honeybadgers.groupapi.service.impl;
 
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
-import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
