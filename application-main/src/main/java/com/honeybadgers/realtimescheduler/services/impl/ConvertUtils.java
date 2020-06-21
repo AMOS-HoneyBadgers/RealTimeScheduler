@@ -9,6 +9,6 @@ public class ConvertUtils implements IConvertUtils {
         if (dayofweek > 7)
             throw new IllegalArgumentException("Max size of dayofweek is 6");
 
-        return dayofweek == 2 ? 6 : dayofweek - 2;
+        return dayofweek == 1 ? 6 : dayofweek - 2;
     }
 }
