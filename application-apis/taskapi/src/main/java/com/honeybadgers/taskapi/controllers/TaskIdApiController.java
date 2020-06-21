@@ -1,5 +1,8 @@
 package com.honeybadgers.taskapi.controllers;
 
+import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.taskapi.exceptions.CreationException;
+import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
@@ -22,12 +25,13 @@ import java.util.UUID;
 @RequestMapping("${openapi.Realtimescheduler Task Api.base-path:/api/task}")
 public class TaskIdApiController implements TaskIdApi {
 
-    final static Logger logger = LogManager.getLogger(TaskIdApiController.class);
+    @Autowired
+    ITaskService taskService;
 
     private final NativeWebRequest request;
 
-    @Autowired
-    ITaskService taskservice;
+    final static Logger logger = LogManager.getLogger(TaskIdApiController.class);
+
 
     @org.springframework.beans.factory.annotation.Autowired
     public TaskIdApiController(NativeWebRequest request) {
@@ -50,15 +54,12 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
-        TaskModel restModel = null;
-
         try{
-            restModel = taskservice.getTaskById(taskId);
+            TaskModel restModel = taskService.getTaskById(taskId);
+            return ResponseEntity.ok(restModel);
         }catch(NoSuchElementException e){
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(restModel);
     }
 
     /**
@@ -74,7 +75,31 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<ResponseModel> taskIdPost(UUID taskId, @Valid TaskModel taskModel) {
-        return null;
+        ResponseModel response = new ResponseModel();
+        response.setCode("200");
+        response.setMessage("Success");
+
+        try {
+            taskService.updateTask(taskId, taskModel);
+            logger.info("Task " + taskId + " updated.");
+            //TODO: Behavior on changing force attributed. Task iight be scheduler by now. Dispatch once!
+            if (taskModel.getForce() != null && taskModel.getForce()){
+                taskService.sendTaskToPriorityQueue(taskModel);
+            }else{
+                taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
+            }
+
+        } catch (UnknownEnumException e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (JpaException | CreationException | IllegalStateException e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -88,14 +113,12 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
-        TaskModel restModel = null;
-
         try{
-            restModel = taskservice.deleteTask(taskId);
+            TaskModel restModel = taskService.deleteTask(taskId);
+            logger.info("Task " + taskId + " deleted.");
+            return ResponseEntity.ok(restModel);
         }catch(NoSuchElementException e){
            return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(restModel);
     }
 }

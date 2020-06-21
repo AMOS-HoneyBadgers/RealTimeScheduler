@@ -1,4 +1,4 @@
-package com.honeybadgers.groupapi.repository;
+package com.honeybadgers.postgre.repository;
 
 
 import com.honeybadgers.models.model.Group;
@@ -16,4 +16,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     @Query(value = "SELECT * FROM public.\"group\" LIMIT ?1 OFFSET ?2", nativeQuery = true)
     List<Group> getAllGroupsByPage(int size, int offset);
+
+    @Query(value = "SELECT * FROM public.\"group\" WHERE parent_id=?1", nativeQuery = true)
+    List<Group> findAllByParentGroupId(String parentId);
 }

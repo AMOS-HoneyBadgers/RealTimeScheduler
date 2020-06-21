@@ -33,13 +33,11 @@ public class DefaultApiControllerTest {
 
     @Autowired
     private MockMvc mvc;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @MockBean
     IGroupService groupService;
-
     @MockBean
     IGroupConvertUtils convertUtils;
 
@@ -94,7 +92,6 @@ public class DefaultApiControllerTest {
 
     @Test
     public void testGroupCreate_invalidModel() throws Exception {
-
         mvc.perform(post( "/api/group/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(

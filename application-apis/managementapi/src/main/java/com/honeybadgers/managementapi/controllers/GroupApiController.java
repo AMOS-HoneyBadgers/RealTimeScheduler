@@ -19,12 +19,14 @@ import java.util.Optional;
 @Controller
 @RequestMapping("${openapi.Realtimescheduler Management Api.base-path:/api/management}")
 public class GroupApiController implements GroupApi {
-    static final Logger logger = LogManager.getLogger(GroupApiController.class);
-
-    private final NativeWebRequest request;
 
     @Autowired
     IManagementService managmentService;
+
+    private final NativeWebRequest request;
+
+    static final Logger logger = LogManager.getLogger(GroupApiController.class);
+
 
     @org.springframework.beans.factory.annotation.Autowired
     public GroupApiController(NativeWebRequest request) {

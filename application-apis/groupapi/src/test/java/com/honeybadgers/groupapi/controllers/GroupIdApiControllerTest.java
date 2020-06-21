@@ -4,11 +4,11 @@ package com.honeybadgers.groupapi.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.groupapi.utils.TestUtils;
 import com.honeybadgers.models.model.Group;
+import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,19 +33,15 @@ public class GroupIdApiControllerTest {
 
     @Autowired
     private MockMvc mvc;
-
     @Autowired
     private ObjectMapper objectMapper;
 
     @MockBean
     IGroupService groupService;
-
-    @MockBean
-    IGroupConvertUtils convertUtils;
-
     @MockBean
     GroupRepository groupRepository;
-
+    @MockBean
+    IGroupConvertUtils convertUtils;
 
     @Test
     public void testGroupUpdate() throws Exception {
@@ -192,5 +188,4 @@ public class GroupIdApiControllerTest {
 
         verify(convertUtils, never()).groupJpaToRest(any(Group.class));
     }
-
 }

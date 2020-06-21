@@ -6,8 +6,11 @@ import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.ResponseModel;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
+import com.honeybadgers.groupapi.service.impl.GroupService;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.UnknownEnumException;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -27,11 +30,12 @@ public class DefaultApiController implements DefaultApi {
 
     @Autowired
     IGroupService groupService;
-
     @Autowired
     IGroupConvertUtils convertUtils;
 
     private final NativeWebRequest request;
+
+    static final Logger logger = LogManager.getLogger(DefaultApiController.class);
 
     @org.springframework.beans.factory.annotation.Autowired
     public DefaultApiController(NativeWebRequest request) {
@@ -50,13 +54,13 @@ public class DefaultApiController implements DefaultApi {
      */
     @Override
     public ResponseEntity<ResponseModel> rootPost(@Valid GroupModel groupModel) {
-
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
 
         try {
             groupService.createGroup(groupModel);
+            logger.info("Group " + groupModel.getId() + " created.");
             //groupService.sendGroupToTaskEventQueue(groupModel.getId());
         } catch (UnknownEnumException e) {
             // Should never happen, due to GroupModel being validated (validates, if model is of Enum)
@@ -74,9 +78,7 @@ public class DefaultApiController implements DefaultApi {
 
     @Override
     public ResponseEntity<List<GroupModel>> rootGet() {
-
         List<Group> groups = groupService.getAllGroups();
-
         return ResponseEntity.ok(groups.stream().map(group -> convertUtils.groupJpaToRest(group)).collect(Collectors.toList()));
     }
 }

@@ -4,13 +4,13 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.groupapi.exceptions.CreationException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.groupapi.repository.GroupRepository;
-import com.honeybadgers.groupapi.repository.TaskRepository;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,19 +26,16 @@ import java.util.stream.Collectors;
 @Service
 public class GroupService implements IGroupService {
 
-    static final Logger logger = LogManager.getLogger(GroupService.class);
-
     @Autowired
     GroupRepository groupRepository;
-
     @Autowired
     TaskRepository taskRepository;
-
     @Autowired
     ICommunication sender;
-
     @Autowired
     IGroupConvertUtils convertUtils;
+
+    static final Logger logger = LogManager.getLogger(GroupService.class);
 
     @Override
     public Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException {
@@ -56,6 +53,7 @@ public class GroupService implements IGroupService {
                                 " -> aborting!"
                 );
         }
+
         Group newGroup = convertUtils.groupRestToJpa(restModel);
 
         try {
@@ -110,7 +108,6 @@ public class GroupService implements IGroupService {
                 throw new JpaException("DataIntegrityViolation on save new group!");
             }
         }
-
         return targetGroup;
     }
 
@@ -143,6 +140,4 @@ public class GroupService implements IGroupService {
         groupRepository.deleteById(groupId);
         return group;
     }
-
-
 }

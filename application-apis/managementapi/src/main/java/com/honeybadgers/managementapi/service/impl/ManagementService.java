@@ -21,10 +21,10 @@ import static com.honeybadgers.models.model.Constants.*;
 @Service
 public class ManagementService implements IManagementService {
 
-    static final Logger logger = LogManager.getLogger(ManagementService.class);
-
     @Autowired
     LockRedisRepository lockRedisRepository;
+
+    static final Logger logger = LogManager.getLogger(ManagementService.class);
 
     @Override
     @Transactional
@@ -89,6 +89,4 @@ public class ManagementService implements IManagementService {
         String id = LOCK_GROUP_PREFIX + grouId;
         lockRedisRepository.deleteById(id);
     }
-
-
 }
