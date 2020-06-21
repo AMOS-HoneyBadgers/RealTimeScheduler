@@ -33,15 +33,19 @@ public class GroupIdApiControllerTest {
 
     @Autowired
     private MockMvc mvc;
+
     @Autowired
     private ObjectMapper objectMapper;
 
     @MockBean
     IGroupService groupService;
-    @MockBean
-    GroupRepository groupRepository;
+
     @MockBean
     IGroupConvertUtils convertUtils;
+
+    @MockBean
+    GroupRepository groupRepository;
+
 
     @Test
     public void testGroupUpdate() throws Exception {
@@ -188,4 +192,5 @@ public class GroupIdApiControllerTest {
 
         verify(convertUtils, never()).groupJpaToRest(any(Group.class));
     }
+
 }
