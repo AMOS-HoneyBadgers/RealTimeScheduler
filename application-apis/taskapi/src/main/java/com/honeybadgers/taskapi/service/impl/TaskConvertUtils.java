@@ -33,7 +33,6 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         taskmodel.setTypeFlag(TaskModel.TypeFlagEnum.fromValue(task.getTypeFlagEnum().toString().toLowerCase()));
         taskmodel.setForce(task.isForce());
         taskmodel.setRetries(task.getRetries());
-        taskmodel.setPaused(task.isPaused());
         taskmodel.setIndexNumber(task.getIndexNumber());
         taskmodel.setDeadline(timestampJpaToRest(task.getDeadline()));
         taskmodel.setMeta(metaDataJpaToRest(task.getMetaData()));

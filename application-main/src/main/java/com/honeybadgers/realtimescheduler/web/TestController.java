@@ -3,24 +3,22 @@ package com.honeybadgers.realtimescheduler.web;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.RedisLock;
 import com.honeybadgers.models.model.RedisTask;
-import com.honeybadgers.realtimescheduler.config.RedisApplicationProperties;
-import com.honeybadgers.realtimescheduler.model.GroupAncestorModel;
-import com.honeybadgers.realtimescheduler.repository.LockRedisRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskRedisRepository;
+import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import com.honeybadgers.redis.config.RedisApplicationProperties;
+import com.honeybadgers.redis.repository.LockRedisRepository;
+import com.honeybadgers.redis.repository.TaskRedisRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -56,14 +54,6 @@ public class TestController {
 
     @GetMapping("/testtask/{priority}")
     public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
-
-        /*Task task = new Task();
-        task.setPriority(Integer.parseInt(priority));
-        task.setId(UUID.randomUUID().toString());
-        task.setDeadline(new Timestamp(System.currentTimeMillis()+100000));
-
-
-        schedulerService.scheduleTask(task.getId());*/
         sender.sendTaskToDispatcher("assassasa");
         return ResponseEntity.ok().build();
     }

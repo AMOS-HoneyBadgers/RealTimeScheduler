@@ -72,9 +72,6 @@ public class Task {
     @Column(name = "retries")
     private int retries = 0;
 
-    @Column(name = "paused", nullable = false)
-    private boolean paused = false;
-
     @Column(name = "force", nullable = false)
     private boolean force = false;
 
