@@ -81,11 +81,13 @@ public class TaskIdApiController implements TaskIdApi {
 
         try {
             taskService.updateTask(taskId, taskModel);
-            //TODO: how to behave
-            if (taskModel.getForce() != null && taskModel.getForce())
+            logger.info("Task " + taskId + " updated.");
+            //TODO: Behavior on changing force attributed. Task iight be scheduler by now. Dispatch once!
+            if (taskModel.getForce() != null && taskModel.getForce()){
                 taskService.sendTaskToPriorityQueue(taskModel);
-            else
+            }else{
                 taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
+            }
 
         } catch (UnknownEnumException e) {
             response.setCode("400");
@@ -113,6 +115,7 @@ public class TaskIdApiController implements TaskIdApi {
     public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
         try{
             TaskModel restModel = taskService.deleteTask(taskId);
+            logger.info("Task " + taskId + " deleted.");
             return ResponseEntity.ok(restModel);
         }catch(NoSuchElementException e){
            return ResponseEntity.notFound().build();

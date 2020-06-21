@@ -62,6 +62,7 @@ public class GroupIdApiController implements GroupIdApi {
 
         try {
             groupService.updateGroup(groupId.toString(), groupModel);
+            logger.info("Group " + groupId + " updated.");
         } catch (JpaException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
@@ -81,15 +82,12 @@ public class GroupIdApiController implements GroupIdApi {
 
     @Override
     public ResponseEntity<GroupModel> groupIdIdDelete(String groupId) {
-
-        Group group;
-
         try {
-            group = groupService.deleteGroup(groupId);
+            Group group = groupService.deleteGroup(groupId);
+            logger.info("Group " + groupId + " deleted.");
+            return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
     }
 }

@@ -69,9 +69,11 @@ public class DefaultApiController implements DefaultApi {
 
         try {
             taskService.createTask(taskModel);
-            if (taskModel.getForce() != null && taskModel.getForce())
+            logger.info("Task " + taskModel.getId() + " recived.");
+            if (taskModel.getForce() != null && taskModel.getForce()) {
                 taskService.sendTaskToPriorityQueue(taskModel);
-            else
+                logger.info("Task " + taskModel.getId() + " was immediately dispatched");
+            }else
                 taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
 
         } catch (UnknownEnumException e) {
