@@ -25,13 +25,12 @@ import java.util.Optional;
 @RequestMapping("${openapi.Realtimescheduler Group Api.base-path:/api/group}")
 public class GroupIdApiController implements GroupIdApi {
 
-    private final NativeWebRequest request;
-
     @Autowired
     IGroupService groupService;
-
     @Autowired
     IGroupConvertUtils convertUtils;
+
+    private final NativeWebRequest request;
 
     final static Logger logger = LogManager.getLogger(GroupIdApiController.class);
 
@@ -47,16 +46,12 @@ public class GroupIdApiController implements GroupIdApi {
 
     @Override
     public ResponseEntity<GroupModel> groupIdIdGet(String groupId) {
-
-        Group group;
-
         try {
-            group = groupService.getGroupById(groupId);
+            Group group = groupService.getGroupById(groupId);
+            return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
     }
 
     @Override

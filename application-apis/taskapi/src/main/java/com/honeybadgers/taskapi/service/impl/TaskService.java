@@ -27,25 +27,20 @@ import java.util.stream.Collectors;
 @Service
 public class TaskService implements ITaskService {
 
-    static final Logger logger = LogManager.getLogger(TaskService.class);
-
     @Autowired
     GroupRepository groupRepository;
-
     @Autowired
     TaskRepository taskRepository;
-
     @Autowired
     ICommunication sender;
-
     @Autowired
     ITaskConvertUtils converter;
+
+    static final Logger logger = LogManager.getLogger(TaskService.class);
 
     @Override
     public List<TaskModel> getAllTasks() {
         List<TaskModel> taskModelList;
-        //Pageable PageXwithTwentyElements = PageRequest.of(0, 20);
-        //taskRepository.findAll(PageXwithTwentyElements);
         List<Task> taskList = taskRepository.findAll();
 
         taskModelList = taskList.stream().map(t -> {
@@ -58,7 +53,6 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
-
         Task checkTask = taskRepository.findById(restModel.getId().toString()).orElse(null);
         if( checkTask != null ){
             throw new JpaException("Primary or unique constraint failed!");
@@ -78,7 +72,6 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
-
         Task checkTask = taskRepository.findById(taskId.toString()).orElse(null);
         if(checkTask == null)
             throw new NoSuchElementException("No existing Task with id: " + taskId);
@@ -87,7 +80,6 @@ public class TaskService implements ITaskService {
             throw new IllegalStateException("Task " + taskId +  " already bypassed scheduling process. Cannot schedule now");
 
         restModel.setId(taskId);
-
         Task updatedTask = converter.taskRestToJpa(restModel);
 
         try {
@@ -136,5 +128,4 @@ public class TaskService implements ITaskService {
         taskQueueModel.setDispatched(Timestamp.from(Instant.now()));
         sender.sendTaskToPriorityQueue(taskQueueModel);
     }
-
 }

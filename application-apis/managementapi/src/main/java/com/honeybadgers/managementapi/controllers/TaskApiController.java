@@ -20,10 +20,11 @@ import java.util.UUID;
 @RequestMapping("${openapi.Realtimescheduler Management Api.base-path:/api/management}")
 public class TaskApiController implements TaskApi {
 
-    private final NativeWebRequest request;
-
     @Autowired
     IManagementService managmentService;
+
+    private final NativeWebRequest request;
+
 
     @org.springframework.beans.factory.annotation.Autowired
     public TaskApiController(NativeWebRequest request) {
@@ -34,7 +35,6 @@ public class TaskApiController implements TaskApi {
     public Optional<NativeWebRequest> getRequest() {
         return Optional.ofNullable(request);
     }
-
 
     @Override
     public ResponseEntity<ResponseModel> taskTaskIdStartPut(UUID taskId) {

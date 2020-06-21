@@ -26,21 +26,20 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = GroupConvertUtils.class)
 public class GroupConvertUtilsTest {
 
-    @MockBean
-    GroupRepository groupRepository;
-
     @Autowired
     GroupConvertUtils convertUtils;
 
+    @MockBean
+    GroupRepository groupRepository;
+
+    // TODO tests for groupModel conversion
     @Before
     public void setUp() {
-
         Group parentGroup = new Group();
         parentGroup.setId("parentGroup");
         parentGroup.setPriority(200);
 
         when(groupRepository.findById("parentGroup")).thenReturn(Optional.of(parentGroup));
-
     }
 
     @Test
@@ -119,8 +118,6 @@ public class GroupConvertUtilsTest {
         assertEquals(0, groupModelActiveTimes.size());
     }
 
-    // TODO tests for groupModel conversion
-
     @Test
     public void testGroupRestToJpa() throws UnknownEnumException {
         Group group;
@@ -153,7 +150,6 @@ public class GroupConvertUtilsTest {
         when(groupRepository.findById(model.getParentId())).thenReturn(Optional.empty());
 
         Exception e = assertThrows(NoSuchElementException.class, () -> convertUtils.groupRestToJpa(model));
-
         assertNotNull(e);
     }
 

@@ -26,19 +26,16 @@ import java.util.stream.Collectors;
 @Service
 public class GroupService implements IGroupService {
 
-    static final Logger logger = LogManager.getLogger(GroupService.class);
-
     @Autowired
     GroupRepository groupRepository;
-
     @Autowired
     TaskRepository taskRepository;
-
     @Autowired
     ICommunication sender;
-
     @Autowired
     IGroupConvertUtils convertUtils;
+
+    static final Logger logger = LogManager.getLogger(GroupService.class);
 
     @Override
     public Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException {
@@ -56,6 +53,7 @@ public class GroupService implements IGroupService {
                                 " -> aborting!"
                 );
         }
+
         Group newGroup = convertUtils.groupRestToJpa(restModel);
 
         try {
@@ -110,7 +108,6 @@ public class GroupService implements IGroupService {
                 throw new JpaException("DataIntegrityViolation on save new group!");
             }
         }
-
         return targetGroup;
     }
 
@@ -143,6 +140,4 @@ public class GroupService implements IGroupService {
         groupRepository.deleteById(groupId);
         return group;
     }
-
-
 }

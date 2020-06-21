@@ -30,6 +30,8 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = TaskConvertUtils.class)
 public class TaskConvertUtilsTest {
 
+    @Autowired
+    ITaskConvertUtils converter;
 
     @MockBean
     GroupRepository grouprepository;
@@ -37,27 +39,23 @@ public class TaskConvertUtilsTest {
     TaskRepository taskrepository;
 
 
-
-    @Autowired
-    ITaskConvertUtils converter;
-
     @Test
     public void testTaskJpaToRest(){
-
         Group group = new Group();
         group.setId("exampleGroup");
 
         Task exampleTask = new Task();
+
         String taskID = "70884515-8692-40e0-9c0e-e34ba4bcc3f8";
         int priority = 100;
         int indexNumber = 0;
+        int retries = 1;
+        int[] workdays = new int[]{1,0,1,0,1,0,1};
         boolean force = false;
         ModeEnum mode = ModeEnum.Sequential;
         TypeFlagEnum type = TypeFlagEnum.Realtime;
         TaskStatusEnum status = TaskStatusEnum.Scheduled;
-        int[] workdays = new int[]{1,0,1,0,1,0,1};
         Timestamp deadline = new Timestamp(123456789);
-        int retries = 1;
 
         List<ActiveTimes> activeTimes = new LinkedList<ActiveTimes>();
         ActiveTimes timeFrame = new ActiveTimes();
@@ -108,21 +106,20 @@ public class TaskConvertUtilsTest {
 
     @Test
     public void testTaskRestToJpa() throws UnknownEnumException, JpaException, CreationException {
-
-        UUID taskId = UUID.randomUUID();
         Group group = new Group();
         String groupId = "TestGroup";
         group.setId(groupId);
+
+        UUID taskId = UUID.randomUUID();
         Integer priority = 100;
         Integer indexNumber = 1;
         boolean force = false;
+        List<Boolean> workdays = new ArrayList<>();
+        OffsetDateTime deadline = OffsetDateTime.now();
         TaskModel.ModeEnum mode= TaskModel.ModeEnum.PARALLEL;
         TaskModel.TypeFlagEnum type = TaskModel.TypeFlagEnum.BATCH;
-
-        List<Boolean> workdays = new ArrayList<>();
         workdays.addAll(Arrays.asList(true, false, true, false, true, false, true));
 
-        OffsetDateTime deadline = OffsetDateTime.now();
 
         List<TaskModelActiveTimes> activeTimes = new ArrayList<>();
         TaskModelActiveTimes timeFrame = new TaskModelActiveTimes();
@@ -167,46 +164,7 @@ public class TaskConvertUtilsTest {
         assertTrue(activeTimes.get(0).getFrom() == jpaModel.getActiveTimeFrames().get(0).getFrom() &&
                 activeTimes.get(0).getTo() == jpaModel.getActiveTimeFrames().get(0).getTo());
         assertEquals(metaData.getValue(), jpaModel.getMetaData().get(metaData.getKey()));
-
-
     }
-
-
-      /*
-
-
-  @Test
-    public void testCreateTask_group404() {
-
-        TaskModel restModel = new TaskModel();
-        restModel.setId(UUID.randomUUID());
-        restModel.setGroupId("testGroupNotFound");
-
-        Exception e = assertThrows(JpaException.class, () -> taskService.createTask(restModel));
-        assertEquals("Group not found!", e.getMessage());
-    }
-
-  @Test
-    public void testCreateTask_groupChildrenViolation() {
-
-        Group child = new Group();
-        child.setId("TestGroup");
-        Group child2 = new Group();
-        child2.setId("TestGroup2");
-        when(groupRepository.findAllByParentGroupId("testGroup")).thenReturn(Arrays.asList(child, child2));
-
-        TaskModel restModel = new TaskModel();
-        restModel.setId(UUID.randomUUID());
-        restModel.setGroupId("testGroup");
-
-        Exception e = assertThrows(CreationException.class, () -> taskService.createTask(restModel));
-        assertEquals("Group of task has other groups as children: TestGroup, TestGroup2 -> aborting!", e.getMessage());
-    }
-
-
-
-    */
-
 
     @Test
     public void testActiveTimesJpaToRest(){
@@ -228,7 +186,6 @@ public class TaskConvertUtilsTest {
 
     @Test
     public void testMetaDataJpaToRest(){
-
         Map<String, String> metaMap = new HashMap<String,String>();
         metaMap.put("key1", "value1");
         metaMap.put("key2", "value2");
@@ -237,7 +194,6 @@ public class TaskConvertUtilsTest {
         List<TaskModelMeta> res = converter.metaDataJpaToRest(metaMap);
 
         assertEquals(3, res.size());
-       assertEquals("value1", res.get(0).getValue());
+        assertEquals("value1", res.get(0).getValue());
     }
-
 }

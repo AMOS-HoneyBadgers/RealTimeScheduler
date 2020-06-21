@@ -29,15 +29,17 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(TaskIdApiController.class)
 public class TaskIdApiControllerTest {
 
+    @Autowired
+    private MockMvc mvc;
+
     @MockBean
     ITaskService taskservice;
 
-    @Autowired
-    private MockMvc mvc;
 
     @Test
     public void testGetTaskById() throws Exception {
         UUID taskId = UUID.randomUUID();
+
         when(taskservice.getTaskById(taskId)).thenReturn(new TaskModel().id(taskId));
 
         MvcResult mvcResult = mvc.perform(get("/api/task/" + taskId.toString())
@@ -147,5 +149,4 @@ public class TaskIdApiControllerTest {
 
         verify(taskservice).deleteTask(taskId);
     }
-
 }

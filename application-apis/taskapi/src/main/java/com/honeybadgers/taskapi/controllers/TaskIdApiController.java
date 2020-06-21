@@ -25,12 +25,13 @@ import java.util.UUID;
 @RequestMapping("${openapi.Realtimescheduler Task Api.base-path:/api/task}")
 public class TaskIdApiController implements TaskIdApi {
 
-    final static Logger logger = LogManager.getLogger(TaskIdApiController.class);
+    @Autowired
+    ITaskService taskService;
 
     private final NativeWebRequest request;
 
-    @Autowired
-    ITaskService taskService;
+    final static Logger logger = LogManager.getLogger(TaskIdApiController.class);
+
 
     @org.springframework.beans.factory.annotation.Autowired
     public TaskIdApiController(NativeWebRequest request) {
@@ -53,15 +54,12 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
-        TaskModel restModel = null;
-
         try{
-            restModel = taskService.getTaskById(taskId);
+            TaskModel restModel = taskService.getTaskById(taskId);
+            return ResponseEntity.ok(restModel);
         }catch(NoSuchElementException e){
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(restModel);
     }
 
     /**
@@ -77,7 +75,6 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<ResponseModel> taskIdPost(UUID taskId, @Valid TaskModel taskModel) {
-
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
@@ -114,14 +111,11 @@ public class TaskIdApiController implements TaskIdApi {
      */
     @Override
     public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
-        TaskModel restModel = null;
-
         try{
-            restModel = taskService.deleteTask(taskId);
+            TaskModel restModel = taskService.deleteTask(taskId);
+            return ResponseEntity.ok(restModel);
         }catch(NoSuchElementException e){
            return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(restModel);
     }
 }

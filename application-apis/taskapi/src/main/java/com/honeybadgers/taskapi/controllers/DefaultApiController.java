@@ -27,9 +27,10 @@ public class DefaultApiController implements DefaultApi {
     @Autowired
     ITaskService taskService;
 
+    private final NativeWebRequest request;
+
     static final Logger logger = LogManager.getLogger(DefaultApiController.class);
 
-    private final NativeWebRequest request;
 
     @org.springframework.beans.factory.annotation.Autowired
     public DefaultApiController(NativeWebRequest request) {
@@ -60,10 +61,8 @@ public class DefaultApiController implements DefaultApi {
      * @param taskModel new task object (required)
      * @return
      */
-
     @Override
     public ResponseEntity<ResponseModel> rootPost(@Valid TaskModel taskModel) {
-
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");

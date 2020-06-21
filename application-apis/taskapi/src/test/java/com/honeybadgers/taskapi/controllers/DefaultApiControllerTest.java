@@ -35,7 +35,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @WebMvcTest(DefaultApiController.class)
 public class DefaultApiControllerTest {
 
-
     @Autowired
     private MockMvc mvc;
 
@@ -142,7 +141,6 @@ public class DefaultApiControllerTest {
 
     @Test
     public void testTaskCreate_invalidModel() throws Exception {
-
         mvc.perform(post( "/api/task/")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(
@@ -154,6 +152,4 @@ public class DefaultApiControllerTest {
                 ))
                 .andExpect(status().isBadRequest());
     }
-
-    
 }

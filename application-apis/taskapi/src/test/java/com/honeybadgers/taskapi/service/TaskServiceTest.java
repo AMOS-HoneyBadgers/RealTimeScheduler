@@ -46,7 +46,6 @@ public class TaskServiceTest {
     ITaskService taskService;
 
 
-
     @Before
     public void setUp() {
         Group group = new Group();
@@ -72,7 +71,6 @@ public class TaskServiceTest {
 
     @Test
     public void testCreateTask() throws JpaException, UnknownEnumException, CreationException {
-
         UUID taskId = UUID.randomUUID();
 
         TaskModel restModel = new TaskModel();
@@ -81,10 +79,8 @@ public class TaskServiceTest {
         Task createdTask = new Task();
         createdTask.setId(taskId.toString());
 
-
         when(converter.taskRestToJpa(restModel)).thenReturn(createdTask);
         Task t = taskService.createTask(restModel);
-
 
         assertNotNull(t);
         assertThat(t.getId()).isEqualTo(restModel.getId().toString());
@@ -92,7 +88,6 @@ public class TaskServiceTest {
 
     @Test
     public void testCreateTask_JpaException() {
-
         JpaException vio = new JpaException("Primary or unique constraint failed!");
 
         Task task = new Task();
@@ -106,12 +101,10 @@ public class TaskServiceTest {
 
         Exception e = assertThrows(JpaException.class, () -> taskService.createTask(restModel));
         assertEquals("Primary or unique constraint failed!", e.getMessage());
-
     }
 
     @Test
     public void testUpdateTask() throws UnknownEnumException, JpaException, CreationException {
-
         UUID taskId =  UUID.randomUUID();
 
         TaskModel restModel = new TaskModel();
@@ -124,6 +117,7 @@ public class TaskServiceTest {
 
         when(taskRepository.findById(any())).thenReturn(Optional.of(updatedTask));
         when(converter.taskRestToJpa(restModel)).thenReturn(updatedTask);
+
         Task t = taskService.updateTask(taskId, restModel);
 
         assertNotNull(t);
@@ -131,7 +125,6 @@ public class TaskServiceTest {
 
     @Test
     public void testUpdateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
-
         UUID taskId =  UUID.randomUUID();
 
         TaskModel restModel = new TaskModel();
@@ -145,8 +138,8 @@ public class TaskServiceTest {
 
     @Test
     public void testUpdateTask_forceExeption() throws UnknownEnumException, JpaException, CreationException {
-
         UUID taskId =  UUID.randomUUID();
+
         Task task = new Task();
         task.setId(taskId.toString());
         task.setForce(true);
@@ -163,7 +156,6 @@ public class TaskServiceTest {
 
     @Test
     public void testCreateTask_primaryKeyViolation() {
-
         Task alreadyInTask = new Task();
         alreadyInTask.setId("AlreadyExistingUUID");
 
@@ -195,6 +187,7 @@ public class TaskServiceTest {
     @Test
     public void getNonExistingTaskByI(){
         UUID id = UUID.randomUUID();
+
         when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
 
         Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.deleteTask(id));
@@ -231,7 +224,6 @@ public class TaskServiceTest {
 
     @Test
     public void testSendTaskToPriorityQueue() {
-
         TaskModel taskModel = new TaskModel();
         taskModel.setId(UUID.randomUUID());
         taskModel.setGroupId("testgroup");
@@ -247,6 +239,7 @@ public class TaskServiceTest {
         taskService.sendTaskToPriorityQueue(taskModel);
         verify(communication,Mockito.only()).sendTaskToPriorityQueue(Mockito.any());
     }
+
     @Test
     public void testSendTaskToPriorityQueue_NullpointerCheck() {
         TaskModel taskModel = new TaskModel();
@@ -262,16 +255,17 @@ public class TaskServiceTest {
         group.setId("exampleGroup");
 
         Task exampleTask = new Task();
+
         String taskID = "70884515-8692-40e0-9c0e-e34ba4bcc3f" + Integer.toString(diff);
         int priority = 100 + diff;
         int indexNumber = 0;
+        int retries = 1;
+        int[] workdays = new int[]{1,0,1,0,1,0,1};
         boolean force = false;
         ModeEnum mode = ModeEnum.Sequential;
         TypeFlagEnum type = TypeFlagEnum.Realtime;
         TaskStatusEnum status = TaskStatusEnum.Scheduled;
-        int[] workdays = new int[]{1,0,1,0,1,0,1};
         Timestamp deadline = new Timestamp(123456789);
-        int retries = 1;
 
         List<ActiveTimes> activeTimes = new LinkedList<ActiveTimes>();
         ActiveTimes timeFrame = new ActiveTimes();
@@ -306,6 +300,7 @@ public class TaskServiceTest {
     @Test
     public void testCreateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
         UUID taskId = UUID.randomUUID();
+
         TaskModel restModel = new TaskModel();
         restModel.setId(taskId);
 
@@ -352,5 +347,4 @@ public class TaskServiceTest {
 
         assertThrows(JpaException.class, () -> taskService.updateTask(taskId, restModel));
     }
-
 }

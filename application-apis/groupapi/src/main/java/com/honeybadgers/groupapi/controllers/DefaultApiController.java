@@ -27,7 +27,6 @@ public class DefaultApiController implements DefaultApi {
 
     @Autowired
     IGroupService groupService;
-
     @Autowired
     IGroupConvertUtils convertUtils;
 
@@ -50,7 +49,6 @@ public class DefaultApiController implements DefaultApi {
      */
     @Override
     public ResponseEntity<ResponseModel> rootPost(@Valid GroupModel groupModel) {
-
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
@@ -74,9 +72,7 @@ public class DefaultApiController implements DefaultApi {
 
     @Override
     public ResponseEntity<List<GroupModel>> rootGet() {
-
         List<Group> groups = groupService.getAllGroups();
-
         return ResponseEntity.ok(groups.stream().map(group -> convertUtils.groupJpaToRest(group)).collect(Collectors.toList()));
     }
 }
