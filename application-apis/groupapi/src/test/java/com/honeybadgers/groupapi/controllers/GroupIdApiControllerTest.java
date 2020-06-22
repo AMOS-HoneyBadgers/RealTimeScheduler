@@ -39,15 +39,9 @@ public class GroupIdApiControllerTest {
 
     @MockBean
     IGroupService groupService;
-<<<<<<< Updated upstream
 
-=======
->>>>>>> Stashed changes
     @MockBean
     IGroupConvertUtils convertUtils;
-    @MockBean
-    GroupRepository groupRepository;
-
 
     @MockBean
     GroupRepository groupRepository;
@@ -199,8 +193,4 @@ public class GroupIdApiControllerTest {
         verify(convertUtils, never()).groupJpaToRest(any(Group.class));
     }
 
-<<<<<<< Updated upstream
 }
-=======
-}
->>>>>>> Stashed changes
