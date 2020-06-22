@@ -121,7 +121,6 @@ public class SchedulerService implements ISchedulerService {
             return;
         }
 
-        logger.info("Step 2: search for task in Redis DB with id: " + taskId);
         RedisTask redisTask = taskRedisRepository.findById(taskId).orElse(null);
 
         if (redisTask == null) {
@@ -133,18 +132,15 @@ public class SchedulerService implements ISchedulerService {
         if (task == null)
             throw new RuntimeException("task could not be found in database with id: " + taskId);
 
-        logger.info("Step 3: calculate priority for id: " + taskId);
         redisTask.setPriority(taskService.calculatePriority(task));
-        logger.info("redistask is: " + redisTask.toString());
+        logger.info("Task " + taskId + " created " + redisTask.toString());
 
         taskRedisRepository.save(redisTask);
 
         List<RedisTask> tasks = this.getAllRedisTasksAndSort();
 
         if (!isSchedulerLocked()) {
-            logger.info("Step 4: try and send Tasks to dispatcher");
             sendTaskstoDispatcher(tasks);
-
         } else
             logger.info("Scheduler is locked!");
     }
@@ -161,13 +157,13 @@ public class SchedulerService implements ISchedulerService {
                     throw new RuntimeException("Task not found in Postgre Database for taskid: " + currentTask.getId());
 
                 if(isTaskLocked(currentTask.getId())) {
-                    logger.info("Task with id " + currentTask.getId() + " is currently paused!");
+                    logger.info("Task " + currentTask.getId() + " is currently paused!");
                     continue;
                 }
 
                 List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
-                if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask))
+                if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
                     continue;
 
                 if (!checkIfTaskIsInActiveTime(task) || !checkIfTaskIsInWorkingDays(task) || sequentialHasToWait(task))
@@ -181,29 +177,28 @@ public class SchedulerService implements ISchedulerService {
                     currentParallelismDegree = createGroupParallelismTracker(groupParlallelName);
 
                 int limit = getLimitFromGroup(groupsOfTask, currentTask.getGroupid());
-                if (currentParallelismDegree.getCurrentTasks() >= limit)
+                if (currentParallelismDegree.getCurrentTasks() >= limit) {
+                    logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + currentParallelismDegree.getId() + " is now at: " + currentParallelismDegree.getCurrentTasks());
                     continue;
-
+                }
                 currentParallelismDegree.setCurrentTasks(currentParallelismDegree.getCurrentTasks() + 1);
                 lockRedisRepository.save(currentParallelismDegree);
-                logger.info("current_tasks for " + currentParallelismDegree.getId() + "is now at: " + currentParallelismDegree.getCurrentTasks());
 
                 sender.sendTaskToDispatcher(currentTask.getId());
-                logger.info("Sent task to dispatcher queue for taskid: " + currentTask.getId());
 
                 taskRedisRepository.deleteById(currentTask.getId());
-                logger.info("Deleted task from redis database for taskid: " + currentTask.getId());
+                logger.info("Task " + currentTask.getId() +  " was sent to dispatcher queue and removed from redis Database");
             }
         } catch (IndexOutOfBoundsException e) {
             logger.error(e.getMessage());
         }
     }
 
-    public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask) {
+    public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask, String taskid) {
         for (String groupId : groupsOfTask) {
             // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
             if(isGroupLocked(groupId)) {
-                logger.debug("Found paused group with groupId " + groupId);
+                logger.info("Task " + taskid + " is paused by Group " + groupId);
                 return true;
             }
         }
@@ -219,7 +214,7 @@ public class SchedulerService implements ISchedulerService {
             if (task.getIndexNumber() == parentgroup.getLastIndexNumber()+1)
                 return false;
             else {
-                logger.info("task with id: " + task.getId() + " is not sent due to Sequential");
+                logger.info("Task " + task.getId() + " is not sent due to Sequential");
                 return true;
             }
         }
@@ -236,7 +231,7 @@ public class SchedulerService implements ISchedulerService {
         if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBooleans(dayofweek)))
             return true;
 
-        logger.info("task with id: " + task.getId() + " is not sent due to workingDays");
+        logger.info("Task " + task.getId() + " is not sent due to workingDays");
         return false;
     }
 
@@ -297,7 +292,7 @@ public class SchedulerService implements ISchedulerService {
         } catch(ParseException pe) {
             logger.error(pe.getMessage());
         }
-        logger.info("task with id: " + task.getId() + " is not sent due to ActiveTimes");
+        logger.info("Task " + task.getId() + " is not sent due to ActiveTimes");
         return false;
     }
 

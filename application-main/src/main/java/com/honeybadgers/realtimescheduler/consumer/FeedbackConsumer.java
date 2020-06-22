@@ -44,7 +44,7 @@ public class FeedbackConsumer {
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String id) throws InterruptedException {
-        logger.info("Step 5: Received feedback from dispatcher");
+        logger.info("Task " + id + " was processed by the dispatcher");
 
         Task currentTask = service.getTaskById(id).orElse(null);
         if(currentTask == null)
@@ -56,13 +56,12 @@ public class FeedbackConsumer {
             checkAndSetSequentialAndIndexNumber(currentTask);
 
         sender.sendTaskToTasksQueue(scheduler_trigger);
-        logger.info("Step 7: Send Trigger for Scheduler, so new Tasks can be send to Dispatcher");
     }
 
     //TODO is it necessary to do this also for all grandparent groups??
     public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
         Group group = currentTask.getGroup();
-        logger.info("update index Number of group"+group.getId());
+        logger.debug("Task " + currentTask.getId() + " update index Number of group " + group.getId());
         group.setLastIndexNumber(group.getLastIndexNumber()+1);
         groupPostgresRepository.save(group);
     }
@@ -81,7 +80,6 @@ public class FeedbackConsumer {
         else
             currentParallelismDegree.setCurrentTasks(0);
 
-        logger.info("Step 6: Decreased current_tasks is now at :" + currentParallelismDegree.getCurrentTasks());
         lockRedisRepository.save(currentParallelismDegree);
     }
 }

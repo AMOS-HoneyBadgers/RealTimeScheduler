@@ -22,8 +22,7 @@ public class TaskConsumer {
 
     @RabbitListener(queues="tasks", containerFactory = "taskcontainerFactory")
     public void receiveTask(String message) {
-        logger.info("Received message in TaskConsumer with id:" + message);
-        logger.info("Step 1: scheduling Task");
+        logger.info("Task " + message + " Step 1: received Task");
         try {
             service.scheduleTask(message);
         } catch(Exception e) {
@@ -33,6 +32,6 @@ public class TaskConsumer {
 
     @RabbitListener(queues="priority", containerFactory = "priorityContainerFactory")
     public void receiveTaskQueueModel(TaskQueueModel message) {
-        logger.info("Received message '{}'" + message.toString());
+        logger.info("Task " + message + " from Priority Queue");
     }
 }
