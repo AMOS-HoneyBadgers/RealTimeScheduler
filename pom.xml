@@ -185,7 +185,7 @@
         <module>task-consumer</module>
         <module>application-rediscommunication</module>
         <module>application-clienttests</module>
-        <module>application-postgreommunication</module>
+        <module>application-postgrescommunication</module>
     </modules>
 
     <build>

@@ -9,7 +9,7 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>application-postgreommunication</artifactId>
+    <artifactId>application-postgrescommunication</artifactId>
     <dependencies>
         <dependency>
             <groupId>com.honeybadgers</groupId>

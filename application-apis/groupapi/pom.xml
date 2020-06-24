@@ -56,7 +56,7 @@
         </dependency>
         <dependency>
             <groupId>com.honeybadgers</groupId>
-            <artifactId>application-postgreommunication</artifactId>
+            <artifactId>application-postgrescommunication</artifactId>
             <version>0.0.1-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
