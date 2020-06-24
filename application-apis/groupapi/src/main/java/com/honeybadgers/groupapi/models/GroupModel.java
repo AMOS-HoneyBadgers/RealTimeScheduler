@@ -4,17 +4,19 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import org.openapitools.jackson.nullable.JsonNullable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
 
 /**
  * GroupModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-13T16:16:45.192661400+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T09:35:30.486+02:00[Europe/Berlin]")
 
 public class GroupModel   {
   @JsonProperty("id")
@@ -113,9 +115,6 @@ public class GroupModel   {
 
   @JsonProperty("mode")
   private ModeEnum mode = ModeEnum.PARALLEL;
-
-  @JsonProperty("paused")
-  private Boolean paused = false;
 
   @JsonProperty("last_index_number")
   private Integer lastIndexNumber;
@@ -303,26 +302,6 @@ public class GroupModel   {
     this.mode = mode;
   }
 
-  public GroupModel paused(Boolean paused) {
-    this.paused = paused;
-    return this;
-  }
-
-  /**
-   * Boolean, which identifies, whereas this group (and all of its tasks) are currently paused
-   * @return paused
-  */
-  @ApiModelProperty(value = "Boolean, which identifies, whereas this group (and all of its tasks) are currently paused")
-
-
-  public Boolean getPaused() {
-    return paused;
-  }
-
-  public void setPaused(Boolean paused) {
-    this.paused = paused;
-  }
-
   public GroupModel lastIndexNumber(Integer lastIndexNumber) {
     this.lastIndexNumber = lastIndexNumber;
     return this;
@@ -383,14 +362,13 @@ public class GroupModel   {
         Objects.equals(this.workingDays, groupModel.workingDays) &&
         Objects.equals(this.typeFlag, groupModel.typeFlag) &&
         Objects.equals(this.mode, groupModel.mode) &&
-        Objects.equals(this.paused, groupModel.paused) &&
         Objects.equals(this.lastIndexNumber, groupModel.lastIndexNumber) &&
         Objects.equals(this.parallelismDegree, groupModel.parallelismDegree);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, parentId, priority, deadline, activeTimes, workingDays, typeFlag, mode, paused, lastIndexNumber, parallelismDegree);
+    return Objects.hash(id, parentId, priority, deadline, activeTimes, workingDays, typeFlag, mode, lastIndexNumber, parallelismDegree);
   }
 
   @Override
@@ -406,7 +384,6 @@ public class GroupModel   {
     sb.append("    workingDays: ").append(toIndentedString(workingDays)).append("\n");
     sb.append("    typeFlag: ").append(toIndentedString(typeFlag)).append("\n");
     sb.append("    mode: ").append(toIndentedString(mode)).append("\n");
-    sb.append("    paused: ").append(toIndentedString(paused)).append("\n");
     sb.append("    lastIndexNumber: ").append(toIndentedString(lastIndexNumber)).append("\n");
     sb.append("    parallelismDegree: ").append(toIndentedString(parallelismDegree)).append("\n");
     sb.append("}");

@@ -2,12 +2,12 @@ package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
-import com.honeybadgers.taskapi.repository.GroupRepository;
-import com.honeybadgers.taskapi.repository.TaskRepository;
 import com.honeybadgers.taskapi.service.impl.TaskService;
 import org.junit.Before;
 import org.junit.Test;
@@ -71,11 +71,15 @@ public class TaskServiceTest {
 
     @Test
     public void testCreateTask() throws JpaException, UnknownEnumException, CreationException {
+        UUID taskId = UUID.randomUUID();
 
         TaskModel restModel = new TaskModel();
-        restModel.setId(UUID.randomUUID());
-        restModel.setGroupId("testGroup");
+        restModel.setId(taskId);
 
+        Task createdTask = new Task();
+        createdTask.setId(taskId.toString());
+
+        when(converter.taskRestToJpa(restModel)).thenReturn(createdTask);
         Task t = taskService.createTask(restModel);
 
         assertNotNull(t);
@@ -83,19 +87,75 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testCreateTask_group404() {
+    public void testCreateTask_JpaException() {
+        JpaException vio = new JpaException("Primary or unique constraint failed!");
+
+        Task task = new Task();
+        task.setId(UUID.randomUUID().toString());
+
+        when(taskRepository.findById(any())).thenReturn(Optional.of(task));
 
         TaskModel restModel = new TaskModel();
         restModel.setId(UUID.randomUUID());
-        restModel.setGroupId("testGroupNotFound");
+        restModel.setGroupId("testGroup");
 
         Exception e = assertThrows(JpaException.class, () -> taskService.createTask(restModel));
-        assertEquals("Group not found!", e.getMessage());
+        assertEquals("Primary or unique constraint failed!", e.getMessage());
+    }
+
+    @Test
+    public void testUpdateTask() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId =  UUID.randomUUID();
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+        restModel.setPriority(100);
+
+        Task updatedTask = new Task();
+        updatedTask.setId(taskId.toString());
+        updatedTask.setPriority(100);
+
+        when(taskRepository.findById(any())).thenReturn(Optional.of(updatedTask));
+        when(converter.taskRestToJpa(restModel)).thenReturn(updatedTask);
+
+        Task t = taskService.updateTask(taskId, restModel);
+
+        assertNotNull(t);
+    }
+
+    @Test
+    public void testUpdateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId =  UUID.randomUUID();
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+        restModel.setPriority(100);
+
+        when(taskRepository.findById(taskId.toString())).thenThrow(NoSuchElementException.class);
+
+        assertThrows(NoSuchElementException.class, () -> taskService.updateTask(taskId, restModel));
+    }
+
+    @Test
+    public void testUpdateTask_forceExeption() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId =  UUID.randomUUID();
+
+        Task task = new Task();
+        task.setId(taskId.toString());
+        task.setForce(true);
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+        restModel.setPriority(100);
+        restModel.setForce(false);
+
+        when(taskRepository.findById(taskId.toString())).thenReturn(Optional.of(task));
+
+        assertThrows(IllegalStateException.class, () -> taskService.updateTask(taskId, restModel));
     }
 
     @Test
     public void testCreateTask_primaryKeyViolation() {
-
         Task alreadyInTask = new Task();
         alreadyInTask.setId("AlreadyExistingUUID");
 
@@ -107,38 +167,6 @@ public class TaskServiceTest {
 
         Exception e = assertThrows(JpaException.class, () -> taskService.createTask(restModel));
         assertEquals("Primary or unique constraint failed!", e.getMessage());
-    }
-
-    @Test
-    public void testCreateTask_JpaException() {
-
-        DataIntegrityViolationException vio = new DataIntegrityViolationException("primary key violation");
-
-        when(taskRepository.save(any(Task.class))).thenThrow(vio);
-
-        TaskModel restModel = new TaskModel();
-        restModel.setId(UUID.randomUUID());
-        restModel.setGroupId("testGroup");
-
-        Exception e = assertThrows(JpaException.class, () -> taskService.createTask(restModel));
-        assertEquals("DataIntegrityViolation on save new task!", e.getMessage());
-    }
-
-    @Test
-    public void testCreateTask_groupChildrenViolation() {
-
-        Group child = new Group();
-        child.setId("TestGroup");
-        Group child2 = new Group();
-        child2.setId("TestGroup2");
-        when(groupRepository.findAllByParentGroupId("testGroup")).thenReturn(Arrays.asList(child, child2));
-
-        TaskModel restModel = new TaskModel();
-        restModel.setId(UUID.randomUUID());
-        restModel.setGroupId("testGroup");
-
-        Exception e = assertThrows(CreationException.class, () -> taskService.createTask(restModel));
-        assertEquals("Group of task has other groups as children: TestGroup, TestGroup2 -> aborting!", e.getMessage());
     }
 
     @Test
@@ -159,6 +187,7 @@ public class TaskServiceTest {
     @Test
     public void getNonExistingTaskByI(){
         UUID id = UUID.randomUUID();
+
         when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
 
         Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.deleteTask(id));
@@ -195,7 +224,6 @@ public class TaskServiceTest {
 
     @Test
     public void testSendTaskToPriorityQueue() {
-
         TaskModel taskModel = new TaskModel();
         taskModel.setId(UUID.randomUUID());
         taskModel.setGroupId("testgroup");
@@ -211,6 +239,7 @@ public class TaskServiceTest {
         taskService.sendTaskToPriorityQueue(taskModel);
         verify(communication,Mockito.only()).sendTaskToPriorityQueue(Mockito.any());
     }
+
     @Test
     public void testSendTaskToPriorityQueue_NullpointerCheck() {
         TaskModel taskModel = new TaskModel();
@@ -226,17 +255,17 @@ public class TaskServiceTest {
         group.setId("exampleGroup");
 
         Task exampleTask = new Task();
+
         String taskID = "70884515-8692-40e0-9c0e-e34ba4bcc3f" + Integer.toString(diff);
         int priority = 100 + diff;
         int indexNumber = 0;
+        int retries = 1;
+        int[] workdays = new int[]{1,0,1,0,1,0,1};
         boolean force = false;
-        boolean paused = true;
         ModeEnum mode = ModeEnum.Sequential;
         TypeFlagEnum type = TypeFlagEnum.Realtime;
         TaskStatusEnum status = TaskStatusEnum.Scheduled;
-        int[] workdays = new int[]{1,0,1,0,1,0,1};
         Timestamp deadline = new Timestamp(123456789);
-        int retries = 1;
 
         List<ActiveTimes> activeTimes = new LinkedList<ActiveTimes>();
         ActiveTimes timeFrame = new ActiveTimes();
@@ -256,7 +285,6 @@ public class TaskServiceTest {
         exampleTask.setPriority(priority);
         exampleTask.setIndexNumber(indexNumber);
         exampleTask.setForce(force);
-        exampleTask.setPaused(paused);
         exampleTask.setModeEnum(mode);
         exampleTask.setTypeFlagEnum(type);
         exampleTask.setStatus(status);
@@ -269,4 +297,54 @@ public class TaskServiceTest {
         return exampleTask;
     }
 
+    @Test
+    public void testCreateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId = UUID.randomUUID();
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+
+        Task createdTask = new Task();
+        createdTask.setId(taskId.toString());
+
+        when(converter.taskRestToJpa(restModel)).thenReturn(createdTask);
+        when(taskRepository.save(createdTask)).thenThrow(new DataIntegrityViolationException(""));
+
+       assertThrows(JpaException.class, () -> taskService.createTask(restModel));
+    }
+
+    @Test
+    public void testGetTaskById(){
+        UUID id = UUID.randomUUID();
+        Task task = new Task();
+        task.setId(id.toString());
+
+        when(taskRepository.findById(id.toString())).thenReturn(Optional.of(task));
+        taskService.getTaskById(id);
+
+        verify(converter).taskJpaToRest(task);
+    }
+
+    @Test
+    public void testGetTaskById_Exeption(){
+        UUID id = UUID.randomUUID();
+
+        assertThrows(NoSuchElementException.class, () -> taskService.getTaskById(id));
+    }
+
+    @Test
+    public void testupdateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId = UUID.randomUUID();
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+
+        Task createdTask = new Task();
+        createdTask.setId(taskId.toString());
+
+        when(converter.taskRestToJpa(restModel)).thenReturn(createdTask);
+        when(taskRepository.save(createdTask)).thenThrow(new DataIntegrityViolationException(""));
+        when(taskRepository.findById(taskId.toString())).thenReturn(Optional.of(new Task()));
+
+        assertThrows(JpaException.class, () -> taskService.updateTask(taskId, restModel));
+    }
 }

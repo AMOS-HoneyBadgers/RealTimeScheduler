@@ -1,6 +1,5 @@
 package com.honeybadgers.managementapi.controllers;
 
-import com.honeybadgers.managementapi.configuration.RedisApplicationProperties;
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ResponseModel;
@@ -21,15 +20,13 @@ import java.util.Optional;
 @RequestMapping("${openapi.Realtimescheduler Management Api.base-path:/api/management}")
 public class GroupApiController implements GroupApi {
 
-    static final Logger logger = LogManager.getLogger(GroupApiController.class);
-
     @Autowired
-    RedisApplicationProperties redisApplicationProperties;
+    IManagementService managmentService;
 
     private final NativeWebRequest request;
 
-    @Autowired
-    IManagementService managmentService;
+    static final Logger logger = LogManager.getLogger(GroupApiController.class);
+
 
     @org.springframework.beans.factory.annotation.Autowired
     public GroupApiController(NativeWebRequest request) {
@@ -57,8 +54,6 @@ public class GroupApiController implements GroupApi {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
-
-        logger.info("########################## REDIS PROP: " + redisApplicationProperties.toString());
 
         try{
             managmentService.pauseGroup(groupId, dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);

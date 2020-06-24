@@ -25,13 +25,12 @@ import java.util.Optional;
 @RequestMapping("${openapi.Realtimescheduler Group Api.base-path:/api/group}")
 public class GroupIdApiController implements GroupIdApi {
 
-    private final NativeWebRequest request;
-
     @Autowired
     IGroupService groupService;
-
     @Autowired
     IGroupConvertUtils convertUtils;
+
+    private final NativeWebRequest request;
 
     final static Logger logger = LogManager.getLogger(GroupIdApiController.class);
 
@@ -47,16 +46,12 @@ public class GroupIdApiController implements GroupIdApi {
 
     @Override
     public ResponseEntity<GroupModel> groupIdIdGet(String groupId) {
-
-        Group group;
-
         try {
-            group = groupService.getGroupById(groupId);
+            Group group = groupService.getGroupById(groupId);
+            return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
     }
 
     @Override
@@ -67,6 +62,7 @@ public class GroupIdApiController implements GroupIdApi {
 
         try {
             groupService.updateGroup(groupId.toString(), groupModel);
+            logger.info("Group " + groupId + " updated.");
         } catch (JpaException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
@@ -86,15 +82,12 @@ public class GroupIdApiController implements GroupIdApi {
 
     @Override
     public ResponseEntity<GroupModel> groupIdIdDelete(String groupId) {
-
-        Group group;
-
         try {
-            group = groupService.deleteGroup(groupId);
+            Group group = groupService.deleteGroup(groupId);
+            logger.info("Group " + groupId + " deleted.");
+            return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
         }
-
-        return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
     }
 }

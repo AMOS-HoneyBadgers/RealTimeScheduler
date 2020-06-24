@@ -248,29 +248,6 @@ public class TaskModelTest {
     }
 
     @Test
-    void paused() {
-        TaskModel model = new TaskModel();
-
-        Boolean newValue = true;
-        TaskModel get = model.paused(newValue);
-
-        assertNotNull(get);
-        assertEquals(get.getDeadline(), model.getDeadline());
-        assertEquals(get.getPaused(), newValue);
-    }
-
-    @Test
-    void getsetPaused() {
-        TaskModel model = new TaskModel();
-
-        Boolean newValue = true;
-        model.setPaused(newValue);
-        Boolean get = model.getPaused();
-
-        assertEquals(get, newValue);
-    }
-
-    @Test
     void force() {
         TaskModel model = new TaskModel();
 

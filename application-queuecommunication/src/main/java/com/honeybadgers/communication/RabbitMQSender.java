@@ -50,33 +50,36 @@ public class RabbitMQSender implements ICommunication {
         this.rabbitTemplate = template;
     }
 
+    /**
+     * This Method is for testing purposes only, in productive environment, this has to be replaced with real Dispatcher Queue
+     */
     @Override
     public void sendTaskToDispatcher(String task) {
         rabbitTemplate.convertAndSend(dispatcherexchange, dispatcherroutingkey, task);
-        logger.info("Send task to dispatcher + " + task);
+        logger.debug("Task " + task + " sent to dispatcher");
     }
 
     public String sendFeedbackToScheduler(String feedback) {
         rabbitTemplate.convertAndSend(feedbackExchange, feedbackroutingkey, feedback);
-        logger.info("Send feedback to Scheduler = " + feedback);
+        logger.debug("Feedback for Task " + feedback + " sent to Scheduler" );
         return "test";
     }
 
     @Override
     public void sendTaskToTasksQueue(String task) {
         rabbitTemplate.convertAndSend(tasksExchange, tasksroutingkey, task);
-        logger.info("Send task to Taskqueue= " + task);
+        logger.debug("Task " + task + " sent to Taskqueue");
     }
 
     @Override
     public void sendGroupToTasksQueue(String group) {
         rabbitTemplate.convertAndSend(tasksExchange, tasksroutingkey, group);
-        logger.info("Send group Taskqueue= " + group);
+        logger.debug("Group " + group + " sent Taskqueue");
     }
 
     @Override
     public void sendTaskToPriorityQueue(TaskQueueModel task) {
         rabbitTemplate.convertAndSend(priorityExchange, priorityroutingkey, task);
-        logger.info("Send task to Priorityqueue= " + task.toString());
+        logger.debug("Task " + task.toString() + " send to Priorityqueue");
     }
 }

@@ -2,9 +2,9 @@ package com.honeybadgers.managementapi.service;
 
 
 import com.honeybadgers.managementapi.exception.LockException;
-import com.honeybadgers.managementapi.repository.LockRedisRepository;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
 import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.redis.repository.LockRedisRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;

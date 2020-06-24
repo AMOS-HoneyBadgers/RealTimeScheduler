@@ -2,9 +2,9 @@ package com.honeybadgers.groupapi.service.impl;
 
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
-import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.GroupRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -63,9 +63,6 @@ public class GroupConvertUtils implements IGroupConvertUtils {
         if(groupModel.getPriority() != null)
             newGroup.setPriority(groupModel.getPriority());
 
-        if(groupModel.getPaused() != null)
-            newGroup.setPaused(groupModel.getPaused());
-
         if(groupModel.getParallelismDegree() != null)
             newGroup.setParallelismDegree(groupModel.getParallelismDegree());
         else
@@ -90,7 +87,6 @@ public class GroupConvertUtils implements IGroupConvertUtils {
         model.setMode(GroupModel.ModeEnum.fromValue(group.getModeEnum().toString().toLowerCase()));
         model.setTypeFlag(GroupModel.TypeFlagEnum.fromValue(group.getTypeFlagEnum().toString().toLowerCase()));
         model.setPriority(group.getPriority());
-        model.setPaused(group.isPaused());
         model.setParallelismDegree(group.getParallelismDegree());
         return model;
     }

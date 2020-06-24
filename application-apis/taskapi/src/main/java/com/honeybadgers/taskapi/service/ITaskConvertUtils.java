@@ -2,7 +2,10 @@ package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.models.model.ActiveTimes;
 import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.UnknownEnumException;
 import com.honeybadgers.models.utils.IConvertUtils;
+import com.honeybadgers.taskapi.exceptions.CreationException;
+import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
@@ -16,6 +19,8 @@ import java.util.Map;
 public interface ITaskConvertUtils extends IConvertUtils {
 
      TaskModel taskJpaToRest(Task task);
+
+     Task taskRestToJpa(TaskModel restModel) throws JpaException, CreationException, UnknownEnumException;
 
      List<TaskModelActiveTimes> activeTimesJpaToRest(List<ActiveTimes> activeTimes);
 

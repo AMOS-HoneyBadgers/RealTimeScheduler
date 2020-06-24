@@ -4,11 +4,11 @@ package com.honeybadgers.groupapi.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.groupapi.repository.GroupRepository;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.groupapi.utils.TestUtils;
 import com.honeybadgers.models.model.Group;
+import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,7 +51,6 @@ public class GroupIdApiControllerTest {
     public void testGroupUpdate() throws Exception {
         GroupModel testModel = new GroupModel();
         testModel.setId("testGroup");
-        testModel.setPaused(true);
 
         mvc.perform(post( "/api/group/testGroup/id")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -66,7 +65,6 @@ public class GroupIdApiControllerTest {
     public void testGroupUpdate_returns404() throws Exception {
         GroupModel testModel = new GroupModel();
         testModel.setId("testGroup");
-        testModel.setPaused(true);
 
         NoSuchElementException ex = new NoSuchElementException();
         when(groupService.updateGroup(any(String.class), any(GroupModel.class))).thenThrow(ex);
@@ -84,7 +82,6 @@ public class GroupIdApiControllerTest {
     public void testGroupUpdate_JpaExceptionWasThrown() throws Exception {
         GroupModel testModel = new GroupModel();
         testModel.setId("testGroup");
-        testModel.setPaused(true);
 
         JpaException ex = new JpaException("Primary or unique constraint failed!");
         when(groupService.updateGroup(any(String.class), any(GroupModel.class))).thenThrow(ex);
@@ -118,10 +115,8 @@ public class GroupIdApiControllerTest {
     public void testGroupIdIdGet() throws Exception {
         GroupModel testModel = new GroupModel();
         testModel.setId("testGroup");
-        testModel.setPaused(true);
         Group group = new Group();
         group.setId(testModel.getId());
-        group.setPaused(testModel.getPaused());
 
         when(groupService.getGroupById("testGroup")).thenReturn(group);
         when(convertUtils.groupJpaToRest(any(Group.class))).thenReturn(testModel);
@@ -143,10 +138,8 @@ public class GroupIdApiControllerTest {
     public void testGroupIdIdGet_notFound() throws Exception {
         GroupModel testModel = new GroupModel();
         testModel.setId("testGroup");
-        testModel.setPaused(true);
         Group group = new Group();
         group.setId(testModel.getId());
-        group.setPaused(testModel.getPaused());
 
         when(groupService.getGroupById("testGroup")).thenThrow(new NoSuchElementException("Group Not found! - PLACEHOLDER"));
         when(convertUtils.groupJpaToRest(any(Group.class))).thenReturn(testModel);
@@ -163,10 +156,8 @@ public class GroupIdApiControllerTest {
     public void testGroupIdIdDelete() throws Exception {
         GroupModel testModel = new GroupModel();
         testModel.setId("testGroup");
-        testModel.setPaused(true);
         Group group = new Group();
         group.setId(testModel.getId());
-        group.setPaused(testModel.getPaused());
 
         when(groupService.deleteGroup("testGroup")).thenReturn(group);
         when(convertUtils.groupJpaToRest(any(Group.class))).thenReturn(testModel);
@@ -188,10 +179,8 @@ public class GroupIdApiControllerTest {
     public void testGroupIdIdDelete_notFound() throws Exception {
         GroupModel testModel = new GroupModel();
         testModel.setId("testGroup");
-        testModel.setPaused(true);
         Group group = new Group();
         group.setId(testModel.getId());
-        group.setPaused(testModel.getPaused());
 
         when(groupService.deleteGroup("testGroup")).thenThrow(new NoSuchElementException("Group Not found! - PLACEHOLDER"));
         when(convertUtils.groupJpaToRest(any(Group.class))).thenReturn(testModel);

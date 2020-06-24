@@ -18,10 +18,10 @@ import java.util.Optional;
 @RequestMapping("${openapi.Realtimescheduler Management Api.base-path:/api/management}")
 public class SchedulerApiController implements SchedulerApi {
 
-    private final NativeWebRequest request;
-
     @Autowired
     IManagementService managmentService;
+
+    private final NativeWebRequest request;
 
     @org.springframework.beans.factory.annotation.Autowired
     public SchedulerApiController(NativeWebRequest request) {
