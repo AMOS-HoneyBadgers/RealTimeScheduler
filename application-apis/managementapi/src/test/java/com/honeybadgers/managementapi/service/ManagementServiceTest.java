@@ -1,6 +1,7 @@
 package com.honeybadgers.managementapi.service;
 
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
 import com.honeybadgers.models.model.RedisLock;
@@ -32,6 +33,8 @@ public class ManagementServiceTest {
     @Autowired
     ManagementService service;
 
+    @MockBean
+    ICommunication sender;
 
     @Test
     public void testPauseScheduler() {

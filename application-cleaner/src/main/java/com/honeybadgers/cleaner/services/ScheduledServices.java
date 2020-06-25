@@ -23,6 +23,7 @@ public class ScheduledServices {
     @Autowired
     LockRedisRepository lockRedisRepository;
 
+
     @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
         // TODO: for optimisation write custom query which gets all where resume_date != null (REQUIRES COMPLETE IMPL OF CRUDREPOS.)

@@ -149,7 +149,7 @@ public class GroupServiceTest {
 
         Group group = groupService.updateGroup(group_id, restGroup);
 
-        verify(sender, never()).sendTaskToDispatcher(any());
+        verify(sender, atMostOnce()).sendTaskToDispatcher(any());
         assertNotNull(group);
         assertEquals( 100, group.getPriority() );
         assertEquals("parentGroup", group.getParentGroup().getId());
