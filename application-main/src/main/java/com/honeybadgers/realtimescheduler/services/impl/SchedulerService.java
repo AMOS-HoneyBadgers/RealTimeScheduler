@@ -120,43 +120,37 @@ public class SchedulerService implements ISchedulerService {
     // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
     public void sendTaskstoDispatcher(List<Task> tasks) {
         try {
-            for (int i = 0; i < tasks.size(); i++) {
-                Task currentTask = tasks.get(i);
+           for (Task currentTask:tasks) {
+               if (isTaskLocked(currentTask.getId())) {
+                   logger.info("Task " + currentTask.getId() + " is currently paused!");
+                   continue;
+               }
 
-                Task task = taskService.getTaskById(currentTask.getId()).orElse(null);
-                if (task == null)
-                    throw new RuntimeException("Task not found in Postgre Database for taskid: " + currentTask.getId());
+               List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
-                if(isTaskLocked(currentTask.getId())) {
-                    logger.info("Task " + currentTask.getId() + " is currently paused!");
-                    continue;
-                }
+               if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
+                   continue;
 
-                List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
+               if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
+                   continue;
 
-                if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
-                    continue;
+               // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
+               Group parentGroup = currentTask.getGroup();
 
-                if (!checkIfTaskIsInActiveTime(task) || !checkIfTaskIsInWorkingDays(task) || sequentialHasToWait(task))
-                    continue;
+               int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
+               // TODO bug
+               if (parentGroup.getCurrentParallelismDegree() >= limit) {
+                   logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
+                   continue;
+               }
+               // update which equals parentGroup.setCurrentParallelismDegree(parentGroup.getCurrentParallelismDegree() + 1); groupRepository.save(parentGroup);
+               currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
-                // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
-                Group parentGroup = currentTask.getGroup();
+               sender.sendTaskToDispatcher(currentTask.getId());
 
-                int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
-                // TODO bug
-                if (parentGroup.getCurrentParallelismDegree() >= limit) {
-                    logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
-                    continue;
-                }
-                // update which equals parentGroup.setCurrentParallelismDegree(parentGroup.getCurrentParallelismDegree() + 1); groupRepository.save(parentGroup);
-                parentGroup = groupRepository.incrementCurrentParallelismDegree(parentGroup.getId());
-
-                sender.sendTaskToDispatcher(currentTask.getId());
-
-                taskRepository.deleteById(currentTask.getId());
-                logger.info("Task " + currentTask.getId() +  " was sent to dispatcher queue and removed from redis Database");
-            }
+               taskRepository.deleteById(currentTask.getId());
+               logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
+           }
         } catch (IndexOutOfBoundsException e) {
             logger.error(e.getMessage());
         }
