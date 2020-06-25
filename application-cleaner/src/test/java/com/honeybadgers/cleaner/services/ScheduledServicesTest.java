@@ -2,6 +2,7 @@ package com.honeybadgers.cleaner.services;
 
 
 import com.honeybadgers.cleaner.repository.LockRedisRepository;
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.RedisLock;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,6 +29,9 @@ public class ScheduledServicesTest {
 
     @MockBean
     LockRedisRepository lockRedisRepository;
+
+    @MockBean
+    ICommunication sender;
 
     ArrayList<RedisLock> list;
     RedisLock paraLock;
@@ -69,6 +73,7 @@ public class ScheduledServicesTest {
 
         verify(lockRedisRepository).findAll();
         verify(lockRedisRepository, times(1)).deleteById(list.get(1).getId());
+        verify(sender, atMostOnce()).sendTaskToDispatcher(any());
         verify(lockRedisRepository, never()).deleteById(paraLock.getId());
 
         RedisLock lockNew = new RedisLock();
