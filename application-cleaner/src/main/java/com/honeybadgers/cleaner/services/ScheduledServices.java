@@ -6,6 +6,7 @@ import com.honeybadgers.models.model.RedisLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -27,6 +28,8 @@ public class ScheduledServices {
     @Autowired
     ICommunication sender;
 
+    @Value("${scheduler.trigger}")
+    String scheduler_trigger;
 
     @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
@@ -57,6 +60,7 @@ public class ScheduledServices {
             }
             logger.info("Finished paused cleanup!");
             if(found)
+                sender.sendTaskToTasksQueue(scheduler_trigger);
 
         } catch (Exception e) {
             logger.error("Caught exception in cleanPausedLocks:");
