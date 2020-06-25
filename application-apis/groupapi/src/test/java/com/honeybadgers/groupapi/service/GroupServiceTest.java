@@ -24,8 +24,7 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = GroupService.class)
@@ -135,7 +134,6 @@ public class GroupServiceTest {
 
     @Test
     public void testGroupUpdate() throws JpaException, UnknownEnumException {
-
         String group_id = "testGroup";
         GroupModel restGroup = new GroupModel();
         restGroup.setId("testGroup");
@@ -151,6 +149,7 @@ public class GroupServiceTest {
 
         Group group = groupService.updateGroup(group_id, restGroup);
 
+        verify(sender, never()).sendTaskToDispatcher(any());
         assertNotNull(group);
         assertEquals( 100, group.getPriority() );
         assertEquals("parentGroup", group.getParentGroup().getId());
