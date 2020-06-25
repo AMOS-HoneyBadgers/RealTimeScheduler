@@ -84,6 +84,9 @@ public class Task {
     @Basic(fetch = FetchType.LAZY)
     private Map<String, String> metaData;
 
+    @Column(name = "total_priority")
+    private int totalPriority;
+
 
     @PrePersist
     void checkModeParameters() {

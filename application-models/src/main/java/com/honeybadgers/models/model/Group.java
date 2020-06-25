@@ -28,8 +28,6 @@ import java.util.List;
 @NoArgsConstructor
 public class Group {
 
-
-
     @Id
     @Column(name="id", unique = true, nullable = false)
     private String id;
@@ -71,6 +69,9 @@ public class Group {
     @Min(value = 1)
     @Column(name = "parallelism_degree")
     private Integer parallelismDegree;
+
+    @Column(name = "current_parallelism_degree", nullable = false)
+    private Integer currentParallelismDegree = 0;
 
 
     @PrePersist
