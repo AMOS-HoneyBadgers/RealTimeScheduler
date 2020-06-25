@@ -1,7 +1,6 @@
 package com.honeybadgers.cleaner.services;
 
 import com.honeybadgers.cleaner.repository.LockRedisRepository;
-import com.honeybadgers.models.model.RedisLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

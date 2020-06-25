@@ -2,12 +2,9 @@ package com.honeybadgers.managementapi.service.impl;
 
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.service.IManagementService;
-import com.honeybadgers.models.model.RedisLock;
-import com.honeybadgers.redis.repository.LockRedisRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -1,8 +1,6 @@
 package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.RedisLock;
-import com.honeybadgers.models.model.RedisTask;
 import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;

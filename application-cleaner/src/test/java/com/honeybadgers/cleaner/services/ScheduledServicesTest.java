@@ -2,7 +2,6 @@ package com.honeybadgers.cleaner.services;
 
 
 import com.honeybadgers.cleaner.repository.LockRedisRepository;
-import com.honeybadgers.models.model.RedisLock;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
