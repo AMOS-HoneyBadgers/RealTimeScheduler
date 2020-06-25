@@ -67,6 +67,7 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
+        when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         doNothing().when(spy).sendTaskstoDispatcher(anyList());
         spy.scheduleTask(t.getId());
@@ -75,31 +76,33 @@ public class SchedulerServiceTest {
         verify(taskService).calculatePriority(t);
         verify(taskRepository).findAllScheduledTasksSorted();
     }
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testIfTaskNotFoundThenThrow() {
         Task t = createTaskTestObject(null,"TEST");
 
-        when(taskService.getTaskById(t.getId())).thenReturn(null);
-        SchedulerService spy = spy(service);
-        spy.scheduleTask(t.getId());
+        when(taskService.getTaskById(t.getId())).thenReturn(Optional.empty());
+        Exception e = assertThrows(RuntimeException.class, () -> service.scheduleTask(t.getId()));
+        assertEquals("task could not be found in database with id: " + t.getId(), e.getMessage());
     }
     @Test
     public void testIfSchedulerIsLockedDontSend() {
         Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
         Task t = createTaskTestObject(group, "TEST");
 
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
-        when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(new RedisLock()));
+        when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(new Lock()));
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         SchedulerService spy = spy(service);
         spy.scheduleTask(t.getId());
-        verify(spy, times(0)).sendTaskstoDispatcher(any());
+        verify(spy, never()).sendTaskstoDispatcher(any());
     }
 
     @Test
     public void testIsTaskLocked_NotLocked() {
         String taskId = UUID.randomUUID().toString();
         String lockId = LOCK_TASK_PREFIX + taskId;
-        RedisLock lockObj = new RedisLock();
+        Lock lockObj = new Lock();
         lockObj.setId(lockId);
         when(lockRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
 
@@ -118,7 +121,7 @@ public class SchedulerServiceTest {
     public void testIsGroupLocked_NotLocked() {
         String groupId = "GROUPID";
         String lockId = LOCK_GROUP_PREFIX + groupId;
-        RedisLock lockObj = new RedisLock();
+        Lock lockObj = new Lock();
         lockObj.setId(lockId);
         when(lockRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
 
@@ -136,7 +139,7 @@ public class SchedulerServiceTest {
 
     @Test
     public void testIsSchedulerLocked_NotLocked() {
-        RedisLock lockObj = new RedisLock();
+        Lock lockObj = new Lock();
         lockObj.setId(LOCK_SCHEDULER_ALIAS);
         when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
 
