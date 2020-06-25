@@ -1,6 +1,7 @@
 package com.honeybadgers.cleaner.services;
 
 import com.honeybadgers.cleaner.repository.LockRedisRepository;
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.RedisLock;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,11 +24,15 @@ public class ScheduledServices {
     @Autowired
     LockRedisRepository lockRedisRepository;
 
+    @Autowired
+    ICommunication sender;
+
 
     @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
         // TODO: for optimisation write custom query which gets all where resume_date != null (REQUIRES COMPLETE IMPL OF CRUDREPOS.)
         try {
+            boolean found = false;
             logger.info("Starting paused cleanup!");
             Iterable<RedisLock> paused = lockRedisRepository.findAll();
             logger.info("Checking " + ((Collection<?>) paused).size() + " locks on resume_date");
@@ -47,9 +52,12 @@ public class ScheduledServices {
                 if(redisLock.getResume_date().isBefore(now)) {
                     logger.info("Deleting lock with id " + redisLock.getId());
                     lockRedisRepository.deleteById(redisLock.getId());
+                    found = true;
                 }
             }
             logger.info("Finished paused cleanup!");
+            if(found)
+
         } catch (Exception e) {
             logger.error("Caught exception in cleanPausedLocks:");
             logger.error(Arrays.deepToString(e.getStackTrace()));
