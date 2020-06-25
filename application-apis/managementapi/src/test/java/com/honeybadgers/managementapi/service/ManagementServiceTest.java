@@ -21,6 +21,9 @@ import java.util.UUID;
 import static com.honeybadgers.models.model.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.verify;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -54,6 +57,7 @@ public class ManagementServiceTest {
     public void testResumeScheduler() {
         service.resumeScheduler();
         Mockito.verify(lockRedisRepository, Mockito.only()).deleteById(LOCK_SCHEDULER_ALIAS);
+        verify(sender, atMostOnce()).sendTaskToDispatcher(any());
     }
 
     @Test
