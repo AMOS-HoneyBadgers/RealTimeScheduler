@@ -104,11 +104,13 @@ public class SchedulerService implements ISchedulerService {
             throw new RuntimeException("task could not be found in database with id: " + taskId);
 
         task.setTotalPriority(taskService.calculatePriority(task));
-        logger.info("Task " + taskId + " created " + task.toString());
+        logger.info("Task " + taskId + " calculated total priority: " + task.getTotalPriority());
 
+        task.setStatus(TaskStatusEnum.Scheduled);
         taskRepository.save(task);
 
         List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
+        //logger.debug("Task " + currentTask.getId() + " found " + tasks.size() + " tasks to be sent to dispatcher.");
 
         if (!isSchedulerLocked()) {
             sendTaskstoDispatcher(tasks);
@@ -128,15 +130,18 @@ public class SchedulerService implements ISchedulerService {
 
                List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
+               //logger.debug("Task " + currentTask.getId() + " checking on group paused.");
                if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
                    continue;
 
+               //logger.debug("Task " + currentTask.getId() + " checking on activeTimes, workingDays and seqNo.");
                if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
                    continue;
 
                // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
                Group parentGroup = currentTask.getGroup();
 
+               //logger.debug("Task " + currentTask.getId() + " checking on parallelismDegree.");
                int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
                // TODO bug
                if (parentGroup.getCurrentParallelismDegree() >= limit) {
@@ -146,9 +151,11 @@ public class SchedulerService implements ISchedulerService {
                // update which equals parentGroup.setCurrentParallelismDegree(parentGroup.getCurrentParallelismDegree() + 1); groupRepository.save(parentGroup);
                currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
+               //logger.debug("Task " + currentTask.getId() + " sent.");
                sender.sendTaskToDispatcher(currentTask.getId());
 
-               taskRepository.deleteById(currentTask.getId());
+               currentTask.setStatus(TaskStatusEnum.Dispatched);
+               taskRepository.save(currentTask);
                logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
            }
         } catch (IndexOutOfBoundsException e) {
