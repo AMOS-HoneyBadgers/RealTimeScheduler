@@ -2,10 +2,11 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.LockRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
-import com.honeybadgers.redis.repository.LockRedisRepository;
-import com.honeybadgers.redis.repository.TaskRedisRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,13 +15,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import java.util.*;
 import java.sql.Time;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 import static com.honeybadgers.models.model.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,10 +32,10 @@ public class SchedulerServiceTest {
     private ITaskService taskService;
 
     @MockBean
-    private TaskRedisRepository taskRedisRepository;
+    private TaskRepository taskRepository;
 
     @MockBean
-    private LockRedisRepository lockRedisRepository;
+    private LockRepository lockRepository;
 
     @MockBean
     private ICommunication sender;
@@ -47,63 +44,61 @@ public class SchedulerServiceTest {
     private IGroupService groupService;
 
     @MockBean
+    GroupRepository groupRepository;
+
+    @MockBean
     private ConvertUtils convertUtils;
 
     @Autowired
     private SchedulerService service;
 
     @Test
-    public void testGetAllTasksAndSort() {
-        // TODO IMPLEMENT @Christoff and @Stan
-        service.getAllRedisTasksAndSort();
-    }
-
-    @Test
     public void testScheduleTask() {
         Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
 
         Task t = createTaskTestObject(group,"TEST");
 
-        RedisTask redisTask = new RedisTask();
-        redisTask.setId(t.getId());
-        RedisLock capacity = new RedisLock();
-        capacity.setCurrentTasks(50);
         SchedulerService spy = spy(service);
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
+        when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
+        doNothing().when(spy).sendTaskstoDispatcher(anyList());
         spy.scheduleTask(t.getId());
 
-        verify(taskRedisRepository).save(any());
+        verify(taskRepository).save(any());
         verify(taskService).calculatePriority(t);
-        verify(spy).getAllRedisTasksAndSort();
-
+        verify(taskRepository).findAllScheduledTasksSorted();
     }
-    @Test(expected = RuntimeException.class)
+    @Test
     public void testIfTaskNotFoundThenThrow() {
         Task t = createTaskTestObject(null,"TEST");
 
-        when(taskService.getTaskById(t.getId())).thenReturn(null);
-        SchedulerService spy = spy(service);
-        spy.scheduleTask(t.getId());
+        when(taskService.getTaskById(t.getId())).thenReturn(Optional.empty());
+        Exception e = assertThrows(RuntimeException.class, () -> service.scheduleTask(t.getId()));
+        assertEquals("task could not be found in database with id: " + t.getId(), e.getMessage());
     }
     @Test
     public void testIfSchedulerIsLockedDontSend() {
         Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
         Task t = createTaskTestObject(group, "TEST");
 
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
-        when(lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(new RedisLock()));
+        when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(new Lock()));
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         SchedulerService spy = spy(service);
         spy.scheduleTask(t.getId());
-        verify(spy, times(0)).sendTaskstoDispatcher(any());
+        verify(spy, never()).sendTaskstoDispatcher(any());
     }
 
     @Test
     public void testIsTaskLocked_NotLocked() {
         String taskId = UUID.randomUUID().toString();
         String lockId = LOCK_TASK_PREFIX + taskId;
-        RedisLock lockObj = new RedisLock();
+        Lock lockObj = new Lock();
         lockObj.setId(lockId);
-        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
+        when(lockRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
 
         assertTrue(service.isTaskLocked(taskId));
     }
@@ -112,7 +107,7 @@ public class SchedulerServiceTest {
     public void testIsTaskLocked_Locked() {
         String taskId = UUID.randomUUID().toString();
         String lockId = LOCK_TASK_PREFIX + taskId;
-        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.empty());
+        when(lockRepository.findById(lockId)).thenReturn(Optional.empty());
         assertFalse(service.isTaskLocked(taskId));
     }
 
@@ -120,9 +115,9 @@ public class SchedulerServiceTest {
     public void testIsGroupLocked_NotLocked() {
         String groupId = "GROUPID";
         String lockId = LOCK_GROUP_PREFIX + groupId;
-        RedisLock lockObj = new RedisLock();
+        Lock lockObj = new Lock();
         lockObj.setId(lockId);
-        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
+        when(lockRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
 
         assertTrue(service.isGroupLocked(groupId));
     }
@@ -131,158 +126,92 @@ public class SchedulerServiceTest {
     public void testIsGroupLocked_Locked() {
         String groupId = "GROUPID";
         String lockId = LOCK_GROUP_PREFIX + groupId;
-        when(lockRedisRepository.findById(lockId)).thenReturn(Optional.empty());
+        when(lockRepository.findById(lockId)).thenReturn(Optional.empty());
 
         assertFalse(service.isGroupLocked(groupId));
     }
 
     @Test
     public void testIsSchedulerLocked_NotLocked() {
-        RedisLock lockObj = new RedisLock();
+        Lock lockObj = new Lock();
         lockObj.setId(LOCK_SCHEDULER_ALIAS);
-        when(lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
+        when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
 
         assertTrue(service.isSchedulerLocked());
     }
 
     @Test
     public void testIsSchedulerLocked_Locked() {
-        when(lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
+        when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
 
         assertFalse(service.isSchedulerLocked());
     }
 
     @Test
     public void testSendTasksToDispatcher() {
-        RedisLock test = new RedisLock();
-        test.setId("ass");
-        test.setCurrentTasks(0);
-
-
-        RedisTask task1 = createRedisTaskTestObject("id1", 5);
-        List<RedisTask> tasks = new ArrayList<RedisTask>();
-        tasks.add(task1);
-
+        //Arrange
+        List<Task> tasks = new ArrayList<Task>();
         Group group = createGroupTestObject();
         Task task = createTaskTestObject(group, "TEST");
+        tasks.add(task);
 
         SchedulerService spy = spy(service);
-        when(groupService.getGroupById(any())).thenReturn(group);
-        when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
+        Group groupIncremented = createGroupTestObject();
+        groupIncremented.setCurrentParallelismDegree(group.getCurrentParallelismDegree()+1);
+        when(groupRepository.incrementCurrentParallelismDegree(group.getId())).thenReturn(groupIncremented);
         when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
 
-
         // mock everything related to isPaused
-        when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
-        when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>());
+        when(lockRepository.findById(LOCK_TASK_PREFIX + task.getId())).thenReturn(Optional.empty());
+        when(taskService.getRecursiveGroupsOfTask(task.getId())).thenReturn(new ArrayList<>());
+        doNothing().when(taskRepository).deleteById(task.getId());
 
-        doNothing().when(taskRedisRepository).deleteById(task1.getId());
-
+        //Act
         spy.sendTaskstoDispatcher(tasks);
 
-        assertEquals(1, test.getCurrentTasks());
-        verify(lockRedisRepository).save(any());
-        verify(sender).sendTaskToDispatcher(task1.getId());
-        verify(taskRedisRepository).deleteById(task1.getId());
-        verify(lockRedisRepository,times(2)).findById(any());
+        //Assert
+        assertEquals(1, groupIncremented.getCurrentParallelismDegree().intValue());
+        verify(sender).sendTaskToDispatcher(task.getId());
+        verify(taskRepository).deleteById(task.getId());
+        verify(lockRepository,times(1)).findById(any());
         verify(spy).getLimitFromGroup(any(),any());
     }
 
-    @Test(expected = RuntimeException.class)
-    public void testSendTasksToDispatcherThrowException() {
-        RedisLock test = new RedisLock();
-        test.setId("ass");
-        test.setCurrentTasks(0);
-
-        RedisTask task1 = createRedisTaskTestObject("id1", 5);
-        List<RedisTask> tasks = new ArrayList<RedisTask>();
-        tasks.add(task1);
-
-        SchedulerService spy = spy(service);
-        when(taskService.getTaskById(any())).thenReturn(null);
-
-        spy.sendTaskstoDispatcher(tasks);
-    }
 
     @Test
     public void testSendTasksToDispatcher_3TasksPresentinDatabase_IsOnlyAllowedToSend1() {
-        RedisLock test = new RedisLock();
-        test.setId("ass");
-        test.setCurrentTasks(0);
-
-        RedisTask task1 = createRedisTaskTestObject("id1", 5);
-        task1.setGroupid("456");
-
-        List<RedisTask> tasks = new ArrayList<RedisTask>();
-        tasks.add(task1);
-        tasks.add(task1);
-        tasks.add(task1);
 
         Group group = createGroupTestObject();
         ArrayList<String> groupList = new ArrayList<>();
         groupList.add("456");
-
-        Task task = createTaskTestObject(group, "id1");
-
+        Task task1 = createTaskTestObject(group, "5");
+        List<Task> tasks = new ArrayList<Task>();
+        tasks.add(task1);
+        tasks.add(task1);
+        tasks.add(task1);
         SchedulerService spy = spy(service);
-        when(groupService.getGroupById(any())).thenReturn(group);
-        when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
-        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
-        when(lockRedisRepository.findById(LOCK_GROUP_PREFIX+"456")).thenReturn(Optional.empty());
-        doNothing().when(taskRedisRepository).deleteById(task1.getId());
+        Group groupIncremented = createGroupTestObject();
+        groupIncremented.setCurrentParallelismDegree(task1.getGroup().getCurrentParallelismDegree()+1);
+        when(groupRepository.incrementCurrentParallelismDegree(group.getId())).thenReturn(groupIncremented);
+        when(groupService.getGroupById(group.getId())).thenReturn(group);
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
+        when(lockRepository.findById(LOCK_GROUP_PREFIX+"456")).thenReturn(Optional.empty());
+        doNothing().when(taskRepository).deleteById(task1.getId());
 
         // mock everything related to isPaused
-        when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
+        when(lockRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
         when(taskService.getRecursiveGroupsOfTask(any())).thenReturn(groupList);
 
         spy.sendTaskstoDispatcher(tasks);
 
-        assertEquals(1, test.getCurrentTasks());
+        assertEquals(1, task1.getGroup().getCurrentParallelismDegree().intValue());
         verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
     }
 
 
-    @Test
-    public void testSendTasksToDispatcherCreateGroupParallelismTrackerIsCalledOnce() {
-        RedisLock test = new RedisLock();
-        test.setId("ass");
-        test.setCurrentTasks(0);
 
 
-        RedisTask task1 = createRedisTaskTestObject("id1", 5);
-        List<RedisTask> tasks = new ArrayList<RedisTask>();
-        tasks.add(task1);
 
-        Group group = createGroupTestObject();
-        Task task = createTaskTestObject(group, "TEST");
-
-        SchedulerService spy = spy(service);
-        when(groupService.getGroupById(any())).thenReturn(group);
-        when(lockRedisRepository.findById("GROUP_PREFIX_PARLELLISM_CURRENT_TASKS_RUNNING_FOR_GROUP:456")).thenReturn(null);
-        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
-
-
-        // mock everything related to isPaused
-        when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
-        when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>());
-        doNothing().when(taskRedisRepository).deleteById(task1.getId());
-
-        spy.sendTaskstoDispatcher(tasks);
-
-        verify(lockRedisRepository).save(any());
-        verify(sender).sendTaskToDispatcher(task1.getId());
-        verify(taskRedisRepository).deleteById(task1.getId());
-        verify(lockRedisRepository,times(2)).findById(any());
-        verify(spy).createGroupParallelismTracker(any());
-        verify(spy).getLimitFromGroup(any(),any());
-    }
-
-    private RedisTask createRedisTaskTestObject(String id, long priority) {
-        RedisTask task1 = new RedisTask();
-        task1.setId(id);
-        task1.setPriority(priority);
-        return task1;
-    }
 
     private Task createTaskTestObject(Group group, String id) {
         Task task = new Task();
@@ -297,70 +226,63 @@ public class SchedulerServiceTest {
         Task task = new Task();
         task.setId("123");
 
-        RedisLock test = new RedisLock();
-        test.setId("ass");
-        test.setCurrentTasks(0);
-
-        RedisTask task1 = createRedisTaskTestObject("1",5);
-        List<RedisTask> tasks = new ArrayList<RedisTask>();
+        Group group = createGroupTestObject();
+        Task task1 = createTaskTestObject(group,"TEST");
+        List<Task> tasks = new ArrayList<Task>();
         tasks.add(task1);
 
-        RedisLock taskLock = new RedisLock();
+        Lock taskLock = new Lock();
         taskLock.setId(LOCK_TASK_PREFIX + task1.getId());
 
         SchedulerService spy = spy(service);
-        when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
         when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
 
         // mock everything related to isPaused
-        when(lockRedisRepository.findById(taskLock.getId())).thenReturn(Optional.of(taskLock));
+        when(lockRepository.findById(taskLock.getId())).thenReturn(Optional.of(taskLock));
         when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>());
 
-        doNothing().when(taskRedisRepository).deleteById(task1.getId());
+        doNothing().when(taskRepository).deleteById(task1.getId());
 
         spy.sendTaskstoDispatcher(tasks);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
-        assertEquals(0, test.getCurrentTasks());
-        verify(lockRedisRepository, never()).save(any());
+        assertEquals(0, group.getCurrentParallelismDegree().intValue());
+        verify(lockRepository, never()).save(any());
         verify(sender, never()).sendTaskToDispatcher(task1.getId());
-        verify(taskRedisRepository, never()).deleteById(task1.getId());
+        verify(taskRepository, never()).deleteById(task1.getId());
     }
 
     @Test
     public void sendTasksToDispatcher_groupPaused() {
-        Task task = new Task();
-        task.setId("123");
 
-        RedisLock test = new RedisLock();
-        test.setId("ass");
-        test.setCurrentTasks(0);
+        Group group = createGroupTestObject();
+        group.setId("testGroup");
 
-        RedisTask task1 = createRedisTaskTestObject("id1",5);
-        List<RedisTask> tasks = new ArrayList<RedisTask>();
+
+        Task task1 = createTaskTestObject(group,"5");
+        List<Task> tasks = new ArrayList<Task>();
         tasks.add(task1);
 
-        RedisLock groupLock = new RedisLock();
+        Lock groupLock = new Lock();
         groupLock.setId(LOCK_GROUP_PREFIX + "testGroup");
 
         SchedulerService spy = spy(service);
-        when(lockRedisRepository.findById(any())).thenReturn(Optional.of(test));
 
         // mock everything related to isPaused
-        when(lockRedisRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
+        when(lockRepository.findById(LOCK_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
         when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>(Collections.singleton("testGroup")));
-        when(lockRedisRepository.findById(groupLock.getId())).thenReturn(Optional.of(groupLock));
-        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
+        when(lockRepository.findById(groupLock.getId())).thenReturn(Optional.of(groupLock));
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
 
-        doNothing().when(taskRedisRepository).deleteById(task1.getId());
+        doNothing().when(taskRepository).deleteById(task1.getId());
 
         spy.sendTaskstoDispatcher(tasks);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
-        assertEquals(0, test.getCurrentTasks());
-        verify(lockRedisRepository, never()).save(any());
+        assertEquals(0, group.getCurrentParallelismDegree().intValue());
+        verify(lockRepository, never()).save(any());
         verify(sender, never()).sendTaskToDispatcher(task1.getId());
-        verify(taskRedisRepository, never()).deleteById(task1.getId());
+        verify(taskRepository, never()).deleteById(task1.getId());
     }
 
     @Test
@@ -395,12 +317,7 @@ public class SchedulerServiceTest {
         assertEquals(limit,5);
     }
 
-    @Test()
-    public void testCreateGroupParlellismTracker() {
-        SchedulerService spy = spy(service);
-        RedisLock testlock = spy.createGroupParallelismTracker("123");
-        assertEquals(testlock.getId(),"123");
-    }
+
 
     private Group createGroupTestObject() {
         Group group = new Group();

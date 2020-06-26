@@ -1,8 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.model.Group;
-import com.honeybadgers.realtimescheduler.repository.GroupPostgresRepository;
-import com.honeybadgers.realtimescheduler.services.impl.GroupService;
+import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,7 @@ import java.util.List;
 public class GroupServiceTest {
 
     @MockBean
-    GroupPostgresRepository groupPostgresRepository;
+    GroupRepository groupPostgresRepository;
     @Autowired
     GroupService groupService;
 

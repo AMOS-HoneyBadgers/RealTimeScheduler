@@ -1,4 +1,4 @@
-package com.honeybadgers.realtimescheduler.repository;
+package com.honeybadgers.postgre.repository;
 
 import com.honeybadgers.models.model.GroupAncestorModel;
 import org.springframework.data.jpa.repository.JpaRepository;
