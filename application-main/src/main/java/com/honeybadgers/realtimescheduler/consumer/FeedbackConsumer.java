@@ -64,7 +64,7 @@ public class FeedbackConsumer {
     public void checkAndSetParallelismDegree(Task currentTask) {
         // Get Current Running Tasks from Redis Database, throw exception if it wasnt found
         Optional<Group> updated = groupRepository.decrementCurrentParallelismDegree(currentTask.getGroup().getId());
-        if(updated.isEmpty())
+        if(!updated.isPresent())
             logger.debug("Task " + currentTask.getId() + " failed to decrement currentParallelismDegree due to currentParallelismDegree = 0");
     }
 }
