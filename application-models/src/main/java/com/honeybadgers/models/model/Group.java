@@ -14,6 +14,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -79,5 +80,22 @@ public class Group {
         if(this.modeEnum == ModeEnum.Sequential && this.lastIndexNumber == null) {
             this.lastIndexNumber = 0;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id='" + id + '\'' +
+                ", parentGroup=" + parentGroup +
+                ", priority=" + priority +
+                ", deadline=" + deadline +
+                ", activeTimeFrames=" + activeTimeFrames +
+                ", workingDays=" + Arrays.toString(workingDays) +
+                ", typeFlagEnum=" + typeFlagEnum +
+                ", modeEnum=" + modeEnum +
+                ", lastIndexNumber=" + lastIndexNumber +
+                ", parallelismDegree=" + parallelismDegree +
+                ", currentParallelismDegree=" + currentParallelismDegree +
+                '}';
     }
 }
