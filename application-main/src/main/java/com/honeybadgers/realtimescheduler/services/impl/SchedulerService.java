@@ -20,9 +20,8 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import static com.honeybadgers.models.model.ModeEnum.Sequential;
-
 import static com.honeybadgers.models.model.Constants.*;
+import static com.honeybadgers.models.model.ModeEnum.Sequential;
 
 @Service
 public class SchedulerService implements ISchedulerService {
@@ -32,6 +31,8 @@ public class SchedulerService implements ISchedulerService {
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
+    @Autowired
+    SchedulerService _self;
     @Autowired
     TaskRepository taskRepository;
 
@@ -55,7 +56,7 @@ public class SchedulerService implements ISchedulerService {
 
         for (String groupId : groupsOfTask) {
             Group currentGroup = groupService.getGroupById(groupId);
-            if(currentGroup == null || currentGroup.getParallelismDegree() == null)
+            if (currentGroup == null || currentGroup.getParallelismDegree() == null)
                 continue;
 
             minLimit = Math.min(minLimit, currentGroup.getParallelismDegree());
@@ -90,11 +91,10 @@ public class SchedulerService implements ISchedulerService {
         return lock != null;
     }
 
-    // TODO Transaction
     @Override
     public void scheduleTask(String taskId) {
         // Received special trigger from feedback -> sendTasks has to start immediately
-        if(taskId.equals(scheduler_trigger)) {
+        if (taskId.equals(scheduler_trigger)) {
             sendTaskstoDispatcher(taskRepository.findAllScheduledTasksSorted());
             return;
         }
@@ -121,52 +121,49 @@ public class SchedulerService implements ISchedulerService {
     // TODO Transaction
     // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
     public void sendTaskstoDispatcher(List<Task> tasks) {
-        try {
-           for (Task currentTask:tasks) {
-               if (isTaskLocked(currentTask.getId())) {
-                   logger.info("Task " + currentTask.getId() + " is currently paused!");
-                   continue;
-               }
+        for (Task currentTask : tasks) {
+            if (isTaskLocked(currentTask.getId())) {
+                logger.info("Task " + currentTask.getId() + " is currently paused!");
+                continue;
+            }
 
-               List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
+            List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
-               //logger.debug("Task " + currentTask.getId() + " checking on group paused.");
-               if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
-                   continue;
+            //logger.debug("Task " + currentTask.getId() + " checking on group paused.");
+            if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
+                continue;
 
-               //logger.debug("Task " + currentTask.getId() + " checking on activeTimes, workingDays and seqNo.");
-               if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
-                   continue;
+            //logger.debug("Task " + currentTask.getId() + " checking on activeTimes, workingDays and seqNo.");
+            if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
+                continue;
 
-               // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
-               Group parentGroup = currentTask.getGroup();
+            // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
+            Group parentGroup = currentTask.getGroup();
 
-               //logger.debug("Task " + currentTask.getId() + " checking on parallelismDegree.");
-               int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
-               // TODO bug
-               if (parentGroup.getCurrentParallelismDegree() >= limit) {
-                   logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
-                   continue;
-               }
-               // update which equals parentGroup.setCurrentParallelismDegree(parentGroup.getCurrentParallelismDegree() + 1); groupRepository.save(parentGroup);
-               currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
+            //logger.debug("Task " + currentTask.getId() + " checking on parallelismDegree.");
+            int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
+            // TODO bug
+            if (parentGroup.getCurrentParallelismDegree() >= limit) {
+                logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
+                continue;
+            }
+            // update which equals parentGroup.setCurrentParallelismDegree(parentGroup.getCurrentParallelismDegree() + 1); groupRepository.save(parentGroup);
+            currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
-               //logger.debug("Task " + currentTask.getId() + " sent.");
-               sender.sendTaskToDispatcher(currentTask.getId());
+            //logger.debug("Task " + currentTask.getId() + " sent.");
+            sender.sendTaskToDispatcher(currentTask.getId());
 
-               currentTask.setStatus(TaskStatusEnum.Dispatched);
-               taskRepository.save(currentTask);
-               logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
-           }
-        } catch (IndexOutOfBoundsException e) {
-            logger.error(e.getMessage());
+            currentTask.setStatus(TaskStatusEnum.Dispatched);
+            taskRepository.save(currentTask);
+            logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
         }
+
     }
 
     public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask, String taskid) {
         for (String groupId : groupsOfTask) {
             // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
-            if(isGroupLocked(groupId)) {
+            if (isGroupLocked(groupId)) {
                 logger.info("Task " + taskid + " is paused by Group " + groupId);
                 return true;
             }
@@ -180,7 +177,7 @@ public class SchedulerService implements ISchedulerService {
             Group parentgroup = task.getGroup();
             logger.debug("parentgroup lastindexnumber " + parentgroup.getLastIndexNumber());
 
-            if (task.getIndexNumber() == parentgroup.getLastIndexNumber()+1)
+            if (task.getIndexNumber() == parentgroup.getLastIndexNumber() + 1)
                 return false;
             else {
                 logger.info("Task " + task.getId() + " is not sent due to Sequential");
@@ -207,10 +204,10 @@ public class SchedulerService implements ISchedulerService {
     public int[] getActualWorkingDaysForTask(Task task) {
         int[] workingDays = task.getWorkingDays();
 
-        if(workingDays != null)
+        if (workingDays != null)
             return workingDays;
 
-        if(task.getGroup() == null)
+        if (task.getGroup() == null)
             throw new RuntimeException("parentgroup from " + task.getId() + " is null");
 
         Group parentGroup = groupService.getGroupById(task.getGroup().getId());
@@ -219,13 +216,13 @@ public class SchedulerService implements ISchedulerService {
             if (parentGroup.getWorkingDays() != null)
                 return parentGroup.getWorkingDays();
 
-            if(parentGroup.getParentGroup() == null)
+            if (parentGroup.getParentGroup() == null)
                 break;
 
             parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());
         }
 
-        return new int[]{1,1,1,1,1,1,1};
+        return new int[]{1, 1, 1, 1, 1, 1, 1};
     }
 
     public boolean checkIfTaskIsInActiveTime(Task task) {
@@ -251,7 +248,7 @@ public class SchedulerService implements ISchedulerService {
                     return true;
                 }
             }
-        } catch(ParseException pe) {
+        } catch (ParseException pe) {
             logger.error(pe.getMessage());
         }
         logger.info("Task " + task.getId() + " is not sent due to ActiveTimes");
@@ -260,10 +257,10 @@ public class SchedulerService implements ISchedulerService {
 
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
-        if(activeTimes != null)
+        if (activeTimes != null)
             return activeTimes;
 
-        if(task.getGroup() == null)
+        if (task.getGroup() == null)
             throw new RuntimeException("parentgroup from " + task.getId() + " is null");
 
         Group parentGroup = groupService.getGroupById(task.getGroup().getId());
@@ -272,7 +269,7 @@ public class SchedulerService implements ISchedulerService {
             if (parentGroup.getActiveTimeFrames() != null)
                 return parentGroup.getActiveTimeFrames();
 
-            if(parentGroup.getParentGroup() == null)
+            if (parentGroup.getParentGroup() == null)
                 break;
 
             parentGroup = groupService.getGroupById(parentGroup.getParentGroup().getId());

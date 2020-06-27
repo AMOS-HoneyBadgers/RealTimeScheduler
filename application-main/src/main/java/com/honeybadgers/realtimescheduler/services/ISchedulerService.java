@@ -1,6 +1,8 @@
 package com.honeybadgers.realtimescheduler.services;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -13,5 +15,6 @@ public interface ISchedulerService {
 
     boolean isSchedulerLocked();
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     void scheduleTask(String taskId);
 }
