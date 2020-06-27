@@ -69,7 +69,7 @@ public class DefaultApiController implements DefaultApi {
 
         try {
             taskService.createTask(taskModel);
-            logger.info("Task " + taskModel.getId() + " recived.");
+            logger.info("Task " + taskModel.getId() + " received.");
             if (taskModel.getForce() != null && taskModel.getForce()) {
                 taskService.sendTaskToPriorityQueue(taskModel);
                 logger.info("Task " + taskModel.getId() + " was immediately dispatched");
