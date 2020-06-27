@@ -175,7 +175,7 @@
         <module>application-main-integrationtests</module>
         <module>task-consumer</module>
         <module>application-clienttests</module>
-        <module>application-postgreommunication</module>
+        <module>application-postgrecommunication</module>
     </modules>
 
     <build>
