@@ -88,6 +88,11 @@ public class Task {
     @Column(name = "total_priority")
     private Long totalPriority;
 
+    @Type(type = "jsonb")
+    @Column(name = "history", columnDefinition = "jsonb")
+    @Basic(fetch = FetchType.LAZY)
+    private List<History> history;
+
 
     @PrePersist
     void checkModeParameters() {
@@ -116,6 +121,7 @@ public class Task {
                 ", indexNumber=" + indexNumber +
                 ", metaData=" + metaData +
                 ", totalPriority=" + totalPriority +
+                ", history=" + history +
                 '}';
     }
 }
