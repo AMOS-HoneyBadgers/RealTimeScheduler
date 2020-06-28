@@ -1,9 +1,6 @@
 package com.honeybadgers.cleaner.services;
 
-
-import com.honeybadgers.cleaner.repository.LockRedisRepository;
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.RedisLock;
 import com.honeybadgers.models.model.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.junit.Before;
@@ -35,8 +32,6 @@ public class ScheduledServicesTest {
     @MockBean
     ICommunication sender;
 
-    ArrayList<RedisLock> list;
-    RedisLock paraLock;
     ArrayList<Paused> list;
 
 

@@ -1,20 +1,20 @@
 package com.honeybadgers.cleaner.services;
 
-import com.honeybadgers.cleaner.repository.LockRedisRepository;
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.RedisLock;
+import com.honeybadgers.models.model.Paused;
+import com.honeybadgers.postgre.repository.PausedRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Arrays;
-import java.util.Collection;
+import java.util.List;
 
-import static com.honeybadgers.models.model.Constants.LOCK_GROUP_PREFIX_RUNNING_TASKS;
 
 @Component
 public class ScheduledServices {
