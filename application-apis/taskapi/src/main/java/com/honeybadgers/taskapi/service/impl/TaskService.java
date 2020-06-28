@@ -13,6 +13,7 @@ import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import org.springframework.stereotype.Service;
@@ -35,6 +36,9 @@ public class TaskService implements ITaskService {
     ICommunication sender;
     @Autowired
     ITaskConvertUtils converter;
+
+    @Value("${scheduler.trigger}")
+    String scheduler_trigger;
 
     static final Logger logger = LogManager.getLogger(TaskService.class);
 
@@ -82,8 +86,14 @@ public class TaskService implements ITaskService {
         restModel.setId(taskId);
         Task updatedTask = converter.taskRestToJpa(restModel);
 
+        if(updatedTask.getStatus() != TaskStatusEnum.Scheduled && updatedTask.getStatus() != TaskStatusEnum.Waiting)
+            throw new IllegalStateException("Task: " + updatedTask.getId() + " already dispatched");
+
+        updatedTask.setStatus(TaskStatusEnum.Waiting);
+
         try {
             taskRepository.save(updatedTask);
+            sender.sendTaskToTasksQueue(updatedTask.getId());
         } catch (DataIntegrityViolationException e) {
             logger.error("DataIntegrityViolation on save new task!");
             logger.error(e.getStackTrace());

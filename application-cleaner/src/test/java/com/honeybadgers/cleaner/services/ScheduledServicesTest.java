@@ -1,6 +1,6 @@
 package com.honeybadgers.cleaner.services;
 
-
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.junit.Before;
@@ -28,6 +28,9 @@ public class ScheduledServicesTest {
 
     @MockBean
     PausedRepository pausedRepository;
+
+    @MockBean
+    ICommunication sender;
 
     ArrayList<Paused> list;
 
@@ -66,7 +69,7 @@ public class ScheduledServicesTest {
 
         verify(pausedRepository).findAll();
         verify(pausedRepository, times(1)).deleteById(list.get(1).getId());
-
+        verify(sender, atMostOnce()).sendTaskToDispatcher(any());
         Paused lockNew = new Paused();
         lockNew.setResumeDate(Timestamp.from(Instant.now().minusSeconds(60)));
         lockNew.setId("new");

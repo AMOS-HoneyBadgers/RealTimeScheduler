@@ -1,10 +1,12 @@
 package com.honeybadgers.cleaner.services;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -22,10 +24,17 @@ public class ScheduledServices {
     @Autowired
     PausedRepository pausedRepository;
 
+    @Autowired
+    ICommunication sender;
+
+    @Value("${scheduler.trigger}")
+    String scheduler_trigger;
+
     @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
         // TODO: for optimisation write custom query which gets all where resume_date != null
         try {
+            boolean found = false;
             logger.info("Starting paused cleanup!");
             List<Paused> paused = pausedRepository.findAll();
             logger.info("Checking " + paused.size() + " locks on resume_date");
@@ -39,9 +48,13 @@ public class ScheduledServices {
                 if(pause.getResumeDate().before(now)) {
                     logger.info("Deleting lock with id " + pause.getId());
                     pausedRepository.deleteById(pause.getId());
+                    found = true;
                 }
             }
             logger.info("Finished paused cleanup!");
+            if(found)
+                sender.sendTaskToTasksQueue(scheduler_trigger);
+
         } catch (Exception e) {
             logger.error("Caught exception in cleanPausedLocks:");
             logger.error(Arrays.deepToString(e.getStackTrace()));

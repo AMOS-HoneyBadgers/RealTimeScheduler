@@ -98,6 +98,7 @@ public class SchedulerService implements ISchedulerService {
             sendTaskstoDispatcher(taskRepository.findAllScheduledTasksSorted());
             return;
         }
+        //Todo maybe get list of all waiting tasks and schedule them at once (optimization)
 
         Task task = taskService.getTaskById(taskId).orElse(null);
         if (task == null)
@@ -110,7 +111,6 @@ public class SchedulerService implements ISchedulerService {
         taskRepository.save(task);
 
         List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
-        //logger.debug("Task " + currentTask.getId() + " found " + tasks.size() + " tasks to be sent to dispatcher.");
 
         if (!isSchedulerLocked()) {
             sendTaskstoDispatcher(tasks);
@@ -119,7 +119,6 @@ public class SchedulerService implements ISchedulerService {
     }
 
     // TODO Transaction
-    // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
     public void sendTaskstoDispatcher(List<Task> tasks) {
         for (Task currentTask : tasks) {
             if (isTaskLocked(currentTask.getId())) {
@@ -142,7 +141,7 @@ public class SchedulerService implements ISchedulerService {
 
             //logger.debug("Task " + currentTask.getId() + " checking on parallelismDegree.");
             int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
-            // TODO bug
+            // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
             if (parentGroup.getCurrentParallelismDegree() >= limit) {
                 logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
                 continue;

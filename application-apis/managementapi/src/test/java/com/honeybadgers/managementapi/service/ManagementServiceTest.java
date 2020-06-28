@@ -1,6 +1,7 @@
 package com.honeybadgers.managementapi.service;
 
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
 import com.honeybadgers.models.model.Paused;
@@ -19,6 +20,9 @@ import java.util.UUID;
 import static com.honeybadgers.models.model.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atMostOnce;
+import static org.mockito.Mockito.verify;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,6 +35,8 @@ public class ManagementServiceTest {
     @Autowired
     ManagementService service;
 
+    @MockBean
+    ICommunication sender;
 
     @Test
     public void testPauseScheduler() {
@@ -50,6 +56,7 @@ public class ManagementServiceTest {
     public void testResumeScheduler() {
         service.resumeScheduler();
         Mockito.verify(pausedRepository, Mockito.only()).deleteById(LOCK_SCHEDULER_ALIAS);
+        verify(sender, atMostOnce()).sendTaskToDispatcher(any());
     }
 
     @Test

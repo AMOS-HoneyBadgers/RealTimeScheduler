@@ -14,6 +14,7 @@ import com.honeybadgers.postgre.repository.TaskRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,6 +35,9 @@ public class GroupService implements IGroupService {
     ICommunication sender;
     @Autowired
     IGroupConvertUtils convertUtils;
+
+    @Value("${scheduler.trigger}")
+    String scheduler_trigger;
 
     static final Logger logger = LogManager.getLogger(GroupService.class);
 
@@ -93,6 +97,7 @@ public class GroupService implements IGroupService {
 
         try {
             groupRepository.save(targetGroup);
+            sender.sendTaskToTasksQueue(scheduler_trigger);
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage() != null) {
                 logger.error("DataIntegrityViolation while trying to add new Group: \n" + e.getMessage());
