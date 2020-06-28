@@ -15,7 +15,7 @@ public interface ITaskService {
 
     List<String> getRecursiveGroupsOfTask(String taskId);
 
-    void uploadTask(Task task);
+    void finishTask(Task task);
 
     void deleteTask(String id);
 

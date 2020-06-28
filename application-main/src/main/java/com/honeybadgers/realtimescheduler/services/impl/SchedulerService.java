@@ -93,7 +93,6 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask() {
-        //Todo maybe get list of all waiting tasks and schedule them at once (optimization)
         List<Task> waitingTasks = taskRepository.findAllWaitingTasks();
         for (Task task : waitingTasks ) {
             task.setTotalPriority(taskService.calculatePriority(task));
@@ -123,25 +122,21 @@ public class SchedulerService implements ISchedulerService {
 
             List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
-            //logger.debug("Task " + currentTask.getId() + " checking on group paused.");
             if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
                 continue;
 
-            //logger.debug("Task " + currentTask.getId() + " checking on activeTimes, workingDays and seqNo.");
             if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
                 continue;
 
             // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
             Group parentGroup = currentTask.getGroup();
 
-            //logger.debug("Task " + currentTask.getId() + " checking on parallelismDegree.");
             int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
             // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
             if (parentGroup.getCurrentParallelismDegree() >= limit) {
                 logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
                 continue;
             }
-            // update which equals parentGroup.setCurrentParallelismDegree(parentGroup.getCurrentParallelismDegree() + 1); groupRepository.save(parentGroup);
             currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
             //logger.debug("Task " + currentTask.getId() + " sent.");

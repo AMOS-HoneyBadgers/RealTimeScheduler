@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.TaskStatusEnum;
 import com.honeybadgers.models.model.TypeFlagEnum;
 import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
@@ -84,7 +85,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void uploadTask(Task task) {
+    public void finishTask(Task task) {
+        task.setStatus(TaskStatusEnum.Finished);
         taskRepository.save(task);
     }
 

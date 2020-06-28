@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.GroupAncestorModel;
+import com.honeybadgers.models.model.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 
@@ -51,8 +52,10 @@ public class TaskServiceTest {
     @Test
     public void testUploadTask() {
         TaskService spy = spy(service);
-        spy.uploadTask(any());
-        verify(taskPostgresRepository).save(Mockito.any());
+        Task t = new Task();
+        spy.finishTask(t);
+        t.setStatus(TaskStatusEnum.Finished);
+        verify(taskPostgresRepository).save(t);
     }
 
     @Test
