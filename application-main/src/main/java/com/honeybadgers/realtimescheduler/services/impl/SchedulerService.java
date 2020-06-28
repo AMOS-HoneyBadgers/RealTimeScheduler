@@ -138,7 +138,7 @@ public class SchedulerService implements ISchedulerService {
                Group parentGroup = currentTask.getGroup();
 
                int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
-               // TODO bug
+               // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
                if (parentGroup.getCurrentParallelismDegree() >= limit) {
                    logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
                    continue;
