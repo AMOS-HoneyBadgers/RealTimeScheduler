@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -126,6 +128,13 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         // map List<TaskModelMeta> to Map<String, String>
         if (restModel.getMeta() != null)
             newTask.setMetaData(restModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
+
+        History history = new History();
+        history.setStatus(TaskStatusEnum.Waiting.toString());
+        history.setTimestamp(Timestamp.from(Instant.now()));
+        List<History> histories = new ArrayList<>();
+        histories.add(history);
+        newTask.setHistory(histories);
 
         return newTask;
     }
