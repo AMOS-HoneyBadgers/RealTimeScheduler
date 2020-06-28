@@ -53,8 +53,8 @@ public class FeedbackConsumer {
             checkAndSetSequentialAndIndexNumber(currentTask);
 
         currentTask.setStatus(TaskStatusEnum.Finished);
+        service.updateTaskhistory(currentTask, TaskStatusEnum.Finished);
         service.uploadTask(currentTask);
-
         sender.sendTaskToTasksQueue(scheduler_trigger);
     }
 

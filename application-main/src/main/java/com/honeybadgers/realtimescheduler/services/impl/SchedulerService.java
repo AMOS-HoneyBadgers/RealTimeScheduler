@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -108,6 +110,7 @@ public class SchedulerService implements ISchedulerService {
         logger.info("Task " + taskId + " calculated total priority: " + task.getTotalPriority());
 
         task.setStatus(TaskStatusEnum.Scheduled);
+        taskService.updateTaskhistory(task, TaskStatusEnum.Scheduled);
         taskRepository.save(task);
 
         List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
@@ -117,6 +120,7 @@ public class SchedulerService implements ISchedulerService {
         } else
             logger.info("Scheduler is locked!");
     }
+
 
     // TODO Transaction
     public void sendTaskstoDispatcher(List<Task> tasks) {
@@ -149,6 +153,7 @@ public class SchedulerService implements ISchedulerService {
                sender.sendTaskToDispatcher(currentTask.getId());
 
                currentTask.setStatus(TaskStatusEnum.Dispatched);
+               taskService.updateTaskhistory(currentTask, TaskStatusEnum.Dispatched);
                taskRepository.save(currentTask);
 
                logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
