@@ -93,7 +93,7 @@ public class TaskService implements ITaskService {
 
         try {
             taskRepository.save(updatedTask);
-            sender.sendTaskToDispatcher(scheduler_trigger);
+            sender.sendTaskToTasksQueue(updatedTask.getId());
         } catch (DataIntegrityViolationException e) {
             logger.error("DataIntegrityViolation on save new task!");
             logger.error(e.getStackTrace());

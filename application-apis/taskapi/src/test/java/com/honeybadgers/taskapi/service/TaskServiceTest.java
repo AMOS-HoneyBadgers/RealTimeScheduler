@@ -114,19 +114,20 @@ public class TaskServiceTest {
         Task updatedTask = new Task();
         updatedTask.setId(taskId.toString());
         updatedTask.setPriority(5);
+        updatedTask.setStatus(TaskStatusEnum.Scheduled);
 
         when(taskRepository.findById(any())).thenReturn(Optional.of(updatedTask));
         when(converter.taskRestToJpa(restModel)).thenReturn(updatedTask);
 
         Task t = taskService.updateTask(taskId, restModel);
 
-        verify(communication,Mockito.only()).sendTaskToDispatcher(Mockito.any());
+        verify(communication,Mockito.only()).sendTaskToTasksQueue(Mockito.any());
         assertNotNull(t);
         assertEquals(updatedTask.getPriority(),t.getPriority());
     }
 
     @Test
-    public void testUpdateTask_Exeption() throws UnknownEnumException, JpaException, CreationException {
+    public void testUpdateTask_NoSuchElementException() throws UnknownEnumException, JpaException, CreationException {
         UUID taskId =  UUID.randomUUID();
 
         TaskModel restModel = new TaskModel();
@@ -136,6 +137,44 @@ public class TaskServiceTest {
         when(taskRepository.findById(taskId.toString())).thenThrow(NoSuchElementException.class);
 
         assertThrows(NoSuchElementException.class, () -> taskService.updateTask(taskId, restModel));
+    }
+
+    @Test
+    public void testUpdateTask_StatusExceptionAlreayDispatched() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId =  UUID.randomUUID();
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+        restModel.setPriority(100);
+
+        Task updatedTask = new Task();
+        updatedTask.setId(taskId.toString());
+        updatedTask.setPriority(5);
+        updatedTask.setStatus(TaskStatusEnum.Dispatched);
+
+        when(taskRepository.findById(any())).thenReturn(Optional.of(updatedTask));
+        when(converter.taskRestToJpa(restModel)).thenReturn(updatedTask);
+
+        assertThrows(IllegalStateException.class, () -> taskService.updateTask(taskId, restModel));
+    }
+
+    @Test
+    public void testUpdateTask_StatusExceptionAlreayFinished() throws UnknownEnumException, JpaException, CreationException {
+        UUID taskId =  UUID.randomUUID();
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+        restModel.setPriority(100);
+
+        Task updatedTask = new Task();
+        updatedTask.setId(taskId.toString());
+        updatedTask.setPriority(5);
+        updatedTask.setStatus(TaskStatusEnum.Finished);
+
+        when(taskRepository.findById(any())).thenReturn(Optional.of(updatedTask));
+        when(converter.taskRestToJpa(restModel)).thenReturn(updatedTask);
+
+        assertThrows(IllegalStateException.class, () -> taskService.updateTask(taskId, restModel));
     }
 
     @Test

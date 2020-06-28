@@ -98,6 +98,7 @@ public class SchedulerService implements ISchedulerService {
             sendTaskstoDispatcher(taskRepository.findAllScheduledTasksSorted());
             return;
         }
+        //Todo maybe get list of all waiting tasks and schedule them at once (optimization)
 
         Task task = taskService.getTaskById(taskId).orElse(null);
         if (task == null)
