@@ -128,19 +128,15 @@ public class SchedulerService implements ISchedulerService {
                }
 
                List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
-
-               //logger.debug("Task " + currentTask.getId() + " checking on group paused.");
                if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
                    continue;
 
-               //logger.debug("Task " + currentTask.getId() + " checking on activeTimes, workingDays and seqNo.");
                if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
                    continue;
 
                // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
                Group parentGroup = currentTask.getGroup();
 
-               //logger.debug("Task " + currentTask.getId() + " checking on parallelismDegree.");
                int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
                // TODO bug
                if (parentGroup.getCurrentParallelismDegree() >= limit) {

@@ -25,8 +25,6 @@ public interface ITaskService {
 
     TaskModel getTaskById(UUID taskid) throws NoSuchElementException;
 
-    void sendTaskToTaskEventQueue(String taskId);
-
     //TODO specify which type should be sent to the dispatcher
     void sendTaskToPriorityQueue(TaskModel task);
 }
