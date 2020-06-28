@@ -113,14 +113,16 @@ public class TaskServiceTest {
 
         Task updatedTask = new Task();
         updatedTask.setId(taskId.toString());
-        updatedTask.setPriority(100);
+        updatedTask.setPriority(5);
 
         when(taskRepository.findById(any())).thenReturn(Optional.of(updatedTask));
         when(converter.taskRestToJpa(restModel)).thenReturn(updatedTask);
 
         Task t = taskService.updateTask(taskId, restModel);
 
+        verify(communication,Mockito.only()).sendTaskToDispatcher(Mockito.any());
         assertNotNull(t);
+        assertEquals(updatedTask.getPriority(),t.getPriority());
     }
 
     @Test

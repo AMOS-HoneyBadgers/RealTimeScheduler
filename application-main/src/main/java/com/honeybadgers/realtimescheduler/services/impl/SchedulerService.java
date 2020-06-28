@@ -110,7 +110,6 @@ public class SchedulerService implements ISchedulerService {
         taskRepository.save(task);
 
         List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
-        //logger.debug("Task " + currentTask.getId() + " found " + tasks.size() + " tasks to be sent to dispatcher.");
 
         if (!isSchedulerLocked()) {
             sendTaskstoDispatcher(tasks);
@@ -119,7 +118,6 @@ public class SchedulerService implements ISchedulerService {
     }
 
     // TODO Transaction
-    // TODO CHECK IF TASK WAS SENT TO DISPATCHER ALREADY
     public void sendTaskstoDispatcher(List<Task> tasks) {
         try {
            for (Task currentTask:tasks) {
@@ -151,11 +149,11 @@ public class SchedulerService implements ISchedulerService {
                // update which equals parentGroup.setCurrentParallelismDegree(parentGroup.getCurrentParallelismDegree() + 1); groupRepository.save(parentGroup);
                currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
-               //logger.debug("Task " + currentTask.getId() + " sent.");
                sender.sendTaskToDispatcher(currentTask.getId());
 
                currentTask.setStatus(TaskStatusEnum.Dispatched);
                taskRepository.save(currentTask);
+
                logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
            }
         } catch (IndexOutOfBoundsException e) {

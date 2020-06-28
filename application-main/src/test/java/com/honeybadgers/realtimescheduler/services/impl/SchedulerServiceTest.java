@@ -255,7 +255,6 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setId("testGroup");
 
-
         Task task1 = createTaskTestObject(group,"5");
         List<Task> tasks = new ArrayList<Task>();
         tasks.add(task1);

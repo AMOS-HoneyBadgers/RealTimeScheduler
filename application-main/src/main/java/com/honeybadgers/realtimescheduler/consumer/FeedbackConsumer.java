@@ -4,6 +4,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.ModeEnum;
+import com.honeybadgers.models.model.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.apache.logging.log4j.LogManager;
@@ -34,6 +35,7 @@ public class FeedbackConsumer {
     @Autowired
     TaskService service;
 
+
     // TODO Transaction
     // TODO HANDLE NEGATIVE FEEDBACK
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
@@ -49,6 +51,9 @@ public class FeedbackConsumer {
 
         if(currentTask.getModeEnum()== ModeEnum.Sequential)
             checkAndSetSequentialAndIndexNumber(currentTask);
+
+        currentTask.setStatus(TaskStatusEnum.Finished);
+        service.uploadTask(currentTask);
 
         sender.sendTaskToTasksQueue(scheduler_trigger);
     }
