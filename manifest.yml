@@ -75,3 +75,5 @@ applications:
     services:
       - task_storage
       - postgres_credentials
+      - rabbit_credentials
+      - rabbit

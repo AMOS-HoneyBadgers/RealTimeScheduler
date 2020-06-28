@@ -2,6 +2,7 @@ package com.honeybadgers.clienttests.transactions;
 
 import com.honeybadgers.clienttests.models.ResponseModel;
 import com.honeybadgers.clienttests.models.TaskModel;
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -28,9 +29,12 @@ public class TransactionsService {
     @Autowired
     TaskRepository taskRepository;
 
+    @Autowired
+    ICommunication communication;
+
     public void triggerScheduleWithTwoTransactions() {
-        CompletableFuture<String> async1 = asyncSendRequests();
-        CompletableFuture<String> async2 = asyncSendRequests();
+        CompletableFuture<String> async1 = asyncCreateTaskRequest();
+        CompletableFuture<String> async2 = asyncCreateTaskRequest();
         CompletableFuture.allOf(async1, async2).whenComplete((aVoid, throwable) -> {
             if (throwable != null)
                 log.info(throwable.getMessage());
@@ -61,11 +65,11 @@ public class TransactionsService {
         if (task2.getStatus() == TaskStatusEnum.Dispatched)
             if (task1.getStatus() != TaskStatusEnum.Waiting)
                 throw new RuntimeException("task1 " + taskid1 + " status should be Waiting but isn't. \n Check Transaction!");
-        log.info("DB check for task1 "+taskid1+" and task2 "+taskid2+" successfull");
+        log.info("DB check for task1 " + taskid1 + " and task2 " + taskid2 + " successfull");
     }
 
     @Async
-    public CompletableFuture<String> asyncSendRequests() {
+    public CompletableFuture<String> asyncCreateTaskRequest() {
         restTemplate = new RestTemplate();
         String url = "https://taskapi-amos.cfapps.io/api/task/";
 
@@ -90,5 +94,75 @@ public class TransactionsService {
         return CompletableFuture.completedFuture(taskModel.getId().toString());
 
 
+    }
+
+    public void triggerSendFeedbackAndUpdateTaskWithTwoTransactions(String taskid) {
+        CompletableFuture<String> async1 = asyncSendFeedback(taskid);
+        CompletableFuture<String> async2 = asyncUpdateTaskRequest(taskid);
+        CompletableFuture.allOf(async1, async2).whenComplete((aVoid, throwable) -> {
+            if (throwable != null)
+                log.info(throwable.getMessage());
+            else {
+                try {
+                    checkDatabaseForFinishedStatus(taskid);
+                } catch (InterruptedException e) {
+                    log.error(e.getMessage());
+                }
+            }
+        });
+    }
+
+    /**
+     * Check several times if the corresponding task has the status finished after a defined time period.
+     * We expect the task to be updated at least after 4 time periods.
+     * The reason for the check is the conflicting update + sendFeedbackToScheduler Operation.
+     *
+     * @param taskid for task to be checked
+     */
+    private void checkDatabaseForFinishedStatus(String taskid) throws InterruptedException {
+        for (int i = 0; i < 4; i++) {
+            Task expected = taskRepository.findById(taskid).orElse(null);
+            if (expected == null)
+                throw new RuntimeException("Task " + taskid + " not found");
+            if (expected.getStatus() == TaskStatusEnum.Finished) {
+                log.info("task " + taskid + " status was set successfully to finished ");
+                return;
+            }
+            Thread.sleep(1000);
+        }
+        throw new RuntimeException("Task " + taskid + " didn't reach the status finished after about 4 seconds as expected");
+    }
+
+    @Async
+    public CompletableFuture<String> asyncSendFeedback(String taskid) {
+        communication.sendFeedbackToScheduler(taskid);
+        return CompletableFuture.completedFuture(taskid);
+    }
+
+    @Async
+    public CompletableFuture<String> asyncUpdateTaskRequest(String taskid) {
+        restTemplate = new RestTemplate();
+
+        // create a post object
+        TaskModel taskModel = new TaskModel();
+        taskModel.setId(UUID.fromString(taskid));
+        taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
+        taskModel.setPriority(100);
+
+        String url = "https://taskapi-amos.cfapps.io/api/task/" + taskModel.getId().toString();
+
+        // create headers
+        HttpHeaders headers = new HttpHeaders();
+        // set `content-type` header
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        // set `accept` header
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        // build the request
+        HttpEntity<TaskModel> entity = new HttpEntity<>(taskModel, headers);
+
+        // send POST request
+        ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
+        return CompletableFuture.completedFuture(taskid);
     }
 }
