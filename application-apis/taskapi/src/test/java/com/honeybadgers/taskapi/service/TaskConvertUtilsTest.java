@@ -214,6 +214,7 @@ public class TaskConvertUtilsTest {
         assertTrue(activeTimes.get(0).getFrom() == jpaModel.getActiveTimeFrames().get(0).getFrom() &&
                 activeTimes.get(0).getTo() == jpaModel.getActiveTimeFrames().get(0).getTo());
         assertEquals(metaData.getValue(), jpaModel.getMetaData().get(metaData.getKey()));
+        assertEquals(TaskStatusEnum.Waiting.toString(), jpaModel.getHistory().get(0).getStatus());
     }
 
     @Test
