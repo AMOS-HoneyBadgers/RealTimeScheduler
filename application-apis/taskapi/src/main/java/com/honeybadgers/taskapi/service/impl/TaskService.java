@@ -122,6 +122,12 @@ public class TaskService implements ITaskService {
         return converter.taskJpaToRest(task);
     }
 
+
+    @Override
+    public void sendTaskToTaskEventQueue(String taskId) {
+        sender.sendTaskToTasksQueue(taskId);
+    }
+
     @Override
     public void sendTaskToPriorityQueue(TaskModel task) {
         TaskQueueModel taskQueueModel = new TaskQueueModel();

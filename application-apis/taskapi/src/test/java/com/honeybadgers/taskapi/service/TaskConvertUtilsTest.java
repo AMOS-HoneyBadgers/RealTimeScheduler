@@ -11,6 +11,7 @@ import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.service.impl.TaskConvertUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,8 +22,7 @@ import java.sql.Timestamp;
 import java.time.OffsetDateTime;
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
 
@@ -102,6 +102,56 @@ public class TaskConvertUtilsTest {
         assertTrue( activeTimes.get(0).getFrom() ==  restModel.getActiveTimes().get(0).getFrom() &&
                     activeTimes.get(0).getTo() == restModel.getActiveTimes().get(0).getTo());
     }
+
+    @Test
+    public void testTaskRestToJpaDoesNotHaveGroupThrowsException() throws UnknownEnumException, JpaException, CreationException {
+
+        Group group = new Group();
+        String groupId = "TestGroup";
+        group.setId(groupId);
+
+        UUID taskId = UUID.randomUUID();
+        Integer priority = 100;
+        Integer indexNumber = 1;
+        boolean force = false;
+        List<Boolean> workdays = new ArrayList<>();
+        OffsetDateTime deadline = OffsetDateTime.now();
+        TaskModel.ModeEnum mode= TaskModel.ModeEnum.PARALLEL;
+        TaskModel.TypeFlagEnum type = TaskModel.TypeFlagEnum.BATCH;
+        workdays.addAll(Arrays.asList(true, false, true, false, true, false, true));
+
+
+        List<TaskModelActiveTimes> activeTimes = new ArrayList<>();
+        TaskModelActiveTimes timeFrame = new TaskModelActiveTimes();
+        Time from = new Time(9,0,0);
+        Time to = new Time(12,0,0);
+        timeFrame.setFrom(from);
+        timeFrame.setTo(to);
+        activeTimes.add(timeFrame);
+
+        List<TaskModelMeta> meta = new ArrayList<>();
+        TaskModelMeta metaData = new TaskModelMeta();
+        metaData.setKey("key");
+        metaData.setValue("value");
+        meta.add(metaData);
+
+        TaskModel exampleTaskModel = new TaskModel();
+        exampleTaskModel.setId(taskId);
+        exampleTaskModel.setGroupId(groupId);
+        exampleTaskModel.setPriority(priority);
+        exampleTaskModel.setIndexNumber(indexNumber);
+        exampleTaskModel.setForce(force);
+        exampleTaskModel.setMode(mode);
+        exampleTaskModel.setTypeFlag(type);
+        exampleTaskModel.setWorkingDays(workdays);
+        exampleTaskModel.setDeadline(deadline);
+        exampleTaskModel.setActiveTimes(activeTimes);
+        exampleTaskModel.setMeta(meta);
+        when(grouprepository.findById(Mockito.any())).thenReturn(Optional.empty());
+
+        assertThrows(JpaException.class, () -> converter.taskRestToJpa(exampleTaskModel));
+    }
+
 
 
     @Test
@@ -195,5 +245,17 @@ public class TaskConvertUtilsTest {
 
         assertEquals(3, res.size());
         assertEquals("value1", res.get(0).getValue());
+    }
+
+    @Test
+    public void testMetaDataJpaToRestDataIsNull(){
+        List<TaskModelMeta> res = converter.metaDataJpaToRest(null);
+        assertNull(res);
+    }
+
+    @Test
+    public void testActiveTimesJpaToRestActivesTimesIsNull(){
+        List<TaskModelActiveTimes> res = converter.activeTimesJpaToRest(null);
+        assertNull(res);
     }
 }

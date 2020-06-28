@@ -60,6 +60,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
         if(restModel.getGroupId() == null)
             restModel.setGroupId(DEFAULT_GROUP_ID);
+
         Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
         // foreign key is declared as NOT NULL -> throw JpaException now because it will be thrown on save(newTask) anyway
         if (group == null)
