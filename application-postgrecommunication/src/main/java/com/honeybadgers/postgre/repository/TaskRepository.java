@@ -32,4 +32,7 @@ public interface TaskRepository extends JpaRepository<Task, String> {
 
     @Query(value = "SELECT * FROM task WHERE status='Scheduled' ORDER BY total_priority DESC", nativeQuery = true)
     List<Task> findAllScheduledTasksSorted();
+
+    @Query(value = "SELECT * FROM task WHERE status='Waiting'", nativeQuery = true)
+    List<Task> findAllWaitingTasks();
 }

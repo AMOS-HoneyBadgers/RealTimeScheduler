@@ -11,9 +11,8 @@ public class TransactionsController {
 
 
     @GetMapping("/triggerScheduleWithTwoTransactions")
-    public ResponseEntity<?> createPerformanceTest() {
+    public ResponseEntity<?> triggerScheduleWithTwoTransactions() {
         transactionsService.triggerScheduleWithTwoTransactions();
-
         return ResponseEntity.ok().build();
     }
 }

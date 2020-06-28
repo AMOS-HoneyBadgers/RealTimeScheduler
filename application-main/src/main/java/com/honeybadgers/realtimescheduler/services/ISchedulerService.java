@@ -16,5 +16,5 @@ public interface ISchedulerService {
     boolean isSchedulerLocked();
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    void scheduleTask(String taskId);
+    void scheduleTask();
 }

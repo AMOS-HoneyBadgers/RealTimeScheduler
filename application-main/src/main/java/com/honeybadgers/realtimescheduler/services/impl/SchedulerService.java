@@ -92,26 +92,16 @@ public class SchedulerService implements ISchedulerService {
     }
 
     @Override
-    public void scheduleTask(String taskId) {
-        // Received special trigger from feedback -> sendTasks has to start immediately
-        if (taskId.equals(scheduler_trigger)) {
-            sendTaskstoDispatcher(taskRepository.findAllScheduledTasksSorted());
-            return;
-        }
+    public void scheduleTask() {
         //Todo maybe get list of all waiting tasks and schedule them at once (optimization)
-
-        Task task = taskService.getTaskById(taskId).orElse(null);
-        if (task == null)
-            throw new RuntimeException("task could not be found in database with id: " + taskId);
-
-        task.setTotalPriority(taskService.calculatePriority(task));
-        logger.info("Task " + taskId + " calculated total priority: " + task.getTotalPriority());
-
-        task.setStatus(TaskStatusEnum.Scheduled);
-        taskRepository.save(task);
-
+        List<Task> waitingTasks = taskRepository.findAllWaitingTasks();
+        for (Task task : waitingTasks ) {
+            task.setTotalPriority(taskService.calculatePriority(task));
+            logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
+            task.setStatus(TaskStatusEnum.Scheduled);
+            taskRepository.save(task);
+        }
         List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
-
         if (!isSchedulerLocked()) {
             sendTaskstoDispatcher(tasks);
         } else
@@ -119,6 +109,11 @@ public class SchedulerService implements ISchedulerService {
     }
 
     // TODO Transaction
+
+    /**
+     * Tries to send each task in the given list to the dispatcher if the conditions for sending (of each individual task) are met.
+     * @param tasks List of tasks to be send to the dispatcher
+     */
     public void sendTaskstoDispatcher(List<Task> tasks) {
         for (Task currentTask : tasks) {
             if (isTaskLocked(currentTask.getId())) {
