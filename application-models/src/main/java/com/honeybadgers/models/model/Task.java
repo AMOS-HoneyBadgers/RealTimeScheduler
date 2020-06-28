@@ -14,6 +14,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -84,6 +85,9 @@ public class Task {
     @Basic(fetch = FetchType.LAZY)
     private Map<String, String> metaData;
 
+    @Column(name = "total_priority")
+    private Long totalPriority;
+
 
     @PrePersist
     void checkModeParameters() {
@@ -93,5 +97,25 @@ public class Task {
             // TODO decide if necc
             assert this.group.getParallelismDegree() != null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id='" + id + '\'' +
+                ", group=" + group +
+                ", priority=" + priority +
+                ", deadline=" + deadline +
+                ", activeTimeFrames=" + activeTimeFrames +
+                ", workingDays=" + Arrays.toString(workingDays) +
+                ", status=" + status +
+                ", typeFlagEnum=" + typeFlagEnum +
+                ", modeEnum=" + modeEnum +
+                ", retries=" + retries +
+                ", force=" + force +
+                ", indexNumber=" + indexNumber +
+                ", metaData=" + metaData +
+                ", totalPriority=" + totalPriority +
+                '}';
     }
 }

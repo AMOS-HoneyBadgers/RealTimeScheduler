@@ -53,10 +53,9 @@
             <artifactId>application-models</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
-
         <dependency>
             <groupId>com.honeybadgers</groupId>
-            <artifactId>application-rediscommunication</artifactId>
+            <artifactId>application-postgreommunication</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

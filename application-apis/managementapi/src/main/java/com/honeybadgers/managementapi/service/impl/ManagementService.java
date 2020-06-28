@@ -1,6 +1,5 @@
 package com.honeybadgers.managementapi.service.impl;
 
-import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.service.IManagementService;
 import com.honeybadgers.models.model.RedisLock;
@@ -8,7 +7,6 @@ import com.honeybadgers.redis.repository.LockRedisRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,7 +25,7 @@ public class ManagementService implements IManagementService {
     String scheduler_trigger;
 
     @Autowired
-    LockRedisRepository lockRedisRepository;
+    PausedRepository pausedRepository;
 
     @Autowired
     ICommunication sender;
@@ -37,65 +35,64 @@ public class ManagementService implements IManagementService {
     @Override
     @Transactional
     public void pauseScheduler(OffsetDateTime resumeDate) throws LockException{
-        RedisLock lockObj = lockRedisRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
+        Paused lockObj = pausedRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
 
         if(lockObj != null)
             throw new LockException("Already locked!");
 
-        RedisLock toSave = new RedisLock();
+        Paused toSave = new Paused();
         toSave.setId(LOCK_SCHEDULER_ALIAS);
         if(resumeDate != null)
-            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
-        lockRedisRepository.save(toSave);
+            toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
+        pausedRepository.save(toSave);
     }
 
     @Override
     public void resumeScheduler() {
-        lockRedisRepository.deleteById(LOCK_SCHEDULER_ALIAS);
-        sender.sendTaskToTasksQueue(scheduler_trigger);
+        pausedRepository.deleteById(LOCK_SCHEDULER_ALIAS);
     }
 
     @Override
     @Transactional
     public void pauseTask(UUID taskId, OffsetDateTime resumeDate) throws LockException{
         String id = LOCK_TASK_PREFIX + taskId.toString();
-        RedisLock lockId = lockRedisRepository.findById(id).orElse(null);
+        Paused lockId = pausedRepository.findById(id).orElse(null);
 
         if(lockId != null)
             throw new LockException("Already locked!");
 
-        RedisLock toSave = new RedisLock();
+        Paused toSave = new Paused();
         toSave.setId(id);
         if(resumeDate != null)
-            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
-        lockRedisRepository.save(toSave);
+            toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
+        pausedRepository.save(toSave);
     }
 
     @Override
     public void resumeTask(UUID taskId) {
         String id = LOCK_TASK_PREFIX + taskId.toString();
-        lockRedisRepository.deleteById(id);
+        pausedRepository.deleteById(id);
     }
 
     @Override
     @Transactional
     public void pauseGroup(String groupId, OffsetDateTime resumeDate) throws LockException{
         String id = LOCK_GROUP_PREFIX + groupId;
-        RedisLock lockId = lockRedisRepository.findById(id).orElse(null);
+        Paused lockId = pausedRepository.findById(id).orElse(null);
 
         if(lockId != null)
             throw new LockException("Already locked!");
 
-        RedisLock toSave = new RedisLock();
+        Paused toSave = new Paused();
         toSave.setId(id);
         if(resumeDate != null)
-            toSave.setResume_date(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC));
-        lockRedisRepository.save(toSave);
+            toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
+        pausedRepository.save(toSave);
     }
 
     @Override
     public void resumeGroup(String grouId) {
         String id = LOCK_GROUP_PREFIX + grouId;
-        lockRedisRepository.deleteById(id);
+        pausedRepository.deleteById(id);
     }
 }

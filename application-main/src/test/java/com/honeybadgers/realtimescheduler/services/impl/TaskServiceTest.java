@@ -3,9 +3,9 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.GroupAncestorModel;
-import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
-import com.honeybadgers.realtimescheduler.services.impl.TaskService;
+import com.honeybadgers.postgre.repository.GroupAncestorRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
+
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,7 +30,7 @@ import static org.mockito.Mockito.*;
 public class TaskServiceTest {
 
     @MockBean
-    private TaskPostgresRepository taskPostgresRepository;
+    private TaskRepository taskPostgresRepository;
 
     @MockBean
     GroupAncestorRepository groupAncestorRepository;

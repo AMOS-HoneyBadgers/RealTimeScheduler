@@ -3,8 +3,8 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.TypeFlagEnum;
 import com.honeybadgers.models.model.GroupAncestorModel;
-import com.honeybadgers.realtimescheduler.repository.GroupAncestorRepository;
-import com.honeybadgers.realtimescheduler.repository.TaskPostgresRepository;
+import com.honeybadgers.postgre.repository.GroupAncestorRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -22,7 +22,7 @@ public class TaskService implements ITaskService {
     static final Logger logger = LogManager.getLogger(TaskService.class);
 
     @Autowired
-    TaskPostgresRepository taskPostgresRepository;
+    TaskRepository taskRepository;
 
     @Autowired
     GroupAncestorRepository groupAncestorRepository;
@@ -42,12 +42,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public List<Task> getAllTasks() {
-        return taskPostgresRepository.findAll();
+        return taskRepository.findAll();
     }
 
     @Override
     public Optional<Task> getTaskById(String id) {
-        return taskPostgresRepository.findById(id);
+        return taskRepository.findById(id);
     }
 
     @Override
@@ -85,12 +85,12 @@ public class TaskService implements ITaskService {
 
     @Override
     public void uploadTask(Task task) {
-        taskPostgresRepository.save(task);
+        taskRepository.save(task);
     }
 
     @Override
     public void deleteTask(String id) {
-        this.taskPostgresRepository.deleteById(id);
+        this.taskRepository.deleteById(id);
     }
 
     @Override
