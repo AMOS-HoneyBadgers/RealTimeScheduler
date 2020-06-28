@@ -260,7 +260,7 @@
                         <exclude>com/honeybadgers/taskapi/models/**/*</exclude >
                         <exclude>com/honeybadgers/taskapi/OpenAPI2SpringBoot</exclude >
                         <exclude>com/honeybadgers/taskapi/RFC3339DateFormat</exclude >
-                        <exclude>com/honeybadgers/taskapi/OpenAPI2SpringBoot.ExitException</exclude>
+                        <exclude>com/honeybadgers/taskapi/OpenAPI2SpringBoot/**/*</exclude>
                         <exclude>com/honeybadgers/managementapi/**/*</exclude>
                         <exclude>com/honeybadgers/monitoringapi/**/*</exclude>
                     </excludes>
