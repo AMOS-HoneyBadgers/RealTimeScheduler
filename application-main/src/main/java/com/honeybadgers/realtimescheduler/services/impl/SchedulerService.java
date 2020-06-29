@@ -10,6 +10,7 @@ import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -93,18 +94,22 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask() {
-        List<Task> waitingTasks = taskRepository.findAllWaitingTasks();
-        for (Task task : waitingTasks ) {
-            task.setTotalPriority(taskService.calculatePriority(task));
-            logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
-            task.setStatus(TaskStatusEnum.Scheduled);
-            taskRepository.save(task);
+        try {
+            List<Task> waitingTasks = taskRepository.findAllWaitingTasks();
+            for (Task task : waitingTasks ) {
+                task.setTotalPriority(taskService.calculatePriority(task));
+                logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
+                task.setStatus(TaskStatusEnum.Scheduled);
+                taskRepository.save(task);
+            }
+            List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
+            if (!isSchedulerLocked()) {
+                sendTaskstoDispatcher(tasks);
+            } else
+                logger.info("Scheduler is locked!");
+        } catch (LockAcquisitionException e) {
+            logger.info("LockAcquisitionException caught -> will be tried again at some point");
         }
-        List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
-        if (!isSchedulerLocked()) {
-            sendTaskstoDispatcher(tasks);
-        } else
-            logger.info("Scheduler is locked!");
     }
 
     /**
