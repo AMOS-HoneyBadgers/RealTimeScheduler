@@ -34,9 +34,6 @@ public class SchedulerService implements ISchedulerService {
     String scheduler_trigger;
 
     @Autowired
-    SchedulerService _self;
-
-    @Autowired
     TaskRepository taskRepository;
 
     @Autowired
@@ -105,8 +102,7 @@ public class SchedulerService implements ISchedulerService {
         }
         List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
         if (!isSchedulerLocked()) {
-            // _self just in case to make sure, that spring finds the transactional annotation
-            _self.sendTaskstoDispatcher(tasks);
+            sendTaskstoDispatcher(tasks);
         } else
             logger.info("Scheduler is locked!");
     }

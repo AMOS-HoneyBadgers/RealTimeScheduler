@@ -201,11 +201,6 @@ public class SchedulerServiceTest {
         verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
     }
 
-
-
-
-
-
     private Task createTaskTestObject(Group group, String id) {
         Task task = new Task();
         task.setId(id);
