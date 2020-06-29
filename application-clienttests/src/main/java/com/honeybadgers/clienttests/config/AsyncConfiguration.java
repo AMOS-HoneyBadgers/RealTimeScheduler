@@ -1,4 +1,4 @@
-package com.honeybadgers.clienttests.transactions;
+package com.honeybadgers.clienttests.config;
 
 
 import org.apache.logging.log4j.LogManager;
@@ -22,6 +22,17 @@ public class AsyncConfiguration {
         executor.setMaxPoolSize(2);
         executor.setQueueCapacity(100);
         executor.setThreadNamePrefix("ScheduleThread-");
+        executor.initialize();
+        return executor;
+    }
+    @Bean(name = "taskExecutorPerformance")
+    public Executor taskExecutorPerformance() {
+        LOGGER.debug("Creating Async Task Executor");
+        final ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(20);
+        executor.setMaxPoolSize(40);
+        executor.setQueueCapacity(100);
+        executor.setThreadNamePrefix("PerformanceThread-");
         executor.initialize();
         return executor;
     }
