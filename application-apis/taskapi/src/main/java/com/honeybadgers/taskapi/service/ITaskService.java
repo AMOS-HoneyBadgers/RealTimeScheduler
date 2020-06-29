@@ -6,6 +6,8 @@ import com.honeybadgers.taskapi.exceptions.CreationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -15,12 +17,15 @@ import java.util.UUID;
 @Service
 public interface ITaskService {
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException;
 
     List<TaskModel> getAllTasks();
 
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     TaskModel deleteTask(UUID taskid) throws NoSuchElementException;
 
     TaskModel getTaskById(UUID taskid) throws NoSuchElementException;

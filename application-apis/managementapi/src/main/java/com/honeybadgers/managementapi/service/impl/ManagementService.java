@@ -36,7 +36,6 @@ public class ManagementService implements IManagementService {
     static final Logger logger = LogManager.getLogger(ManagementService.class);
 
     @Override
-    @Transactional
     public void pauseScheduler(OffsetDateTime resumeDate) throws LockException{
         Paused lockObj = pausedRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
 
@@ -56,7 +55,6 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    @Transactional
     public void pauseTask(UUID taskId, OffsetDateTime resumeDate) throws LockException{
         String id = LOCK_TASK_PREFIX + taskId.toString();
         Paused lockId = pausedRepository.findById(id).orElse(null);
@@ -78,7 +76,6 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    @Transactional
     public void pauseGroup(String groupId, OffsetDateTime resumeDate) throws LockException{
         String id = LOCK_GROUP_PREFIX + groupId;
         Paused lockId = pausedRepository.findById(id).orElse(null);

@@ -13,6 +13,8 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -33,6 +35,7 @@ public class SchedulerService implements ISchedulerService {
 
     @Autowired
     SchedulerService _self;
+
     @Autowired
     TaskRepository taskRepository;
 
@@ -102,17 +105,18 @@ public class SchedulerService implements ISchedulerService {
         }
         List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
         if (!isSchedulerLocked()) {
-            sendTaskstoDispatcher(tasks);
+            // _self just in case to make sure, that spring finds the transactional annotation
+            _self.sendTaskstoDispatcher(tasks);
         } else
             logger.info("Scheduler is locked!");
     }
 
-    // TODO Transaction
-
     /**
      * Tries to send each task in the given list to the dispatcher if the conditions for sending (of each individual task) are met.
+     * @Transactional here only just to be sure (should be already in transaction due to only being called by transactional method)
      * @param tasks List of tasks to be send to the dispatcher
      */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     public void sendTaskstoDispatcher(List<Task> tasks) {
         for (Task currentTask : tasks) {
             if (isTaskLocked(currentTask.getId())) {
