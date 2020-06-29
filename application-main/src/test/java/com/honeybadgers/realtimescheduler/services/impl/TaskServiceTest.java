@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.GroupAncestorModel;
+import com.honeybadgers.models.model.TypeFlagEnum;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 
@@ -14,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = TaskService.class)
+@PropertySource("classpath:application-test.properties")
 public class TaskServiceTest {
 
     @MockBean
@@ -139,6 +142,35 @@ public class TaskServiceTest {
         // 10 days
         deadline4.setDeadline(new Timestamp(System.currentTimeMillis() + 864000000));
 
+        // Following calculations with retries and realtime tasks are with priority 100
+
+        Task retries0 = new Task();
+        retries0.setId("TEST");
+        retries0.setPriority(100);
+        // 1 retry
+        retries0.setRetries(1);
+
+        Task retries1 = new Task();
+        retries1.setId("TEST");
+        retries1.setPriority(100);
+        // 3 retries
+        retries1.setRetries(3);
+
+        Task retries2 = new Task();
+        retries2.setId("TEST");
+        retries2.setPriority(100);
+        // 5 retries
+        retries2.setRetries(5);
+
+        Task batch0 = new Task();
+        batch0.setId("TEST");
+        batch0.setPriority(100);
+        // set as realtime
+        batch0.setTypeFlagEnum(TypeFlagEnum.Realtime);
+
+        Task noValues = new Task();
+        noValues.setId("TEST");
+
         long res = service.calculatePriority(prio);
         long res2 = service.calculatePriority(prio2);
         long res3 = service.calculatePriority(prio3);
@@ -147,6 +179,11 @@ public class TaskServiceTest {
         long res6 = service.calculatePriority(deadline2);
         long res7 = service.calculatePriority(deadline3);
         long res8 = service.calculatePriority(deadline4);
+        long res9 = service.calculatePriority(retries0);
+        long res10 = service.calculatePriority(retries1);
+        long res11 = service.calculatePriority(retries2);
+        long res12 = service.calculatePriority(noValues);
+        long res13 = service.calculatePriority(batch0);
         System.out.println("prio: " + res);
         System.out.println("prio2: " + res2);
         System.out.println("prio3: " + res3);
@@ -155,6 +192,11 @@ public class TaskServiceTest {
         System.out.println("deadline2: " + res6);
         System.out.println("deadline3: " + res7);
         System.out.println("deadline4: " + res8);
+        System.out.println("retries0: " + res9);
+        System.out.println("retries1: " + res10);
+        System.out.println("retries2: " + res11);
+        System.out.println("batch0: " + res13);
+        System.out.println("noValues: " + res12);
 
         Assert.assertTrue(true);
     }
