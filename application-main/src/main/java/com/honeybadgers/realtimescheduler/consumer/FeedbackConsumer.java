@@ -58,6 +58,7 @@ public class FeedbackConsumer {
                 if(currentTask.getModeEnum()== ModeEnum.Sequential)
                     checkAndSetSequentialAndIndexNumber(currentTask);
 
+                // Todo refactor put into 1 method
                 taskService.updateTaskhistory(currentTask, TaskStatusEnum.Finished);
                 taskService.finishTask(currentTask);
 
