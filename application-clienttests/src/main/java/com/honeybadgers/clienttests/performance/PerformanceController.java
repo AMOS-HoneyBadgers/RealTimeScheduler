@@ -23,4 +23,16 @@ public class PerformanceController {
         System.out.println("Diff: " + (after - before));
         return ResponseEntity.ok().build();
     }
+
+    @GetMapping("/performance/{listcount}/{taskcount}")
+    public ResponseEntity<?> createPerformanceTest(@PathVariable(value = "listcount") final int listcount, @PathVariable(value = "taskcount") final int taskcount) {
+        long before = System.currentTimeMillis();
+        System.out.println("Before: " + before);
+        performanceService.createBulkPostWithObject(listcount, taskcount);
+        long after = System.currentTimeMillis();
+        System.out.println("After: " + after);
+
+        System.out.println("Diff: " + (after - before));
+        return ResponseEntity.ok().build();
+    }
 }
