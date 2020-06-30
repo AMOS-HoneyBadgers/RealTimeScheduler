@@ -39,7 +39,6 @@ public class FeedbackConsumer {
 
 
 
-    // TODO Transaction
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
     @Transactional(isolation = Isolation.SERIALIZABLE)
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
