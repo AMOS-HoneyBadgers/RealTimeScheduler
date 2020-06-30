@@ -32,32 +32,12 @@ public class ScheduledServices {
 
     @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
-        // TODO: for optimisation write custom query which gets all where resume_date != null
-        try {
-            boolean found = false;
-            logger.info("Starting paused cleanup!");
-            List<Paused> paused = pausedRepository.findAll();
-            logger.info("Checking " + paused.size() + " locks on resume_date");
-            for (Paused pause : paused) {
-                if(pause.getResumeDate() == null)
-                    continue;
-
-                logger.info("resume date is at: " + pause.getResumeDate().toString());
-                Timestamp now = Timestamp.from(Instant.now());
-                logger.info("current time is at: " + now.toString());
-                if(pause.getResumeDate().before(now)) {
-                    logger.info("Deleting lock with id " + pause.getId());
-                    pausedRepository.deleteById(pause.getId());
-                    found = true;
-                }
-            }
-            logger.info("Finished paused cleanup!");
-            if(found)
-                sender.sendTaskToTasksQueue(scheduler_trigger);
-
-        } catch (Exception e) {
-            logger.error("Caught exception in cleanPausedLocks:");
-            logger.error(Arrays.deepToString(e.getStackTrace()));
+        logger.info("Cleaner starting paused cleanup");
+        List<Paused> deleted = pausedRepository.deleteAllExpired();
+        logger.info("Cleaner finished paused cleanup - deleted " + deleted.size() + " elements");
+        if(deleted.size() > 0) {
+            sender.sendTaskToTasksQueue(scheduler_trigger);
+            logger.info("Notified scheduler for rescheduling!");
         }
     }
 }

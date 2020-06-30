@@ -24,12 +24,12 @@
         </dependency>
         <dependency>
             <groupId>com.honeybadgers</groupId>
-            <artifactId>application-queuecommunication</artifactId>
+            <artifactId>application-postgrecommunication</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>com.honeybadgers</groupId>
-            <artifactId>application-postgreommunication</artifactId>
+            <artifactId>application-queuecommunication</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
     </dependencies>

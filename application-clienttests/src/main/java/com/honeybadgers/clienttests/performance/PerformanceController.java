@@ -14,13 +14,7 @@ public class PerformanceController {
 
     @GetMapping("/performance/{count}")
     public ResponseEntity<?> createPerformanceTest(@PathVariable(value = "count") final int count) {
-        long before = System.currentTimeMillis();
-        System.out.println("Before: " + before);
         performanceService.createPostWithObject(count);
-        long after = System.currentTimeMillis();
-        System.out.println("After: " + after);
-
-        System.out.println("Diff: " + (after - before));
         return ResponseEntity.ok().build();
     }
 }

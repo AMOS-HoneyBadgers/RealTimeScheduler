@@ -15,6 +15,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.mockito.Mockito.*;
 
@@ -32,55 +33,34 @@ public class ScheduledServicesTest {
     @MockBean
     ICommunication sender;
 
-    ArrayList<Paused> list;
-
-
-    @Before
-    public void createMocks() {
-        Paused lock1 = new Paused();
-        lock1.setResumeDate(Timestamp.from(Instant.now().plusSeconds(600)));
-        lock1.setId("1");
-
-        Paused lock2 = new Paused();
-        lock2.setResumeDate(Timestamp.from(Instant.now().minusSeconds(60)));
-        lock2.setId("2");
-
-        Paused lock3 = new Paused();
-        lock3.setId("3");
-
-
-        list = new ArrayList<Paused>();
-        list.add(lock1);
-        list.add(lock2);
-        list.add(lock3);
-
-
-        when(pausedRepository.findAll()).thenReturn(list);
-        doNothing().when(pausedRepository).deleteById(any());
-    }
-
     @Test
     public void testSchedulerCleaner_twoIterations() throws InterruptedException {
-        verify(pausedRepository,never()).findAll();
-        verify(pausedRepository,never()).deleteById(anyString());
+        verify(pausedRepository,never()).deleteAllExpired();
 
         // wait for initial delay
         Thread.sleep(200);
 
-        verify(pausedRepository).findAll();
-        verify(pausedRepository, times(1)).deleteById(list.get(1).getId());
+        Paused lock1 = new Paused();
+        lock1.setResumeDate(Timestamp.from(Instant.now().plusSeconds(600)));
+        lock1.setId("1");
+
+        when(pausedRepository.deleteAllExpired()).thenReturn(new ArrayList<>());
+
+        verify(pausedRepository, times(1)).deleteAllExpired();
         verify(sender, atMostOnce()).sendTaskToDispatcher(any());
-        Paused lockNew = new Paused();
-        lockNew.setResumeDate(Timestamp.from(Instant.now().minusSeconds(60)));
-        lockNew.setId("new");
 
-        list = new ArrayList<Paused>();
-        list.add(lockNew);
+        Paused lock2 = new Paused();
+        lock1.setResumeDate(Timestamp.from(Instant.now().minusSeconds(600)));
+        lock1.setId("1");
 
-        when(pausedRepository.findAll()).thenReturn(list);
+        Paused lock3 = new Paused();
+        lock1.setResumeDate(Timestamp.from(Instant.now()));
+        lock1.setId("1");
+
+        when(pausedRepository.deleteAllExpired()).thenReturn(Arrays.asList(lock1, lock2, lock3));
 
         Thread.sleep(1000);
 
-        verify(pausedRepository, times(1)).deleteById(lockNew.getId());
+        verify(pausedRepository, times(2)).deleteAllExpired();
     }
 }

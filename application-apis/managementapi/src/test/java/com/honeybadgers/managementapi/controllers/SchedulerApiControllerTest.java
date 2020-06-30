@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 //@WebMvcTest(SchedulerApiController.class)
 public class SchedulerApiControllerTest {
 
-    // Reason: WebMvc refuses to ignore redis -> fails to init Redis
+    // Reason: WebMvc tries to init rabbit -> disable autoconfig -> fails to init ICommunication
 
     /*@Autowired
     private MockMvc mvc;

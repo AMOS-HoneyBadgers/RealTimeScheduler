@@ -60,35 +60,28 @@ public class SchedulerServiceTest {
         Task t = createTaskTestObject(group,"TEST");
 
         SchedulerService spy = spy(service);
-        when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
         doNothing().when(spy).sendTaskstoDispatcher(anyList());
-        spy.scheduleTask(t.getId());
+        spy.scheduleTask();
 
         verify(taskRepository).save(any());
         verify(taskService).calculatePriority(t);
         verify(taskRepository).findAllScheduledTasksSorted();
     }
-    @Test
-    public void testIfTaskNotFoundThenThrow() {
-        Task t = createTaskTestObject(null,"TEST");
 
-        when(taskService.getTaskById(t.getId())).thenReturn(Optional.empty());
-        Exception e = assertThrows(RuntimeException.class, () -> service.scheduleTask(t.getId()));
-        assertEquals("task could not be found in database with id: " + t.getId(), e.getMessage());
-    }
     @Test
     public void testIfSchedulerIsLockedDontSend() {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
         Task t = createTaskTestObject(group, "TEST");
 
-        when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         when(lockRepository.findById(LOCK_SCHEDULER_ALIAS)).thenReturn(Optional.of(new Lock()));
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
+        when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         SchedulerService spy = spy(service);
-        spy.scheduleTask(t.getId());
+        spy.scheduleTask();
         verify(spy, never()).sendTaskstoDispatcher(any());
     }
 
@@ -207,11 +200,6 @@ public class SchedulerServiceTest {
         assertEquals(1, task1.getGroup().getCurrentParallelismDegree().intValue());
         verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
     }
-
-
-
-
-
 
     private Task createTaskTestObject(Group group, String id) {
         Task task = new Task();

@@ -52,8 +52,10 @@ public class TaskServiceTest {
     @Test
     public void testUploadTask() {
         TaskService spy = spy(service);
-        spy.uploadTask(any());
-        verify(taskPostgresRepository).save(Mockito.any());
+        Task t = new Task();
+        spy.finishTask(t);
+        t.setStatus(TaskStatusEnum.Finished);
+        verify(taskPostgresRepository).save(t);
     }
 
     @Test

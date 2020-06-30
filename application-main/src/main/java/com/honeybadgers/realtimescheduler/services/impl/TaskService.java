@@ -50,8 +50,6 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    @Transactional
-    // TODO transactions
     public List<String> getRecursiveGroupsOfTask(String taskId) {
         if(taskId == null)
             throw new IllegalArgumentException("taskId must not be null!");
@@ -83,7 +81,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public void uploadTask(Task task) {
+    public void finishTask(Task task) {
+        task.setStatus(TaskStatusEnum.Finished);
         taskRepository.save(task);
     }
 

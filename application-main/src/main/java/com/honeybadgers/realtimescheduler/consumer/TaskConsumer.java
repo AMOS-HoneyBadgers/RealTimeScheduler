@@ -21,12 +21,12 @@ public class TaskConsumer {
     SchedulerService service;
 
     @RabbitListener(queues="tasks", containerFactory = "taskcontainerFactory")
-    public void receiveTask(String message) {
-        logger.info("Task " + message + " Step 1: received Task");
+    public void receiveTask(String taskid) {
+        logger.info("Task " + taskid + " Step 1: received Task");
         try {
-            service.scheduleTask(message);
+            service.scheduleTask();
         } catch(Exception e) {
-            System.out.println(e.getMessage());
+            logger.error(e.getMessage());
         }
     }
 

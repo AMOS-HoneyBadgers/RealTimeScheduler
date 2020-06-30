@@ -10,6 +10,8 @@ import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,7 @@ public interface ITaskConvertUtils extends IConvertUtils {
 
      TaskModel taskJpaToRest(Task task);
 
+     @Transactional(isolation = Isolation.SERIALIZABLE)
      Task taskRestToJpa(TaskModel restModel) throws JpaException, CreationException, UnknownEnumException;
 
      List<TaskModelActiveTimes> activeTimesJpaToRest(List<ActiveTimes> activeTimes);

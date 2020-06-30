@@ -35,13 +35,6 @@
             <artifactId>spring-boot-starter-amqp</artifactId>
         </dependency>
 
-        <!-- https://mvnrepository.com/artifact/it.ozimov/embedded-redis -->
-        <dependency>
-            <groupId>it.ozimov</groupId>
-            <artifactId>embedded-redis</artifactId>
-            <version>0.7.1</version>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.apache.maven.surefire</groupId>
             <artifactId>surefire-junit-platform</artifactId>
@@ -55,7 +48,7 @@
         </dependency>
         <dependency>
             <groupId>com.honeybadgers</groupId>
-            <artifactId>application-postgreommunication</artifactId>
+            <artifactId>application-postgrecommunication</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
