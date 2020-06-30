@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.consumer;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.ModeEnum;
+import com.honeybadgers.models.model.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
@@ -57,6 +58,7 @@ public class FeedbackConsumer {
                 if(currentTask.getModeEnum()== ModeEnum.Sequential)
                     checkAndSetSequentialAndIndexNumber(currentTask);
 
+                taskService.updateTaskhistory(currentTask, TaskStatusEnum.Finished);
                 taskService.finishTask(currentTask);
 
                 schedulerService.scheduleTask();

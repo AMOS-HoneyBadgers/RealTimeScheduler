@@ -17,8 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -100,6 +102,7 @@ public class SchedulerService implements ISchedulerService {
                 task.setTotalPriority(taskService.calculatePriority(task));
                 logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
                 task.setStatus(TaskStatusEnum.Scheduled);
+                taskService.updateTaskhistory(task, TaskStatusEnum.Scheduled);
                 taskRepository.save(task);
             }
             List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
@@ -148,6 +151,7 @@ public class SchedulerService implements ISchedulerService {
             sender.sendTaskToDispatcher(currentTask.getId());
 
             currentTask.setStatus(TaskStatusEnum.Dispatched);
+            taskService.updateTaskhistory(currentTask, TaskStatusEnum.Dispatched);
             taskRepository.save(currentTask);
             logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
         }

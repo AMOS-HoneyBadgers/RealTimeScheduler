@@ -1,6 +1,8 @@
 package com.honeybadgers.realtimescheduler.services;
 
+
 import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.TaskStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,4 +31,6 @@ public interface ITaskService {
     void deleteTask(String id);
 
     long calculatePriority(Task task);
+
+    void updateTaskhistory(Task task, TaskStatusEnum status) throws RuntimeException;
 }

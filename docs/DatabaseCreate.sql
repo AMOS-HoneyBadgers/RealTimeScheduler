@@ -51,6 +51,7 @@ CREATE TABLE public.task
     index_number bigint,
     meta_data jsonb,
     total_priority bigint,
+    history jsonb,
     CONSTRAINT task_pkey PRIMARY KEY (id),
     CONSTRAINT group_fk FOREIGN KEY (group_id)
         REFERENCES public."group" (id) MATCH SIMPLE

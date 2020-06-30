@@ -1,9 +1,6 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.TaskStatusEnum;
-import com.honeybadgers.models.model.TypeFlagEnum;
-import com.honeybadgers.models.model.GroupAncestorModel;
+import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
@@ -15,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.*;
 
 @Service
@@ -93,9 +91,20 @@ public class TaskService implements ITaskService {
         this.taskRepository.deleteById(id);
     }
 
+    public void updateTaskhistory(Task task, TaskStatusEnum status) throws RuntimeException{
+        if(task.getHistory() == null)
+            throw new RuntimeException("Task has no History Object");
+        List<History> hist = task.getHistory();
+        hist.add(new History(status.toString(), Timestamp.from(Instant.now())));
+        task.setHistory(hist);
+    }
+
     @Override
     public long calculatePriority(Task task) {
         double basePrio = task.getPriority();
+        // also consider group priority if task has none
+        if(basePrio == 0 && task.getGroup() != null)
+            basePrio = task.getGroup().getPriority();
         Timestamp deadline = task.getDeadline();
 
         Date currentTime = new Date(System.currentTimeMillis());
