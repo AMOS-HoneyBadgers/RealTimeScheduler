@@ -83,6 +83,9 @@
         "type": "integer",
         "minimum": 1
       },
+      "history": {
+        "$ref": "#/HistoryModel"
+      },
       "meta": {
         "description": "Key-value object for meta-data",
         "type": "array",

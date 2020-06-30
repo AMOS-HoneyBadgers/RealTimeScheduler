@@ -9,8 +9,6 @@ applications:
     services:
       - rabbit
       - task_storage
-      - priority_store
-      - redis
       - rabbit_credentials
       - rabbit
 

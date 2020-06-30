@@ -50,6 +50,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         taskmodel.setIndexNumber(task.getIndexNumber());
         taskmodel.setDeadline(timestampJpaToRest(task.getDeadline()));
         taskmodel.setMeta(metaDataJpaToRest(task.getMetaData()));
+        taskmodel.setHistory(task.getHistory());
 
         return taskmodel;
     }
