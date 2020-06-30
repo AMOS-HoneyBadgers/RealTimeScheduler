@@ -15,7 +15,9 @@ import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -41,7 +43,7 @@ public class FeedbackConsumer {
 
 
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
-    @Transactional(isolation = Isolation.SERIALIZABLE)
+    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.NEVER)
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
         int iteration =1;
@@ -65,7 +67,7 @@ public class FeedbackConsumer {
                 schedulerService.scheduleTask();
                 break;
             }
-            catch (LockAcquisitionException lockAcquisitionException){
+            catch (LockAcquisitionException | IllegalTransactionStateException exception){
                 double timeToSleep= Math.random()*1000*iteration;
                 logger.error("Task " + taskid + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
                 Thread.sleep(Math.round(timeToSleep));
