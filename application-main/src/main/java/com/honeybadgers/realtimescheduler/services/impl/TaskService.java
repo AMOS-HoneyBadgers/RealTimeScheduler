@@ -103,6 +103,9 @@ public class TaskService implements ITaskService {
     @Override
     public long calculatePriority(Task task) {
         double basePrio = task.getPriority();
+        // also consider group priority if task has none
+        if(basePrio == 0 && task.getGroup() != null)
+            basePrio = task.getGroup().getPriority();
         Timestamp deadline = task.getDeadline();
 
         Date currentTime = new Date(System.currentTimeMillis());
