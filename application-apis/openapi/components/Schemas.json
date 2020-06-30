@@ -83,6 +83,9 @@
         "type": "integer",
         "minimum": 1
       },
+      "history": {
+        "$ref": "#/HistoryModel"
+      },
       "meta": {
         "description": "Key-value object for meta-data",
         "type": "array",
@@ -186,6 +189,23 @@
           "description": "End of time frame",
           "type": "string",
           "format": "partial-time"
+        }
+      }
+    }
+  },
+  "HistoryModel": {
+    "description": "Array containing the history for a Task status changed with Timestamps",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "description": "Status set to",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "Time of change",
+          "type": "string"
         }
       }
     }

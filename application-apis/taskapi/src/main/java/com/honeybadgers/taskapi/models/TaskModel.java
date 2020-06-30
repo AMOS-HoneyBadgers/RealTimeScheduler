@@ -4,6 +4,7 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.honeybadgers.models.model.History;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -18,7 +19,7 @@ import javax.validation.constraints.*;
 /**
  * TaskModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T10:08:51.202+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-30T15:29:34.348+02:00[Europe/Berlin]")
 
 public class TaskModel   {
   @JsonProperty("id")
@@ -168,6 +169,10 @@ public class TaskModel   {
 
   @JsonProperty("index_number")
   private Integer indexNumber;
+
+  @JsonProperty("history")
+  @Valid
+  private List<History> history = null;
 
   @JsonProperty("meta")
   @Valid
@@ -436,6 +441,34 @@ public class TaskModel   {
     this.indexNumber = indexNumber;
   }
 
+  public TaskModel history(List<History> history) {
+    this.history = history;
+    return this;
+  }
+
+  public TaskModel addHistoryItem(History historyItem) {
+    if (this.history == null) {
+      this.history = new ArrayList<>();
+    }
+    this.history.add(historyItem);
+    return this;
+  }
+
+  /**
+   * Array containing the history for a Task status changed with Timestamps
+   * @return history
+  */
+  @ApiModelProperty(value = "Array containing the history for a Task status changed with Timestamps")
+
+
+  public List<History> getHistory() {
+    return history;
+  }
+
+  public void setHistory(List<History> history) {
+    this.history = history;
+  }
+
   public TaskModel meta(List<TaskModelMeta> meta) {
     this.meta = meta;
     return this;
@@ -487,12 +520,13 @@ public class TaskModel   {
         Objects.equals(this.retries, taskModel.retries) &&
         Objects.equals(this.force, taskModel.force) &&
         Objects.equals(this.indexNumber, taskModel.indexNumber) &&
+        Objects.equals(this.history, taskModel.history) &&
         Objects.equals(this.meta, taskModel.meta);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, groupId, priority, deadline, activeTimes, workingDays, status, typeFlag, mode, retries, force, indexNumber, meta);
+    return Objects.hash(id, groupId, priority, deadline, activeTimes, workingDays, status, typeFlag, mode, retries, force, indexNumber, history, meta);
   }
 
   @Override
@@ -512,6 +546,7 @@ public class TaskModel   {
     sb.append("    retries: ").append(toIndentedString(retries)).append("\n");
     sb.append("    force: ").append(toIndentedString(force)).append("\n");
     sb.append("    indexNumber: ").append(toIndentedString(indexNumber)).append("\n");
+    sb.append("    history: ").append(toIndentedString(history)).append("\n");
     sb.append("    meta: ").append(toIndentedString(meta)).append("\n");
     sb.append("}");
     return sb.toString();
