@@ -37,5 +37,5 @@ public interface ISchedulerService {
      * Method running as @Transactional
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    void scheduleTask();
+    void scheduleTask(String trigger);
 }

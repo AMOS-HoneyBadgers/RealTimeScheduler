@@ -93,9 +93,14 @@ public class SchedulerService implements ISchedulerService {
     }
 
     @Override
-    public void scheduleTask() {
+    public void scheduleTask(String trigger) {
         try {
-            List<Task> waitingTasks = taskRepository.findAllWaitingTasks();
+            List<Task> waitingTasks;
+
+            if(trigger.equals(scheduler_trigger))
+                waitingTasks = taskRepository.findAllScheduledTasksSorted();
+
+            waitingTasks = taskRepository.findAllWaitingTasks();
             for (Task task : waitingTasks ) {
                 task.setTotalPriority(taskService.calculatePriority(task));
                 logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());

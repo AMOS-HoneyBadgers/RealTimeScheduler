@@ -24,7 +24,7 @@ public class TaskConsumer {
     public void receiveTask(String taskid) {
         logger.info("Task " + taskid + " Step 1: received Task");
         try {
-            service.scheduleTask();
+            service.scheduleTask("");
         } catch(Exception e) {
             logger.error(e.getMessage());
         }

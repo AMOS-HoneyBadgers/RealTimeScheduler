@@ -64,7 +64,7 @@ public class SchedulerServiceTest {
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
         doNothing().when(spy).sendTaskstoDispatcher(anyList());
-        spy.scheduleTask();
+        spy.scheduleTask("as");
 
         verify(taskRepository).save(any());
         verify(taskService).calculatePriority(t);
@@ -81,7 +81,7 @@ public class SchedulerServiceTest {
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         SchedulerService spy = spy(service);
-        spy.scheduleTask();
+        spy.scheduleTask("123");
         verify(spy, never()).sendTaskstoDispatcher(any());
     }
 
