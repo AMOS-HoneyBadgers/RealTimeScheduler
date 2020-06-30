@@ -1,8 +1,6 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.models.model.Group;
-import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.GroupAncestorModel;
+import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 
@@ -17,6 +15,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -297,6 +296,30 @@ public class TaskServiceTest {
         assertNotNull(e);
         assertEquals("Ancestor list contains null values for taskId: test", e.getMessage());
     }
-  
+
+    @Test
+    public void testUpdateTaskHistory_NoHistoryElement(){
+        Task taskNoHistory = new Task();
+        taskNoHistory.setHistory(null);
+
+        assertThrows(RuntimeException.class, () -> service.updateTaskhistory(taskNoHistory, TaskStatusEnum.Waiting));
+    }
+
+    @Test
+    public void testUpdateTaskHistory(){
+        Task task = new Task();
+        List<History> history = new ArrayList<>();
+
+        History hist = new History();
+        hist.setStatus(TaskStatusEnum.Waiting.toString());
+        hist.setTimestamp(Timestamp.from(Instant.now()));
+        history.add(hist);
+        task.setHistory(history);
+
+        service.updateTaskhistory(task, TaskStatusEnum.Scheduled);
+
+        assertEquals(2, task.getHistory().size());
+
+    }
 }
 
