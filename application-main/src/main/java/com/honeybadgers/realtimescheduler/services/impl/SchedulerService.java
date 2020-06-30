@@ -153,7 +153,7 @@ public class SchedulerService implements ISchedulerService {
             currentTask.setStatus(TaskStatusEnum.Dispatched);
             taskService.updateTaskhistory(currentTask, TaskStatusEnum.Dispatched);
             taskRepository.save(currentTask);
-            logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and removed from redis Database");
+            logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
         }
 
     }
