@@ -3,7 +3,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
-import com.honeybadgers.postgre.repository.LockRepository;
+import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
@@ -17,10 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -40,7 +38,7 @@ public class SchedulerService implements ISchedulerService {
     TaskRepository taskRepository;
 
     @Autowired
-    LockRepository lockRepository;
+    PausedRepository pausedRepository;
 
     @Autowired
     ITaskService taskService;
@@ -69,29 +67,29 @@ public class SchedulerService implements ISchedulerService {
     }
 
     @Override
-    public boolean isTaskLocked(String taskId) {
+    public boolean isTaskPaused(String taskId) {
         if (taskId == null)
             throw new IllegalArgumentException("Method isTaskLocked: given taskId is null!");
 
-        String lockId = LOCK_TASK_PREFIX + taskId;
-        Lock lock = lockRepository.findById(lockId).orElse(null);
-        return lock != null;
+        String pausedId = PAUSED_TASK_PREFIX + taskId;
+        Paused paused = pausedRepository.findById(pausedId).orElse(null);
+        return paused != null;
     }
 
     @Override
-    public boolean isGroupLocked(String groupId) {
+    public boolean isGroupPaused(String groupId) {
         if (groupId == null)
             throw new IllegalArgumentException("Method isGroupLocked: given groupId is null!");
 
-        String lockId = LOCK_GROUP_PREFIX + groupId;
-        Lock lock = lockRepository.findById(lockId).orElse(null);
-        return lock != null;
+        String pausedId = PAUSED_GROUP_PREFIX + groupId;
+        Paused paused = pausedRepository.findById(pausedId).orElse(null);
+        return paused != null;
     }
 
     @Override
-    public boolean isSchedulerLocked() {
-        Lock lock = lockRepository.findById(LOCK_SCHEDULER_ALIAS).orElse(null);
-        return lock != null;
+    public boolean isSchedulerPaused() {
+        Paused paused = pausedRepository.findById(PAUSED_SCHEDULER_ALIAS).orElse(null);
+        return paused != null;
     }
 
     @Override
@@ -106,7 +104,7 @@ public class SchedulerService implements ISchedulerService {
                 taskRepository.save(task);
             }
             List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
-            if (!isSchedulerLocked()) {
+            if (!isSchedulerPaused()) {
                 sendTaskstoDispatcher(tasks);
             } else
                 logger.info("Scheduler is locked!");
@@ -123,7 +121,7 @@ public class SchedulerService implements ISchedulerService {
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void sendTaskstoDispatcher(List<Task> tasks) {
         for (Task currentTask : tasks) {
-            if (isTaskLocked(currentTask.getId())) {
+            if (isTaskPaused(currentTask.getId())) {
                 logger.info("Task " + currentTask.getId() + " is currently paused!");
                 continue;
             }
@@ -161,7 +159,7 @@ public class SchedulerService implements ISchedulerService {
     public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask, String taskid) {
         for (String groupId : groupsOfTask) {
             // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
-            if (isGroupLocked(groupId)) {
+            if (isGroupPaused(groupId)) {
                 logger.info("Task " + taskid + " is paused by Group " + groupId);
                 return true;
             }

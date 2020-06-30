@@ -15,7 +15,7 @@ public interface ISchedulerService {
      * @param taskId taskId of task to be searched for
      * @return true if task lock was found
      */
-    boolean isTaskLocked(String taskId);
+    boolean isTaskPaused(String taskId);
 
     /**
      * Searches 'paused' table of database whether the table contains the lock for the group with the given groupId
@@ -23,14 +23,14 @@ public interface ISchedulerService {
      * @param groupId taskId of task to be searched for
      * @return true if group lock was found
      */
-    boolean isGroupLocked(String groupId);
+    boolean isGroupPaused(String groupId);
 
     /**
      * Searches 'paused' table of database whether the table contains the special scheduler_lock id
      * defined by Constants.LOCK_SCHEDULER_ALIAS
      * @return true if scheduler lock was found
      */
-    boolean isSchedulerLocked();
+    boolean isSchedulerPaused();
 
     /**
      * Schedule all waiting tasks and then call sendToDispatcher
