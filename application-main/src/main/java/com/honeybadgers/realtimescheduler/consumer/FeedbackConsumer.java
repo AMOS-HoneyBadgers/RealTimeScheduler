@@ -62,7 +62,7 @@ public class FeedbackConsumer {
                 taskService.updateTaskhistory(currentTask, TaskStatusEnum.Finished);
                 taskService.finishTask(currentTask);
 
-                schedulerService.scheduleTask();
+                schedulerService.scheduleTask("");
                 break;
             }
             catch (LockAcquisitionException lockAcquisitionException){
