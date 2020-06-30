@@ -42,7 +42,7 @@ public class PerformanceService {
         }
     }
 
-    public void createBulkPostWithObject(int taskCount, int listCount) {
+    public void createBulkPostWithObject(int listCount, int taskCount) {
         restTemplate = new RestTemplate();
         String url = "https://taskapi-amos.cfapps.io/api/task/tasks";
 
