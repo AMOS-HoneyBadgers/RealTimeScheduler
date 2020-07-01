@@ -78,6 +78,7 @@ public class ManagementService implements IManagementService {
         String id = PAUSED_GROUP_PREFIX + groupId;
         Paused lockId = pausedRepository.findById(id).orElse(null);
 
+
         if(lockId != null)
             throw new LockException("Already locked!");
 
