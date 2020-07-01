@@ -99,8 +99,8 @@ public class SchedulerService implements ISchedulerService {
 
             if(trigger.equals(scheduler_trigger))
                 waitingTasks = taskRepository.findAllScheduledTasksSorted();
-
-            waitingTasks = taskRepository.findAllWaitingTasks();
+            else
+                waitingTasks = taskRepository.findAllWaitingTasks();
             for (Task task : waitingTasks ) {
                 task.setTotalPriority(taskService.calculatePriority(task));
                 logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
