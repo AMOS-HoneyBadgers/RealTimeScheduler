@@ -7,8 +7,7 @@
     "properties": {
       "id": {
         "description": "Primary id of task object",
-        "type": "string",
-        "format": "uuid"
+        "type": "string"
       },
       "group_id": {
         "description": "Id of group this task is assigned to",

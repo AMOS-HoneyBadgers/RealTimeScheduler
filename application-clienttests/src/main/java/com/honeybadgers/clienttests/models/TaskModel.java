@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class TaskModel   {
   @JsonProperty("id")
-  private UUID id;
+  private String id;
 
   @JsonProperty("group_id")
   private String groupId;
@@ -177,7 +177,7 @@ public class TaskModel   {
   @Valid
   private List<TaskModelMeta> meta = null;
 
-  public TaskModel id(UUID id) {
+  public TaskModel id(String id) {
     this.id = id;
     return this;
   }
@@ -191,11 +191,11 @@ public class TaskModel   {
 
   @Valid
 
-  public UUID getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(UUID id) {
+  public void setId(String id) {
     this.id = id;
   }
 

@@ -8,7 +8,6 @@ package com.honeybadgers.taskapi.controllers;
 import com.honeybadgers.taskapi.models.ErrorModel;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
-import java.util.UUID;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-30T15:29:34.348+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-07-02T17:33:16.300+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "{task_Id}", description = "the {task_Id} API")
@@ -59,11 +58,11 @@ public interface TaskIdApi {
     @RequestMapping(value = "/{task_Id}",
         produces = { "application/json" }, 
         method = RequestMethod.DELETE)
-    default ResponseEntity<TaskModel> taskIdDelete(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId) {
+    default ResponseEntity<TaskModel> taskIdDelete(@ApiParam(value = "",required=true) @PathVariable("task_Id") String taskId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
+                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"id\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -93,11 +92,11 @@ public interface TaskIdApi {
     @RequestMapping(value = "/{task_Id}",
         produces = { "application/json" }, 
         method = RequestMethod.GET)
-    default ResponseEntity<TaskModel> taskIdGet(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId) {
+    default ResponseEntity<TaskModel> taskIdGet(@ApiParam(value = "",required=true) @PathVariable("task_Id") String taskId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
+                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"id\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -131,7 +130,7 @@ public interface TaskIdApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.POST)
-    default ResponseEntity<ResponseModel> taskIdPost(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId,@ApiParam(value = "Task object" ,required=true )  @Valid @RequestBody TaskModel taskModel) {
+    default ResponseEntity<ResponseModel> taskIdPost(@ApiParam(value = "",required=true) @PathVariable("task_Id") String taskId,@ApiParam(value = "Task object" ,required=true )  @Valid @RequestBody TaskModel taskModel) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
