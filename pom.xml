@@ -176,6 +176,7 @@
         <module>task-consumer</module>
         <module>application-clienttests</module>
         <module>application-postgrecommunication</module>
+        <module>application-lockservice</module>
     </modules>
 
     <build>
