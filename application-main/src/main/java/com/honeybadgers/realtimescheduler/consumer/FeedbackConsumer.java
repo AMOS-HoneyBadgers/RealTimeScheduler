@@ -14,6 +14,7 @@ import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Isolation;
@@ -43,7 +44,7 @@ public class FeedbackConsumer {
 
 
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
-    @Transactional(isolation = Isolation.SERIALIZABLE, propagation = Propagation.NEVER)
+    @Transactional(isolation = Isolation.SERIALIZABLE)
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
         int iteration =1;
@@ -64,18 +65,16 @@ public class FeedbackConsumer {
                 taskService.updateTaskhistory(currentTask, TaskStatusEnum.Finished);
                 taskService.finishTask(currentTask);
 
-                schedulerService.scheduleTask("");
+                schedulerService.scheduleTaskWrapper("");
                 break;
             }
-            catch (LockAcquisitionException | IllegalTransactionStateException exception){
+            catch (CannotAcquireLockException | IllegalTransactionStateException exception){
                 double timeToSleep= Math.random()*1000*iteration;
                 logger.error("Task " + taskid + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
         }
-
-
     }
 
     //TODO is it necessary to do this also for all grandparent groups??

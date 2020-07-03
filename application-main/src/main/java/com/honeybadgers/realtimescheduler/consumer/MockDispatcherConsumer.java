@@ -1,11 +1,13 @@
 package com.honeybadgers.realtimescheduler.consumer;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.postgre.repository.LockRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -20,14 +22,17 @@ public class MockDispatcherConsumer {
     @Autowired
     public ICommunication sender;
 
+    @Autowired
+    LockRepository lockRepository;
+
     @RabbitListener(queues="dispatch.queue", containerFactory = "dispatchcontainerfactory")
     public void receiveTaskFromSchedulerMockDispatcher(String message) throws InterruptedException {
         logger.info("Received message in Mock Dispatcher'{}'" + message);
 
-        // Mock Feedback, sleep between 10 and 20 seconds until feedback is sent back to the dispatcher
-        /*Thread.sleep((long) Math.random() * ((20000 - 10000) + 1) + 10000);
+        logger.info("Inserting into lockDb for single dispatch check");
+        lockRepository.insert(message);
 
         // Send feedback back to scheduler
-        sender.sendFeedbackToScheduler(message);*/
+        sender.sendFeedbackToScheduler(message);
     }
 }

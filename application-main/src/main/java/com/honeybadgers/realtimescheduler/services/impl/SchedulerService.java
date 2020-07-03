@@ -3,6 +3,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.LockRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -10,6 +11,7 @@ import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.TransactionException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -33,6 +35,9 @@ public class SchedulerService implements ISchedulerService {
 
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
+
+    @Autowired
+    SchedulerService _self;
 
     @Autowired
     TaskRepository taskRepository;
@@ -93,74 +98,119 @@ public class SchedulerService implements ISchedulerService {
     }
 
     @Override
-    public void scheduleTask(String trigger) {
-        try {
-            List<Task> waitingTasks;
+    public void scheduleTaskWrapper(String trigger) {
+        // get all tasks
+        List<Task> waitingTasks;
+        if(trigger.equals(scheduler_trigger))
+            waitingTasks = taskRepository.findAllScheduledTasksSorted();
+        else
+            waitingTasks = taskRepository.findAllWaitingTasks();
 
-            if(trigger.equals(scheduler_trigger))
-                waitingTasks = taskRepository.findAllScheduledTasksSorted();
-            else
-                waitingTasks = taskRepository.findAllWaitingTasks();
-            for (Task task : waitingTasks ) {
-                task.setTotalPriority(taskService.calculatePriority(task));
-                logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
-                task.setStatus(TaskStatusEnum.Scheduled);
-                taskService.updateTaskhistory(task, TaskStatusEnum.Scheduled);
-                taskRepository.save(task);
+        // schedule tasks
+        logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
+        for (Task task : waitingTasks ) {
+            try {
+                _self.scheduleTask(task);
+            } catch (LockAcquisitionException exception) {
+                logger.warn("Task " + task.getId() + " Scheduling LockAcquisitionException!");
+            } catch (TransactionException exception) {
+                logger.warn("Task " + task.getId() + " Scheduling TransactionException!");
             }
-            List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
-            if (!isSchedulerPaused()) {
-                sendTaskstoDispatcher(tasks);
-            } else
-                logger.info("Scheduler is locked!");
-        } catch (LockAcquisitionException e) {
-            logger.info("LockAcquisitionException caught -> will be tried again at some point");
         }
+
+        // dispatch tasks
+        List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
+        if (!isSchedulerPaused()) {
+            logger.info("Step 3: dispatching " + tasks.size() + " tasks");
+            for (Task task : tasks) {
+                try {
+                    _self.sendTaskstoDispatcher(task);
+                    logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
+                } catch (LockAcquisitionException exception) {
+                    // TODO document: if scheduler crashes here -> task could be dispatched twice
+                    logger.warn("Task " + task.getId() + " Dispatching LockAcquisitionException!");
+                    if(inQueue(task)) {
+                        removeFromQueue(task);
+                    }
+                } catch (TransactionException exception) {
+                    // TODO document: if scheduler crashes here -> task could be dispatched twice
+                    logger.warn("Task " + task.getId() + " Dispatching TransactionException!");
+                    if(inQueue(task)) {
+                        removeFromQueue(task);
+                    }
+                }
+            }
+        } else
+            logger.info("Scheduler is locked!");
+    }
+
+    public boolean inQueue(Task task) {
+        return false;
+    }
+
+    public void removeFromQueue(Task task) {
+        return;
     }
 
     /**
-     * Tries to send each task in the given list to the dispatcher if the conditions for sending (of each individual task) are met.
-     * @Transactional here only just to be sure (should be already in transaction due to only being called by transactional method)
-     * @param tasks List of tasks to be send to the dispatcher
+     * Schedule given task and update in DB (Running as transaction)
+     * @param task task to be scheduled
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void sendTaskstoDispatcher(List<Task> tasks) {
-        for (Task currentTask : tasks) {
-            if (isTaskPaused(currentTask.getId())) {
-                logger.info("Task " + currentTask.getId() + " is currently paused!");
-                continue;
-            }
-
-            List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
-
-            if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
-                continue;
-
-            if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
-                continue;
-
-            // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
-            Group parentGroup = currentTask.getGroup();
-
-            int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
-            // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
-            if (parentGroup.getCurrentParallelismDegree() >= limit) {
-                logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
-                continue;
-            }
-            currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
-
-            //logger.debug("Task " + currentTask.getId() + " sent.");
-            sender.sendTaskToDispatcher(currentTask.getId());
-
-            currentTask.setStatus(TaskStatusEnum.Dispatched);
-            taskService.updateTaskhistory(currentTask, TaskStatusEnum.Dispatched);
-            taskRepository.save(currentTask);
-            logger.info("Task " + currentTask.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
-        }
-
+    public void scheduleTask(Task task) {
+        task.setTotalPriority(taskService.calculatePriority(task));
+        logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
+        task.setStatus(TaskStatusEnum.Scheduled);
+        taskService.updateTaskhistory(task, TaskStatusEnum.Scheduled);
+        taskRepository.save(task);
     }
 
+    /**
+     * Tries to send given task to the dispatcher if the conditions for sending are met.
+     * @param currentTask task to be send to the dispatcher
+     */
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public void sendTaskstoDispatcher(Task currentTask) {
+        if (isTaskPaused(currentTask.getId())) {
+            logger.info("Task " + currentTask.getId() + " is currently paused!");
+            return;
+        }
+
+        List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
+
+        if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
+            return;
+
+        if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
+            return;
+
+        // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
+        Group parentGroup = currentTask.getGroup();
+
+        int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
+        // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
+        if (parentGroup.getCurrentParallelismDegree() >= limit) {
+            logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
+            return;
+        }
+        // TODO unnötig -> groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()) reicht, solange currentTask.group danach nicht benutzt wird
+        currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
+
+        //logger.debug("Task " + currentTask.getId() + " sent.");
+        sender.sendTaskToDispatcher(currentTask.getId());
+
+        // TODO custom query
+        currentTask.setStatus(TaskStatusEnum.Dispatched);
+        taskService.updateTaskhistory(currentTask, TaskStatusEnum.Dispatched);
+        taskRepository.save(currentTask);
+    }
+
+    /**
+     * Checks groups with id in given list on paused
+     * @param groupsOfTask List of groupIds to be checked on paused
+     * @param taskid taskId of logging
+     * @return true if one group is paused
+     */
     public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask, String taskid) {
         for (String groupId : groupsOfTask) {
             // check if group is paused (IllegalArgExc should not happen, because groupsOfTask was check on containing null values)
@@ -172,6 +222,11 @@ public class SchedulerService implements ISchedulerService {
         return false;
     }
 
+    /**
+     * Check if given task has to wait due to its sequence number
+     * @param task task to be checked
+     * @return true if task has to wait
+     */
     public boolean sequentialHasToWait(Task task) {
         if (task.getModeEnum() == Sequential) {
             logger.debug("task getIndexNumber " + task.getIndexNumber());

@@ -63,8 +63,8 @@ public class SchedulerServiceTest {
         when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
-        doNothing().when(spy).sendTaskstoDispatcher(anyList());
-        spy.scheduleTask("as");
+        //TODO doNothing().when(spy).sendTaskstoDispatcher(anyList());
+        spy.scheduleTaskWrapper("as");
 
         verify(taskRepository).save(any());
         verify(taskService).calculatePriority(t);
@@ -81,7 +81,7 @@ public class SchedulerServiceTest {
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         SchedulerService spy = spy(service);
-        spy.scheduleTask("123");
+        spy.scheduleTaskWrapper("123");
         verify(spy, never()).sendTaskstoDispatcher(any());
     }
 
@@ -160,7 +160,7 @@ public class SchedulerServiceTest {
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         //Act
-        spy.sendTaskstoDispatcher(tasks);
+        //TODO spy.sendTaskstoDispatcher(tasks);
 
         //Assert
         assertEquals(1, groupIncremented.getCurrentParallelismDegree().intValue());
@@ -195,7 +195,7 @@ public class SchedulerServiceTest {
         when(pausedRepository.findById(PAUSED_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
         when(taskService.getRecursiveGroupsOfTask(any())).thenReturn(groupList);
 
-        spy.sendTaskstoDispatcher(tasks);
+        //TODO spy.sendTaskstoDispatcher(tasks);
 
         assertEquals(1, task1.getGroup().getCurrentParallelismDegree().intValue());
         verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
@@ -228,7 +228,7 @@ public class SchedulerServiceTest {
 
         when(taskRepository.save(any(Task.class))).thenReturn(task1);
 
-        spy.sendTaskstoDispatcher(tasks);
+        //TODO spy.sendTaskstoDispatcher(tasks);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
         assertEquals(0, group.getCurrentParallelismDegree().intValue());
@@ -260,7 +260,7 @@ public class SchedulerServiceTest {
 
         when(taskRepository.save(any(Task.class))).thenReturn(task1);
 
-        spy.sendTaskstoDispatcher(tasks);
+        //TODO spy.sendTaskstoDispatcher(tasks);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
         assertEquals(0, group.getCurrentParallelismDegree().intValue());
