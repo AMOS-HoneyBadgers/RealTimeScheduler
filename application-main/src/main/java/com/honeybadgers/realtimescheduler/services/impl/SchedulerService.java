@@ -99,6 +99,7 @@ public class SchedulerService implements ISchedulerService {
             for (Task task : waitingTasks ) {
                 task.setTotalPriority(taskService.calculatePriority(task));
                 logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
+                //TODO Refactor
                 task.setStatus(TaskStatusEnum.Scheduled);
                 taskService.updateTaskhistory(task, TaskStatusEnum.Scheduled);
                 taskRepository.save(task);
