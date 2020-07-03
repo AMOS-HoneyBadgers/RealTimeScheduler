@@ -26,7 +26,6 @@ public class TaskConsumer {
         try {
             service.scheduleTask("");
         } catch(Exception e) {
-            logger.error(e.getStackTrace());
             logger.error(e.getMessage());
         }
     }

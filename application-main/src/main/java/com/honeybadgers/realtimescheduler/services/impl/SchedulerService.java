@@ -134,7 +134,8 @@ public class SchedulerService implements ISchedulerService {
         } catch (Exception e) {
             if (e.getClass().equals(LockException.class))
                 logger.info("lockexception caught");
-            t.interrupt();
+            if(t != null)
+                t.interrupt();
         }
     }
 
@@ -191,7 +192,7 @@ public class SchedulerService implements ISchedulerService {
             } catch (Exception e) {
                 if(e.getClass().equals(InterruptedException.class)) {
                     releaseLock();
-                    logger.info("releasing lock cause thread was interrupted by scheduler");
+                    logger.info(lockresponse.getValue() + " releasing lock cause thread was interrupted by scheduler");
                 }
                 if (e.getClass().equals(LockException.class))
                     throw e;
