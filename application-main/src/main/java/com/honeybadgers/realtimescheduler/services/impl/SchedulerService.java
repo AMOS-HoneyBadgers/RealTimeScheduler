@@ -13,9 +13,11 @@ import org.apache.logging.log4j.Logger;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -51,6 +53,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Autowired
     GroupRepository groupRepository;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public int getLimitFromGroup(List<String> groupsOfTask, String grpId) {
         int minLimit = Integer.MAX_VALUE;
@@ -95,6 +99,12 @@ public class SchedulerService implements ISchedulerService {
     @Override
     public void scheduleTask(String trigger) {
         try {
+            if(!checkIfAllowedtoSchedule())
+                return;
+
+            Thread t = new HelloThread();
+            t.start();
+
             List<Task> waitingTasks;
 
             if(trigger.equals(scheduler_trigger))
@@ -115,6 +125,58 @@ public class SchedulerService implements ISchedulerService {
                 logger.info("Scheduler is locked!");
         } catch (LockAcquisitionException e) {
             logger.info("LockAcquisitionException caught -> will be tried again at some point");
+        }
+    }
+
+
+    private String checkIfAllowedtoSchedule() {
+        String url = "https://lockservice-amos.cfapps.io/";
+        final String scheduler = "SCHEDULER";
+
+        // create headers
+        HttpHeaders headers = new HttpHeaders();
+        // set `accept` header
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+        // build the request
+        HttpEntity<Object> entity = new HttpEntity<>(null, headers);
+
+        // send POST request
+        ResponseEntity<Object> response = restTemplate.postForEntity(url+scheduler, entity, Object.class);
+
+        if(response.getStatusCode() != HttpStatus.OK)
+            return null;
+
+        return response.getBody()
+    }
+
+    public static class HelloThread extends Thread {
+
+        public void run() {
+            RestTemplate restTemplate = new RestTemplate();
+
+            while(true) {
+                final String scheduler = "SCHEDULER/";
+                final String expiry = "30000";
+                String url = "https://lockservice-amos.cfapps.io/"+scheduler+expiry;
+
+
+                // create headers
+                HttpHeaders headers = new HttpHeaders();
+                // set `accept` header
+                headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+
+                // build the request
+                HttpEntity<Object> entity = new HttpEntity<>(null, headers);
+
+                // send Put request
+                ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.PUT, entity, Object.class);
+
+
+                if(response.getStatusCode() != HttpStatus.OK)
+                    return false;
+
+            }
         }
     }
 
