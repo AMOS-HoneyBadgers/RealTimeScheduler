@@ -248,7 +248,6 @@ public class SchedulerService implements ISchedulerService {
             }
             currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
-            //logger.debug("Task " + currentTask.getId() + " sent.");
             sender.sendTaskToDispatcher(currentTask.getId());
 
             currentTask.setStatus(TaskStatusEnum.Dispatched);
