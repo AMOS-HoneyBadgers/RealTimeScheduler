@@ -106,7 +106,6 @@ public class SchedulerService implements ISchedulerService {
                 return;
 
             t = new HelloThread(lockResponse);
-
             t.start();
 
             List<Task> waitingTasks;
@@ -115,6 +114,7 @@ public class SchedulerService implements ISchedulerService {
                 waitingTasks = taskRepository.findAllScheduledTasksSorted();
             else
                 waitingTasks = taskRepository.findAllWaitingTasks();
+
             for (Task task : waitingTasks) {
                 task.setTotalPriority(taskService.calculatePriority(task));
                 logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
@@ -122,7 +122,9 @@ public class SchedulerService implements ISchedulerService {
                 taskService.updateTaskhistory(task, TaskStatusEnum.Scheduled);
                 taskRepository.save(task);
             }
+
             List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
+
             if (!isSchedulerPaused()) {
                 sendTaskstoDispatcher(tasks);
             } else
@@ -147,8 +149,11 @@ public class SchedulerService implements ISchedulerService {
         // send POST request
         ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
 
-        if (response.getStatusCode() != HttpStatus.OK)
+        if (response.getStatusCode() != HttpStatus.OK) {
+            logger.info("lock for scheduler already acquired");
             return null;
+        }
+
 
         logger.info("acquired lock for: " + response.getBody().getValue());
         return response.getBody();
@@ -176,8 +181,10 @@ public class SchedulerService implements ISchedulerService {
                     // send Put request
                     ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
 
-                    if (response.getStatusCode() != HttpStatus.OK)
+                    if (response.getStatusCode() != HttpStatus.OK) {
+                        logger.error("could not refresh lock");
                         throw new LockException("could not refresh lock");
+                    }
 
                     Thread.sleep(15000);
                 }

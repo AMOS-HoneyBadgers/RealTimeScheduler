@@ -138,10 +138,9 @@ public class TaskIdApiController implements TaskIdApi {
                 if (taskModel.getForce() != null && taskModel.getForce()) {
                     taskService.sendTaskToPriorityQueue(taskModel);
                     logger.info("Task " + taskModel.getId() + " was immediately dispatched");
-                } /*else
-                    taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());*/
+                }
             }
-            taskService.sendTaskToTaskEventQueue("");
+            taskService.sendTaskToTaskEventQueue("bulk");
 
         } catch (UnknownEnumException e) {
             response.setCode("400");
