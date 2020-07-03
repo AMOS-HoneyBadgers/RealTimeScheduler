@@ -102,7 +102,7 @@ public class SchedulerService implements ISchedulerService {
         Thread t = null;
         try {
             LockResponse lockResponse = checkIfAllowedtoSchedule();
-            if (lockResponse != null)
+            if (lockResponse == null)
                 return;
 
             t = new HelloThread(lockResponse);
@@ -142,12 +142,7 @@ public class SchedulerService implements ISchedulerService {
         final String scheduler = "SCHEDULER";
 
         // create headers
-        HttpHeaders headers = new HttpHeaders();
-        // set `accept` header
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-        // build the request
-        HttpEntity<Object> entity = new HttpEntity<>(null, headers);
+        HttpEntity<Object> entity = getObjectHttpEntity();
 
         // send POST request
         ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
@@ -161,44 +156,55 @@ public class SchedulerService implements ISchedulerService {
 
     public static class HelloThread extends Thread {
         LockResponse lockresponse;
+        RestTemplate restTemplate;
+        final String name;
+        final String value;
 
         public HelloThread(LockResponse resp) {
             lockresponse = resp;
+            restTemplate = new RestTemplate();
+            name =  lockresponse.getName();
+            value = lockresponse.getValue();
         }
 
         @SneakyThrows
         public void run() {
             try {
-                RestTemplate restTemplate = new RestTemplate();
-                final String name = lockresponse.getName();
-                final String value = lockresponse.getValue();
-
-                // create headers
-                HttpHeaders headers = new HttpHeaders();
-                // set `accept` header
-                headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-
-                // build the request
-                HttpEntity<Object> entity = new HttpEntity<>(null, headers);
-
+                HttpEntity<Object> entity = getObjectHttpEntity();
                 String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
-
-                logger.info("url is for lock extension is : " + url);
                 while (true) {
                     // send Put request
                     ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
 
-                    logger.info("response for extension is:  " + response.getBody());
                     if (response.getStatusCode() != HttpStatus.OK)
                         throw new LockException("could not refresh lock");
 
                     Thread.sleep(15000);
                 }
             } catch (Exception e) {
+                if(e.getClass().equals(InterruptedException.class)) {
+                    releaseLock();
+                    logger.info("releasing lock cause thread was interrupted by scheduler");
+                }
                 if (e.getClass().equals(LockException.class))
                     throw e;
             }
         }
+
+        public void releaseLock() {
+            HttpEntity<Object> entity = getObjectHttpEntity();
+            String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
+            ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, LockResponse.class);
+        }
+    }
+
+    private static HttpEntity<Object> getObjectHttpEntity() {
+        // create headers
+        HttpHeaders headers = new HttpHeaders();
+        // set `accept` header
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        // build the request
+        return new HttpEntity<>(null, headers);
     }
 
     /**
