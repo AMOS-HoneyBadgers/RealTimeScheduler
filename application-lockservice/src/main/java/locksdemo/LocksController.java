@@ -39,7 +39,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/")
 @RequiredArgsConstructor(onConstructor=@_(@Autowired))
 public class LocksController {
-	
+
+	@Autowired
 	private final LockService service;
 
 	@RequestMapping(method=RequestMethod.GET)

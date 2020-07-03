@@ -25,12 +25,14 @@ import lombok.Setter;
 
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
+import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 
 /**
  * @author Dave Syer
  *
  */
+@Service
 public class RedisLockService implements LockService {
 
 	private static final String DEFAULT_LOCK_PREFIX = "spring.lock.";

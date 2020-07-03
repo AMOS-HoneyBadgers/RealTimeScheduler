@@ -79,3 +79,12 @@ applications:
       - postgres_credentials
       - rabbit_credentials
       - rabbit
+  - name: lockservice-amos
+    buildpacks:
+      - java_buildpack
+    instances: 1
+    memory: 1G
+    path: application-lockservice/target/application-lockservice-0.0.1-SNAPSHOT.jar
+    services:
+      - redis
+      - postgres_credentials

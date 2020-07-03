@@ -15,7 +15,10 @@
  */
 package locksdemo;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
+import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.RedisOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -45,5 +48,14 @@ class RedisUtils {
 	static RedisOperations<String, String> stringTemplate(
 			RedisConnectionFactory redisConnectionFactory) {
 		return new StringRedisTemplate(redisConnectionFactory);
+	}
+
+	@Bean
+	public RedisConnectionFactory redisConnectionFactory() {
+		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
+		redisStandaloneConfiguration.setHostName("redis-19796.c8.us-east-1-3.ec2.cloud.redislabs.com");
+		redisStandaloneConfiguration.setPassword("fqFLV2FheLLAMbdqaaHiWGCweQS7uzCx");
+		redisStandaloneConfiguration.setPort(19796);
+		return new JedisConnectionFactory(redisStandaloneConfiguration);
 	}
 }
