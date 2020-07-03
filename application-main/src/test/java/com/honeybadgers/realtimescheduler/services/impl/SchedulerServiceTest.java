@@ -53,7 +53,7 @@ public class SchedulerServiceTest {
     private SchedulerService service;
 
     @Test
-    public void testScheduleTask() {
+    public void testScheduleTaskWrapper() {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
 
@@ -63,12 +63,49 @@ public class SchedulerServiceTest {
         when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
-        //TODO doNothing().when(spy).sendTaskstoDispatcher(anyList());
+        // unfortunately not possible to mock sendTaskToDispatcher due to calling method on _self proxy
+        // (mocking self results into mocking service which makes this tests useless)
+
         spy.scheduleTaskWrapper("as");
 
-        verify(taskRepository).save(any());
+        verify(taskRepository, times(2)).save(any());// once in scheduleTask and once in sendTaskToDispatcher
         verify(taskService).calculatePriority(t);
         verify(taskRepository).findAllScheduledTasksSorted();
+    }
+
+
+    @Test
+    public void testScheduleTaskWrapper_3TasksPresentInDatabase_IsOnlyAllowedToSend1() {
+
+        Group group = createGroupTestObject();
+        ArrayList<String> groupList = new ArrayList<>();
+        groupList.add("456");
+        Task task1 = createTaskTestObject(group, "5");
+        List<Task> tasks = new ArrayList<Task>();
+        tasks.add(task1);
+        tasks.add(task1);
+        tasks.add(task1);
+        SchedulerService spy = spy(service);
+        Group groupIncremented = createGroupTestObject();
+        groupIncremented.setCurrentParallelismDegree(task1.getGroup().getCurrentParallelismDegree()+1);
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(tasks);
+        when(taskRepository.findAllWaitingTasks()).thenReturn(tasks);
+        when(groupRepository.incrementCurrentParallelismDegree(group.getId())).thenReturn(groupIncremented);
+        when(groupService.getGroupById(group.getId())).thenReturn(group);
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
+        when(pausedRepository.findById(PAUSED_GROUP_PREFIX +"456")).thenReturn(Optional.empty());
+        when(taskRepository.save(any(Task.class))).thenReturn(task1);
+
+        // mock everything related to isPaused
+        when(pausedRepository.findById(PAUSED_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
+        when(taskService.getRecursiveGroupsOfTask(any())).thenReturn(groupList);
+
+        doNothing().when(spy).scheduleTask(any());
+
+        spy.scheduleTaskWrapper("as");
+
+        assertEquals(1, task1.getGroup().getCurrentParallelismDegree().intValue());
+        verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
     }
 
     @Test
@@ -143,10 +180,8 @@ public class SchedulerServiceTest {
     @Test
     public void testSendTasksToDispatcher() {
         //Arrange
-        List<Task> tasks = new ArrayList<Task>();
         Group group = createGroupTestObject();
         Task task = createTaskTestObject(group, "TEST");
-        tasks.add(task);
 
         SchedulerService spy = spy(service);
         Group groupIncremented = createGroupTestObject();
@@ -160,7 +195,7 @@ public class SchedulerServiceTest {
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         //Act
-        //TODO spy.sendTaskstoDispatcher(tasks);
+        spy.sendTaskstoDispatcher(task);
 
         //Assert
         assertEquals(1, groupIncremented.getCurrentParallelismDegree().intValue());
@@ -168,37 +203,6 @@ public class SchedulerServiceTest {
         verify(taskRepository).save(any(Task.class));
         verify(pausedRepository,times(1)).findById(any());
         verify(spy).getLimitFromGroup(any(),any());
-    }
-
-
-    @Test
-    public void testSendTasksToDispatcher_3TasksPresentinDatabase_IsOnlyAllowedToSend1() {
-
-        Group group = createGroupTestObject();
-        ArrayList<String> groupList = new ArrayList<>();
-        groupList.add("456");
-        Task task1 = createTaskTestObject(group, "5");
-        List<Task> tasks = new ArrayList<Task>();
-        tasks.add(task1);
-        tasks.add(task1);
-        tasks.add(task1);
-        SchedulerService spy = spy(service);
-        Group groupIncremented = createGroupTestObject();
-        groupIncremented.setCurrentParallelismDegree(task1.getGroup().getCurrentParallelismDegree()+1);
-        when(groupRepository.incrementCurrentParallelismDegree(group.getId())).thenReturn(groupIncremented);
-        when(groupService.getGroupById(group.getId())).thenReturn(group);
-        when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
-        when(pausedRepository.findById(PAUSED_GROUP_PREFIX +"456")).thenReturn(Optional.empty());
-        when(taskRepository.save(any(Task.class))).thenReturn(task1);
-
-        // mock everything related to isPaused
-        when(pausedRepository.findById(PAUSED_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
-        when(taskService.getRecursiveGroupsOfTask(any())).thenReturn(groupList);
-
-        //TODO spy.sendTaskstoDispatcher(tasks);
-
-        assertEquals(1, task1.getGroup().getCurrentParallelismDegree().intValue());
-        verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
     }
 
     private Task createTaskTestObject(Group group, String id) {
@@ -212,28 +216,26 @@ public class SchedulerServiceTest {
     @Test
     public void sendTasksToDispatcher_taskPaused() {
         Group group = createGroupTestObject();
-        Task task1 = createTaskTestObject(group,"TEST");
-        List<Task> tasks = new ArrayList<Task>();
-        tasks.add(task1);
+        Task task = createTaskTestObject(group,"TEST");
 
         Paused taskPaused = new Paused();
-        taskPaused.setId(PAUSED_TASK_PREFIX + task1.getId());
+        taskPaused.setId(PAUSED_TASK_PREFIX + task.getId());
 
         SchedulerService spy = spy(service);
-        when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
 
         // mock everything related to isPaused
         when(pausedRepository.findById(taskPaused.getId())).thenReturn(Optional.of(taskPaused));
-        when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>());
+        when(taskService.getRecursiveGroupsOfTask(task.getId())).thenReturn(new ArrayList<>());
 
-        when(taskRepository.save(any(Task.class))).thenReturn(task1);
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
 
-        //TODO spy.sendTaskstoDispatcher(tasks);
+        spy.sendTaskstoDispatcher(task);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
         assertEquals(0, group.getCurrentParallelismDegree().intValue());
         verify(pausedRepository, never()).save(any());
-        verify(sender, never()).sendTaskToDispatcher(task1.getId());
+        verify(sender, never()).sendTaskToDispatcher(task.getId());
         verify(taskRepository, never()).save(any(Task.class));
     }
 
@@ -243,9 +245,7 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setId("testGroup");
 
-        Task task1 = createTaskTestObject(group,"5");
-        List<Task> tasks = new ArrayList<Task>();
-        tasks.add(task1);
+        Task task = createTaskTestObject(group,"5");
 
         Paused groupPaused = new Paused();
         groupPaused.setId(PAUSED_GROUP_PREFIX + "testGroup");
@@ -253,19 +253,19 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
 
         // mock everything related to isPaused
-        when(pausedRepository.findById(PAUSED_TASK_PREFIX + task1.getId())).thenReturn(Optional.empty());
-        when(taskService.getRecursiveGroupsOfTask(task1.getId())).thenReturn(new ArrayList<>(Collections.singleton("testGroup")));
+        when(pausedRepository.findById(PAUSED_TASK_PREFIX + task.getId())).thenReturn(Optional.empty());
+        when(taskService.getRecursiveGroupsOfTask(task.getId())).thenReturn(new ArrayList<>(Collections.singleton("testGroup")));
         when(pausedRepository.findById(groupPaused.getId())).thenReturn(Optional.of(groupPaused));
-        when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
+        when(taskService.getTaskById(any())).thenReturn(Optional.of(task));
 
-        when(taskRepository.save(any(Task.class))).thenReturn(task1);
+        when(taskRepository.save(any(Task.class))).thenReturn(task);
 
-        //TODO spy.sendTaskstoDispatcher(tasks);
+        spy.sendTaskstoDispatcher(task);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
         assertEquals(0, group.getCurrentParallelismDegree().intValue());
         verify(pausedRepository, never()).save(any());
-        verify(sender, never()).sendTaskToDispatcher(task1.getId());
+        verify(sender, never()).sendTaskToDispatcher(task.getId());
         verify(taskRepository, never()).save(any(Task.class));
     }
 
