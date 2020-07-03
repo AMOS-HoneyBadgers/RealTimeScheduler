@@ -3,7 +3,6 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
-import com.honeybadgers.postgre.repository.LockRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -15,6 +14,7 @@ import org.hibernate.TransactionException;
 import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,7 +111,7 @@ public class SchedulerService implements ISchedulerService {
         for (Task task : waitingTasks ) {
             try {
                 _self.scheduleTask(task);
-            } catch (LockAcquisitionException exception) {
+            } catch (LockAcquisitionException | CannotAcquireLockException exception) {
                 logger.warn("Task " + task.getId() + " Scheduling LockAcquisitionException!");
             } catch (TransactionException exception) {
                 logger.warn("Task " + task.getId() + " Scheduling TransactionException!");
@@ -126,7 +126,7 @@ public class SchedulerService implements ISchedulerService {
                 try {
                     _self.sendTaskstoDispatcher(task);
                     logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
-                } catch (LockAcquisitionException exception) {
+                } catch (LockAcquisitionException | CannotAcquireLockException exception) {
                     // TODO document: if scheduler crashes here -> task could be dispatched twice
                     logger.warn("Task " + task.getId() + " Dispatching LockAcquisitionException!");
                     if(inQueue(task)) {
@@ -160,8 +160,7 @@ public class SchedulerService implements ISchedulerService {
     public void scheduleTask(Task task) {
         task.setTotalPriority(taskService.calculatePriority(task));
         logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
-        task.setStatus(TaskStatusEnum.Scheduled);
-        taskService.updateTaskhistory(task, TaskStatusEnum.Scheduled);
+        taskService.updateTaskStatus(task, TaskStatusEnum.Scheduled);
         taskRepository.save(task);
     }
 
@@ -200,8 +199,7 @@ public class SchedulerService implements ISchedulerService {
         sender.sendTaskToDispatcher(currentTask.getId());
 
         // TODO custom query
-        currentTask.setStatus(TaskStatusEnum.Dispatched);
-        taskService.updateTaskhistory(currentTask, TaskStatusEnum.Dispatched);
+        taskService.updateTaskStatus(currentTask, TaskStatusEnum.Dispatched);
         taskRepository.save(currentTask);
     }
 

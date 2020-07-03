@@ -361,7 +361,7 @@ public class TaskServiceTest {
         Task taskNoHistory = new Task();
         taskNoHistory.setHistory(null);
 
-        assertThrows(RuntimeException.class, () -> service.updateTaskhistory(taskNoHistory, TaskStatusEnum.Waiting));
+        assertThrows(RuntimeException.class, () -> service.updateTaskStatus(taskNoHistory, TaskStatusEnum.Waiting));
     }
 
     @Test
@@ -375,7 +375,7 @@ public class TaskServiceTest {
         history.add(hist);
         task.setHistory(history);
 
-        service.updateTaskhistory(task, TaskStatusEnum.Scheduled);
+        service.updateTaskStatus(task, TaskStatusEnum.Scheduled);
 
         assertEquals(2, task.getHistory().size());
 

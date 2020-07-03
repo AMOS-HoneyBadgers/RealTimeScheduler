@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.IllegalTransactionStateException;
 import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
@@ -61,16 +59,14 @@ public class FeedbackConsumer {
                 if(currentTask.getModeEnum()== ModeEnum.Sequential)
                     checkAndSetSequentialAndIndexNumber(currentTask);
 
-                // Todo refactor put into 1 method
-                taskService.updateTaskhistory(currentTask, TaskStatusEnum.Finished);
                 taskService.finishTask(currentTask);
 
                 schedulerService.scheduleTaskWrapper("");
                 break;
             }
-            catch (CannotAcquireLockException | IllegalTransactionStateException exception){
+            catch (CannotAcquireLockException | LockAcquisitionException exception){
                 double timeToSleep= Math.random()*1000*iteration;
-                logger.error("Task " + taskid + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                logger.warn("Task " + taskid + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
