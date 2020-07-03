@@ -70,7 +70,7 @@ public class TaskServiceTest {
 
 
     @Test
-    public void testCreateTask() throws JpaException, UnknownEnumException, CreationException {
+    public void testCreateTask() throws JpaException, UnknownEnumException, CreationException, InterruptedException {
         UUID taskId = UUID.randomUUID();
 
         TaskModel restModel = new TaskModel();
@@ -104,7 +104,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTask() throws UnknownEnumException, JpaException, CreationException {
+    public void testUpdateTask() throws UnknownEnumException, JpaException, CreationException, InterruptedException {
         UUID taskId =  UUID.randomUUID();
 
         TaskModel restModel = new TaskModel();

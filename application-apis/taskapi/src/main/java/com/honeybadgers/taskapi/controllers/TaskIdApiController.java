@@ -99,6 +99,10 @@ public class TaskIdApiController implements TaskIdApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
@@ -148,6 +152,10 @@ public class TaskIdApiController implements TaskIdApi {
             return ResponseEntity.badRequest().body(response);
         } catch (JpaException | CreationException e) {
             response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }

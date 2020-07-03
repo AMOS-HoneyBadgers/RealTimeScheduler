@@ -12,11 +12,14 @@ import com.honeybadgers.taskapi.service.ITaskConvertUtils;
 import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.IllegalTransactionStateException;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -56,51 +59,72 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
-        Task checkTask = taskRepository.findById(restModel.getId().toString()).orElse(null);
-        if( checkTask != null ){
-            throw new JpaException("Primary or unique constraint failed!");
-        }
+    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException {
+        int iteration =1;
+        while (true){
+            try{
+                Task checkTask = taskRepository.findById(restModel.getId().toString()).orElse(null);
+                if( checkTask != null ){
+                    throw new JpaException("Primary or unique constraint failed!");
+                }
 
-        Task newTask = converter.taskRestToJpa(restModel);
+                Task newTask = converter.taskRestToJpa(restModel);
 
-        try {
-            taskRepository.save(newTask);
-        } catch (DataIntegrityViolationException e) {
-            logger.error("DataIntegrityViolation on save new task!");
-            logger.error(e.getStackTrace());
-            throw new JpaException("DataIntegrityViolation on save new task!");
+                try {
+                    taskRepository.save(newTask);
+                } catch (DataIntegrityViolationException e) {
+                    logger.error("DataIntegrityViolation on save new task!");
+                    logger.error(e.getStackTrace());
+                    throw new JpaException("DataIntegrityViolation on save new task!");
+                }
+                return newTask;
+            } catch (CannotAcquireLockException | LockAcquisitionException exception){
+                double timeToSleep= Math.random()*1000*iteration;
+                logger.warn("Task " + restModel.getId() + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                Thread.sleep(Math.round(timeToSleep));
+                iteration++;
+            }
         }
-        return newTask;
     }
 
     @Override
-    public Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
-        Task checkTask = taskRepository.findById(taskId.toString()).orElse(null);
-        if(checkTask == null)
-            throw new NoSuchElementException("No existing Task with id: " + taskId);
+    public Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException {
+        int iteration =1;
+        while (true){
+            try{
+                Task checkTask = taskRepository.findById(taskId.toString()).orElse(null);
+                if(checkTask == null)
+                    throw new NoSuchElementException("No existing Task with id: " + taskId);
 
-        if(checkTask.isForce() == true && restModel.getForce() == false)
-            throw new IllegalStateException("Task " + taskId +  " already bypassed scheduling process. Cannot schedule now");
+                if(checkTask.isForce() == true && restModel.getForce() == false)
+                    throw new IllegalStateException("Task " + taskId +  " already bypassed scheduling process. Cannot schedule now");
 
-        restModel.setId(taskId);
-        Task updatedTask = converter.taskRestToJpa(restModel);
+                restModel.setId(taskId);
+                Task updatedTask = converter.taskRestToJpa(restModel);
 
-        if(updatedTask.getStatus() != TaskStatusEnum.Scheduled && updatedTask.getStatus() != TaskStatusEnum.Waiting)
-            throw new IllegalStateException("Task: " + updatedTask.getId() + " already dispatched");
+                if(updatedTask.getStatus() != TaskStatusEnum.Scheduled && updatedTask.getStatus() != TaskStatusEnum.Waiting)
+                    throw new IllegalStateException("Task: " + updatedTask.getId() + " already dispatched");
 
-        updatedTask.setStatus(TaskStatusEnum.Waiting);
+                updatedTask.setStatus(TaskStatusEnum.Waiting);
 
-        try {
-            taskRepository.save(updatedTask);
-            sender.sendTaskToTasksQueue(scheduler_trigger);
-        } catch (DataIntegrityViolationException e) {
-            logger.error("DataIntegrityViolation on save new task!");
-            logger.error(e.getStackTrace());
-            throw new JpaException("DataIntegrityViolation on save new task!");
+                try {
+                    taskRepository.save(updatedTask);
+                    sender.sendTaskToTasksQueue(scheduler_trigger);
+                } catch (DataIntegrityViolationException e) {
+                    logger.error("DataIntegrityViolation on save new task!");
+                    logger.error(e.getStackTrace());
+                    throw new JpaException("DataIntegrityViolation on save new task!");
+                }
+
+                return updatedTask;
+            }
+            catch (LockAcquisitionException | CannotAcquireLockException exception){
+                double timeToSleep= Math.random()*1000*iteration;
+                logger.error("Task " + restModel.getId() + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                Thread.sleep(Math.round(timeToSleep));
+                iteration++;
+            }
         }
-
-        return updatedTask;
     }
 
     @Override
@@ -114,6 +138,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskModel deleteTask(UUID taskid) {
+        // TODO custom query
         Task task = taskRepository.findById(taskid.toString()).orElse(null);
         if(task == null)
             throw new NoSuchElementException("No existing Task with ID: " + taskid);
