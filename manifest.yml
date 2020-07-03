@@ -3,7 +3,7 @@ applications:
   - name: realtimescheduler-amos
     buildpacks:
       - java_buildpack
-    instances: 2
+    instances: 1
     memory: 1G
     path: application-main/target/realtimescheduler-main-0.0.1-SNAPSHOT.jar
     services:

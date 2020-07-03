@@ -8,6 +8,7 @@ import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.exception.LockAcquisitionException;
@@ -98,20 +99,23 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTask(String trigger) {
+        Thread t = null;
         try {
-            if(!checkIfAllowedtoSchedule())
+            LockResponse lockResponse = checkIfAllowedtoSchedule();
+            if (lockResponse != null)
                 return;
 
-            Thread t = new HelloThread();
+            t = new HelloThread(lockResponse);
+
             t.start();
 
             List<Task> waitingTasks;
 
-            if(trigger.equals(scheduler_trigger))
+            if (trigger.equals(scheduler_trigger))
                 waitingTasks = taskRepository.findAllScheduledTasksSorted();
             else
                 waitingTasks = taskRepository.findAllWaitingTasks();
-            for (Task task : waitingTasks ) {
+            for (Task task : waitingTasks) {
                 task.setTotalPriority(taskService.calculatePriority(task));
                 logger.info("Task " + task.getId() + " calculated total priority: " + task.getTotalPriority());
                 task.setStatus(TaskStatusEnum.Scheduled);
@@ -123,13 +127,17 @@ public class SchedulerService implements ISchedulerService {
                 sendTaskstoDispatcher(tasks);
             } else
                 logger.info("Scheduler is locked!");
-        } catch (LockAcquisitionException e) {
-            logger.info("LockAcquisitionException caught -> will be tried again at some point");
+
+            t.interrupt();
+        } catch (Exception e) {
+            if (e.getClass().equals(LockException.class))
+                logger.info("lockexception caught");
+            t.interrupt();
         }
     }
 
 
-    private String checkIfAllowedtoSchedule() {
+    private LockResponse checkIfAllowedtoSchedule() {
         String url = "https://lockservice-amos.cfapps.io/";
         final String scheduler = "SCHEDULER";
 
@@ -142,24 +150,28 @@ public class SchedulerService implements ISchedulerService {
         HttpEntity<Object> entity = new HttpEntity<>(null, headers);
 
         // send POST request
-        ResponseEntity<Object> response = restTemplate.postForEntity(url+scheduler, entity, Object.class);
+        ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
 
-        if(response.getStatusCode() != HttpStatus.OK)
+        if (response.getStatusCode() != HttpStatus.OK)
             return null;
 
-        return response.getBody()
+        logger.info("acquired lock for: " + response.getBody().getValue());
+        return response.getBody();
     }
 
     public static class HelloThread extends Thread {
+        LockResponse lockresponse;
 
+        public HelloThread(LockResponse resp) {
+            lockresponse = resp;
+        }
+
+        @SneakyThrows
         public void run() {
-            RestTemplate restTemplate = new RestTemplate();
-
-            while(true) {
-                final String scheduler = "SCHEDULER/";
-                final String expiry = "30000";
-                String url = "https://lockservice-amos.cfapps.io/"+scheduler+expiry;
-
+            try {
+                RestTemplate restTemplate = new RestTemplate();
+                final String name = lockresponse.getName();
+                final String value = lockresponse.getValue();
 
                 // create headers
                 HttpHeaders headers = new HttpHeaders();
@@ -169,21 +181,31 @@ public class SchedulerService implements ISchedulerService {
                 // build the request
                 HttpEntity<Object> entity = new HttpEntity<>(null, headers);
 
-                // send Put request
-                ResponseEntity<Object> response = restTemplate.exchange(url, HttpMethod.PUT, entity, Object.class);
+                String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
 
+                logger.info("url is for lock extension is : " + url);
+                while (true) {
+                    // send Put request
+                    ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
 
-                if(response.getStatusCode() != HttpStatus.OK)
-                    return false;
+                    logger.info("response for extension is:  " + response.getBody());
+                    if (response.getStatusCode() != HttpStatus.OK)
+                        throw new LockException("could not refresh lock");
 
+                    Thread.sleep(15000);
+                }
+            } catch (Exception e) {
+                if (e.getClass().equals(LockException.class))
+                    throw e;
             }
         }
     }
 
     /**
      * Tries to send each task in the given list to the dispatcher if the conditions for sending (of each individual task) are met.
-     * @Transactional here only just to be sure (should be already in transaction due to only being called by transactional method)
+     *
      * @param tasks List of tasks to be send to the dispatcher
+     * @Transactional here only just to be sure (should be already in transaction due to only being called by transactional method)
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void sendTaskstoDispatcher(List<Task> tasks) {
@@ -312,7 +334,7 @@ public class SchedulerService implements ISchedulerService {
                 }
             }
         } catch (ParseException pe) {
-            logger.error(pe.getMessage());
+            logger.error("active times exception: " + pe.getMessage());
         }
         logger.info("Task " + task.getId() + " is not sent due to ActiveTimes");
         return false;
