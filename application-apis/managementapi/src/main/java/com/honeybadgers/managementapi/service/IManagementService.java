@@ -17,9 +17,9 @@ public interface IManagementService {
     void resumeScheduler();
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    void pauseTask(UUID taskId, OffsetDateTime resumeDate) throws LockException;
+    void pauseTask(String taskId, OffsetDateTime resumeDate) throws LockException;
 
-    void resumeTask(UUID taskId);
+    void resumeTask(String taskId);
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     void pauseGroup(String groupId, OffsetDateTime resumeDate) throws LockException;
