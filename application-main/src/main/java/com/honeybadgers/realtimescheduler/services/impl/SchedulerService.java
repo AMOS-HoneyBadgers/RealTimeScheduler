@@ -111,7 +111,7 @@ public class SchedulerService implements ISchedulerService {
         for (Task task : waitingTasks ) {
             try {
                 _self.scheduleTask(task);
-            } catch (LockAcquisitionException | CannotAcquireLockException exception) {
+            } catch (LockAcquisitionException exception) {
                 logger.warn("Task " + task.getId() + " Scheduling LockAcquisitionException!");
             } catch (TransactionException exception) {
                 logger.warn("Task " + task.getId() + " Scheduling TransactionException!");
@@ -126,7 +126,7 @@ public class SchedulerService implements ISchedulerService {
                 try {
                     _self.sendTaskstoDispatcher(task);
                     logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
-                } catch (LockAcquisitionException | CannotAcquireLockException exception) {
+                } catch (LockAcquisitionException exception) {
                     // TODO document: if scheduler crashes here -> task could be dispatched twice
                     logger.warn("Task " + task.getId() + " Dispatching LockAcquisitionException!");
                     if(inQueue(task)) {

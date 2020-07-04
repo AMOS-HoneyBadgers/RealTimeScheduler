@@ -26,11 +26,18 @@ public class MockDispatcherConsumer {
     LockRepository lockRepository;
 
     @RabbitListener(queues="dispatch.queue", containerFactory = "dispatchcontainerfactory")
-    public void receiveTaskFromSchedulerMockDispatcher(String message) throws InterruptedException {
+    public void receiveTaskFromSchedulerMockDispatcher(String message) {
         logger.info("Received message in Mock Dispatcher'{}'" + message);
 
+        // This is for checking, whereas tasks are dispatched multiple times
         logger.info("Inserting into lockDb for single dispatch check");
-        lockRepository.insert(message);
+        try {
+            lockRepository.insert(message);
+        } catch (DataIntegrityViolationException e) {
+            logger.error("##############################################################################");
+            logger.error("DataIntegrityViolationException for " + message);
+            logger.error("##############################################################################");
+        }
 
         // Send feedback back to scheduler
         sender.sendFeedbackToScheduler(message);
