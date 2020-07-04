@@ -63,8 +63,7 @@ public class FeedbackConsumer {
 
                 schedulerService.scheduleTaskWrapper("");
                 break;
-            }
-            catch (CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (CannotAcquireLockException | LockAcquisitionException exception){
                 double timeToSleep= Math.random()*1000*iteration;
                 logger.warn("Task " + taskid + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
                 Thread.sleep(Math.round(timeToSleep));
