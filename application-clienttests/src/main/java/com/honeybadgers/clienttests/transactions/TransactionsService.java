@@ -82,7 +82,7 @@ public class TransactionsService {
 
         // create a post object
         TaskModel taskModel = new TaskModel();
-        taskModel.setId(UUID.randomUUID());
+        taskModel.setId(UUID.randomUUID().toString());
         taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
         taskModel.setPriority(100);
 
@@ -145,7 +145,7 @@ public class TransactionsService {
 
         // create a post object
         TaskModel taskModel = new TaskModel();
-        taskModel.setId(UUID.fromString(taskid));
+        taskModel.setId(taskid);
         taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
         taskModel.setPriority(100);
 

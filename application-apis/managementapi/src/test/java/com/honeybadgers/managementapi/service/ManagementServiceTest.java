@@ -64,7 +64,7 @@ public class ManagementServiceTest {
         UUID taskId = UUID.randomUUID();
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
         Mockito.when(pausedRepository.findById(lockId)).thenReturn(Optional.empty());
-        assertDoesNotThrow(() -> service.pauseTask(taskId, null));
+        assertDoesNotThrow(() -> service.pauseTask(taskId.toString(), null));
     }
 
     @Test
@@ -74,14 +74,14 @@ public class ManagementServiceTest {
         Paused lockObj = new Paused();
         lockObj.setId(lockId);
         Mockito.when(pausedRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
-        assertThrows(LockException.class, () -> service.pauseTask(taskId, null));
+        assertThrows(LockException.class, () -> service.pauseTask(taskId.toString(), null));
     }
 
     @Test
     public void testResumeTask() {
         UUID taskId = UUID.randomUUID();
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
-        service.resumeTask(taskId);
+        service.resumeTask(taskId.toString());
         Mockito.verify(pausedRepository, Mockito.only()).deleteById(lockId);
     }
 

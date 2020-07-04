@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,6 +31,7 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = TaskConvertUtils.class)
 public class TaskConvertUtilsTest {
 
+    @Qualifier("taskConvertUtils")
     @Autowired
     ITaskConvertUtils converter;
 
@@ -86,7 +88,7 @@ public class TaskConvertUtilsTest {
 
         TaskModel restModel = converter.taskJpaToRest(exampleTask);
 
-        assertEquals(UUID.fromString(taskID),         restModel.getId());
+        assertEquals(taskID,                          restModel.getId());
         assertEquals(group.getId(),                   restModel.getGroupId());
         assertEquals(priority,                        restModel.getPriority().intValue());
         assertEquals(indexNumber,                     restModel.getIndexNumber().intValue());
@@ -110,7 +112,7 @@ public class TaskConvertUtilsTest {
         String groupId = "TestGroup";
         group.setId(groupId);
 
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         Integer priority = 100;
         Integer indexNumber = 1;
         boolean force = false;
@@ -160,7 +162,7 @@ public class TaskConvertUtilsTest {
         String groupId = "TestGroup";
         group.setId(groupId);
 
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         Integer priority = 100;
         Integer indexNumber = 1;
         boolean force = false;

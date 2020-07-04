@@ -47,7 +47,7 @@ public class DefaultApiControllerTest {
         List<TaskModel> tasks = new LinkedList<TaskModel>();
 
         TaskModel taskmodel = new TaskModel();
-        UUID uuid = UUID.randomUUID();
+        String uuid = UUID.randomUUID().toString();
         taskmodel.setId(uuid);
         taskmodel.setGroupId("TestGroup");
         taskmodel.setPriority(100);
@@ -71,7 +71,7 @@ public class DefaultApiControllerTest {
     @Test
     public void testTaskCreate() throws Exception {
         TaskModel testModel = new TaskModel();
-        testModel.setId(UUID.randomUUID());
+        testModel.setId(UUID.randomUUID().toString());
         testModel.setGroupId("TestGruppe");
 
         mvc.perform(post( "/api/task/")
@@ -88,7 +88,7 @@ public class DefaultApiControllerTest {
     @Test
     public void testTaskCreate_JpaExceptionWasThrown() throws Exception {
         TaskModel testModel = new TaskModel();
-        testModel.setId(UUID.randomUUID());
+        testModel.setId(UUID.randomUUID().toString());
         testModel.setGroupId("TestGruppe");
 
         JpaException ex = new JpaException("Primary or unique constraint failed!");
@@ -106,7 +106,7 @@ public class DefaultApiControllerTest {
     @Test
     public void testTaskCreate_EnumExceptionWasThrown() throws Exception {
         TaskModel testModel = new TaskModel();
-        testModel.setId(UUID.randomUUID());
+        testModel.setId(UUID.randomUUID().toString());
         testModel.setGroupId("TestGruppe");
 
         UnknownEnumException ex = new UnknownEnumException ("Invalid Enum");
@@ -124,7 +124,7 @@ public class DefaultApiControllerTest {
     @Test
     public void testTaskCreate_CreationExceptionWasThrown() throws Exception {
         TaskModel testModel = new TaskModel();
-        testModel.setId(UUID.randomUUID());
+        testModel.setId(UUID.randomUUID().toString());
         testModel.setGroupId("TestGruppe");
 
         CreationException ex = new CreationException("Group of task has other groups as children -> aborting!");

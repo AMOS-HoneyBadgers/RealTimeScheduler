@@ -8,7 +8,6 @@ package com.honeybadgers.managementapi.controllers;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ErrorModel;
 import com.honeybadgers.managementapi.models.ResponseModel;
-import java.util.UUID;
 import io.swagger.annotations.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -30,7 +29,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T09:37:47.342+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-07-02T17:30:15.667+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "task", description = "the task API")
@@ -59,7 +58,7 @@ public interface TaskApi {
     @RequestMapping(value = "/task/{task_Id}/start",
         produces = { "application/json" }, 
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> taskTaskIdStartPut(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId) {
+    default ResponseEntity<ResponseModel> taskTaskIdStartPut(@ApiParam(value = "",required=true) @PathVariable("task_Id") String taskId) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
@@ -95,7 +94,7 @@ public interface TaskApi {
         produces = { "application/json" }, 
         consumes = { "application/json" },
         method = RequestMethod.PUT)
-    default ResponseEntity<ResponseModel> taskTaskIdStopPut(@ApiParam(value = "",required=true) @PathVariable("task_Id") UUID taskId,@ApiParam(value = "DateTime body which indicates, when to resume scheduling"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
+    default ResponseEntity<ResponseModel> taskTaskIdStopPut(@ApiParam(value = "",required=true) @PathVariable("task_Id") String taskId,@ApiParam(value = "DateTime body which indicates, when to resume scheduling"  )  @Valid @RequestBody(required = false) DateTimeBody dateTimeBody) {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {

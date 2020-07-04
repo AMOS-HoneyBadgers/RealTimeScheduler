@@ -55,7 +55,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
+    public ResponseEntity<TaskModel> taskIdGet(String taskId) {
         try{
             TaskModel restModel = taskService.getTaskById(taskId);
             return ResponseEntity.ok(restModel);
@@ -76,7 +76,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<ResponseModel> taskIdPost(UUID taskId, @Valid TaskModel taskModel) {
+    public ResponseEntity<ResponseModel> taskIdPost(String taskId, @Valid TaskModel taskModel) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
@@ -118,7 +118,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
+    public ResponseEntity<TaskModel> taskIdDelete(String taskId) {
         try{
             TaskModel restModel = taskService.deleteTask(taskId);
             logger.info("Task " + taskId + " deleted.");
