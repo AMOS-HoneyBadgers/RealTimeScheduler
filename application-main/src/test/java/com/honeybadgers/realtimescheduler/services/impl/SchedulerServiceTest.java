@@ -12,6 +12,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.CannotAcquireLockException;
@@ -54,6 +55,9 @@ public class SchedulerServiceTest {
     @Autowired
     private SchedulerService service;
 
+    @Value("${scheduler.trigger}")
+    String scheduler_trigger;
+
     @Test
     public void testScheduleTaskWrapper() {
         Group group = createGroupTestObject();
@@ -73,6 +77,27 @@ public class SchedulerServiceTest {
         verify(taskRepository, times(2)).save(any());// once in scheduleTask and once in sendTaskToDispatcher
         verify(taskService).calculatePriority(t);
         verify(taskRepository).findAllScheduledTasksSorted();
+    }
+
+    @Test
+    public void testScheduleTaskWrapper_schedulerTrigger() {
+        Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
+
+        Task t = createTaskTestObject(group,"TEST");
+        Task t2 = createTaskTestObject(group,"TEST2");
+        SchedulerService spy = spy(service);
+        when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t2)).thenReturn(Collections.singletonList(t2));
+        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+        // unfortunately not possible to mock sendTaskToDispatcher due to calling method on _self proxy
+        // (mocking self results into mocking service which makes this tests useless)
+
+        spy.scheduleTaskWrapper(scheduler_trigger);
+
+        verify(taskRepository, times(2)).save(any());// once in scheduleTask and once in sendTaskToDispatcher
+        verify(taskService).calculatePriority(t2);
+        verify(taskRepository, times(2)).findAllScheduledTasksSorted();
     }
 
     @Test
