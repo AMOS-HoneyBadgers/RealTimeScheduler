@@ -15,6 +15,7 @@ import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
@@ -111,9 +112,9 @@ public class SchedulerService implements ISchedulerService {
         for (Task task : waitingTasks ) {
             try {
                 _self.scheduleTask(task);
-            } catch (LockAcquisitionException exception) {
+            } catch (CannotAcquireLockException | LockAcquisitionException exception) {
                 logger.warn("Task " + task.getId() + " Scheduling LockAcquisitionException!");
-            } catch (TransactionException exception) {
+            } catch (JpaSystemException | TransactionException exception) {
                 logger.warn("Task " + task.getId() + " Scheduling TransactionException!");
             }
         }
@@ -126,13 +127,13 @@ public class SchedulerService implements ISchedulerService {
                 try {
                     _self.sendTaskstoDispatcher(task);
                     logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
-                } catch (LockAcquisitionException exception) {
+                } catch (CannotAcquireLockException | LockAcquisitionException exception) {
                     // TODO document: if scheduler crashes here -> task could be dispatched twice
                     logger.warn("Task " + task.getId() + " Dispatching LockAcquisitionException!");
                     if(inQueue(task)) {
                         removeFromQueue(task);
                     }
-                } catch (TransactionException exception) {
+                } catch (JpaSystemException | TransactionException exception) {
                     // TODO document: if scheduler crashes here -> task could be dispatched twice
                     logger.warn("Task " + task.getId() + " Dispatching TransactionException!");
                     if(inQueue(task)) {

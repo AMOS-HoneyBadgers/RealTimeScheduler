@@ -108,6 +108,28 @@ public class SchedulerServiceTest {
         verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
     }
 
+    /*
+    * 2020-07-04 12:30:18,717 INFO - Task fa702dd5-4e92-4060-9f04-3affd093aded received.
+    * -
+    * 2020-07-04 12:36:00,239 INFO - Task b60d33f3-0d01-4656-ae4c-7f647b74e024 received.
+    *
+    * 2020-07-04 12:30:18,897 INFO - Task fa702dd5-4e92-4060-9f04-3affd093aded Step 1: received Task
+    * -
+    * 2020-07-04 12:36:33,553 INFO - Task a5e63bc3-0002-45a7-9b70-7061f277f6d5 Step 1: received Task -> from here on: Schedule 0 Tasks
+    * 2020-07-04 12:37:12,479 INFO - Step 3: dispatching 0 tasks
+    *
+    * Realtimescheduler still LockAcquisitionException at:
+    * at com.honeybadgers.realtimescheduler.services.impl.SchedulerService.isSchedulerPaused(SchedulerService.java:96) ~[classes/:?]
+    * and
+    * at com.honeybadgers.realtimescheduler.services.impl.SchedulerService.isTaskPaused(SchedulerService.java:80)
+    * and
+    * at com.honeybadgers.realtimescheduler.consumer.FeedbackConsumer.processFeedback(FeedbackConsumer.java:89)
+    * and
+    * at com.honeybadgers.realtimescheduler.consumer.FeedbackConsumer.receiveFeedbackFromDispatcher(FeedbackConsumer.java:58)
+    *
+    * DataIntegr for: 969fa543-cb7b-4bdb-8b86-a9fee2310806  63d0aee6-9f67-45fe-9091-6ef8cf136cbb
+    */
+
     @Test
     public void testIfSchedulerIsLockedDontSend() {
         Group group = createGroupTestObject();
