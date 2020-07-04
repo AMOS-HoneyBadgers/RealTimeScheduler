@@ -31,7 +31,7 @@ public interface IGroupConvertUtils extends IConvertUtils {
     /**
      * Convert a Group from Rest Model to JPA Model.
      * @param groupModel GroupModel received via Rest.
-     * @return Group Object which can be stored in teh Database.
+     * @return Group Object which can be stored in the Database.
      * @throws UnknownEnumException Mode or Type does not exist.
      * @throws NoSuchElementException Parent Group does not exist.
      */

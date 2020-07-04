@@ -77,7 +77,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
+    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, IllegalStateException {
         Task checkTask = taskRepository.findById(taskId).orElse(null);
         if(checkTask == null)
             throw new NoSuchElementException("No existing Task with id: " + taskId);

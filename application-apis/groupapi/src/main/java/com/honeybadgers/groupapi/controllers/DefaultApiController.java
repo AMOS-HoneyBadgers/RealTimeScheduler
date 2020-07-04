@@ -48,9 +48,13 @@ public class DefaultApiController implements DefaultApi {
     }
 
     /**
-     * Create new group request.
+     * POST
+     *
+     * Create new group and save it in Database.
      * @param groupModel new group object (required)
-     * @return
+     * @return New Group created successfully (status code 200)
+     * or Error while creating Group - invalid Group model (status code 400)
+     * or Unauthorized (status code 401)
      */
     @Override
     public ResponseEntity<ResponseModel> rootPost(@Valid GroupModel groupModel) {
@@ -76,9 +80,13 @@ public class DefaultApiController implements DefaultApi {
         return ResponseEntity.ok(response);
     }
 
+
     /**
-     * Get all Groups request.
-     * @return
+     * GET
+     *
+     * Get all Groups from Database.
+     * @return List of Groups (status code 200)
+     * or Unauthorized (status code 401)
      */
     @Override
     public ResponseEntity<List<GroupModel>> rootGet() {

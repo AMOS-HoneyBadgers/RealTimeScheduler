@@ -45,9 +45,13 @@ public class GroupIdApiController implements GroupIdApi {
     }
 
     /**
-     * Get a single Group request.
+     * GET /{groupId}/id
+     *
+     * Get a single Group from Database.
      * @param groupId  (required)
-     * @return
+     * @return requested Group (status code 200)
+     * or Error while retriving Group - groupId not found (status code 404)
+     * or Unauthorized (status code 401)
      */
     @Override
     public ResponseEntity<GroupModel> groupIdIdGet(String groupId) {
@@ -60,10 +64,15 @@ public class GroupIdApiController implements GroupIdApi {
     }
 
     /**
-     * Update a Group request.
+     * POST /{groupId}/id
+     *
+     * Update a Group in Database.
      * @param groupId  (required)
-     * @param groupModel group object (required)
-     * @return
+     * @param groupModel Group object (required)
+     * @return Group updated successfully (status code 200)
+     * or Error while updateing Group - invalid Group model (status code 400)
+     * or Error while updateing Group - groupId not found (status code 404)
+     * or Unauthorized (status code 401)
      */
     @Override
     public ResponseEntity<ResponseModel> groupIdIdPost(String groupId, @Valid GroupModel groupModel) {
@@ -91,10 +100,15 @@ public class GroupIdApiController implements GroupIdApi {
         return ResponseEntity.ok(response);
     }
 
+
     /**
-     * Delete a Group request.
+     * DELETE /{groupId}/id
+     *
+     * Delete a Group in Database.
      * @param groupId  (required)
-     * @return
+     * @return Task was deleted successfully (status code 200)
+     * or Error while deleting Group - groupId not found (status code 404)
+     * or Unauthorized (status code 401)
      */
     @Override
     public ResponseEntity<GroupModel> groupIdIdDelete(String groupId) {
