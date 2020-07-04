@@ -7,12 +7,14 @@ import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import org.hibernate.TransactionException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Time;
@@ -70,6 +72,81 @@ public class SchedulerServiceTest {
 
         verify(taskRepository, times(2)).save(any());// once in scheduleTask and once in sendTaskToDispatcher
         verify(taskService).calculatePriority(t);
+        verify(taskRepository).findAllScheduledTasksSorted();
+    }
+
+    @Test
+    public void testScheduleTaskWrapper_sendToDispatcher_LockException() {
+        Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
+
+        Task t = createTaskTestObject(group,"TEST");
+
+        SchedulerService spy = spy(service);
+
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+
+        when(spy.isTaskPaused(t.getId())).thenThrow(new CannotAcquireLockException(""));
+
+        spy.scheduleTaskWrapper("as");
+
+        verify(spy).inQueue(any());
+    }
+    @Test
+    public void testScheduleTaskWrapper_sendToDispatcher_TransactionException() {
+        Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
+
+        Task t = createTaskTestObject(group,"TEST");
+
+        SchedulerService spy = spy(service);
+
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+
+        when(spy.isTaskPaused(t.getId())).thenThrow(new TransactionException(""));
+
+        spy.scheduleTaskWrapper("as");
+
+        verify(spy).inQueue(any());
+    }
+
+    @Test
+    public void testScheduleTaskWrapper_scheduleTask_LockException() {
+        Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
+
+        Task t = createTaskTestObject(group,"TEST");
+
+        SchedulerService spy = spy(service);
+
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+
+        when(taskService.calculatePriority(any())).thenThrow(new CannotAcquireLockException(""));
+
+        spy.scheduleTaskWrapper("as");
+
+        verify(taskRepository).findAllScheduledTasksSorted();
+    }
+
+    @Test
+    public void testScheduleTaskWrapper_scheduleTask_TransactionException() {
+        Group group = createGroupTestObject();
+        group.setCurrentParallelismDegree(50);
+
+        Task t = createTaskTestObject(group,"TEST");
+
+        SchedulerService spy = spy(service);
+
+        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+
+        when(taskService.calculatePriority(any())).thenThrow(new TransactionException(""));
+
+        spy.scheduleTaskWrapper("as");
+
         verify(taskRepository).findAllScheduledTasksSorted();
     }
 
