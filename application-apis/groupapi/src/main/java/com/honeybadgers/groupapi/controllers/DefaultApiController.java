@@ -48,7 +48,7 @@ public class DefaultApiController implements DefaultApi {
     }
 
     /**
-     * Create new group
+     * Create new group request.
      * @param groupModel new group object (required)
      * @return
      */
@@ -76,6 +76,10 @@ public class DefaultApiController implements DefaultApi {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Get all Groups request.
+     * @return
+     */
     @Override
     public ResponseEntity<List<GroupModel>> rootGet() {
         List<Group> groups = groupService.getAllGroups();

@@ -44,6 +44,11 @@ public class GroupIdApiController implements GroupIdApi {
         return Optional.ofNullable(request);
     }
 
+    /**
+     * Get a single Group request.
+     * @param groupId  (required)
+     * @return
+     */
     @Override
     public ResponseEntity<GroupModel> groupIdIdGet(String groupId) {
         try {
@@ -54,6 +59,12 @@ public class GroupIdApiController implements GroupIdApi {
         }
     }
 
+    /**
+     * Update a Group request.
+     * @param groupId  (required)
+     * @param groupModel group object (required)
+     * @return
+     */
     @Override
     public ResponseEntity<ResponseModel> groupIdIdPost(String groupId, @Valid GroupModel groupModel) {
         ResponseModel response = new ResponseModel();
@@ -80,6 +91,11 @@ public class GroupIdApiController implements GroupIdApi {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Delete a Group request.
+     * @param groupId  (required)
+     * @return
+     */
     @Override
     public ResponseEntity<GroupModel> groupIdIdDelete(String groupId) {
         try {
