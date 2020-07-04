@@ -70,10 +70,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException {
-        logger.info("-------------- START OF CREATE TASK");
         int iteration = 1;
         while (true){
-            logger.info("-------------- START OF CREATE TASK ITER: " + iteration );
             try{
                 return _self.createTaskInternal(restModel);
             } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
@@ -88,7 +86,6 @@ public class TaskService implements ITaskService {
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public Task createTaskInternal(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
-        logger.info("-------------- START OF CREATE TASK INTERNAL");
         Task checkTask = taskRepository.findById(restModel.getId()).orElse(null);
         if( checkTask != null ){
             throw new JpaException("Primary or unique constraint failed!");
