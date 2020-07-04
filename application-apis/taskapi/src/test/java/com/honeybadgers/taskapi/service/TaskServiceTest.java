@@ -9,6 +9,7 @@ import com.honeybadgers.taskapi.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.service.impl.TaskService;
+import org.hibernate.TransactionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -86,6 +87,26 @@ public class TaskServiceTest {
 
         assertNotNull(t);
         assertThat(t.getId()).isEqualTo(restModel.getId());
+    }
+
+    @Test
+    public void testCreateTask_ThrowsTransactionException() throws JpaException, UnknownEnumException, CreationException, InterruptedException {
+        String taskId = UUID.randomUUID().toString();
+
+        TaskModel restModel = new TaskModel();
+        restModel.setId(taskId);
+
+        Task createdTask = new Task();
+        createdTask.setId(taskId);
+
+        when(converter.taskRestToJpa(restModel)).thenReturn(createdTask);
+        when(taskRepository.findById(restModel.getId())).thenThrow(new TransactionException("")).thenReturn(Optional.empty());
+        Task t = taskService.createTask(restModel);
+
+        assertNotNull(t);
+        assertThat(t.getId()).isEqualTo(restModel.getId());
+        verify(converter).taskRestToJpa(restModel);
+        verify(taskRepository, times(2)).findById(anyString());
     }
 
     @Test
