@@ -8,6 +8,7 @@ import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import com.honeybadgers.realtimescheduler.services.ISchedulerService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.TransactionException;
@@ -16,9 +17,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.orm.jpa.JpaSystemException;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -57,6 +60,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Autowired
     GroupRepository groupRepository;
+
+    private final RestTemplate restTemplate = new RestTemplate();
 
     public int getLimitFromGroup(List<String> groupsOfTask, String grpId) {
         int minLimit = Integer.MAX_VALUE;
@@ -100,49 +105,99 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTaskWrapper(String trigger) {
-        // get all tasks
-        List<Task> waitingTasks;
-        if(trigger.equals(scheduler_trigger))
-            waitingTasks = taskRepository.findAllScheduledTasksSorted();
-        else
-            waitingTasks = taskRepository.findAllWaitingTasks();
+        Thread t = null;
+        try {
 
-        // schedule tasks
-        logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
-        for (Task task : waitingTasks ) {
-            try {
-                _self.scheduleTask(task);
-            } catch (CannotAcquireLockException | LockAcquisitionException exception) {
-                logger.warn("Task " + task.getId() + " Scheduling LockAcquisitionException!");
-            } catch (JpaSystemException | TransactionException exception) {
-                logger.warn("Task " + task.getId() + " Scheduling TransactionException!");
-            }
-        }
+            // aquire scheduling lock from Lock Application
+            LockResponse lockResponse = checkIfAllowedtoSchedule();
+            if (lockResponse == null)
+                return;
 
-        // dispatch tasks
-        List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
-        if (!isSchedulerPaused()) {
-            logger.info("Step 3: dispatching " + tasks.size() + " tasks");
-            for (Task task : tasks) {
+            // create and start lock-refresh-thread
+            t = new HelloThread(lockResponse);
+            t.start();
+
+            // get all tasks
+            List<Task> waitingTasks;
+            if(trigger.equals(scheduler_trigger))
+                waitingTasks = taskRepository.findAllScheduledTasksSorted();
+            else
+                waitingTasks = taskRepository.findAllWaitingTasks();
+
+            // schedule tasks
+            logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
+            for (Task task : waitingTasks ) {
                 try {
-                    _self.sendTaskstoDispatcher(task);
-                    logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
+                    _self.scheduleTask(task);
                 } catch (CannotAcquireLockException | LockAcquisitionException exception) {
-                    // TODO document: if scheduler crashes here -> task could be dispatched twice
-                    logger.warn("Task " + task.getId() + " Dispatching LockAcquisitionException!");
-                    if(inQueue(task)) {
-                        removeFromQueue(task);
-                    }
+                    logger.warn("Task " + task.getId() + " Scheduling LockAcquisitionException!");
                 } catch (JpaSystemException | TransactionException exception) {
-                    // TODO document: if scheduler crashes here -> task could be dispatched twice
-                    logger.warn("Task " + task.getId() + " Dispatching TransactionException!");
-                    if(inQueue(task)) {
-                        removeFromQueue(task);
-                    }
+                    logger.warn("Task " + task.getId() + " Scheduling TransactionException!");
                 }
             }
-        } else
-            logger.info("Scheduler is locked!");
+
+            // dispatch tasks
+            List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
+            if (!isSchedulerPaused()) {
+                logger.info("Step 3: dispatching " + tasks.size() + " tasks");
+                for (Task task : tasks) {
+                    try {
+                        _self.sendTaskstoDispatcher(task);
+                        logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
+                    } catch (CannotAcquireLockException | LockAcquisitionException exception) {
+                        // TODO document: if scheduler crashes here -> task could be dispatched twice
+                        logger.warn("Task " + task.getId() + " Dispatching LockAcquisitionException!");
+                        if(inQueue(task)) {
+                            removeFromQueue(task);
+                        }
+                    } catch (JpaSystemException | TransactionException exception) {
+                        // TODO document: if scheduler crashes here -> task could be dispatched twice
+                        logger.warn("Task " + task.getId() + " Dispatching TransactionException!");
+                        if(inQueue(task)) {
+                            removeFromQueue(task);
+                        }
+                    }
+                }
+            } else
+                logger.info("Scheduler is locked!");
+
+            // stop lock-refresh-thread
+            t.interrupt();
+        } catch (Exception e) {
+            if (e.getClass().equals(LockException.class))
+                logger.info("lockexception caught");
+            if(t != null)
+                t.interrupt();
+        }
+    }
+
+    private LockResponse checkIfAllowedtoSchedule() {
+        String url = "https://lockservice-amos.cfapps.io/";
+        final String scheduler = "SCHEDULER";
+
+        // create headers
+        HttpEntity<Object> entity = getObjectHttpEntity();
+
+        // send POST request
+        ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
+
+        if (response.getStatusCode() != HttpStatus.OK) {
+            logger.info("lock for scheduler already acquired");
+            return null;
+        }
+
+
+        logger.info("acquired lock for: " + response.getBody().getValue());
+        return response.getBody();
+    }
+
+    private static HttpEntity<Object> getObjectHttpEntity() {
+        // create headers
+        HttpHeaders headers = new HttpHeaders();
+        // set `accept` header
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        // build the request
+        return new HttpEntity<>(null, headers);
     }
 
     public boolean inQueue(Task task) {
@@ -304,7 +359,7 @@ public class SchedulerService implements ISchedulerService {
                 }
             }
         } catch (ParseException pe) {
-            logger.error(pe.getMessage());
+            logger.error("active times exception: " + pe.getMessage());
         }
         logger.info("Task " + task.getId() + " is not sent due to ActiveTimes");
         return false;
@@ -331,5 +386,52 @@ public class SchedulerService implements ISchedulerService {
         }
 
         return new ArrayList<>();
+    }
+
+
+    public static class HelloThread extends Thread {
+        LockResponse lockresponse;
+        RestTemplate restTemplate;
+        final String name;
+        final String value;
+
+        public HelloThread(LockResponse resp) {
+            lockresponse = resp;
+            restTemplate = new RestTemplate();
+            name =  lockresponse.getName();
+            value = lockresponse.getValue();
+        }
+
+        @SneakyThrows
+        public void run() {
+            try {
+                HttpEntity<Object> entity = getObjectHttpEntity();
+                String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
+                while (true) {
+                    // send Put request
+                    ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
+
+                    if (response.getStatusCode() != HttpStatus.OK) {
+                        logger.error("could not refresh lock");
+                        throw new LockException("could not refresh lock");
+                    }
+
+                    Thread.sleep(15000);
+                }
+            } catch (Exception e) {
+                if(e.getClass().equals(InterruptedException.class)) {
+                    releaseLock();
+                    logger.info(lockresponse.getValue() + " releasing lock cause thread was interrupted by scheduler");
+                }
+                if (e.getClass().equals(LockException.class))
+                    throw e;
+            }
+        }
+
+        public void releaseLock() {
+            HttpEntity<Object> entity = getObjectHttpEntity();
+            String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
+            ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, LockResponse.class);
+        }
     }
 }
