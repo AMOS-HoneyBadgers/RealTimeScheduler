@@ -16,7 +16,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.web.client.RestTemplate;
 
 import java.sql.Time;
 import java.time.LocalTime;
@@ -52,8 +55,11 @@ public class SchedulerServiceTest {
     @MockBean
     private ConvertUtils convertUtils;
 
+    @MockBean
+    RestTemplate restTemplate;
+
     @Autowired
-    private SchedulerService service;
+    SchedulerService service;
 
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
@@ -66,6 +72,9 @@ public class SchedulerServiceTest {
         Task t = createTaskTestObject(group,"TEST");
 
         SchedulerService spy = spy(service);
+        when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
@@ -87,6 +96,9 @@ public class SchedulerServiceTest {
         Task t = createTaskTestObject(group,"TEST");
         Task t2 = createTaskTestObject(group,"TEST2");
         SchedulerService spy = spy(service);
+        when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t2)).thenReturn(Collections.singletonList(t2));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
@@ -109,14 +121,15 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
 
+        when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
 
         when(spy.isTaskPaused(t.getId())).thenThrow(new CannotAcquireLockException(""));
 
         spy.scheduleTaskWrapper("as");
-
-        verify(spy).inQueue(any());
     }
     @Test
     public void testScheduleTaskWrapper_sendToDispatcher_TransactionException() {
@@ -127,14 +140,15 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
 
+        when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
 
         when(spy.isTaskPaused(t.getId())).thenThrow(new TransactionException(""));
 
         spy.scheduleTaskWrapper("as");
-
-        verify(spy).inQueue(any());
     }
 
     @Test
@@ -146,6 +160,9 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
 
+        when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
 
@@ -165,6 +182,9 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
 
+        when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t));
         when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
 
@@ -190,6 +210,9 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
         Group groupIncremented = createGroupTestObject();
         groupIncremented.setCurrentParallelismDegree(task1.getGroup().getCurrentParallelismDegree()+1);
+        when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
+                .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(taskRepository.findAllScheduledTasksSorted()).thenReturn(tasks);
         when(taskRepository.findAllWaitingTasks()).thenReturn(tasks);
         when(groupRepository.incrementCurrentParallelismDegree(group.getId())).thenReturn(groupIncremented);
@@ -243,7 +266,7 @@ public class SchedulerServiceTest {
         when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));
         SchedulerService spy = spy(service);
         spy.scheduleTaskWrapper("123");
-        verify(spy, never()).sendTaskstoDispatcher(any());
+        verify(spy, never()).checkTaskForDispatchingAndUpdate(any());
     }
 
     @Test
@@ -319,11 +342,11 @@ public class SchedulerServiceTest {
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
         //Act
-        spy.sendTaskstoDispatcher(task);
+        boolean ret = spy.checkTaskForDispatchingAndUpdate(task);
 
         //Assert
+        assertTrue(ret);
         assertEquals(1, groupIncremented.getCurrentParallelismDegree().intValue());
-        verify(sender).sendTaskToDispatcher(task.getId());
         verify(taskRepository).save(any(Task.class));
         verify(pausedRepository,times(1)).findById(any());
         verify(spy).getLimitFromGroup(any(),any());
@@ -354,12 +377,12 @@ public class SchedulerServiceTest {
 
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
-        spy.sendTaskstoDispatcher(task);
+        boolean ret = spy.checkTaskForDispatchingAndUpdate(task);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
+        assertFalse(ret);
         assertEquals(0, group.getCurrentParallelismDegree().intValue());
         verify(pausedRepository, never()).save(any());
-        verify(sender, never()).sendTaskToDispatcher(task.getId());
         verify(taskRepository, never()).save(any(Task.class));
     }
 
@@ -384,12 +407,12 @@ public class SchedulerServiceTest {
 
         when(taskRepository.save(any(Task.class))).thenReturn(task);
 
-        spy.sendTaskstoDispatcher(task);
+        boolean ret = spy.checkTaskForDispatchingAndUpdate(task);
 
         // assert, that task was not sent to dispatcher, not deleted from DB and capacity unchanged
+        assertFalse(ret);
         assertEquals(0, group.getCurrentParallelismDegree().intValue());
         verify(pausedRepository, never()).save(any());
-        verify(sender, never()).sendTaskToDispatcher(task.getId());
         verify(taskRepository, never()).save(any(Task.class));
     }
 

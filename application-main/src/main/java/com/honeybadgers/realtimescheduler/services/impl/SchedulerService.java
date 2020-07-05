@@ -61,7 +61,8 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     GroupRepository groupRepository;
 
-    private final RestTemplate restTemplate = new RestTemplate();
+    @Autowired
+    RestTemplate restTemplate;
 
     public int getLimitFromGroup(List<String> groupsOfTask, String grpId) {
         int minLimit = Integer.MAX_VALUE;
@@ -109,13 +110,11 @@ public class SchedulerService implements ISchedulerService {
         Thread lockrefresherThread = null;
         try {
 
-            // aquire scheduling lock from Lock Application
+            // try to acquire scheduling lock from Lock Application
             LockResponse lockResponse = checkIfAllowedtoSchedule();
-            if (lockResponse == null)
-                return;
 
             // create and start lock-refresh-thread
-            lockrefresherThread = new LockRefresherThread(lockResponse);
+            lockrefresherThread = new LockRefresherThread(lockResponse, restTemplate);
             lockrefresherThread.start();
 
             // get all tasks
@@ -147,20 +146,18 @@ public class SchedulerService implements ISchedulerService {
                     try {
                         if (stopSchedulerDueToLockAcquisitionException)
                             return;
-                        _self.sendTaskstoDispatcher(task);
-                        logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
+
+                        if(_self.checkTaskForDispatchingAndUpdate(task)) {
+                            // TODO document: if scheduler crashes here -> task could be dispatched twice
+                            // dispatch here because this only gets executed if transaction succeeds
+                            sender.sendTaskToDispatcher(task.getId());
+                            logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
+                        }
+
                     } catch (CannotAcquireLockException | LockAcquisitionException exception) {
-                        // TODO document: if scheduler crashes here -> task could be dispatched twice
                         logger.warn("Task " + task.getId() + " Dispatching LockAcquisitionException!");
-                        if(inQueue(task)) {
-                            removeFromQueue(task);
-                        }
                     } catch (JpaSystemException | TransactionException exception) {
-                        // TODO document: if scheduler crashes here -> task could be dispatched twice
                         logger.warn("Task " + task.getId() + " Dispatching TransactionException!");
-                        if(inQueue(task)) {
-                            removeFromQueue(task);
-                        }
                     }
                 }
             } else
@@ -176,7 +173,7 @@ public class SchedulerService implements ISchedulerService {
         }
     }
 
-    private LockResponse checkIfAllowedtoSchedule() {
+    public LockResponse checkIfAllowedtoSchedule() throws LockException {
         String url = "https://lockservice-amos.cfapps.io/";
         final String scheduler = "SCHEDULER";
 
@@ -188,7 +185,7 @@ public class SchedulerService implements ISchedulerService {
 
         if (response.getStatusCode() != HttpStatus.OK) {
             logger.info("lock for scheduler already acquired");
-            return null;
+            throw new LockException("Failed to acquire lock for Lock Application");
         }
 
 
@@ -203,14 +200,6 @@ public class SchedulerService implements ISchedulerService {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         // build the request
         return new HttpEntity<>(null, headers);
-    }
-
-    public boolean inQueue(Task task) {
-        return false;
-    }
-
-    public void removeFromQueue(Task task) {
-        return;
     }
 
     /**
@@ -228,21 +217,22 @@ public class SchedulerService implements ISchedulerService {
     /**
      * Tries to send given task to the dispatcher if the conditions for sending are met.
      * @param currentTask task to be send to the dispatcher
+     * @return return true if status was updated and dispatch is wanted
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    public void sendTaskstoDispatcher(Task currentTask) {
+    public boolean checkTaskForDispatchingAndUpdate(Task currentTask) {
         if (isTaskPaused(currentTask.getId())) {
             logger.info("Task " + currentTask.getId() + " is currently paused!");
-            return;
+            return false;
         }
 
         List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
 
         if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
-            return;
+            return false;
 
         if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
-            return;
+            return false;
 
         // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
         Group parentGroup = currentTask.getGroup();
@@ -251,17 +241,16 @@ public class SchedulerService implements ISchedulerService {
         // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
         if (parentGroup.getCurrentParallelismDegree() >= limit) {
             logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
-            return;
+            return false;
         }
         // TODO unnötig -> groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()) reicht, solange currentTask.group danach nicht benutzt wird
         currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
-        //logger.debug("Task " + currentTask.getId() + " sent.");
-        sender.sendTaskToDispatcher(currentTask.getId());
-
         // TODO custom query
         taskService.updateTaskStatus(currentTask, TaskStatusEnum.Dispatched);
         taskRepository.save(currentTask);
+
+        return true;
     }
 
     /**
@@ -400,9 +389,9 @@ public class SchedulerService implements ISchedulerService {
         final String name;
         final String value;
 
-        public LockRefresherThread(LockResponse resp) {
+        public LockRefresherThread(LockResponse resp, RestTemplate template) {
             lockresponse = resp;
-            restTemplate = new RestTemplate();
+            restTemplate = template;
             name = lockresponse.getName();
             value = lockresponse.getValue();
         }
