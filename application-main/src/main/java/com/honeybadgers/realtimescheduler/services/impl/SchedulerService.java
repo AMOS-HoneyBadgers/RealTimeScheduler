@@ -64,6 +64,12 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     RestTemplate restTemplate;
 
+    /**
+     * Returns the minimal parallelism degree of all groups of the task
+     * @param groupsOfTask list with all parent groups of the task
+     * @param grpId id of the group
+     * @return minimal parallelism degree
+     */
     public int getLimitFromGroup(List<String> groupsOfTask, String grpId) {
         int minLimit = Integer.MAX_VALUE;
 
@@ -173,6 +179,11 @@ public class SchedulerService implements ISchedulerService {
         }
     }
 
+    /**
+     * Tries to acquire the lock for the scheduler application. If false, tasks can't be dispatched
+     * @return LockResponse Object with values for expiration date
+     * @throws LockException when another instance already claims the lock
+     */
     public LockResponse checkIfAllowedtoSchedule() throws LockException {
         String url = "https://lockservice-amos.cfapps.io/";
         final String scheduler = "SCHEDULER";
@@ -195,6 +206,10 @@ public class SchedulerService implements ISchedulerService {
 
     }
 
+    /**
+     * Wrapper method for http entity creation
+     * @return HttpEntity instance
+     */
     private static HttpEntity<Object> getObjectHttpEntity() {
         // create headers
         HttpHeaders headers = new HttpHeaders();
@@ -297,13 +312,19 @@ public class SchedulerService implements ISchedulerService {
         return false;
     }
 
+    /**
+     * Check if the task can be dispatched due to his working days (monday to sunday). Sometimes tasks can only be send
+     * on several days. The method checks that the task can't be dispatched if current day isn't allowed.
+     * @param task taskModel
+     * @return boolean true if current day is allowed, else false
+     */
     public boolean checkIfTaskIsInWorkingDays(Task task) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int dayofweek = calendar.get(Calendar.DAY_OF_WEEK);
         int[] workingdays = getActualWorkingDaysForTask(task);
         ConvertUtils convertUtils = new ConvertUtils();
         List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(workingdays);
-
+        // TODO: Check if there is no bug in working days (expect in api that working days start at monday, but we have sunday = 0)
         if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBooleans(dayofweek)))
             return true;
 
@@ -311,6 +332,12 @@ public class SchedulerService implements ISchedulerService {
         return false;
     }
 
+    /**
+     * When a task has multiple groups, this method returns the actual working days of the parent, or grandparent (highest group).
+     * @param task taskModel
+     * @return working days of task if group has no working days, otherwise it returns the working days of the highest group.
+     * @return int array with 7x 1 values if no working day is specified anywhere - can be dispatched at any weekday
+     */
     public int[] getActualWorkingDaysForTask(Task task) {
         int[] workingDays = task.getWorkingDays();
 
@@ -335,6 +362,11 @@ public class SchedulerService implements ISchedulerService {
         return new int[]{1, 1, 1, 1, 1, 1, 1};
     }
 
+    /**
+     * Checks the active times of the task and if it is allowed to be dispatched at the current time
+     * @param task taskModel
+     * @return boolean true if it is allowed, otherwise false
+     */
     public boolean checkIfTaskIsInActiveTime(Task task) {
         Date current = new Date();
         Date from = new Date();
@@ -365,6 +397,12 @@ public class SchedulerService implements ISchedulerService {
         return false;
     }
 
+    /**
+     * When a task has multiple groups, this method returns the actual active times of the parent, or grandparent (highest group).
+     * @param task taskModel
+     * @return active times of task if group has no active times, otherwise it returns the active times of the highest group.
+     * @return empty list for active times if no active times is specified anywhere - can be dispatched anytime
+     */
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
         if (activeTimes != null)
@@ -402,6 +440,9 @@ public class SchedulerService implements ISchedulerService {
             value = lockresponse.getValue();
         }
 
+        /**
+         * Send a REST request to the lockservice periodically. Tries to refresh current lock status
+         */
         @SneakyThrows
         public void run() {
             try {
@@ -429,6 +470,10 @@ public class SchedulerService implements ISchedulerService {
             }
         }
 
+        /**
+         * If an exception is thrown within the lock acquire attempt, this method deletes the current lock.
+         * F.e during thread interrupt in scheduler.
+         */
         public void releaseLock() {
             HttpEntity<Object> entity = getObjectHttpEntity();
             String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
