@@ -20,6 +20,10 @@ public class PerformanceService {
 
     private RestTemplate restTemplate;
 
+    /**
+     * send an amount of tasks create calls as Future Objects to the api
+     * @param count how many tasks should be created
+     */
     public void createPostWithObject(int count) {
         restTemplate = new RestTemplate();
         String url = "https://taskapi-amos.cfapps.io/api/task/";
@@ -57,6 +61,13 @@ public class PerformanceService {
         });
     }
 
+    /**
+     * Async REST call to the specified url
+     * @param headers standard http headers
+     * @param url url to connect
+     * @param number handed over to the method in order to print out current task
+     * @return CompletableFuture Object of response
+     */
     @Async("taskExecutorPerformance")
     public CompletableFuture<ResponseEntity<ResponseModel>> sendRequest(HttpHeaders headers, String url, int number) {
         // create a post object
@@ -74,6 +85,12 @@ public class PerformanceService {
         return CompletableFuture.completedFuture(response);
     }
 
+    /**
+     * Connect to bulk endpoint of task api and send multiple tasks within separate lists
+     * Example: listCount: 20, taskCount: 50 --> 20 lists with each 50 tasks = 1000 tasks
+     * @param listCount amount of lists for tasks
+     * @param taskCount amount of tasks per list
+     */
     public void createBulkPostWithObject(int listCount, int taskCount) {
         restTemplate = new RestTemplate();
         String url = "https://taskapi-amos.cfapps.io/api/task/tasks";
