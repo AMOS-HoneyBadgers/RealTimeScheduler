@@ -53,8 +53,8 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void pauseTask(UUID taskId, OffsetDateTime resumeDate) throws LockException{
-        String id = PAUSED_TASK_PREFIX + taskId.toString();
+    public void pauseTask(String taskId, OffsetDateTime resumeDate) throws LockException{
+        String id = PAUSED_TASK_PREFIX + taskId;
         Paused lockId = pausedRepository.findById(id).orElse(null);
 
         if(lockId != null)
@@ -68,8 +68,8 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void resumeTask(UUID taskId) {
-        String id = PAUSED_TASK_PREFIX + taskId.toString();
+    public void resumeTask(String taskId) {
+        String id = PAUSED_TASK_PREFIX + taskId;
         pausedRepository.deleteById(id);
     }
 

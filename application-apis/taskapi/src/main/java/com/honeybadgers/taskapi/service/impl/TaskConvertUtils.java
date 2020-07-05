@@ -37,7 +37,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
         TaskModel taskmodel = new TaskModel();
 
-        taskmodel.setId(UUID.fromString(task.getId()));
+        taskmodel.setId(task.getId());
         taskmodel.setGroupId(task.getGroup().getId());
         taskmodel.setPriority(task.getPriority());
         taskmodel.setActiveTimes(activeTimesJpaToRest(task.getActiveTimeFrames()));
@@ -50,7 +50,8 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         taskmodel.setIndexNumber(task.getIndexNumber());
         taskmodel.setDeadline(timestampJpaToRest(task.getDeadline()));
         taskmodel.setMeta(metaDataJpaToRest(task.getMetaData()));
-        taskmodel.setHistory(task.getHistory());
+        if(task.getHistory() != null)
+            taskmodel.setHistory(task.getHistory().stream().map(history -> (Object) history).collect(Collectors.toList()));
 
         return taskmodel;
     }
@@ -59,7 +60,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
     public Task taskRestToJpa(TaskModel restModel) throws JpaException, CreationException, UnknownEnumException {
         Task newTask = new Task();
 
-        newTask.setId(restModel.getId().toString());
+        newTask.setId(restModel.getId());
 
         if(restModel.getGroupId() == null)
             restModel.setGroupId(DEFAULT_GROUP_ID);

@@ -38,11 +38,11 @@ public class TaskIdApiControllerTest {
 
     @Test
     public void testGetTaskById() throws Exception {
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
 
         when(taskservice.getTaskById(taskId)).thenReturn(new TaskModel().id(taskId));
 
-        MvcResult mvcResult = mvc.perform(get("/api/task/" + taskId.toString())
+        MvcResult mvcResult = mvc.perform(get("/api/task/" + taskId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -50,17 +50,17 @@ public class TaskIdApiControllerTest {
         verify(taskservice).getTaskById(taskId);
 
         String response = mvcResult.getResponse().getContentAsString();
-        assertTrue(response.contains(taskId.toString()));
+        assertTrue(response.contains(taskId));
     }
 
     @Test
     public void testPostTaskById() throws Exception {
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         TaskModel testModel = new TaskModel();
         testModel.setId(taskId);
         testModel.setGroupId("TestGruppe");
 
-        mvc.perform(post("/api/task/" + taskId.toString())
+        mvc.perform(post("/api/task/" + taskId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtils.convertObjectToJsonBytes(testModel)))
             .andExpect(status().isOk())
@@ -73,14 +73,14 @@ public class TaskIdApiControllerTest {
     @Test
     public void testPostTaskById_EnumExceptionWasThrown() throws Exception {
         TaskModel testModel = new TaskModel();
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         testModel.setId(taskId);
         testModel.setGroupId("TestGruppe");
 
         UnknownEnumException ex = new UnknownEnumException ("Invalid Enum");
         when(taskservice.updateTask(taskId, testModel)).thenThrow(ex);
 
-        mvc.perform(post( "/api/task/" + taskId.toString())
+        mvc.perform(post( "/api/task/" + taskId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtils.convertObjectToJsonBytes(testModel)))
             .andExpect(status().isBadRequest())
@@ -92,14 +92,14 @@ public class TaskIdApiControllerTest {
 
     @Test
     public void testPostTaskById_Exeption() throws Exception {
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         TaskModel testModel = new TaskModel();
         testModel.setId(taskId);
         testModel.setGroupId("TestGruppe");
 
         when(taskservice.updateTask(taskId, testModel)).thenThrow(JpaException.class);
 
-         mvc.perform(post("/api/task/" + taskId.toString())
+         mvc.perform(post("/api/task/" + taskId)
             .contentType(MediaType.APPLICATION_JSON)
             .content(TestUtils.convertObjectToJsonBytes(testModel)))
             .andExpect(status().isBadRequest())
@@ -112,10 +112,10 @@ public class TaskIdApiControllerTest {
 
     @Test
     public void testGetTaskByIdNotFound() throws Exception {
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         when(taskservice.getTaskById(taskId)).thenThrow(new NoSuchElementException());
 
-        mvc.perform(get("/api/task/" + taskId.toString())
+        mvc.perform(get("/api/task/" + taskId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 
@@ -124,10 +124,10 @@ public class TaskIdApiControllerTest {
 
     @Test
     public void testDeleteTaskById() throws Exception {
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         when(taskservice.deleteTask(taskId)).thenReturn(new TaskModel().id(taskId));
 
-        MvcResult mvcResult = mvc.perform(delete("/api/task/" + taskId.toString())
+        MvcResult mvcResult = mvc.perform(delete("/api/task/" + taskId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andReturn();
@@ -135,15 +135,15 @@ public class TaskIdApiControllerTest {
         verify(taskservice).deleteTask(taskId);
 
         String response = mvcResult.getResponse().getContentAsString();
-        assertTrue(response.contains(taskId.toString()));
+        assertTrue(response.contains(taskId));
     }
 
     @Test
     public void testDeleteTaskByIdNotFound() throws Exception {
-        UUID taskId = UUID.randomUUID();
+        String taskId = UUID.randomUUID().toString();
         when(taskservice.deleteTask(taskId)).thenThrow(new NoSuchElementException());
 
-         mvc.perform(delete("/api/task/" + taskId.toString())
+         mvc.perform(delete("/api/task/" + taskId)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNotFound());
 

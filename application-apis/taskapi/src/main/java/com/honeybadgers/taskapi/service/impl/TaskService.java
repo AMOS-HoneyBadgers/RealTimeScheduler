@@ -13,6 +13,7 @@ import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.DataIntegrityViolationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
@@ -34,6 +35,7 @@ public class TaskService implements ITaskService {
     TaskRepository taskRepository;
     @Autowired
     ICommunication sender;
+    @Qualifier("taskConvertUtils")
     @Autowired
     ITaskConvertUtils converter;
 
@@ -57,7 +59,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
-        Task checkTask = taskRepository.findById(restModel.getId().toString()).orElse(null);
+        Task checkTask = taskRepository.findById(restModel.getId()).orElse(null);
         if( checkTask != null ){
             throw new JpaException("Primary or unique constraint failed!");
         }
@@ -75,8 +77,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
-        Task checkTask = taskRepository.findById(taskId.toString()).orElse(null);
+    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
+        Task checkTask = taskRepository.findById(taskId).orElse(null);
         if(checkTask == null)
             throw new NoSuchElementException("No existing Task with id: " + taskId);
 
@@ -104,8 +106,8 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public TaskModel getTaskById(UUID taskid) {
-        Task task = taskRepository.findById(taskid.toString()).orElse(null);
+    public TaskModel getTaskById(String taskid) {
+        Task task = taskRepository.findById(taskid).orElse(null);
         if(task == null)
             throw new NoSuchElementException("No existing Task with ID: " + taskid);
 
@@ -113,12 +115,12 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public TaskModel deleteTask(UUID taskid) {
-        Task task = taskRepository.findById(taskid.toString()).orElse(null);
+    public TaskModel deleteTask(String taskid) {
+        Task task = taskRepository.findById(taskid).orElse(null);
         if(task == null)
             throw new NoSuchElementException("No existing Task with ID: " + taskid);
 
-        taskRepository.deleteById(taskid.toString());
+        taskRepository.deleteById(taskid);
         return converter.taskJpaToRest(task);
     }
 
@@ -132,7 +134,7 @@ public class TaskService implements ITaskService {
     public void sendTaskToPriorityQueue(TaskModel task) {
         TaskQueueModel taskQueueModel = new TaskQueueModel();
         taskQueueModel.setGroupId(task.getGroupId());
-        taskQueueModel.setId(task.getId().toString());
+        taskQueueModel.setId(task.getId());
         if (task.getMeta() != null)
             taskQueueModel.setMetaData(task.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
         taskQueueModel.setDispatched(Timestamp.from(Instant.now()));

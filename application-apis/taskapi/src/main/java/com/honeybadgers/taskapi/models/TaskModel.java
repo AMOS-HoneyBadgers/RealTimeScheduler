@@ -4,14 +4,12 @@ import java.util.Objects;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonValue;
-import com.honeybadgers.models.model.History;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -19,11 +17,11 @@ import javax.validation.constraints.*;
 /**
  * TaskModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-30T15:29:34.348+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-07-02T17:33:16.300+02:00[Europe/Berlin]")
 
 public class TaskModel   {
   @JsonProperty("id")
-  private UUID id;
+  private String id;
 
   @JsonProperty("group_id")
   private String groupId;
@@ -172,13 +170,13 @@ public class TaskModel   {
 
   @JsonProperty("history")
   @Valid
-  private List<History> history = null;
+  private List<Object> history = null;
 
   @JsonProperty("meta")
   @Valid
   private List<TaskModelMeta> meta = null;
 
-  public TaskModel id(UUID id) {
+  public TaskModel id(String id) {
     this.id = id;
     return this;
   }
@@ -190,13 +188,12 @@ public class TaskModel   {
   @ApiModelProperty(required = true, value = "Primary id of task object")
   @NotNull
 
-  @Valid
 
-  public UUID getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(UUID id) {
+  public void setId(String id) {
     this.id = id;
   }
 
@@ -441,12 +438,12 @@ public class TaskModel   {
     this.indexNumber = indexNumber;
   }
 
-  public TaskModel history(List<History> history) {
+  public TaskModel history(List<Object> history) {
     this.history = history;
     return this;
   }
 
-  public TaskModel addHistoryItem(History historyItem) {
+  public TaskModel addHistoryItem(Object historyItem) {
     if (this.history == null) {
       this.history = new ArrayList<>();
     }
@@ -461,11 +458,11 @@ public class TaskModel   {
   @ApiModelProperty(value = "Array containing the history for a Task status changed with Timestamps")
 
 
-  public List<History> getHistory() {
+  public List<Object> getHistory() {
     return history;
   }
 
-  public void setHistory(List<History> history) {
+  public void setHistory(List<Object> history) {
     this.history = history;
   }
 
