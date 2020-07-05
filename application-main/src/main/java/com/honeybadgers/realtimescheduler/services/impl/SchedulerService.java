@@ -36,7 +36,7 @@ import static com.honeybadgers.models.model.ModeEnum.Sequential;
 public class SchedulerService implements ISchedulerService {
 
     static final Logger logger = LogManager.getLogger(SchedulerService.class);
-
+    public static volatile boolean stopSchedulerDueToLockAcquisitionException = false;
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
@@ -105,7 +105,8 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTaskWrapper(String trigger) {
-        Thread t = null;
+        stopSchedulerDueToLockAcquisitionException = false;
+        Thread lockrefresherThread = null;
         try {
 
             // aquire scheduling lock from Lock Application
@@ -114,12 +115,12 @@ public class SchedulerService implements ISchedulerService {
                 return;
 
             // create and start lock-refresh-thread
-            t = new HelloThread(lockResponse);
-            t.start();
+            lockrefresherThread = new LockRefresherThread(lockResponse);
+            lockrefresherThread.start();
 
             // get all tasks
             List<Task> waitingTasks;
-            if(trigger.equals(scheduler_trigger))
+            if (trigger.equals(scheduler_trigger))
                 waitingTasks = taskRepository.findAllScheduledTasksSorted();
             else
                 waitingTasks = taskRepository.findAllWaitingTasks();
@@ -128,6 +129,8 @@ public class SchedulerService implements ISchedulerService {
             logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
             for (Task task : waitingTasks ) {
                 try {
+                    if (stopSchedulerDueToLockAcquisitionException)
+                        return;
                     _self.scheduleTask(task);
                 } catch (CannotAcquireLockException | LockAcquisitionException exception) {
                     logger.warn("Task " + task.getId() + " Scheduling LockAcquisitionException!");
@@ -142,6 +145,8 @@ public class SchedulerService implements ISchedulerService {
                 logger.info("Step 3: dispatching " + tasks.size() + " tasks");
                 for (Task task : tasks) {
                     try {
+                        if (stopSchedulerDueToLockAcquisitionException)
+                            return;
                         _self.sendTaskstoDispatcher(task);
                         logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
                     } catch (CannotAcquireLockException | LockAcquisitionException exception) {
@@ -162,12 +167,12 @@ public class SchedulerService implements ISchedulerService {
                 logger.info("Scheduler is locked!");
 
             // stop lock-refresh-thread
-            t.interrupt();
+            lockrefresherThread.interrupt();
         } catch (Exception e) {
-            if (e.getClass().equals(LockException.class))
-                logger.info("lockexception caught");
-            if(t != null)
-                t.interrupt();
+            logger.error("unexpected exception in scheduling " + e.getMessage());
+        } finally {
+            if (lockrefresherThread != null)
+                lockrefresherThread.interrupt();
         }
     }
 
@@ -389,16 +394,16 @@ public class SchedulerService implements ISchedulerService {
     }
 
 
-    public static class HelloThread extends Thread {
+    public static class LockRefresherThread extends Thread {
         LockResponse lockresponse;
         RestTemplate restTemplate;
         final String name;
         final String value;
 
-        public HelloThread(LockResponse resp) {
+        public LockRefresherThread(LockResponse resp) {
             lockresponse = resp;
             restTemplate = new RestTemplate();
-            name =  lockresponse.getName();
+            name = lockresponse.getName();
             value = lockresponse.getValue();
         }
 
@@ -410,21 +415,23 @@ public class SchedulerService implements ISchedulerService {
                 while (true) {
                     // send Put request
                     ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
-
+                    logger.info(" Statuscode put response" + response.getStatusCode());
                     if (response.getStatusCode() != HttpStatus.OK) {
                         logger.error("could not refresh lock");
                         throw new LockException("could not refresh lock");
                     }
 
                     Thread.sleep(15000);
+
                 }
             } catch (Exception e) {
-                if(e.getClass().equals(InterruptedException.class)) {
+                if (e.getClass().equals(InterruptedException.class)) {
                     releaseLock();
                     logger.info(lockresponse.getValue() + " releasing lock cause thread was interrupted by scheduler");
+                } else {
+                    logger.error("error by refreshing lock for lock " + name + "with value " + value + " " + e.getMessage());
+                    SchedulerService.stopSchedulerDueToLockAcquisitionException = true;
                 }
-                if (e.getClass().equals(LockException.class))
-                    throw e;
             }
         }
 
