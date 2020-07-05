@@ -1,4 +1,4 @@
-# Technology Decision
+# Technology Decision and General Documentation
 
 This Document is supposed to archive and document the technology and architecture decision that where made throughout the AMOS 2020 Project.
 
@@ -28,3 +28,8 @@ This Document is supposed to archive and document the technology and architectur
  - PostGreSQl will be used as our main data storage database, which will store groups and tasks persistent.
  - Redis will be used for the LockService, due to its faster access and write time.
  - We originally intended to use Redis also for currently Scheduled tasks, but changed this, due to the need for transaction, which redis does not support (It is mainly advised to not use redis, if transactions are needed).
+
+
+### Known Issues
+
+- In case the Scheduler instance crashes after the transaction for checkTaskForDispatchingAndUpdate finishes, the task will never be dispatched.
