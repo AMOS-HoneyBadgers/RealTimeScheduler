@@ -17,11 +17,9 @@ import java.util.UUID;
 @Service
 public interface ITaskService {
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
+    Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException;
+    Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException;
 
     List<TaskModel> getAllTasks();
 

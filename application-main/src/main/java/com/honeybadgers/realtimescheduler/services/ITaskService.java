@@ -32,5 +32,5 @@ public interface ITaskService {
 
     long calculatePriority(Task task);
 
-    void updateTaskhistory(Task task, TaskStatusEnum status) throws RuntimeException;
+    void updateTaskStatus(Task task, TaskStatusEnum status) throws RuntimeException;
 }

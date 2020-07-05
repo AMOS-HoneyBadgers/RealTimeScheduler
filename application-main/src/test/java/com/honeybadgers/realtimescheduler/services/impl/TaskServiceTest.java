@@ -357,15 +357,19 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTaskHistory_NoHistoryElement(){
+    public void testUpdateTaskStatus_NoHistoryElement(){
         Task taskNoHistory = new Task();
         taskNoHistory.setHistory(null);
 
-        assertThrows(RuntimeException.class, () -> service.updateTaskhistory(taskNoHistory, TaskStatusEnum.Waiting));
+        service.updateTaskStatus(taskNoHistory, TaskStatusEnum.Waiting);
+
+        assertNotNull(taskNoHistory.getHistory());
+        assertEquals(1, taskNoHistory.getHistory().size());
+        assertEquals(TaskStatusEnum.Waiting, taskNoHistory.getStatus());
     }
 
     @Test
-    public void testUpdateTaskHistory(){
+    public void testUpdateTaskStatus(){
         Task task = new Task();
         List<History> history = new ArrayList<>();
 
@@ -375,9 +379,10 @@ public class TaskServiceTest {
         history.add(hist);
         task.setHistory(history);
 
-        service.updateTaskhistory(task, TaskStatusEnum.Scheduled);
+        service.updateTaskStatus(task, TaskStatusEnum.Scheduled);
 
         assertEquals(2, task.getHistory().size());
+        assertEquals(TaskStatusEnum.Scheduled, task.getStatus());
 
     }
 }
