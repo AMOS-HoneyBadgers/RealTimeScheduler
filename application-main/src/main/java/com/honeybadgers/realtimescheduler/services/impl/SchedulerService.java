@@ -126,7 +126,7 @@ public class SchedulerService implements ISchedulerService {
 
             // schedule tasks
             logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
-            for (Task task : waitingTasks ) {
+            for (Task task : waitingTasks) {
                 try {
                     if (stopSchedulerDueToLockAcquisitionException)
                         return;
@@ -147,7 +147,7 @@ public class SchedulerService implements ISchedulerService {
                         if (stopSchedulerDueToLockAcquisitionException)
                             return;
 
-                        if(_self.checkTaskForDispatchingAndUpdate(task)) {
+                        if (_self.checkTaskForDispatchingAndUpdate(task)) {
                             // TODO document: if scheduler crashes here -> task could be dispatched twice
                             // dispatch here because this only gets executed if transaction succeeds
                             sender.sendTaskToDispatcher(task.getId());
@@ -166,7 +166,7 @@ public class SchedulerService implements ISchedulerService {
             // stop lock-refresh-thread
             lockrefresherThread.interrupt();
         } catch (Exception e) {
-            logger.error("unexpected exception in scheduling " + e.getMessage());
+            logger.error( e.getMessage());
         } finally {
             if (lockrefresherThread != null)
                 lockrefresherThread.interrupt();
@@ -179,18 +179,20 @@ public class SchedulerService implements ISchedulerService {
 
         // create headers
         HttpEntity<Object> entity = getObjectHttpEntity();
-
-        // send POST request
-        ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
-
-        if (response.getStatusCode() != HttpStatus.OK) {
-            logger.info("lock for scheduler already acquired");
-            throw new LockException("Failed to acquire lock for Lock Application");
+        try {
+            // send POST request
+            ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
+            if (response.getStatusCode() != HttpStatus.OK) {
+                logger.info("lock for scheduler already acquired");
+                throw new LockException("Failed to acquire lock for Lock Application");
+            }
+            logger.info("acquired lock for: " + response.getBody().getValue());
+            return response.getBody();
+        } catch (Exception e) {
+            throw  new LockException("error by acquiring scheduler lock " +  e.getMessage());
         }
 
 
-        logger.info("acquired lock for: " + response.getBody().getValue());
-        return response.getBody();
     }
 
     private static HttpEntity<Object> getObjectHttpEntity() {
@@ -204,6 +206,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Schedule given task and update in DB (Running as transaction)
+     *
      * @param task task to be scheduled
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -216,6 +219,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Tries to send given task to the dispatcher if the conditions for sending are met.
+     *
      * @param currentTask task to be send to the dispatcher
      * @return return true if status was updated and dispatch is wanted
      */
@@ -255,8 +259,9 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Checks groups with id in given list on paused
+     *
      * @param groupsOfTask List of groupIds to be checked on paused
-     * @param taskid taskId of logging
+     * @param taskid       taskId of logging
      * @return true if one group is paused
      */
     public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask, String taskid) {
@@ -272,6 +277,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Check if given task has to wait due to its sequence number
+     *
      * @param task task to be checked
      * @return true if task has to wait
      */
@@ -404,7 +410,6 @@ public class SchedulerService implements ISchedulerService {
                 while (true) {
                     // send Put request
                     ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
-                    logger.info(" Statuscode put response" + response.getStatusCode());
                     if (response.getStatusCode() != HttpStatus.OK) {
                         logger.error("could not refresh lock");
                         throw new LockException("could not refresh lock");

@@ -30,7 +30,6 @@ public class MockDispatcherConsumer {
         logger.info("Received message in Mock Dispatcher'{}'" + message);
 
         // This is for checking, whereas tasks are dispatched multiple times
-        logger.info("Inserting into lockDb for single dispatch check");
         try {
             lockRepository.insert(message);
         } catch (DataIntegrityViolationException e) {
@@ -40,6 +39,6 @@ public class MockDispatcherConsumer {
         }
 
         // Send feedback back to scheduler
-        sender.sendFeedbackToScheduler(message);
+        //sender.sendFeedbackToScheduler(message);
     }
 }
