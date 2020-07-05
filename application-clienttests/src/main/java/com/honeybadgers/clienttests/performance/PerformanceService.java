@@ -61,7 +61,7 @@ public class PerformanceService {
     public CompletableFuture<ResponseEntity<ResponseModel>> sendRequest(HttpHeaders headers, String url, int number) {
         // create a post object
         TaskModel taskModel = new TaskModel();
-        taskModel.setId(UUID.randomUUID());
+        taskModel.setId(UUID.randomUUID().toString());
         taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
         taskModel.setPriority(100);
 
@@ -91,7 +91,7 @@ public class PerformanceService {
             List<TaskModel> taskList = new ArrayList<TaskModel>();
             for(int j = 0; j < taskCount; j++){
                 TaskModel taskModel = new TaskModel();
-                taskModel.setId(UUID.randomUUID());
+                taskModel.setId(UUID.randomUUID().toString());
                 taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
                 taskModel.setPriority(100);
                 taskList.add(taskModel);

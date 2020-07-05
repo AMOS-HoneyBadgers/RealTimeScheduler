@@ -37,7 +37,7 @@ public class TaskApiController implements TaskApi {
     }
 
     @Override
-    public ResponseEntity<ResponseModel> taskTaskIdStartPut(UUID taskId) {
+    public ResponseEntity<ResponseModel> taskTaskIdStartPut(String taskId) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
@@ -48,7 +48,7 @@ public class TaskApiController implements TaskApi {
     }
 
     @Override
-    public ResponseEntity<ResponseModel> taskTaskIdStopPut(UUID taskId, @Valid DateTimeBody dateTimeBody) {
+    public ResponseEntity<ResponseModel> taskTaskIdStopPut(String taskId, @Valid DateTimeBody dateTimeBody) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");

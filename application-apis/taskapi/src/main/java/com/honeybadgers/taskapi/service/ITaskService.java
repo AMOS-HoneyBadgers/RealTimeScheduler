@@ -17,18 +17,16 @@ import java.util.UUID;
 @Service
 public interface ITaskService {
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
+    Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException;
 
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    Task updateTask(UUID taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException;
+    Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException;
 
     List<TaskModel> getAllTasks();
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    TaskModel deleteTask(UUID taskid) throws NoSuchElementException;
+    TaskModel deleteTask(String taskid) throws NoSuchElementException;
 
-    TaskModel getTaskById(UUID taskid) throws NoSuchElementException;
+    TaskModel getTaskById(String taskid) throws NoSuchElementException;
 
     void sendTaskToTaskEventQueue(String taskId);
 

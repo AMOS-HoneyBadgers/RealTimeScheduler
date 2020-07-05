@@ -28,7 +28,7 @@ import javax.validation.constraints.*;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T10:11:01.178+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-07-02T17:52:09.928+02:00[Europe/Berlin]")
 
 @Validated
 @Api(value = "task", description = "the task API")
@@ -58,7 +58,7 @@ public interface TaskApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
+                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"id\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -89,7 +89,7 @@ public interface TaskApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
+                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"id\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -120,7 +120,7 @@ public interface TaskApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
+                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"id\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }
@@ -151,7 +151,7 @@ public interface TaskApi {
         getRequest().ifPresent(request -> {
             for (MediaType mediaType: MediaType.parseMediaTypes(request.getHeader("Accept"))) {
                 if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"046b6c7f-0b8a-43b9-b35d-6489e6daee91\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
+                    String exampleString = "{ \"working_days\" : [ true, true, true, true, true ], \"active_times\" : [ \"{}\", \"{}\" ], \"history\" : [ \"{}\", \"{}\" ], \"priority\" : 800, \"mode\" : \"parallel\", \"retries\" : 0, \"index_number\" : 1, \"group_id\" : \"group_id\", \"meta\" : [ { \"value\" : \"value\", \"key\" : \"key\" }, { \"value\" : \"value\", \"key\" : \"key\" } ], \"force\" : false, \"id\" : \"id\", \"deadline\" : \"2000-01-23T04:56:07.000+00:00\", \"status\" : \"waiting\", \"type_flag\" : \"batch\" }";
                     ApiUtil.setExampleResponse(request, "application/json", exampleString);
                     break;
                 }

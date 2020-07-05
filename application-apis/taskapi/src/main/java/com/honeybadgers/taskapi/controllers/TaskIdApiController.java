@@ -55,7 +55,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
+    public ResponseEntity<TaskModel> taskIdGet(String taskId) {
         try{
             TaskModel restModel = taskService.getTaskById(taskId);
             return ResponseEntity.ok(restModel);
@@ -76,7 +76,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<ResponseModel> taskIdPost(UUID taskId, @Valid TaskModel taskModel) {
+    public ResponseEntity<ResponseModel> taskIdPost(String taskId, @Valid TaskModel taskModel) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
@@ -99,6 +99,10 @@ public class TaskIdApiController implements TaskIdApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
@@ -114,7 +118,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
+    public ResponseEntity<TaskModel> taskIdDelete(String taskId) {
         try{
             TaskModel restModel = taskService.deleteTask(taskId);
             logger.info("Task " + taskId + " deleted.");
@@ -138,9 +142,9 @@ public class TaskIdApiController implements TaskIdApi {
                 if (taskModel.getForce() != null && taskModel.getForce()) {
                     taskService.sendTaskToPriorityQueue(taskModel);
                     logger.info("Task " + taskModel.getId() + " was immediately dispatched");
-                }else
-                    taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
+                }
             }
+            taskService.sendTaskToTaskEventQueue("bulk");
 
         } catch (UnknownEnumException e) {
             response.setCode("400");
@@ -148,6 +152,10 @@ public class TaskIdApiController implements TaskIdApi {
             return ResponseEntity.badRequest().body(response);
         } catch (JpaException | CreationException e) {
             response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }

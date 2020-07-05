@@ -10,7 +10,6 @@ import io.swagger.annotations.ApiModelProperty;
 import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import org.openapitools.jackson.nullable.JsonNullable;
 import javax.validation.Valid;
 import javax.validation.constraints.*;
@@ -18,11 +17,11 @@ import javax.validation.constraints.*;
 /**
  * TaskModel
  */
-@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-19T10:11:01.178+02:00[Europe/Berlin]")
+@javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-07-02T17:52:09.928+02:00[Europe/Berlin]")
 
 public class TaskModel   {
   @JsonProperty("id")
-  private UUID id;
+  private String id;
 
   @JsonProperty("group_id")
   private String groupId;
@@ -169,11 +168,15 @@ public class TaskModel   {
   @JsonProperty("index_number")
   private Integer indexNumber;
 
+  @JsonProperty("history")
+  @Valid
+  private List<Object> history = null;
+
   @JsonProperty("meta")
   @Valid
   private List<TaskModelMeta> meta = null;
 
-  public TaskModel id(UUID id) {
+  public TaskModel id(String id) {
     this.id = id;
     return this;
   }
@@ -185,13 +188,12 @@ public class TaskModel   {
   @ApiModelProperty(required = true, value = "Primary id of task object")
   @NotNull
 
-  @Valid
 
-  public UUID getId() {
+  public String getId() {
     return id;
   }
 
-  public void setId(UUID id) {
+  public void setId(String id) {
     this.id = id;
   }
 
@@ -436,6 +438,34 @@ public class TaskModel   {
     this.indexNumber = indexNumber;
   }
 
+  public TaskModel history(List<Object> history) {
+    this.history = history;
+    return this;
+  }
+
+  public TaskModel addHistoryItem(Object historyItem) {
+    if (this.history == null) {
+      this.history = new ArrayList<>();
+    }
+    this.history.add(historyItem);
+    return this;
+  }
+
+  /**
+   * Array containing the history for a Task status changed with Timestamps
+   * @return history
+  */
+  @ApiModelProperty(value = "Array containing the history for a Task status changed with Timestamps")
+
+
+  public List<Object> getHistory() {
+    return history;
+  }
+
+  public void setHistory(List<Object> history) {
+    this.history = history;
+  }
+
   public TaskModel meta(List<TaskModelMeta> meta) {
     this.meta = meta;
     return this;
@@ -487,12 +517,13 @@ public class TaskModel   {
         Objects.equals(this.retries, taskModel.retries) &&
         Objects.equals(this.force, taskModel.force) &&
         Objects.equals(this.indexNumber, taskModel.indexNumber) &&
+        Objects.equals(this.history, taskModel.history) &&
         Objects.equals(this.meta, taskModel.meta);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(id, groupId, priority, deadline, activeTimes, workingDays, status, typeFlag, mode, retries, force, indexNumber, meta);
+    return Objects.hash(id, groupId, priority, deadline, activeTimes, workingDays, status, typeFlag, mode, retries, force, indexNumber, history, meta);
   }
 
   @Override
@@ -512,6 +543,7 @@ public class TaskModel   {
     sb.append("    retries: ").append(toIndentedString(retries)).append("\n");
     sb.append("    force: ").append(toIndentedString(force)).append("\n");
     sb.append("    indexNumber: ").append(toIndentedString(indexNumber)).append("\n");
+    sb.append("    history: ").append(toIndentedString(history)).append("\n");
     sb.append("    meta: ").append(toIndentedString(meta)).append("\n");
     sb.append("}");
     return sb.toString();

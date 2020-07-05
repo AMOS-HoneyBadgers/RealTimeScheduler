@@ -4,9 +4,13 @@ import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.TransactionException;
+import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -24,7 +28,10 @@ public class TaskConsumer {
     public void receiveTask(String taskid) {
         logger.info("Task " + taskid + " Step 1: received Task");
         try {
-            service.scheduleTask("");
+            service.scheduleTaskWrapper(taskid);
+        } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
+            logger.warn("Task " + taskid + " transaction exception in scheduleTaskWrapper" );
         } catch(Exception e) {
             logger.error(e.getMessage());
         }

@@ -12,7 +12,7 @@ public class TaskModelTest {
     void id() {
         TaskModel model = new TaskModel();
 
-        UUID newValue = UUID.randomUUID();
+        String newValue = UUID.randomUUID().toString();
         TaskModel get = model.id(newValue);
 
         assertNotNull(get);
@@ -24,9 +24,9 @@ public class TaskModelTest {
     void getsetId() {
         TaskModel model = new TaskModel();
 
-        UUID newValue = UUID.randomUUID();
+        String newValue = UUID.randomUUID().toString();
         model.setId(newValue);
-        UUID get = model.getId();
+        String get = model.getId();
 
         assertEquals(get, newValue);
     }
@@ -327,7 +327,7 @@ public class TaskModelTest {
         TaskModel model1 = new TaskModel();
         TaskModel model2 = new TaskModel();
         TaskModel model3 = new TaskModel();
-        model3.setId(UUID.randomUUID());
+        model3.setId(UUID.randomUUID().toString());
 
         assertTrue(model1.equals(model2));
         assertFalse(model1.equals(model3));
@@ -339,7 +339,7 @@ public class TaskModelTest {
         TaskModel model1 = new TaskModel();
         TaskModel model2 = new TaskModel();
         TaskModel model3 = new TaskModel();
-        model3.setId(UUID.randomUUID());
+        model3.setId(UUID.randomUUID().toString());
 
         assertEquals(model1.hashCode(), model2.hashCode());
         assertNotEquals(model1.hashCode(), model3.hashCode());
