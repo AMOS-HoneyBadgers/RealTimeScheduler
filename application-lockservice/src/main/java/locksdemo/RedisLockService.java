@@ -40,7 +40,7 @@ public class RedisLockService implements LockService {
 	private String prefix = DEFAULT_LOCK_PREFIX;
 
 	@Setter
-	private long expiry = 30000; // 30 seconds
+	public long expiry = 30000; // 30 seconds
 
 	private final RedisOperations<String, String> redisOperations;
 
