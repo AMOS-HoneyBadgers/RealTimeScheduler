@@ -17,7 +17,7 @@ This Document is supposed to archive and document the technology and architectur
 
 ### Code Quality
 
- - In order to have a good Code quality, the devs agreed on a 95% test coverage.
+ - In order to have a good Code quality, the devs agreed on a 80% test coverage.
  - The coverage will be tested with jacoco and checked before every push via a githook.
  - Additionally, we have set up SonarQube for code analysis.
 
