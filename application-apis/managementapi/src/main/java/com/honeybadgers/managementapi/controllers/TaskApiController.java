@@ -36,6 +36,11 @@ public class TaskApiController implements TaskApi {
         return Optional.ofNullable(request);
     }
 
+    /**
+     * Unlocks a Task.
+     * @param taskId  (required)
+     * @return
+     */
     @Override
     public ResponseEntity<ResponseModel> taskTaskIdStartPut(String taskId) {
         ResponseModel response = new ResponseModel();
@@ -47,6 +52,12 @@ public class TaskApiController implements TaskApi {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Locks a Task.
+     * @param taskId  (required)
+     * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
+     * @return
+     */
     @Override
     public ResponseEntity<ResponseModel> taskTaskIdStopPut(String taskId, @Valid DateTimeBody dateTimeBody) {
         ResponseModel response = new ResponseModel();
