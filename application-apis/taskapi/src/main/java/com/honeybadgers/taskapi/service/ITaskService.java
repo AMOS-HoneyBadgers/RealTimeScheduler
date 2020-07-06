@@ -24,7 +24,7 @@ public interface ITaskService {
      * @throws UnknownEnumException Mode or Type does not exist.
      * @throws CreationException Groups can either have other Groups or Tasks violation.
      */
-    Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
+    Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, InterruptedException, CreationException;
 
     /**
      * Update a Task in in the Database.
@@ -36,7 +36,7 @@ public interface ITaskService {
      * @throws CreationException Groups can either have other Groups or Tasks violation.
      * @throws IllegalStateException illegal update on dispatched Task.
      */
-    Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, IllegalStateException;
+    Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException, IllegalStateException;
 
     /**
      * Get all Tasks from Database.
