@@ -12,18 +12,23 @@ import com.honeybadgers.taskapi.service.ITaskConvertUtils;
 import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.hibernate.TransactionException;
+import org.hibernate.exception.LockAcquisitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
 import com.honeybadgers.taskapi.exceptions.JpaException;
+import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,8 +44,14 @@ public class TaskService implements ITaskService {
     @Autowired
     ITaskConvertUtils converter;
 
+    @Autowired
+    TaskService _self;
+
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
+
+    @Value("${com.honeybadgers.transaction.max-retry-sleep:500}")
+    int maxTransactionRetrySleep;
 
     static final Logger logger = LogManager.getLogger(TaskService.class);
 
@@ -58,7 +69,23 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
+    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException {
+        int iteration = 1;
+        while (true){
+            try{
+                return _self.createTaskInternal(restModel);
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+                // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
+                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
+                logger.warn("Task " + restModel.getId() + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                Thread.sleep(Math.round(timeToSleep));
+                iteration++;
+            }
+        }
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Task createTaskInternal(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException {
         Task checkTask = taskRepository.findById(restModel.getId()).orElse(null);
         if( checkTask != null ){
             throw new JpaException("Primary or unique constraint failed!");
@@ -77,7 +104,24 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
+    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException, IllegalStateException {
+        int iteration =1;
+        while (true){
+            try{
+                return _self.updateTaskInternal(taskId, restModel);
+            }
+            catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+                // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
+                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
+                logger.error("Task " + restModel.getId() + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                Thread.sleep(Math.round(timeToSleep));
+                iteration++;
+            }
+        }
+    }
+
+    @Transactional(isolation = Isolation.SERIALIZABLE)
+    public Task updateTaskInternal(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException {
         Task checkTask = taskRepository.findById(taskId).orElse(null);
         if(checkTask == null)
             throw new NoSuchElementException("No existing Task with id: " + taskId);
@@ -116,6 +160,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public TaskModel deleteTask(String taskid) {
+        // TODO custom query
         Task task = taskRepository.findById(taskid).orElse(null);
         if(task == null)
             throw new NoSuchElementException("No existing Task with ID: " + taskid);

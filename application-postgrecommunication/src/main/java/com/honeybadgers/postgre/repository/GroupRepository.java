@@ -15,9 +15,20 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     /*@Query(value = "SELECT *, ARRAY(SELECT id FROM public.\"group\" WHERE parent_id=?1) as childs FROM public.\"group\" WHERE id=?1", nativeQuery = true)
     Optional<GROUP EXTENSION> findByIdWithChildrenList(String groupId);*/
 
+    /**
+     * Splits the table into variable sized pages and returns one.
+     * @param size Number of Objects per page.
+     * @param offset Page number.
+     * @return Page of groups as List.
+     */
     @Query(value = "SELECT * FROM public.\"group\" LIMIT ?1 OFFSET ?2", nativeQuery = true)
     List<Group> getAllGroupsByPage(int size, int offset);
 
+    /**
+     * Returns a List of all groups with the same parent group.
+     * @param parentId id of specified parent group.
+     * @return List of child groups.
+     */
     @Query(value = "SELECT * FROM public.\"group\" WHERE parent_id=?1", nativeQuery = true)
     List<Group> findAllByParentGroupId(String parentId);
 

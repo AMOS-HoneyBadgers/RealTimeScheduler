@@ -14,6 +14,11 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfiguration {
     private static final Logger LOGGER = LogManager.getLogger(AsyncConfiguration.class);
+
+    /**
+     * Executor thread pool for HTTP performance tests calls with size 2
+     * @return Executor Object
+     */
     @Bean(name = "taskExecutor")
     public Executor taskExecutor() {
         LOGGER.debug("Creating Async Task Executor");
@@ -25,6 +30,11 @@ public class AsyncConfiguration {
         executor.initialize();
         return executor;
     }
+
+    /**
+     * Executor thread pool for HTTP performance tests calls with size 40
+     * @return Executor Object
+     */
     @Bean(name = "taskExecutorPerformance")
     public Executor taskExecutorPerformance() {
         LOGGER.debug("Creating Async Task Executor");
