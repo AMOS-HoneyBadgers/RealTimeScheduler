@@ -363,7 +363,7 @@ public class SchedulerServiceTest {
         verify(groupRepository, never()).incrementCurrentParallelismDegree(anyString());
         verify(taskRepository).save(any(Task.class));
         verify(pausedRepository,times(1)).findById(any());
-        verify(spy).checkParallelismDegreeSurpassed(anyList());
+        verify(spy).checkParallelismDegreeSurpassed(anyList(),anyString());
     }
 
     @Test
@@ -378,7 +378,7 @@ public class SchedulerServiceTest {
         List<String> groups = Arrays.asList(group.getId(), groupAncestor.getId());
 
         SchedulerService spy = spy(service);
-        boolean ret = spy.checkParallelismDegreeSurpassed(groups);
+        boolean ret = spy.checkParallelismDegreeSurpassed(groups,"testTask");
 
         assertFalse(ret);
     }
@@ -396,7 +396,7 @@ public class SchedulerServiceTest {
         List<String> groups = Arrays.asList(group.getId(), groupAncestor.getId());
 
         SchedulerService spy = spy(service);
-        boolean ret = spy.checkParallelismDegreeSurpassed(groups);
+        boolean ret = spy.checkParallelismDegreeSurpassed(groups, "testTask");
 
         assertTrue(ret);
     }

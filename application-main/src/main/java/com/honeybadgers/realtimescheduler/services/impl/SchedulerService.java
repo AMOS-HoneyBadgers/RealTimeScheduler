@@ -231,7 +231,7 @@ public class SchedulerService implements ISchedulerService {
             return false;
 
         if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) ||
-                sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask))
+                sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId()))
             return false;
 
         // Increment current parallelismDegree for all ancestors
@@ -249,15 +249,17 @@ public class SchedulerService implements ISchedulerService {
     /**
      * Check if CurrentParallelismDegree + 1 is greater than ParallelismDegree among all ancestor groups.
      * @param groups List of ids of all ancestors.
+     * @param taskid Task id for logging.
      * @return true if ParallelismDegree is surpassed for any ancestor.
      * false otherwise
      */
-    public boolean checkParallelismDegreeSurpassed(List<String> groups){
+    public boolean checkParallelismDegreeSurpassed(List<String> groups, String taskid){
         for (String groupId : groups) {
             Group currentGroup = groupService.getGroupById(groupId);
             if(currentGroup == null)
                 continue;
             if(currentGroup.getCurrentParallelismDegree() + 1 > currentGroup.getParallelismDegree() ){
+                logger.info("Task " + taskid + " was not sent due to Parallelism degree" );
                 return true;
             }
         }
