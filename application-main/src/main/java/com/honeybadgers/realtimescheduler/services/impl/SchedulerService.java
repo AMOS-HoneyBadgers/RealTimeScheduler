@@ -64,26 +64,6 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     RestTemplate restTemplate;
 
-    /**
-     * Returns the minimal parallelism degree of all groups of the task
-     * @param groupsOfTask list with all parent groups of the task
-     * @param grpId id of the group
-     * @return minimal parallelism degree
-     */
-    public int getLimitFromGroup(List<String> groupsOfTask, String grpId) {
-        int minLimit = Integer.MAX_VALUE;
-
-        for (String groupId : groupsOfTask) {
-            Group currentGroup = groupService.getGroupById(groupId);
-            if (currentGroup == null || currentGroup.getParallelismDegree() == null)
-                continue;
-
-            minLimit = Math.min(minLimit, currentGroup.getParallelismDegree());
-        }
-        logger.debug("limit for groupid: " + grpId + "is now at: " + minLimit);
-        return minLimit;
-    }
-
     @Override
     public boolean isTaskPaused(String taskId) {
         if (taskId == null)
@@ -250,26 +230,38 @@ public class SchedulerService implements ISchedulerService {
         if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
             return false;
 
-        if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
+        if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) ||
+                sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask))
             return false;
 
-        // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
-        Group parentGroup = currentTask.getGroup();
-
-        int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
-        // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
-        if (parentGroup.getCurrentParallelismDegree() >= limit) {
-            logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
-            return false;
+        // Increment current parallelismDegree for all ancestors
+        for(String group: groupsOfTask) {
+            groupRepository.incrementCurrentParallelismDegree(group);
         }
-        // TODO unnötig -> groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()) reicht, solange currentTask.group danach nicht benutzt wird
-        currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
         // TODO custom query
         taskService.updateTaskStatus(currentTask, TaskStatusEnum.Dispatched);
         taskRepository.save(currentTask);
 
         return true;
+    }
+
+    /**
+     * Check if CurrentParallelismDegree + 1 is greater than ParallelismDegree among all ancestor groups.
+     * @param groups List of ids of all ancestors.
+     * @return true if ParallelismDegree is surpassed for any ancestor.
+     * false otherwise
+     */
+    public boolean checkParallelismDegreeSurpassed(List<String> groups){
+        for (String groupId : groups) {
+            Group currentGroup = groupService.getGroupById(groupId);
+            if(currentGroup == null)
+                continue;
+            if(currentGroup.getCurrentParallelismDegree() + 1 > currentGroup.getParallelismDegree() ){
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

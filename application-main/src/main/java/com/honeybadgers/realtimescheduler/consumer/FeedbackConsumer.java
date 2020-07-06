@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -129,13 +130,17 @@ public class FeedbackConsumer {
     }
 
     /**
-     * Decreases the parallelism degree of the corresponding group of the task
+     * Decreases the parallelism degree of the corresponding group and all ancestor groups of the task
      * @param currentTask task which is in a group of parallel tasks
      */
     public void checkAndSetParallelismDegree(Task currentTask) {
-        // Decrement current parallelismDegree in group of given task
-        Optional<Group> updated = groupRepository.decrementCurrentParallelismDegree(currentTask.getGroup().getId());
-        if(!updated.isPresent())
-            logger.debug("Task " + currentTask.getId() + " failed to decrement currentParallelismDegree due to currentParallelismDegree = 0");
+        List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
+        for (String group : groupsOfTask) {
+            // Decrement current parallelismDegree in group of given task
+            Optional<Group> updated = groupRepository.decrementCurrentParallelismDegree(group);
+
+            if (!updated.isPresent())
+                logger.debug("Task " + currentTask.getId() + " failed to decrement currentParallelismDegree due to currentParallelismDegree = 0");
+        }
     }
 }
