@@ -30,6 +30,9 @@ public class ScheduledServices {
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
+    /**
+     * This Component check for paused Tasks and Groups and makes sure they are unlocked at specified times.
+     */
     @Scheduled(fixedRateString = "${cleaner.paused.fixed-rate}", initialDelayString = "${cleaner.paused.initial-delay}")
     public void cleanPausedLocks() {
         logger.info("Cleaner starting paused cleanup");

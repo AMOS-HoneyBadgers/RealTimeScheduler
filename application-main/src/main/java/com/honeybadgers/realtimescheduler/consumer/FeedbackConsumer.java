@@ -20,6 +20,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -47,7 +48,14 @@ public class FeedbackConsumer {
     int maxTransactionRetrySleep;
 
 
-
+    /**
+     * Methods which is called if feedback from the feedback queue is received in the scheduler.
+     * Feedback is processed (parallelism degree and sequential check) and afterwards a trigger is send to the
+     * scheduler to reschedule the waiting tasks. Catches several transaction exceptions and retries if transaction fails
+     * (due to concurrency update/read)
+     * @param taskid task id of the received task
+     * @throws InterruptedException if sleep is interrupted
+     */
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
@@ -89,6 +97,10 @@ public class FeedbackConsumer {
         }
     }
 
+    /**
+     * Handles the feedback. Decreases the parallelism degree and decreases the sequentialIndexNumber of the group
+     * @param taskId to be processed
+     */
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void processFeedback(String taskId) {
         logger.info("Task " + taskId + " was processed by the dispatcher");
@@ -105,6 +117,10 @@ public class FeedbackConsumer {
         taskService.finishTask(currentTask);
     }
 
+    /**
+     * Increases the LastIndexNumber of the corresponding group of the task
+     * @param currentTask task which is in a group of sequential tasks
+     */
     //TODO is it necessary to do this also for all grandparent groups??
     public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
         Group group = currentTask.getGroup();
@@ -113,10 +129,18 @@ public class FeedbackConsumer {
         groupRepository.save(group);
     }
 
+    /**
+     * Decreases the parallelism degree of the corresponding group and all ancestor groups of the task
+     * @param currentTask task which is in a group of parallel tasks
+     */
     public void checkAndSetParallelismDegree(Task currentTask) {
-        // Decrement current parallelismDegree in group of given task
-        Optional<Group> updated = groupRepository.decrementCurrentParallelismDegree(currentTask.getGroup().getId());
-        if(!updated.isPresent())
-            logger.debug("Task " + currentTask.getId() + " failed to decrement currentParallelismDegree due to currentParallelismDegree = 0");
+        List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
+        for (String group : groupsOfTask) {
+            // Decrement current parallelismDegree in group of given task
+            Optional<Group> updated = groupRepository.decrementCurrentParallelismDegree(group);
+
+            if (!updated.isPresent())
+                logger.debug("Task " + currentTask.getId() + " failed to decrement currentParallelismDegree due to currentParallelismDegree = 0");
+        }
     }
 }

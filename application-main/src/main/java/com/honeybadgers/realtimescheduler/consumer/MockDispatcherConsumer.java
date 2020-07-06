@@ -25,6 +25,11 @@ public class MockDispatcherConsumer {
     @Autowired
     LockRepository lockRepository;
 
+    /**
+     * Mocked the dispatcher in the scheduler instance. This method is called when a scheduler sends a task to the dispatcher
+     * Sends feedback back to scheduler. In production there should be a dispatcher which should replace this
+     * @param message task id which is received
+     */
     @RabbitListener(queues="dispatch.queue", containerFactory = "dispatchcontainerfactory")
     public void receiveTaskFromSchedulerMockDispatcher(String message) {
         logger.info("Received message in Mock Dispatcher'{}'" + message);
