@@ -17,10 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -206,6 +203,7 @@ public class TaskServiceTest {
         System.out.println("batch0: " + res13);
         System.out.println("noValues: " + res12);
 
+
         Assert.assertTrue(res > res2);
         Assert.assertTrue(res2 > res3);
         Assert.assertTrue(res4 > res5);
@@ -357,15 +355,19 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTaskHistory_NoHistoryElement(){
+    public void testUpdateTaskStatus_NoHistoryElement(){
         Task taskNoHistory = new Task();
         taskNoHistory.setHistory(null);
 
-        assertThrows(RuntimeException.class, () -> service.updateTaskhistory(taskNoHistory, TaskStatusEnum.Waiting));
+        service.updateTaskStatus(taskNoHistory, TaskStatusEnum.Waiting);
+
+        assertNotNull(taskNoHistory.getHistory());
+        assertEquals(1, taskNoHistory.getHistory().size());
+        assertEquals(TaskStatusEnum.Waiting, taskNoHistory.getStatus());
     }
 
     @Test
-    public void testUpdateTaskHistory(){
+    public void testUpdateTaskStatus(){
         Task task = new Task();
         List<History> history = new ArrayList<>();
 
@@ -375,9 +377,10 @@ public class TaskServiceTest {
         history.add(hist);
         task.setHistory(history);
 
-        service.updateTaskhistory(task, TaskStatusEnum.Scheduled);
+        service.updateTaskStatus(task, TaskStatusEnum.Scheduled);
 
         assertEquals(2, task.getHistory().size());
+        assertEquals(TaskStatusEnum.Scheduled, task.getStatus());
 
     }
 }

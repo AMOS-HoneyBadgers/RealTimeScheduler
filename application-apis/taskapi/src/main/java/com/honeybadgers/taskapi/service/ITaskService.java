@@ -24,7 +24,6 @@ public interface ITaskService {
      * @throws UnknownEnumException Mode or Type does not exist.
      * @throws CreationException Groups can either have other Groups or Tasks violation.
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException;
 
     /**
@@ -37,7 +36,6 @@ public interface ITaskService {
      * @throws CreationException Groups can either have other Groups or Tasks violation.
      * @throws IllegalStateException illegal update on dispatched Task.
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
     Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, IllegalStateException;
 
     /**

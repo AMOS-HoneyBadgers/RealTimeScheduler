@@ -99,6 +99,10 @@ public class TaskIdApiController implements TaskIdApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
@@ -138,9 +142,9 @@ public class TaskIdApiController implements TaskIdApi {
                 if (taskModel.getForce() != null && taskModel.getForce()) {
                     taskService.sendTaskToPriorityQueue(taskModel);
                     logger.info("Task " + taskModel.getId() + " was immediately dispatched");
-                }else
-                    taskService.sendTaskToTaskEventQueue(taskModel.getId().toString());
+                }
             }
+            taskService.sendTaskToTaskEventQueue("bulk");
 
         } catch (UnknownEnumException e) {
             response.setCode("400");
@@ -148,6 +152,10 @@ public class TaskIdApiController implements TaskIdApi {
             return ResponseEntity.badRequest().body(response);
         } catch (JpaException | CreationException e) {
             response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }

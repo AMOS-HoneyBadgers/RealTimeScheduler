@@ -33,9 +33,9 @@ public interface ISchedulerService {
     boolean isSchedulerPaused();
 
     /**
-     * Schedule all waiting tasks and then call sendToDispatcher
-     * Method running as @Transactional
+     * Wrapper for transactional methods, which schedules each task (in transaction)
+     * and then dispatches all tasks (in transaction)
+     * @param trigger trigger type which indicates, which tasks have to be scheduled (for schedule or reschedule)
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    void scheduleTask(String trigger);
+    void scheduleTaskWrapper(String trigger);
 }

@@ -12,12 +12,24 @@ public class PerformanceController {
     @Autowired
     PerformanceService performanceService;
 
+    /**
+     * REST endpoint for performance test with tasks creations
+     * @param count how many tasks should be created
+     * @return Response of HTTP call
+     */
     @GetMapping("/performance/{count}")
     public ResponseEntity<?> createPerformanceTest(@PathVariable(value = "count") final int count) {
         performanceService.createPostWithObject(count);
         return ResponseEntity.ok().build();
     }
 
+    /**
+     * REST endpoint for performance test with tasks creations as batched imports (reduced http latency due to lists
+     * of tasks in the http body)
+     * @param listcount amount of lists for tasks
+     * @param taskcount amount of tasks per list
+     * @return Response of HTTP call
+     */
     @GetMapping("/performance/{listcount}/{taskcount}")
     public ResponseEntity<?> createPerformanceTest(@PathVariable(value = "listcount") final int listcount, @PathVariable(value = "taskcount") final int taskcount) {
         long before = System.currentTimeMillis();

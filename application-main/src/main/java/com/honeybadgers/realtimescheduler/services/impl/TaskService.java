@@ -9,7 +9,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
@@ -82,7 +81,7 @@ public class TaskService implements ITaskService {
 
     @Override
     public void finishTask(Task task) {
-        task.setStatus(TaskStatusEnum.Finished);
+        updateTaskStatus(task, TaskStatusEnum.Finished);
         taskRepository.save(task);
     }
 
@@ -91,12 +90,14 @@ public class TaskService implements ITaskService {
         this.taskRepository.deleteById(id);
     }
 
-    public void updateTaskhistory(Task task, TaskStatusEnum status) throws RuntimeException{
-        if(task.getHistory() == null)
-            throw new RuntimeException("Task has no History Object");
+    @Override
+    public void updateTaskStatus(Task task, TaskStatusEnum status) {
         List<History> hist = task.getHistory();
+        if(hist == null)
+            hist = new ArrayList<>();
         hist.add(new History(status.toString(), Timestamp.from(Instant.now())));
         task.setHistory(hist);
+        task.setStatus(status);
     }
 
     @Override
