@@ -248,9 +248,9 @@ public class SchedulerServiceTest {
     * and
     * at com.honeybadgers.realtimescheduler.services.impl.SchedulerService.isTaskPaused(SchedulerService.java:80)
     * and
-    * at com.honeybadgers.realtimescheduler.consumer.FeedbackConsumer.processFeedback(FeedbackConsumer.java:89)
+    * at com.honeybadgers.realtimescheduler.consumer.impl.FeedbackConsumer.processFeedback(FeedbackConsumer.java:89)
     * and
-    * at com.honeybadgers.realtimescheduler.consumer.FeedbackConsumer.receiveFeedbackFromDispatcher(FeedbackConsumer.java:58)
+    * at com.honeybadgers.realtimescheduler.consumer.impl.FeedbackConsumer.receiveFeedbackFromDispatcher(FeedbackConsumer.java:58)
     *
     * DataIntegr for: 969fa543-cb7b-4bdb-8b86-a9fee2310806  63d0aee6-9f67-45fe-9091-6ef8cf136cbb
     */
