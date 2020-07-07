@@ -27,7 +27,7 @@ public interface IFeedbackConsumer {
     void checkAndSetSequentialAndIndexNumber(Task currentTask);
 
     /**
-     * Decreases the parallelism degree of the corresponding group of the task
+     * Decreases the parallelism degree of the corresponding group of the task (including ancestor groups)
      * @param currentTask task which is in a group of parallel tasks
      */
     void checkAndSetParallelismDegree(Task currentTask);
