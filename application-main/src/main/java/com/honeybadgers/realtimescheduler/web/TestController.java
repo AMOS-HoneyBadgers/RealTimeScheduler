@@ -4,7 +4,6 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.GroupAncestorModel;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
-import com.honeybadgers.postgre.repository.LockRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
@@ -41,8 +40,7 @@ public class TestController {
     @Autowired
     PausedRepository pausedRepository;
 
-    @Autowired
-    LockRepository lockRepository;
+
 
     @Autowired
     TaskRepository taskRepository;

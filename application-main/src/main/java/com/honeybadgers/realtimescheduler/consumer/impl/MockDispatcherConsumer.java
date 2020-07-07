@@ -1,7 +1,6 @@
 package com.honeybadgers.realtimescheduler.consumer.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.postgre.repository.LockRepository;
 import com.honeybadgers.realtimescheduler.consumer.IMockDispatcherConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -23,24 +22,16 @@ public class MockDispatcherConsumer implements IMockDispatcherConsumer {
     @Autowired
     public ICommunication sender;
 
-    @Autowired
-    LockRepository lockRepository;
+
 
     @Override
     @RabbitListener(queues="dispatch.queue", containerFactory = "dispatchcontainerfactory")
     public void receiveTaskFromSchedulerMockDispatcher(String message) {
         logger.info("Received message in Mock Dispatcher'{}'" + message);
 
-        // This is for checking, whereas tasks are dispatched multiple times
-        try {
-            lockRepository.insert(message);
-        } catch (DataIntegrityViolationException e) {
-            logger.error("##############################################################################");
-            logger.error("DataIntegrityViolationException for " + message);
-            logger.error("##############################################################################");
-        }
+
 
         // Send feedback back to scheduler
-        //sender.sendFeedbackToScheduler(message);
+        sender.sendFeedbackToScheduler(message);
     }
 }
