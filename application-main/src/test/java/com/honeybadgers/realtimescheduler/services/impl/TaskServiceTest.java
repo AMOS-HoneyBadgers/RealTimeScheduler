@@ -17,10 +17,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -205,6 +202,7 @@ public class TaskServiceTest {
         System.out.println("retries2: " + res11);
         System.out.println("batch0: " + res13);
         System.out.println("noValues: " + res12);
+
 
         Assert.assertTrue(res > res2);
         Assert.assertTrue(res2 > res3);

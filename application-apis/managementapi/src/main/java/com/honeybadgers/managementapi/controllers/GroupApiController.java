@@ -38,6 +38,11 @@ public class GroupApiController implements GroupApi {
         return Optional.ofNullable(request);
     }
 
+    /**
+     * Unlocks a Group.
+     * @param groupId  (required)
+     * @return
+     */
     @Override
     public ResponseEntity<ResponseModel> groupGroupIdStartPut(String groupId) {
         ResponseModel response = new ResponseModel();
@@ -49,6 +54,12 @@ public class GroupApiController implements GroupApi {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Locks a Group.
+     * @param groupId  (required)
+     * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
+     * @return
+     */
     @Override
     public ResponseEntity<ResponseModel> groupGroupIdStopPut(String groupId, @Valid DateTimeBody dateTimeBody) {
         ResponseModel response = new ResponseModel();

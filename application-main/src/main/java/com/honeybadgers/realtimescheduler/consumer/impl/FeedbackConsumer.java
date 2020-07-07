@@ -1,9 +1,10 @@
-package com.honeybadgers.realtimescheduler.consumer;
+package com.honeybadgers.realtimescheduler.consumer.impl;
 
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.ModeEnum;
 import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.realtimescheduler.consumer.IFeedbackConsumer;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.apache.logging.log4j.LogManager;
@@ -20,11 +21,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Component
 @EnableRabbit
-public class FeedbackConsumer {
+public class FeedbackConsumer implements IFeedbackConsumer {
 
     static final Logger logger = LogManager.getLogger(FeedbackConsumer.class);
 
@@ -47,8 +49,8 @@ public class FeedbackConsumer {
     int maxTransactionRetrySleep;
 
 
-
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
+    @Override
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
         int iteration =1;
@@ -89,6 +91,7 @@ public class FeedbackConsumer {
         }
     }
 
+    @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void processFeedback(String taskId) {
         logger.info("Task " + taskId + " was processed by the dispatcher");
@@ -106,6 +109,7 @@ public class FeedbackConsumer {
     }
 
     //TODO is it necessary to do this also for all grandparent groups??
+    @Override
     public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
         Group group = currentTask.getGroup();
         logger.debug("Task " + currentTask.getId() + " update index Number of group " + group.getId());
@@ -113,10 +117,15 @@ public class FeedbackConsumer {
         groupRepository.save(group);
     }
 
+    @Override
     public void checkAndSetParallelismDegree(Task currentTask) {
-        // Decrement current parallelismDegree in group of given task
-        Optional<Group> updated = groupRepository.decrementCurrentParallelismDegree(currentTask.getGroup().getId());
-        if(!updated.isPresent())
-            logger.debug("Task " + currentTask.getId() + " failed to decrement currentParallelismDegree due to currentParallelismDegree = 0");
+        List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
+        for (String group : groupsOfTask) {
+            // Decrement current parallelismDegree in group of given task
+            Optional<Group> updated = groupRepository.decrementCurrentParallelismDegree(group);
+
+            if (!updated.isPresent())
+                logger.debug("Task " + currentTask.getId() + " failed to decrement currentParallelismDegree due to currentParallelismDegree = 0");
+        }
     }
 }

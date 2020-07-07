@@ -104,7 +104,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException {
+    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException, IllegalStateException {
         int iteration =1;
         while (true){
             try{

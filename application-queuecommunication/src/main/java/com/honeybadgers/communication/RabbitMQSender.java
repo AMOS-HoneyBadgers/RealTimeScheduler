@@ -59,6 +59,7 @@ public class RabbitMQSender implements ICommunication {
         logger.debug("Task " + task + " sent to dispatcher");
     }
 
+    @Override
     public String sendFeedbackToScheduler(String feedback) {
         rabbitTemplate.convertAndSend(feedbackExchange, feedbackroutingkey, feedback);
         logger.debug("Feedback for Task " + feedback + " sent to Scheduler" );

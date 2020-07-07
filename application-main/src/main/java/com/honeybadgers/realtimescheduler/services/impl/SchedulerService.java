@@ -64,20 +64,6 @@ public class SchedulerService implements ISchedulerService {
     @Autowired
     RestTemplate restTemplate;
 
-    public int getLimitFromGroup(List<String> groupsOfTask, String grpId) {
-        int minLimit = Integer.MAX_VALUE;
-
-        for (String groupId : groupsOfTask) {
-            Group currentGroup = groupService.getGroupById(groupId);
-            if (currentGroup == null || currentGroup.getParallelismDegree() == null)
-                continue;
-
-            minLimit = Math.min(minLimit, currentGroup.getParallelismDegree());
-        }
-        logger.debug("limit for groupid: " + grpId + "is now at: " + minLimit);
-        return minLimit;
-    }
-
     @Override
     public boolean isTaskPaused(String taskId) {
         if (taskId == null)
@@ -126,7 +112,7 @@ public class SchedulerService implements ISchedulerService {
 
             // schedule tasks
             logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
-            for (Task task : waitingTasks ) {
+            for (Task task : waitingTasks) {
                 try {
                     if (stopSchedulerDueToLockAcquisitionException)
                         return;
@@ -147,7 +133,7 @@ public class SchedulerService implements ISchedulerService {
                         if (stopSchedulerDueToLockAcquisitionException)
                             return;
 
-                        if(_self.checkTaskForDispatchingAndUpdate(task)) {
+                        if (_self.checkTaskForDispatchingAndUpdate(task)) {
                             // TODO document: if scheduler crashes here -> task could be dispatched twice
                             // dispatch here because this only gets executed if transaction succeeds
                             sender.sendTaskToDispatcher(task.getId());
@@ -166,33 +152,44 @@ public class SchedulerService implements ISchedulerService {
             // stop lock-refresh-thread
             lockrefresherThread.interrupt();
         } catch (Exception e) {
-            logger.error("unexpected exception in scheduling " + e.getMessage());
+            logger.error( e.getMessage());
         } finally {
             if (lockrefresherThread != null)
                 lockrefresherThread.interrupt();
         }
     }
 
+    /**
+     * Tries to acquire the lock for the scheduler application. If false, tasks can't be dispatched
+     * @return LockResponse Object with values for expiration date
+     * @throws LockException when another instance already claims the lock
+     */
     public LockResponse checkIfAllowedtoSchedule() throws LockException {
         String url = "https://lockservice-amos.cfapps.io/";
         final String scheduler = "SCHEDULER";
 
         // create headers
         HttpEntity<Object> entity = getObjectHttpEntity();
-
-        // send POST request
-        ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
-
-        if (response.getStatusCode() != HttpStatus.OK) {
-            logger.info("lock for scheduler already acquired");
-            throw new LockException("Failed to acquire lock for Lock Application");
+        try {
+            // send POST request
+            ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
+            if (response.getStatusCode() != HttpStatus.OK) {
+                logger.info("lock for scheduler already acquired");
+                throw new LockException("Failed to acquire lock for Lock Application");
+            }
+            logger.info("acquired lock for: " + response.getBody().getValue());
+            return response.getBody();
+        } catch (Exception e) {
+            throw  new LockException("error by acquiring scheduler lock " +  e.getMessage());
         }
 
 
-        logger.info("acquired lock for: " + response.getBody().getValue());
-        return response.getBody();
     }
 
+    /**
+     * Wrapper method for http entity creation
+     * @return HttpEntity instance
+     */
     private static HttpEntity<Object> getObjectHttpEntity() {
         // create headers
         HttpHeaders headers = new HttpHeaders();
@@ -204,6 +201,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Schedule given task and update in DB (Running as transaction)
+     *
      * @param task task to be scheduled
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -216,6 +214,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Tries to send given task to the dispatcher if the conditions for sending are met.
+     *
      * @param currentTask task to be send to the dispatcher
      * @return return true if status was updated and dispatch is wanted
      */
@@ -231,20 +230,14 @@ public class SchedulerService implements ISchedulerService {
         if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
             return false;
 
-        if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) || sequentialHasToWait(currentTask))
+        if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) ||
+                sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId()))
             return false;
 
-        // Get Parlellism Current Task Amount from group of task (this also includes tasks of )
-        Group parentGroup = currentTask.getGroup();
-
-        int limit = getLimitFromGroup(groupsOfTask, parentGroup.getId());
-        // TODO bug User Story 84 (documents, as mentioned in US, in documents channel of discord)
-        if (parentGroup.getCurrentParallelismDegree() >= limit) {
-            logger.info("Task " + currentTask.getId() + " was not sned due to parallelism limit for Group " + parentGroup.getId() + " is now at: " + parentGroup.getCurrentParallelismDegree());
-            return false;
+        // Increment current parallelismDegree for all ancestors
+        for(String group: groupsOfTask) {
+            groupRepository.incrementCurrentParallelismDegree(group);
         }
-        // TODO unnötig -> groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()) reicht, solange currentTask.group danach nicht benutzt wird
-        currentTask.setGroup(groupRepository.incrementCurrentParallelismDegree(parentGroup.getId()));
 
         // TODO custom query
         taskService.updateTaskStatus(currentTask, TaskStatusEnum.Dispatched);
@@ -254,9 +247,30 @@ public class SchedulerService implements ISchedulerService {
     }
 
     /**
+     * Check if CurrentParallelismDegree + 1 is greater than ParallelismDegree among all ancestor groups.
+     * @param groups List of ids of all ancestors.
+     * @param taskid Task id for logging.
+     * @return true if ParallelismDegree is surpassed for any ancestor.
+     * false otherwise
+     */
+    public boolean checkParallelismDegreeSurpassed(List<String> groups, String taskid){
+        for (String groupId : groups) {
+            Group currentGroup = groupService.getGroupById(groupId);
+            if(currentGroup == null)
+                continue;
+            if(currentGroup.getCurrentParallelismDegree() + 1 > currentGroup.getParallelismDegree() ){
+                logger.info("Task " + taskid + " was not sent due to Parallelism degree" );
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
      * Checks groups with id in given list on paused
+     *
      * @param groupsOfTask List of groupIds to be checked on paused
-     * @param taskid taskId of logging
+     * @param taskid       taskId of logging
      * @return true if one group is paused
      */
     public boolean checkGroupOrAncesterGroupIsOnPause(List<String> groupsOfTask, String taskid) {
@@ -272,6 +286,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Check if given task has to wait due to its sequence number
+     *
      * @param task task to be checked
      * @return true if task has to wait
      */
@@ -291,13 +306,19 @@ public class SchedulerService implements ISchedulerService {
         return false;
     }
 
+    /**
+     * Check if the task can be dispatched due to his working days (monday to sunday). Sometimes tasks can only be send
+     * on several days. The method checks that the task can't be dispatched if current day isn't allowed.
+     * @param task taskModel
+     * @return boolean true if current day is allowed, else false
+     */
     public boolean checkIfTaskIsInWorkingDays(Task task) {
         Calendar calendar = Calendar.getInstance(TimeZone.getDefault());
         int dayofweek = calendar.get(Calendar.DAY_OF_WEEK);
         int[] workingdays = getActualWorkingDaysForTask(task);
         ConvertUtils convertUtils = new ConvertUtils();
         List<Boolean> workingdaybools = convertUtils.intArrayToBoolList(workingdays);
-
+        // TODO: Check if there is no bug in working days (expect in api that working days start at monday, but we have sunday = 0)
         if (workingdaybools.get(convertUtils.fitDayOfWeekToWorkingDayBooleans(dayofweek)))
             return true;
 
@@ -305,6 +326,12 @@ public class SchedulerService implements ISchedulerService {
         return false;
     }
 
+    /**
+     * When a task has multiple groups, this method returns the actual working days of the parent, or grandparent (highest group).
+     * @param task taskModel
+     * @return working days of task if group has no working days, otherwise it returns the working days of the highest group.
+     * @return int array with 7x 1 values if no working day is specified anywhere - can be dispatched at any weekday
+     */
     public int[] getActualWorkingDaysForTask(Task task) {
         int[] workingDays = task.getWorkingDays();
 
@@ -329,6 +356,11 @@ public class SchedulerService implements ISchedulerService {
         return new int[]{1, 1, 1, 1, 1, 1, 1};
     }
 
+    /**
+     * Checks the active times of the task and if it is allowed to be dispatched at the current time
+     * @param task taskModel
+     * @return boolean true if it is allowed, otherwise false
+     */
     public boolean checkIfTaskIsInActiveTime(Task task) {
         Date current = new Date();
         Date from = new Date();
@@ -359,6 +391,12 @@ public class SchedulerService implements ISchedulerService {
         return false;
     }
 
+    /**
+     * When a task has multiple groups, this method returns the actual active times of the parent, or grandparent (highest group).
+     * @param task taskModel
+     * @return active times of task if group has no active times, otherwise it returns the active times of the highest group.
+     * @return empty list for active times if no active times is specified anywhere - can be dispatched anytime
+     */
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
         List<ActiveTimes> activeTimes = task.getActiveTimeFrames();
         if (activeTimes != null)
@@ -396,6 +434,9 @@ public class SchedulerService implements ISchedulerService {
             value = lockresponse.getValue();
         }
 
+        /**
+         * Send a REST request to the lockservice periodically. Tries to refresh current lock status
+         */
         @SneakyThrows
         public void run() {
             try {
@@ -404,7 +445,6 @@ public class SchedulerService implements ISchedulerService {
                 while (true) {
                     // send Put request
                     ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
-                    logger.info(" Statuscode put response" + response.getStatusCode());
                     if (response.getStatusCode() != HttpStatus.OK) {
                         logger.error("could not refresh lock");
                         throw new LockException("could not refresh lock");
@@ -424,6 +464,10 @@ public class SchedulerService implements ISchedulerService {
             }
         }
 
+        /**
+         * If an exception is thrown within the lock acquire attempt, this method deletes the current lock.
+         * F.e during thread interrupt in scheduler.
+         */
         public void releaseLock() {
             HttpEntity<Object> entity = getObjectHttpEntity();
             String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;

@@ -32,6 +32,10 @@ public class TransactionsService {
     @Autowired
     ICommunication communication;
 
+    /**
+     * Create two tasks asynchronously. Check if the expected status of the tasks is present in the database
+     * (Dispatched and Waiting)
+     */
     public void triggerScheduleWithTwoTransactions() {
         CompletableFuture<String> async1 = asyncCreateTaskRequest();
         CompletableFuture<String> async2 = asyncCreateTaskRequest();
@@ -56,6 +60,11 @@ public class TransactionsService {
         });
     }
 
+    /**
+     * Checks the database for two tasks. Successfull if one is dispatched and the other is waiting
+     * @param taskid1 id of task1
+     * @param taskid2 id of task2
+     */
     private void checkDatabaseForExpectedStatus(String taskid1, String taskid2) {
         Task task1 = taskRepository.findById(taskid1).orElse(null);
         Task task2 = taskRepository.findById(taskid2).orElse(null);
@@ -68,6 +77,10 @@ public class TransactionsService {
         log.info("DB check for task1 " + taskid1 + " and task2 " + taskid2 + " successfull");
     }
 
+    /**
+     * Creates a asynchronous HTTP api call for task creations
+     * @return CompletableFuture Object of task
+     */
     @Async
     public CompletableFuture<String> asyncCreateTaskRequest() {
         restTemplate = new RestTemplate();
@@ -92,10 +105,13 @@ public class TransactionsService {
         // send POST request
         ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
         return CompletableFuture.completedFuture(taskModel.getId().toString());
-
-
     }
 
+    /**
+     * Creates a async call for feedback and update of the same taskid both done in two transactions
+     * Check the database for status finished afterwards
+     * @param taskid taskid which is processed
+     */
     public void triggerSendFeedbackAndUpdateTaskWithTwoTransactions(String taskid) {
         CompletableFuture<String> async1 = asyncSendFeedback(taskid);
         CompletableFuture<String> async2 = asyncUpdateTaskRequest(taskid);
@@ -133,12 +149,22 @@ public class TransactionsService {
         throw new RuntimeException("Task " + taskid + " didn't reach the status finished after about 4 seconds as expected");
     }
 
+    /**
+     * send asynchronous feedback to scheduler
+     * @param taskid task id which is finished
+     * @return CompletableFuture Object
+     */
     @Async
     public CompletableFuture<String> asyncSendFeedback(String taskid) {
         communication.sendFeedbackToScheduler(taskid);
         return CompletableFuture.completedFuture(taskid);
     }
 
+    /**
+     * Creates a asynchronous HTTP api call for task updates
+     * @param taskid the task id to be updated
+     * @return CompletableFuture Object of task
+     */
     @Async
     public CompletableFuture<String> asyncUpdateTaskRequest(String taskid) {
         restTemplate = new RestTemplate();
