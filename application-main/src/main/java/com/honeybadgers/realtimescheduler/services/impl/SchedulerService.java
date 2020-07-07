@@ -152,7 +152,7 @@ public class SchedulerService implements ISchedulerService {
             // stop lock-refresh-thread
             lockrefresherThread.interrupt();
         } catch (Exception e) {
-            logger.error( e.getMessage());
+            logger.error(e.getMessage());
         } finally {
             if (lockrefresherThread != null)
                 lockrefresherThread.interrupt();
@@ -161,6 +161,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Tries to acquire the lock for the scheduler application. If false, tasks can't be dispatched
+     *
      * @return LockResponse Object with values for expiration date
      * @throws LockException when another instance already claims the lock
      */
@@ -180,7 +181,7 @@ public class SchedulerService implements ISchedulerService {
             logger.info("acquired lock for: " + response.getBody().getValue());
             return response.getBody();
         } catch (Exception e) {
-            throw  new LockException("error by acquiring scheduler lock " +  e.getMessage());
+            throw new LockException("error by acquiring scheduler lock " + e.getMessage());
         }
 
 
@@ -188,6 +189,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Wrapper method for http entity creation
+     *
      * @return HttpEntity instance
      */
     private static HttpEntity<Object> getObjectHttpEntity() {
@@ -235,7 +237,7 @@ public class SchedulerService implements ISchedulerService {
             return false;
 
         // Increment current parallelismDegree for all ancestors
-        for(String group: groupsOfTask) {
+        for (String group : groupsOfTask) {
             groupRepository.incrementCurrentParallelismDegree(group);
         }
 
@@ -248,18 +250,19 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Check if CurrentParallelismDegree + 1 is greater than ParallelismDegree among all ancestor groups.
+     *
      * @param groups List of ids of all ancestors.
      * @param taskid Task id for logging.
      * @return true if ParallelismDegree is surpassed for any ancestor.
      * false otherwise
      */
-    public boolean checkParallelismDegreeSurpassed(List<String> groups, String taskid){
+    public boolean checkParallelismDegreeSurpassed(List<String> groups, String taskid) {
         for (String groupId : groups) {
             Group currentGroup = groupService.getGroupById(groupId);
-            if(currentGroup == null)
+            if (currentGroup == null)
                 continue;
-            if(currentGroup.getCurrentParallelismDegree() + 1 > currentGroup.getParallelismDegree() ){
-                logger.info("Task " + taskid + " was not sent due to Parallelism degree" );
+            if (currentGroup.getCurrentParallelismDegree() + 1 > currentGroup.getParallelismDegree()) {
+                logger.info("Task " + taskid + " was not sent due to Parallelism degree");
                 return true;
             }
         }
@@ -309,6 +312,7 @@ public class SchedulerService implements ISchedulerService {
     /**
      * Check if the task can be dispatched due to his working days (monday to sunday). Sometimes tasks can only be send
      * on several days. The method checks that the task can't be dispatched if current day isn't allowed.
+     *
      * @param task taskModel
      * @return boolean true if current day is allowed, else false
      */
@@ -328,8 +332,8 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * When a task has multiple groups, this method returns the actual working days of the parent, or grandparent (highest group).
+     *
      * @param task taskModel
-     * @return working days of task if group has no working days, otherwise it returns the working days of the highest group.
      * @return int array with 7x 1 values if no working day is specified anywhere - can be dispatched at any weekday
      */
     public int[] getActualWorkingDaysForTask(Task task) {
@@ -358,6 +362,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Checks the active times of the task and if it is allowed to be dispatched at the current time
+     *
      * @param task taskModel
      * @return boolean true if it is allowed, otherwise false
      */
@@ -393,8 +398,8 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * When a task has multiple groups, this method returns the actual active times of the parent, or grandparent (highest group).
+     *
      * @param task taskModel
-     * @return active times of task if group has no active times, otherwise it returns the active times of the highest group.
      * @return empty list for active times if no active times is specified anywhere - can be dispatched anytime
      */
     public List<ActiveTimes> getActiveTimesForTask(Task task) {
