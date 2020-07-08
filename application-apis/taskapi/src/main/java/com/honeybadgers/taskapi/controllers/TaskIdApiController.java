@@ -9,12 +9,14 @@ import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
@@ -53,7 +55,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<TaskModel> taskIdGet(UUID taskId) {
+    public ResponseEntity<TaskModel> taskIdGet(String taskId) {
         try{
             TaskModel restModel = taskService.getTaskById(taskId);
             return ResponseEntity.ok(restModel);
@@ -74,7 +76,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<ResponseModel> taskIdPost(UUID taskId, @Valid TaskModel taskModel) {
+    public ResponseEntity<ResponseModel> taskIdPost(String taskId, @Valid TaskModel taskModel) {
         ResponseModel response = new ResponseModel();
         response.setCode("200");
         response.setMessage("Success");
@@ -97,6 +99,10 @@ public class TaskIdApiController implements TaskIdApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
@@ -112,7 +118,7 @@ public class TaskIdApiController implements TaskIdApi {
      * or Unauthorized (status code 401)
      */
     @Override
-    public ResponseEntity<TaskModel> taskIdDelete(UUID taskId) {
+    public ResponseEntity<TaskModel> taskIdDelete(String taskId) {
         try{
             TaskModel restModel = taskService.deleteTask(taskId);
             logger.info("Task " + taskId + " deleted.");
@@ -120,5 +126,39 @@ public class TaskIdApiController implements TaskIdApi {
         }catch(NoSuchElementException e){
            return ResponseEntity.notFound().build();
         }
+    }
+
+    @RequestMapping(value = "/tasks", method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> batchCreate (@RequestBody @Valid List<TaskModel> taskModels){
+
+        ResponseModel response = new ResponseModel();
+        response.setCode("200");
+        response.setMessage("Success");
+
+        try {
+            for(TaskModel taskModel : taskModels){
+                taskService.createTask(taskModel);
+                logger.info("Task " + taskModel.getId() + " received.");
+                if (taskModel.getForce() != null && taskModel.getForce()) {
+                    taskService.sendTaskToPriorityQueue(taskModel);
+                    logger.info("Task " + taskModel.getId() + " was immediately dispatched");
+                }
+            }
+            taskService.sendTaskToTaskEventQueue("bulk");
+
+        } catch (UnknownEnumException e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (JpaException | CreationException e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+        return ResponseEntity.ok(response);
     }
 }

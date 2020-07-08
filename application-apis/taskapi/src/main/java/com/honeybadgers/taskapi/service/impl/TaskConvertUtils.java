@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -35,7 +37,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
         TaskModel taskmodel = new TaskModel();
 
-        taskmodel.setId(UUID.fromString(task.getId()));
+        taskmodel.setId(task.getId());
         taskmodel.setGroupId(task.getGroup().getId());
         taskmodel.setPriority(task.getPriority());
         taskmodel.setActiveTimes(activeTimesJpaToRest(task.getActiveTimeFrames()));
@@ -48,6 +50,8 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         taskmodel.setIndexNumber(task.getIndexNumber());
         taskmodel.setDeadline(timestampJpaToRest(task.getDeadline()));
         taskmodel.setMeta(metaDataJpaToRest(task.getMetaData()));
+        if(task.getHistory() != null)
+            taskmodel.setHistory(task.getHistory().stream().map(history -> (Object) history).collect(Collectors.toList()));
 
         return taskmodel;
     }
@@ -56,10 +60,11 @@ public class TaskConvertUtils implements ITaskConvertUtils {
     public Task taskRestToJpa(TaskModel restModel) throws JpaException, CreationException, UnknownEnumException {
         Task newTask = new Task();
 
-        newTask.setId(restModel.getId().toString());
+        newTask.setId(restModel.getId());
 
         if(restModel.getGroupId() == null)
             restModel.setGroupId(DEFAULT_GROUP_ID);
+
         Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
         // foreign key is declared as NOT NULL -> throw JpaException now because it will be thrown on save(newTask) anyway
         if (group == null)
@@ -125,6 +130,13 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         // map List<TaskModelMeta> to Map<String, String>
         if (restModel.getMeta() != null)
             newTask.setMetaData(restModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
+
+        History history = new History();
+        history.setStatus(TaskStatusEnum.Waiting.toString());
+        history.setTimestamp(Timestamp.from(Instant.now()));
+        List<History> histories = new ArrayList<>();
+        histories.add(history);
+        newTask.setHistory(histories);
 
         return newTask;
     }

@@ -69,7 +69,7 @@ public class DefaultApiController implements DefaultApi {
 
         try {
             taskService.createTask(taskModel);
-            logger.info("Task " + taskModel.getId() + " recived.");
+            logger.info("Task " + taskModel.getId() + " received.");
             if (taskModel.getForce() != null && taskModel.getForce()) {
                 taskService.sendTaskToPriorityQueue(taskModel);
                 logger.info("Task " + taskModel.getId() + " was immediately dispatched");
@@ -82,6 +82,10 @@ public class DefaultApiController implements DefaultApi {
             return ResponseEntity.badRequest().body(response);
         } catch (JpaException | CreationException e) {
             response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }

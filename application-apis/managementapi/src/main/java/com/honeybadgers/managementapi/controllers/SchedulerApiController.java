@@ -33,6 +33,10 @@ public class SchedulerApiController implements SchedulerApi {
         return Optional.ofNullable(request);
     }
 
+    /**
+     * Resumes the Scheduler.
+     * @return
+     */
     @Override
     public ResponseEntity<ResponseModel> schedulerStartPut() {
         ResponseModel response = new ResponseModel();
@@ -44,6 +48,11 @@ public class SchedulerApiController implements SchedulerApi {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Pauses the Scheduler.
+     * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
+     * @return
+     */
     @Override
     public ResponseEntity<ResponseModel> schedulerStopPut(@Valid DateTimeBody dateTimeBody) {
         ResponseModel response = new ResponseModel();

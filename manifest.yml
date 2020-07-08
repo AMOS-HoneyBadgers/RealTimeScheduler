@@ -3,16 +3,14 @@ applications:
   - name: realtimescheduler-amos
     buildpacks:
       - java_buildpack
-    instances: 1
+    instances: 2
     memory: 1G
     path: application-main/target/realtimescheduler-main-0.0.1-SNAPSHOT.jar
     services:
-      - rabbit
       - task_storage
-      - priority_store
-      - redis
       - rabbit_credentials
       - rabbit
+      - postgres_credentials
 
   - name: groupapi-amos
     buildpacks:
@@ -20,6 +18,11 @@ applications:
     instances: 1
     memory: 1G
     path: application-apis/groupapi/target/realtimescheduler-groupapi-1.0.0.jar
+    services:
+      - task_storage
+      - postgres_credentials
+      - rabbit_credentials
+      - rabbit
 
   - name: managementapi-amos
     buildpacks:
@@ -27,6 +30,9 @@ applications:
     instances: 1
     memory: 1G
     path: application-apis/managementapi/target/realtimescheduler-managementapi-1.0.0.jar
+    services:
+      - task_storage
+      - postgres_credentials
 
   - name: monitoringapi-amos
     buildpacks:
@@ -34,6 +40,9 @@ applications:
     instances: 1
     memory: 1G
     path: application-apis/monitoringapi/target/realtimescheduler-monitoringapi-1.0.0.jar
+    services:
+      - task_storage
+      - postgres_credentials
 
   - name: taskapi-amos
     buildpacks:
@@ -41,6 +50,11 @@ applications:
     instances: 1
     memory: 1G
     path: application-apis/taskapi/target/realtimescheduler-taskapi-1.0.0.jar
+    services:
+      - task_storage
+      - postgres_credentials
+      - rabbit_credentials
+      - rabbit
 
   - name: cleaner-amos
     buildpacks:
@@ -49,5 +63,28 @@ applications:
     memory: 1G
     path: application-cleaner/target/cleaner-0.0.1-SNAPSHOT.jar
     services:
-      - priority_store
+      - task_storage
+      - postgres_credentials
+      - rabbit_credentials
+      - rabbit
+
+  - name: clienttest-amos
+    buildpacks:
+      - java_buildpack
+    instances: 1
+    memory: 1G
+    path: application-clienttests/target/application-clienttests-0.0.1-SNAPSHOT.jar
+    services:
+      - task_storage
+      - postgres_credentials
+      - rabbit_credentials
+      - rabbit
+  - name: lockservice-amos
+    buildpacks:
+      - java_buildpack
+    instances: 1
+    memory: 1G
+    path: application-lockservice/target/application-lockservice-0.0.1-SNAPSHOT.jar
+    services:
       - redis
+      - postgres_credentials

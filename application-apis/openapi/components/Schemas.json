@@ -7,8 +7,7 @@
     "properties": {
       "id": {
         "description": "Primary id of task object",
-        "type": "string",
-        "format": "uuid"
+        "type": "string"
       },
       "group_id": {
         "description": "Id of group this task is assigned to",
@@ -82,6 +81,9 @@
         "description": "[only with mode = sequential] Index number of task in corresponding sequence",
         "type": "integer",
         "minimum": 1
+      },
+      "history": {
+        "$ref": "#/HistoryModel"
       },
       "meta": {
         "description": "Key-value object for meta-data",
@@ -186,6 +188,23 @@
           "description": "End of time frame",
           "type": "string",
           "format": "partial-time"
+        }
+      }
+    }
+  },
+  "HistoryModel": {
+    "description": "Array containing the history for a Task status changed with Timestamps",
+    "type": "array",
+    "items": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "description": "Status set to",
+          "type": "string"
+        },
+        "timestamp": {
+          "description": "Time of change",
+          "type": "string"
         }
       }
     }

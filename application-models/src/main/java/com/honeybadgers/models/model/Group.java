@@ -14,6 +14,7 @@ import javax.persistence.*;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import java.sql.Timestamp;
+import java.util.Arrays;
 import java.util.List;
 
 @Entity
@@ -27,8 +28,6 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Group {
-
-
 
     @Id
     @Column(name="id", unique = true, nullable = false)
@@ -72,11 +71,31 @@ public class Group {
     @Column(name = "parallelism_degree")
     private Integer parallelismDegree;
 
+    @Column(name = "current_parallelism_degree", nullable = false)
+    private Integer currentParallelismDegree = 0;
+
 
     @PrePersist
     void checkModeParameters() {
         if(this.modeEnum == ModeEnum.Sequential && this.lastIndexNumber == null) {
             this.lastIndexNumber = 0;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "Group{" +
+                "id='" + id + '\'' +
+                ", parentGroup=" + parentGroup +
+                ", priority=" + priority +
+                ", deadline=" + deadline +
+                ", activeTimeFrames=" + activeTimeFrames +
+                ", workingDays=" + Arrays.toString(workingDays) +
+                ", typeFlagEnum=" + typeFlagEnum +
+                ", modeEnum=" + modeEnum +
+                ", lastIndexNumber=" + lastIndexNumber +
+                ", parallelismDegree=" + parallelismDegree +
+                ", currentParallelismDegree=" + currentParallelismDegree +
+                '}';
     }
 }

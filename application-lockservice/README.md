@@ -1,0 +1,1 @@
+This library is forked from https://github.com/spring-cloud-samples/locks and slightly modified for our purpose. Due to older Versions the tests are not integrated.

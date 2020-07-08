@@ -11,6 +11,7 @@ on:
       - 'application-models/**'
       - 'application-queuecommunication/**'
   pull_request:
+    types: [closed]
     branches:
       - 'develop'
       - 'master'
