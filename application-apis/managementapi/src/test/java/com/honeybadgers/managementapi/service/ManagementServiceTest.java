@@ -21,8 +21,7 @@ import static com.honeybadgers.models.model.Constants.*;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atMostOnce;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -56,7 +55,7 @@ public class ManagementServiceTest {
     public void testResumeScheduler() {
         service.resumeScheduler();
         Mockito.verify(pausedRepository, Mockito.only()).deleteById(PAUSED_SCHEDULER_ALIAS);
-        verify(sender, atMostOnce()).sendTaskToDispatcher(any());
+        verify(sender, only()).sendTaskToTasksQueue(any());
     }
 
     @Test
@@ -83,6 +82,7 @@ public class ManagementServiceTest {
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
         service.resumeTask(taskId.toString());
         Mockito.verify(pausedRepository, Mockito.only()).deleteById(lockId);
+        verify(sender, only()).sendTaskToTasksQueue(any());
     }
 
     @Test
@@ -109,5 +109,6 @@ public class ManagementServiceTest {
         String lockId = PAUSED_GROUP_PREFIX + groupId;
         service.resumeGroup(groupId);
         Mockito.verify(pausedRepository, Mockito.only()).deleteById(lockId);
+        verify(sender, only()).sendTaskToTasksQueue(any());
     }
 }
