@@ -70,7 +70,7 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
 
-        Task t = createTaskTestObject(group,"TEST");
+        Task t = createTaskTestObject(group, "TEST");
 
         SchedulerService spy = spy(service);
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
@@ -94,8 +94,8 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
 
-        Task t = createTaskTestObject(group,"TEST");
-        Task t2 = createTaskTestObject(group,"TEST2");
+        Task t = createTaskTestObject(group, "TEST");
+        Task t2 = createTaskTestObject(group, "TEST2");
         SchedulerService spy = spy(service);
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
@@ -118,7 +118,7 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
 
-        Task t = createTaskTestObject(group,"TEST");
+        Task t = createTaskTestObject(group, "TEST");
 
         SchedulerService spy = spy(service);
 
@@ -132,12 +132,13 @@ public class SchedulerServiceTest {
 
         spy.scheduleTaskWrapper("as");
     }
+
     @Test
     public void testScheduleTaskWrapper_sendToDispatcher_TransactionException() {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
 
-        Task t = createTaskTestObject(group,"TEST");
+        Task t = createTaskTestObject(group, "TEST");
 
         SchedulerService spy = spy(service);
 
@@ -157,7 +158,7 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
 
-        Task t = createTaskTestObject(group,"TEST");
+        Task t = createTaskTestObject(group, "TEST");
 
         SchedulerService spy = spy(service);
 
@@ -179,7 +180,7 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setCurrentParallelismDegree(50);
 
-        Task t = createTaskTestObject(group,"TEST");
+        Task t = createTaskTestObject(group, "TEST");
 
         SchedulerService spy = spy(service);
 
@@ -260,9 +261,9 @@ public class SchedulerServiceTest {
     * and
     * at com.honeybadgers.realtimescheduler.services.impl.SchedulerService.isTaskPaused(SchedulerService.java:80)
     * and
-    * at com.honeybadgers.realtimescheduler.consumer.FeedbackConsumer.processFeedback(FeedbackConsumer.java:89)
+    * at com.honeybadgers.realtimescheduler.consumer.impl.FeedbackConsumer.processFeedback(FeedbackConsumer.java:89)
     * and
-    * at com.honeybadgers.realtimescheduler.consumer.FeedbackConsumer.receiveFeedbackFromDispatcher(FeedbackConsumer.java:58)
+    * at com.honeybadgers.realtimescheduler.consumer.impl.FeedbackConsumer.receiveFeedbackFromDispatcher(FeedbackConsumer.java:58)
     *
     * DataIntegr for: 969fa543-cb7b-4bdb-8b86-a9fee2310806  63d0aee6-9f67-45fe-9091-6ef8cf136cbb
     */
@@ -441,7 +442,7 @@ public class SchedulerServiceTest {
         Group group = createGroupTestObject();
         group.setId("testGroup");
 
-        Task task = createTaskTestObject(group,"5");
+        Task task = createTaskTestObject(group, "5");
 
         Paused groupPaused = new Paused();
         groupPaused.setId(PAUSED_GROUP_PREFIX + "testGroup");
@@ -516,7 +517,7 @@ public class SchedulerServiceTest {
 
         //Arrange
         List<ActiveTimes> res = spy.getActiveTimesForTask(task);
-        Assert.assertEquals(res , parentactiveTimes);
+        Assert.assertEquals(res, parentactiveTimes);
     }
 
     @Test
@@ -624,21 +625,23 @@ public class SchedulerServiceTest {
     @Test
     public void testcheckIfTaskIsInWorkingDays_returnsTrue() {
         Task task = new Task();
-        int[] workingdays = new int[]{1,1,1,1,1,1,1};
+        int[] workingdays = new int[]{1, 1, 1, 1, 1, 1, 1};
         task.setWorkingDays(workingdays);
         SchedulerService spy = spy(service);
-        Assert.assertEquals(true,spy.checkIfTaskIsInWorkingDays(task));
+        Assert.assertEquals(true, spy.checkIfTaskIsInWorkingDays(task));
     }
+
     @Test
     public void testcheckIfTaskIsInWorkingDays_returnsFalse() {
         Task task = new Task();
-        int[] workingdays = new int[]{0,0,0,0,0,0,0};
+        int[] workingdays = new int[]{0, 0, 0, 0, 0, 0, 0};
         task.setWorkingDays(workingdays);
         SchedulerService spy = spy(service);
-        Assert.assertEquals(false,spy.checkIfTaskIsInWorkingDays(task));
+        Assert.assertEquals(false, spy.checkIfTaskIsInWorkingDays(task));
     }
+
     @Test
-    public void testgetActualWorkingDaysForTask_TaskHasNullWorkingDays_AndParentHasWorkingDays(){
+    public void testgetActualWorkingDaysForTask_TaskHasNullWorkingDays_AndParentHasWorkingDays() {
         Task task = new Task();
         task.setId("TEST");
         int[] workingDays = null;
@@ -646,7 +649,7 @@ public class SchedulerServiceTest {
 
         Group parentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
-        int[] parentworkingdays = new int[]{0,0,0,0,0,1,0};
+        int[] parentworkingdays = new int[]{0, 0, 0, 0, 0, 1, 0};
         parentGroup.setWorkingDays(parentworkingdays);
         task.setGroup(parentGroup);
 
@@ -656,7 +659,7 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void testgetActualWorkingDaysForTask_NoWorkingDaysPresent_GivesAll111111Array(){
+    public void testgetActualWorkingDaysForTask_NoWorkingDaysPresent_GivesAll111111Array() {
         Task task = new Task();
         task.setId("TEST");
         int[] workingDays = null;
@@ -679,11 +682,11 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
         when(groupService.getGroupById(task.getGroup().getId())).thenReturn(parentGroup);
-        Assert.assertArrayEquals(spy.getActualWorkingDaysForTask(task), new int[]{1,1,1,1,1,1,1});
+        Assert.assertArrayEquals(spy.getActualWorkingDaysForTask(task), new int[]{1, 1, 1, 1, 1, 1, 1});
     }
 
     @Test(expected = RuntimeException.class)
-    public void testgetActualWorkingDaysForTask_TaskHasnoGroupAndNoWorkingDaysThrowsException(){
+    public void testgetActualWorkingDaysForTask_TaskHasnoGroupAndNoWorkingDaysThrowsException() {
         Task task = new Task();
         task.setId("TEST");
         int[] workingDays = null;
@@ -699,23 +702,23 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void testgetActualWorkingDaysForTask_Task_ParentAndGrandparentHaveWorkingDays_AndGivesUsWorkingDaysFromTask(){
+    public void testgetActualWorkingDaysForTask_Task_ParentAndGrandparentHaveWorkingDays_AndGivesUsWorkingDaysFromTask() {
         //prepare Task
         Task task = new Task();
         task.setId("TEST");
-        int[] workingdays = new int[]{0,0,0,0,0,0,0};
+        int[] workingdays = new int[]{0, 0, 0, 0, 0, 0, 0};
         task.setWorkingDays(workingdays);
 
         //prepare ParentGroup
         Group parentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
-        int[] parentworkingdays = new int[]{0,0,0,0,0,1,0};
+        int[] parentworkingdays = new int[]{0, 0, 0, 0, 0, 1, 0};
         parentGroup.setWorkingDays(parentworkingdays);
 
         //prepare GrandParentGroup
         Group grandparentGroup = new Group();
         parentGroup.setId("TESTPARENTGROUP");
-        int[] grandparentworkingdays = new int[]{0,0,0,0,0,1,0};
+        int[] grandparentworkingdays = new int[]{0, 0, 0, 0, 0, 1, 0};
         grandparentGroup.setWorkingDays(grandparentworkingdays);
 
         //setParentGroup for task
@@ -730,7 +733,7 @@ public class SchedulerServiceTest {
     }
 
     @Test
-    public void testsequentialCheckReturnsFalse(){
+    public void testsequentialCheckReturnsFalse() {
         //Arrange
         Task task = new Task();
         task.setModeEnum(ModeEnum.Sequential);
@@ -750,7 +753,7 @@ public class SchedulerServiceTest {
 
 
     @Test
-    public void testsequentialCheckReturnsTrue(){
+    public void testSequentialCheckReturnsTrue() {
         //Arrange
         Task task = new Task();
         task.setModeEnum(ModeEnum.Sequential);
@@ -765,4 +768,27 @@ public class SchedulerServiceTest {
         //Assert
         Assert.assertTrue(spy.sequentialHasToWait(task));
     }
+
+    @Test()
+    public void testRunWithBAD_REQUESTSchedulerIsStopped() {
+        //Arrange
+        LockResponse lockResponse = new LockResponse();
+        lockResponse.setName("SCHEDULER");
+        lockResponse.setValue("value");
+        Thread t = new SchedulerService.LockRefresherThread(lockResponse, restTemplate);
+        when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.BAD_REQUEST));
+        //Act
+        t.run();
+        Assert.assertTrue(SchedulerService.stopSchedulerDueToLockAcquisitionException);
+    }
+    @Test(expected = LockException.class)
+    public void testCheckIfAllowedToScheduleWithBAD_REQUESTThrowsLockException() {
+        //Arrange
+        when(restTemplate.postForEntity(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.BAD_REQUEST));
+        //Act
+        SchedulerService spy = spy(service);
+        spy.checkIfAllowedtoSchedule();
+
+    }
+
 }

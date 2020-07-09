@@ -1,9 +1,10 @@
-package com.honeybadgers.realtimescheduler.consumer;
+package com.honeybadgers.realtimescheduler.consumer.impl;
 
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.ModeEnum;
 import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.realtimescheduler.consumer.IFeedbackConsumer;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
 import com.honeybadgers.realtimescheduler.services.impl.TaskService;
 import org.apache.logging.log4j.LogManager;
@@ -25,7 +26,7 @@ import java.util.Optional;
 
 @Component
 @EnableRabbit
-public class FeedbackConsumer {
+public class FeedbackConsumer implements IFeedbackConsumer {
 
     static final Logger logger = LogManager.getLogger(FeedbackConsumer.class);
 
@@ -48,15 +49,8 @@ public class FeedbackConsumer {
     int maxTransactionRetrySleep;
 
 
-    /**
-     * Methods which is called if feedback from the feedback queue is received in the scheduler.
-     * Feedback is processed (parallelism degree and sequential check) and afterwards a trigger is send to the
-     * scheduler to reschedule the waiting tasks. Catches several transaction exceptions and retries if transaction fails
-     * (due to concurrency update/read)
-     * @param taskid task id of the received task
-     * @throws InterruptedException if sleep is interrupted
-     */
     // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
+    @Override
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
         int iteration =1;
@@ -97,10 +91,7 @@ public class FeedbackConsumer {
         }
     }
 
-    /**
-     * Handles the feedback. Decreases the parallelism degree and decreases the sequentialIndexNumber of the group
-     * @param taskId to be processed
-     */
+    @Override
     @Transactional(isolation = Isolation.SERIALIZABLE)
     public void processFeedback(String taskId) {
         logger.info("Task " + taskId + " was processed by the dispatcher");
@@ -117,11 +108,8 @@ public class FeedbackConsumer {
         taskService.finishTask(currentTask);
     }
 
-    /**
-     * Increases the LastIndexNumber of the corresponding group of the task
-     * @param currentTask task which is in a group of sequential tasks
-     */
     //TODO is it necessary to do this also for all grandparent groups??
+    @Override
     public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
         Group group = currentTask.getGroup();
         logger.debug("Task " + currentTask.getId() + " update index Number of group " + group.getId());
@@ -129,10 +117,7 @@ public class FeedbackConsumer {
         groupRepository.save(group);
     }
 
-    /**
-     * Decreases the parallelism degree of the corresponding group and all ancestor groups of the task
-     * @param currentTask task which is in a group of parallel tasks
-     */
+    @Override
     public void checkAndSetParallelismDegree(Task currentTask) {
         List<String> groupsOfTask = taskService.getRecursiveGroupsOfTask(currentTask.getId());
         for (String group : groupsOfTask) {
