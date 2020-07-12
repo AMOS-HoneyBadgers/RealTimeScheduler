@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.DispatchFlagRepository;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -48,6 +49,10 @@ public class SchedulerService implements ISchedulerService {
 
     @Autowired
     PausedRepository pausedRepository;
+
+    @Autowired
+    DispatchFlagRepository dispatchFlagRepository;
+
 
     @Autowired
     ITaskService taskService;
@@ -137,6 +142,8 @@ public class SchedulerService implements ISchedulerService {
                             // TODO document: if scheduler crashes here -> task could be dispatched twice
                             // dispatch here because this only gets executed if transaction succeeds
                             sender.sendTaskToDispatcher(task.getId());
+                            DispatchFlag dispatchFlag = new DispatchFlag(task.getId(),true);
+                            dispatchFlagRepository.save(dispatchFlag);
                             logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
                         }
 
