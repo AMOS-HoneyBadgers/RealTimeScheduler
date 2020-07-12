@@ -3,6 +3,7 @@ package com.honeybadgers.cleaner.services;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +30,9 @@ public class ScheduledServicesTest {
 
     @MockBean
     PausedRepository pausedRepository;
+
+    @MockBean
+    TaskRepository taskRepository;
 
     @MockBean
     ICommunication sender;

@@ -2,6 +2,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.postgre.repository.DispatchFlagRepository;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -49,6 +50,9 @@ public class SchedulerServiceTest {
 
     @MockBean
     private IGroupService groupService;
+
+    @MockBean
+    private DispatchFlagRepository dispatchFlagRepository;
 
     @MockBean
     GroupRepository groupRepository;
