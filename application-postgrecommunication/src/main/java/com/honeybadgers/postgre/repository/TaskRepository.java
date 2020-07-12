@@ -50,4 +50,7 @@ public interface TaskRepository extends JpaRepository<Task, String> {
      */
     @Query(value = "SELECT * FROM task WHERE status='Waiting'", nativeQuery = true)
     List<Task> findAllWaitingTasks();
+
+    @Query(value = "SELECT * FROM task where task.status='Dispatched' and NOT EXISTS(SELECT  *  FROM public.lock where task.id  = lock.id and lock.is_dispatched=true)",nativeQuery = true)
+    List<Task> getNotDispatchedTasks();
 }
