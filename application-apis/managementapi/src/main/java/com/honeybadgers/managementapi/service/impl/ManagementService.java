@@ -50,7 +50,7 @@ public class ManagementService implements IManagementService {
     @Override
     public void resumeScheduler() {
         pausedRepository.deleteById(PAUSED_SCHEDULER_ALIAS);
-        sender.sendTaskToTasksQueue("");
+        sender.sendTaskToTasksQueue("123");
     }
 
     @Override
@@ -72,7 +72,7 @@ public class ManagementService implements IManagementService {
     public void resumeTask(String taskId) {
         String id = PAUSED_TASK_PREFIX + taskId;
         pausedRepository.deleteById(id);
-        sender.sendTaskToTasksQueue("");
+        sender.sendTaskToTasksQueue("123");
     }
 
     @Override
@@ -95,6 +95,6 @@ public class ManagementService implements IManagementService {
     public void resumeGroup(String grouId) {
         String id = PAUSED_GROUP_PREFIX + grouId;
         pausedRepository.deleteById(id);
-        sender.sendTaskToTasksQueue("");
+        sender.sendTaskToTasksQueue("123");
     }
 }
