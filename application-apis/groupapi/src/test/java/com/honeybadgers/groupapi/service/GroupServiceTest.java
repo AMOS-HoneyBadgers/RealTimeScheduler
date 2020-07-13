@@ -297,4 +297,24 @@ public class GroupServiceTest {
         assertEquals("Failed transaction 1 times!", e.getMessage());
     }
 
+    @Test
+    public void testDeleteGroup_foreignKeyException() {
+
+        when(groupRepository.deleteByIdCustomQuery("testGroup")).thenThrow(new DataIntegrityViolationException("constraint [group_fk]"));
+
+        Exception e = assertThrows(JpaException.class, () -> groupService.deleteGroup("testGroup"));
+        assertNotNull(e);
+        assertEquals("Group deletion failed due to being referenced by task!", e.getMessage());
+    }
+
+    @Test
+    public void testDeleteGroup_dataIntegrityException() {
+
+        when(groupRepository.deleteByIdCustomQuery("testGroup")).thenThrow(new DataIntegrityViolationException(""));
+
+        Exception e = assertThrows(DataIntegrityViolationException.class, () -> groupService.deleteGroup("testGroup"));
+        assertNotNull(e);
+        assertEquals("", e.getMessage());
+    }
+
 }
