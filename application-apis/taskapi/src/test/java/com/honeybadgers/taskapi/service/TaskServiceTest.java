@@ -1,11 +1,12 @@
 package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import com.honeybadgers.taskapi.exceptions.CreationException;
-import com.honeybadgers.taskapi.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.service.impl.TaskService;

@@ -1,14 +1,14 @@
 package com.honeybadgers.groupapi.service.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.groupapi.exceptions.CreationException;
-import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import org.apache.logging.log4j.LogManager;

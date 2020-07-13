@@ -1,12 +1,12 @@
 package com.honeybadgers.groupapi.controllers;
 
-import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.ResponseModel;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.model.Group;
-import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;

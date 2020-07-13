@@ -2,10 +2,12 @@ package com.honeybadgers.taskapi.service.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import com.honeybadgers.taskapi.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.service.ITaskConvertUtils;
@@ -19,7 +21,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.dao.DataIntegrityViolationException;
-import com.honeybadgers.taskapi.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.JpaException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -75,7 +77,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException {
+    public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
         while (iteration <= maxTransactionRetryCount){
             try{
@@ -89,7 +91,7 @@ public class TaskService implements ITaskService {
             }
         }
         // throw exception due to surpassing max retries
-        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
+        throw new TransactionRetriesExceeded("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -112,7 +114,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException, IllegalStateException {
+    public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException, IllegalStateException, TransactionRetriesExceeded {
         int iteration =1;
         while (iteration <= maxTransactionRetryCount){
             try{
@@ -127,7 +129,7 @@ public class TaskService implements ITaskService {
             }
         }
         // throw exception due to surpassing max retries
-        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
+        throw new TransactionRetriesExceeded("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -160,7 +162,7 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public TaskModel getTaskById(String taskid) throws InterruptedException, JpaException {
+    public TaskModel getTaskById(String taskid) throws InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             try {
@@ -178,11 +180,11 @@ public class TaskService implements ITaskService {
             }
         }
         // throw exception due to surpassing max retries
-        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
+        throw new TransactionRetriesExceeded("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
     @Override
-    public TaskModel deleteTask(String taskid) throws InterruptedException, JpaException {
+    public TaskModel deleteTask(String taskid) throws InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             try {
@@ -199,7 +201,7 @@ public class TaskService implements ITaskService {
             }
         }
         // throw exception due to surpassing max retries
-        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
+        throw new TransactionRetriesExceeded("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
 

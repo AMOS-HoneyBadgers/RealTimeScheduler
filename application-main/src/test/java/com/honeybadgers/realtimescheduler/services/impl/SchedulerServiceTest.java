@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.exceptions.LockException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
@@ -11,7 +12,6 @@ import org.hibernate.TransactionException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.invocation.InvocationOnMock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;

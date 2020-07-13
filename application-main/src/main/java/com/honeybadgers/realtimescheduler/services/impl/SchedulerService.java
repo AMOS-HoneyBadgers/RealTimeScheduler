@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.exceptions.LockException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;

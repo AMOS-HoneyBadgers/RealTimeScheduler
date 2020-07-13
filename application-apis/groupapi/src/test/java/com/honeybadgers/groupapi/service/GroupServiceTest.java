@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.service.impl.GroupService;
 import org.springframework.boot.test.mock.mockito.MockBean;

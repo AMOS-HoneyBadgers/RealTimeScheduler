@@ -1,10 +1,10 @@
 package com.honeybadgers.groupapi.service;
 
-import com.honeybadgers.groupapi.exceptions.CreationException;
-import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.model.Group;
-import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;

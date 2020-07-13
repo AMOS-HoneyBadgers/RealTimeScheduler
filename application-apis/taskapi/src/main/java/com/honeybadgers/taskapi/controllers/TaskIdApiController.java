@@ -1,8 +1,9 @@
 package com.honeybadgers.taskapi.controllers;
 
-import com.honeybadgers.models.model.UnknownEnumException;
-import com.honeybadgers.taskapi.exceptions.CreationException;
-import com.honeybadgers.taskapi.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
@@ -62,7 +63,7 @@ public class TaskIdApiController implements TaskIdApi {
         } catch (InterruptedException e) {
             logger.error(Arrays.deepToString(e.getStackTrace()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        } catch (JpaException e) {
+        } catch (TransactionRetriesExceeded e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -98,7 +99,7 @@ public class TaskIdApiController implements TaskIdApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        } catch (JpaException | CreationException | IllegalStateException e) {
+        } catch (JpaException | CreationException | TransactionRetriesExceeded | IllegalStateException e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
@@ -131,7 +132,7 @@ public class TaskIdApiController implements TaskIdApi {
         } catch (InterruptedException e) {
             logger.error(Arrays.deepToString(e.getStackTrace()));
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        } catch (JpaException e) {
+        } catch (TransactionRetriesExceeded e) {
             return ResponseEntity.badRequest().build();
         }
     }
@@ -158,7 +159,7 @@ public class TaskIdApiController implements TaskIdApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        } catch (JpaException | CreationException e) {
+        } catch (JpaException | CreationException | TransactionRetriesExceeded e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
