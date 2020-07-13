@@ -55,7 +55,7 @@ public class ManagementServiceTest {
         lockObj.setId(PAUSED_SCHEDULER_ALIAS);
         lockObj.setResumeDate(null);
 
-        DataIntegrityViolationException exception = new DataIntegrityViolationException("primary");
+        DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
         Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
         assertThrows(LockException.class, () -> service.pauseScheduler(null));
@@ -91,7 +91,7 @@ public class ManagementServiceTest {
         lockObj.setId(lockId);
         lockObj.setResumeDate(null);
 
-        DataIntegrityViolationException exception = new DataIntegrityViolationException("primary");
+        DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
         Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
         assertThrows(LockException.class, () -> service.pauseTask(taskId.toString(), null));
@@ -131,7 +131,7 @@ public class ManagementServiceTest {
         lockObj.setId(lockId);
         lockObj.setResumeDate(null);
 
-        DataIntegrityViolationException exception = new DataIntegrityViolationException("primary");
+        DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
         Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
 

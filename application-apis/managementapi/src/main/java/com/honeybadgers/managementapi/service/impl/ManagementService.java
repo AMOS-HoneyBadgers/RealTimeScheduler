@@ -57,7 +57,7 @@ public class ManagementService implements IManagementService {
                 pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
                 return;
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage() != null && (e.getMessage().contains("primary") || e.getMessage().contains("duplicate"))) {
+                if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
                     throw new LockException("Already locked!");
                 }
                 throw e;
@@ -110,7 +110,7 @@ public class ManagementService implements IManagementService {
                 pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
                 return;
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage() != null && (e.getMessage().contains("primary") || e.getMessage().contains("duplicate"))) {
+                if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
                     throw new LockException("Already locked!");
                 }
                 throw e;
@@ -164,7 +164,7 @@ public class ManagementService implements IManagementService {
                 pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
                 return;
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage() != null && (e.getMessage().contains("primary") || e.getMessage().contains("duplicate"))) {
+                if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
                     throw new LockException("Already locked!");
                 }
                 throw e;
