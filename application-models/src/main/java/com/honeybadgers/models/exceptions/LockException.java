@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.honeybadgers.models.model;
+package com.honeybadgers.models.exceptions;
 
 /**
  * @author Dave Syer
