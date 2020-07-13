@@ -1,7 +1,7 @@
 package com.honeybadgers.managementapi.service.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.managementapi.exception.LockException;
+import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.service.IManagementService;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.model.Paused;
@@ -45,7 +45,7 @@ public class ManagementService implements IManagementService {
     int maxTransactionRetryCount;
 
     @Override
-    public void pauseScheduler(OffsetDateTime resumeDate) throws LockException, InterruptedException, TransactionRetriesExceeded {
+    public void pauseScheduler(OffsetDateTime resumeDate) throws PauseException, InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             Paused toSave = new Paused();
@@ -58,7 +58,7 @@ public class ManagementService implements IManagementService {
                 return;
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
-                    throw new LockException("Already locked!");
+                    throw new PauseException("Already locked!");
                 }
                 throw e;
             } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
@@ -74,13 +74,13 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void resumeScheduler() throws InterruptedException, TransactionRetriesExceeded, LockException {
+    public void resumeScheduler() throws InterruptedException, TransactionRetriesExceeded, PauseException {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             try {
                 Paused paused = pausedRepository.deleteByIdCustomQuery(PAUSED_SCHEDULER_ALIAS).orElse(null);
                 if(paused == null)
-                    throw new LockException("Already unlocked!");
+                    throw new PauseException("Already unlocked!");
                 // only trigger reschedule if change in paused entities
                 sender.sendTaskToTasksQueue("");
                 return;
@@ -97,7 +97,7 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void pauseTask(String taskId, OffsetDateTime resumeDate) throws LockException, InterruptedException, TransactionRetriesExceeded {
+    public void pauseTask(String taskId, OffsetDateTime resumeDate) throws PauseException, InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             String id = PAUSED_TASK_PREFIX + taskId;
@@ -111,7 +111,7 @@ public class ManagementService implements IManagementService {
                 return;
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
-                    throw new LockException("Already locked!");
+                    throw new PauseException("Already locked!");
                 }
                 throw e;
             } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
@@ -127,14 +127,14 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void resumeTask(String taskId) throws InterruptedException, TransactionRetriesExceeded, LockException {
+    public void resumeTask(String taskId) throws InterruptedException, TransactionRetriesExceeded, PauseException {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             try {
                 String id = PAUSED_TASK_PREFIX + taskId;
                 Paused paused = pausedRepository.deleteByIdCustomQuery(id).orElse(null);
                 if(paused == null)
-                    throw new LockException("Already unlocked!");
+                    throw new PauseException("Already unlocked!");
                 // only trigger reschedule if change in paused entities
                 sender.sendTaskToTasksQueue("");
                 return;
@@ -151,7 +151,7 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void pauseGroup(String groupId, OffsetDateTime resumeDate) throws LockException, InterruptedException, TransactionRetriesExceeded {
+    public void pauseGroup(String groupId, OffsetDateTime resumeDate) throws PauseException, InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             String id = PAUSED_GROUP_PREFIX + groupId;
@@ -165,7 +165,7 @@ public class ManagementService implements IManagementService {
                 return;
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
-                    throw new LockException("Already locked!");
+                    throw new PauseException("Already locked!");
                 }
                 throw e;
             } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
@@ -181,14 +181,14 @@ public class ManagementService implements IManagementService {
     }
 
     @Override
-    public void resumeGroup(String groupId) throws InterruptedException, TransactionRetriesExceeded, LockException {
+    public void resumeGroup(String groupId) throws InterruptedException, TransactionRetriesExceeded, PauseException {
         int iteration = 1;
         while(iteration <= maxTransactionRetryCount) {
             try {
                 String id = PAUSED_GROUP_PREFIX + groupId;
                 Paused paused = pausedRepository.deleteByIdCustomQuery(id).orElse(null);
                 if(paused == null)
-                    throw new LockException("Already unlocked!");
+                    throw new PauseException("Already unlocked!");
                 // only trigger reschedule if change in paused entities
                 sender.sendTaskToTasksQueue("");
                 return;

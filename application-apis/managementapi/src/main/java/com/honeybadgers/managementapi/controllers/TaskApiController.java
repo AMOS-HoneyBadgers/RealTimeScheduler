@@ -1,6 +1,6 @@
 package com.honeybadgers.managementapi.controllers;
 
-import com.honeybadgers.managementapi.exception.LockException;
+import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ResponseModel;
 import com.honeybadgers.managementapi.service.IManagementService;
@@ -14,7 +14,6 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import java.util.Optional;
-import java.util.UUID;
 
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-06-05T20:22:57.974+02:00[Europe/Berlin]")
 
@@ -59,7 +58,7 @@ public class TaskApiController implements TaskApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        } catch (LockException e) {
+        } catch (PauseException e) {
             response.setMessage("Task was not paused!");
             return ResponseEntity.ok(response);
         }
@@ -81,7 +80,7 @@ public class TaskApiController implements TaskApi {
 
         try{
             managmentService.pauseTask(taskId, dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
-        } catch(LockException e){
+        } catch(PauseException e){
             response.setCode("400");
             response.setMessage("Task with taskId=" + taskId.toString() + " already paused!");
             return ResponseEntity.badRequest().body(response);

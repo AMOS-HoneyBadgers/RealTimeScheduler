@@ -1,6 +1,6 @@
 package com.honeybadgers.managementapi.controllers;
 
-import com.honeybadgers.managementapi.exception.LockException;
+import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ResponseModel;
 import com.honeybadgers.managementapi.service.IManagementService;
@@ -55,7 +55,7 @@ public class SchedulerApiController implements SchedulerApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        } catch (LockException e) {
+        } catch (PauseException e) {
             response.setMessage("Scheduler was not paused!");
             return ResponseEntity.ok(response);
         }
@@ -76,7 +76,7 @@ public class SchedulerApiController implements SchedulerApi {
 
         try{
             managmentService.pauseScheduler(dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
-        } catch(LockException e){
+        } catch(PauseException e){
             response.setCode("400");
             response.setMessage("Scheduler already paused!");
             return ResponseEntity.badRequest().body(response);

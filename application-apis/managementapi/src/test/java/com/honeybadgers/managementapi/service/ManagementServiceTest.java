@@ -2,7 +2,7 @@ package com.honeybadgers.managementapi.service;
 
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.managementapi.exception.LockException;
+import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.model.Paused;
@@ -61,7 +61,7 @@ public class ManagementServiceTest {
         DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
         Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
-        assertThrows(LockException.class, () -> service.pauseScheduler(null));
+        assertThrows(PauseException.class, () -> service.pauseScheduler(null));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class ManagementServiceTest {
     }
 
     @Test
-    public void testResumeScheduler() throws InterruptedException, LockException, TransactionRetriesExceeded {
+    public void testResumeScheduler() throws InterruptedException, PauseException, TransactionRetriesExceeded {
         when(pausedRepository.deleteByIdCustomQuery(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.of(new Paused()));
 
         service.resumeScheduler();
@@ -87,7 +87,7 @@ public class ManagementServiceTest {
     }
 
     @Test
-    public void testResumeScheduler_transactionException() throws InterruptedException, LockException, TransactionRetriesExceeded {
+    public void testResumeScheduler_transactionException() throws InterruptedException, PauseException, TransactionRetriesExceeded {
         when(pausedRepository.deleteByIdCustomQuery(PAUSED_SCHEDULER_ALIAS)).thenThrow(new TransactionException(""));
 
         assertThrows(TransactionRetriesExceeded.class, () -> service.resumeScheduler());
@@ -119,7 +119,7 @@ public class ManagementServiceTest {
         DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
         Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
-        assertThrows(LockException.class, () -> service.pauseTask(taskId.toString(), null));
+        assertThrows(PauseException.class, () -> service.pauseTask(taskId.toString(), null));
     }
 
     @Test
@@ -137,7 +137,7 @@ public class ManagementServiceTest {
     }
 
     @Test
-    public void testResumeTask() throws InterruptedException, LockException, TransactionRetriesExceeded {
+    public void testResumeTask() throws InterruptedException, PauseException, TransactionRetriesExceeded {
         UUID taskId = UUID.randomUUID();
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
 
@@ -150,7 +150,7 @@ public class ManagementServiceTest {
     }
 
     @Test
-    public void testResumeTask_transactionException() throws InterruptedException, LockException, TransactionRetriesExceeded {
+    public void testResumeTask_transactionException() throws InterruptedException, PauseException, TransactionRetriesExceeded {
         UUID taskId = UUID.randomUUID();
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
 
@@ -187,7 +187,7 @@ public class ManagementServiceTest {
 
         Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
 
-        assertThrows(LockException.class, () -> service.pauseGroup(groupId, null));
+        assertThrows(PauseException.class, () -> service.pauseGroup(groupId, null));
     }
 
     @Test
@@ -205,7 +205,7 @@ public class ManagementServiceTest {
     }
 
     @Test
-    public void testResumeGroup() throws InterruptedException, LockException, TransactionRetriesExceeded {
+    public void testResumeGroup() throws InterruptedException, PauseException, TransactionRetriesExceeded {
         String groupId = "GROUPID";
         String lockId = PAUSED_GROUP_PREFIX + groupId;
 
@@ -218,7 +218,7 @@ public class ManagementServiceTest {
     }
 
     @Test
-    public void testResumeGroup_transactionException() throws InterruptedException, LockException, TransactionRetriesExceeded {
+    public void testResumeGroup_transactionException() throws InterruptedException, PauseException, TransactionRetriesExceeded {
         String groupId = "GROUPID";
         String lockId = PAUSED_GROUP_PREFIX + groupId;
 
