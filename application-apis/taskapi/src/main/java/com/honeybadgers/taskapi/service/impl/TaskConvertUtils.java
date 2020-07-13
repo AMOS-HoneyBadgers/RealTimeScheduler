@@ -88,8 +88,6 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         // convert List<TaskModelActiveTimes> to List<ActiveTimes> or use default of group
         if (restModel.getActiveTimes() != null)
             newTask.setActiveTimeFrames(restModel.getActiveTimes().stream().map(taskModelActiveTimes -> taskModelActiveTimes.getAsJpaModel()).collect(Collectors.toList()));
-        else
-            newTask.setActiveTimeFrames(group.getActiveTimeFrames());
 
         // convert List<Boolean> to int[]
         if (restModel.getWorkingDays() != null) {
@@ -99,8 +97,6 @@ public class TaskConvertUtils implements ITaskConvertUtils {
                 // convert boolean to int
                 return (value ? 1 : 0);
             }).toArray());
-        } else {
-            newTask.setWorkingDays(group.getWorkingDays());
         }
 
         // convert Enums using RestEnum.toString and JpaEnum.fromString
