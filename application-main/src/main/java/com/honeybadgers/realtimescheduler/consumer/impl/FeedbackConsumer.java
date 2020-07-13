@@ -99,7 +99,7 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         Task currentTask = taskService.getTaskById(taskId).orElse(null);
         if(currentTask == null)
             throw new RuntimeException("could not find tasks in postgre database");
-
+        //TODO: For Sequential Grops parallesm degree is not decremented ( stays 1 but LastIndex is incremented )
         checkAndSetParallelismDegree(currentTask);
 
         if(currentTask.getModeEnum()== ModeEnum.Sequential)
