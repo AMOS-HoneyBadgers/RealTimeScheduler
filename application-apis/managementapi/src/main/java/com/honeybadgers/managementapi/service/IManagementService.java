@@ -1,12 +1,12 @@
 package com.honeybadgers.managementapi.service;
 
 import com.honeybadgers.managementapi.exception.LockException;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.OffsetDateTime;
-import java.util.UUID;
 
 @Service
 public interface IManagementService {
@@ -15,43 +15,55 @@ public interface IManagementService {
      * Pauses the Scheduler. Scheduler does not dispatch Tasks anymore.
      * Scheduler still is able to receive and schedule the Tasks.
      * @param resumeDate Date when the Scheduler automatically resumes working or null.
-     * @throws LockException Scheduler is already locked.
+     * @throws LockException Scheduler is already paused.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    void pauseScheduler(OffsetDateTime resumeDate) throws LockException;
+    void pauseScheduler(OffsetDateTime resumeDate) throws LockException, InterruptedException, TransactionRetriesExceeded;
 
     /**
      * Resumes the Scheduler.
+     * @throws LockException Scheduler was not paused.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    void resumeScheduler();
+    void resumeScheduler() throws InterruptedException, TransactionRetriesExceeded, LockException;
 
     /**
-     * Locks a Task, preventing it from being dispatched.
+     * Pauses a Task, preventing it from being dispatched.
      * @param taskId id of specified Task.
-     * @param resumeDate Date when Task is unlocked automatically or null.
-     * @throws LockException Task is already locked.
+     * @param resumeDate Date when Task automatically resumes or null.
+     * @throws LockException Task is already paused.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    void pauseTask(String taskId, OffsetDateTime resumeDate) throws LockException;
+    void pauseTask(String taskId, OffsetDateTime resumeDate) throws LockException, InterruptedException, TransactionRetriesExceeded;
 
     /**
-     * Unlocks a Task.
+     * Resumes a Task.
      * @param taskId id of specified Task.
+     * @throws LockException Task was not paused.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    void resumeTask(String taskId);
+    void resumeTask(String taskId) throws InterruptedException, TransactionRetriesExceeded, LockException;
 
     /**
-     * Locks a Group. Any Tasks under the specified Group in the hierarchy are locked in the process.
+     * Pauses a Group.
      * @param groupId id of specified Group.
-     * @param resumeDate Date when Group is unlocked automatically or null.
-     * @throws LockException Group is already locked.
+     * @param resumeDate Date when Group automatically resumes or null.
+     * @throws LockException Group is already paused.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    void pauseGroup(String groupId, OffsetDateTime resumeDate) throws LockException;
+    void pauseGroup(String groupId, OffsetDateTime resumeDate) throws LockException, InterruptedException, TransactionRetriesExceeded;
 
     /**
-     * Unlocks a Group.
-     * @param grouId id of specified Group.
+     * Resumes a Group.
+     * @param groupId id of specified Group.
+     * @throws LockException Group was not paused.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    void resumeGroup(String grouId);
+    void resumeGroup(String groupId) throws InterruptedException, TransactionRetriesExceeded, LockException;
 }

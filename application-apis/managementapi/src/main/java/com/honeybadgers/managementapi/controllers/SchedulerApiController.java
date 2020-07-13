@@ -4,7 +4,9 @@ import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.models.DateTimeBody;
 import com.honeybadgers.managementapi.models.ResponseModel;
 import com.honeybadgers.managementapi.service.IManagementService;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -43,7 +45,20 @@ public class SchedulerApiController implements SchedulerApi {
         response.setCode("200");
         response.setMessage("Success");
 
-        managmentService.resumeScheduler();
+        try {
+            managmentService.resumeScheduler();
+        } catch (InterruptedException e) {
+            response.setCode("500");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        } catch (TransactionRetriesExceeded e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        } catch (LockException e) {
+            response.setMessage("Scheduler was not paused!");
+            return ResponseEntity.ok(response);
+        }
 
         return ResponseEntity.ok(response);
     }
@@ -61,9 +76,17 @@ public class SchedulerApiController implements SchedulerApi {
 
         try{
             managmentService.pauseScheduler(dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
-        }catch(LockException e){
+        } catch(LockException e){
             response.setCode("400");
             response.setMessage("Scheduler already paused!");
+            return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            response.setCode("500");
+            response.setMessage(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        } catch (TransactionRetriesExceeded e) {
+            response.setCode("400");
+            response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         }
 

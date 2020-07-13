@@ -4,6 +4,7 @@ package com.honeybadgers.managementapi.service;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.LockException;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.model.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.junit.Test;
@@ -12,6 +13,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.Optional;
@@ -31,15 +33,19 @@ public class ManagementServiceTest {
     @MockBean
     PausedRepository pausedRepository;
 
-    @Autowired
-    ManagementService service;
-
     @MockBean
     ICommunication sender;
 
+    @Autowired
+    ManagementService service;
+
     @Test
     public void testPauseScheduler() {
-        Mockito.when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
+        Paused lockObj = new Paused();
+        lockObj.setId(PAUSED_SCHEDULER_ALIAS);
+        lockObj.setResumeDate(null);
+
+        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenReturn(Optional.of(lockObj));
         assertDoesNotThrow(() -> service.pauseScheduler(null));
     }
 
@@ -47,14 +53,21 @@ public class ManagementServiceTest {
     public void testPauseScheduler_locked() {
         Paused lockObj = new Paused();
         lockObj.setId(PAUSED_SCHEDULER_ALIAS);
-        Mockito.when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.of(lockObj));
+        lockObj.setResumeDate(null);
+
+        DataIntegrityViolationException exception = new DataIntegrityViolationException("primary");
+
+        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
         assertThrows(LockException.class, () -> service.pauseScheduler(null));
     }
 
     @Test
-    public void testResumeScheduler() {
+    public void testResumeScheduler() throws InterruptedException, LockException, TransactionRetriesExceeded {
+        when(pausedRepository.deleteByIdCustomQuery(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.of(new Paused()));
+
         service.resumeScheduler();
-        Mockito.verify(pausedRepository, Mockito.only()).deleteById(PAUSED_SCHEDULER_ALIAS);
+
+        Mockito.verify(pausedRepository, Mockito.only()).deleteByIdCustomQuery(PAUSED_SCHEDULER_ALIAS);
         verify(sender, only()).sendTaskToTasksQueue(any());
     }
 
@@ -62,7 +75,11 @@ public class ManagementServiceTest {
     public void testPauseTask() {
         UUID taskId = UUID.randomUUID();
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
-        Mockito.when(pausedRepository.findById(lockId)).thenReturn(Optional.empty());
+        Paused lockObj = new Paused();
+        lockObj.setId(lockId);
+        lockObj.setResumeDate(null);
+
+        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenReturn(Optional.of(lockObj));
         assertDoesNotThrow(() -> service.pauseTask(taskId.toString(), null));
     }
 
@@ -72,16 +89,24 @@ public class ManagementServiceTest {
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
         Paused lockObj = new Paused();
         lockObj.setId(lockId);
-        Mockito.when(pausedRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
+        lockObj.setResumeDate(null);
+
+        DataIntegrityViolationException exception = new DataIntegrityViolationException("primary");
+
+        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
         assertThrows(LockException.class, () -> service.pauseTask(taskId.toString(), null));
     }
 
     @Test
-    public void testResumeTask() {
+    public void testResumeTask() throws InterruptedException, LockException, TransactionRetriesExceeded {
         UUID taskId = UUID.randomUUID();
         String lockId = PAUSED_TASK_PREFIX + taskId.toString();
+
+        when(pausedRepository.deleteByIdCustomQuery(lockId)).thenReturn(Optional.of(new Paused()));
+
         service.resumeTask(taskId.toString());
-        Mockito.verify(pausedRepository, Mockito.only()).deleteById(lockId);
+
+        Mockito.verify(pausedRepository, Mockito.only()).deleteByIdCustomQuery(lockId);
         verify(sender, only()).sendTaskToTasksQueue(any());
     }
 
@@ -89,7 +114,12 @@ public class ManagementServiceTest {
     public void testPauseGroup() {
         String groupId = "GROUPID";
         String lockId = PAUSED_GROUP_PREFIX + groupId;
-        Mockito.when(pausedRepository.findById(lockId)).thenReturn(Optional.empty());
+        Paused lockObj = new Paused();
+        lockObj.setId(lockId);
+        lockObj.setResumeDate(null);
+
+        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenReturn(Optional.of(lockObj));
+
         assertDoesNotThrow(() -> service.pauseGroup(groupId, null));
     }
 
@@ -99,16 +129,25 @@ public class ManagementServiceTest {
         String lockId = PAUSED_GROUP_PREFIX + groupId;
         Paused lockObj = new Paused();
         lockObj.setId(lockId);
-        Mockito.when(pausedRepository.findById(lockId)).thenReturn(Optional.of(lockObj));
+        lockObj.setResumeDate(null);
+
+        DataIntegrityViolationException exception = new DataIntegrityViolationException("primary");
+
+        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
+
         assertThrows(LockException.class, () -> service.pauseGroup(groupId, null));
     }
 
     @Test
-    public void testResumeGroup() {
+    public void testResumeGroup() throws InterruptedException, LockException, TransactionRetriesExceeded {
         String groupId = "GROUPID";
         String lockId = PAUSED_GROUP_PREFIX + groupId;
+
+        when(pausedRepository.deleteByIdCustomQuery(lockId)).thenReturn(Optional.of(new Paused()));
+
         service.resumeGroup(groupId);
-        Mockito.verify(pausedRepository, Mockito.only()).deleteById(lockId);
+
+        Mockito.verify(pausedRepository, Mockito.only()).deleteByIdCustomQuery(lockId);
         verify(sender, only()).sendTaskToTasksQueue(any());
     }
 }
