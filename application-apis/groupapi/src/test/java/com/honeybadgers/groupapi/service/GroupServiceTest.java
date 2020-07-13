@@ -1,7 +1,9 @@
 package com.honeybadgers.groupapi.service;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.groupapi.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -11,8 +13,8 @@ import org.junit.runner.RunWith;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
-import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.service.impl.GroupService;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,7 @@ public class GroupServiceTest {
     ICommunication sender;
 
     @MockBean
+    @Qualifier("groupConvertUtils")
     IGroupConvertUtils convertUtils;
 
     @Autowired
@@ -66,7 +69,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testCreateGroup() throws JpaException, UnknownEnumException, CreationException {
+    public void testCreateGroup() throws JpaException, UnknownEnumException, CreationException, TransactionRetriesExceeded, InterruptedException {
 
         when(taskRepository.findAllByGroupId("parentGroup")).thenReturn(new ArrayList<>());
         when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenReturn(new Group());
@@ -133,7 +136,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testGroupUpdate() throws JpaException, UnknownEnumException {
+    public void testGroupUpdate() throws JpaException, UnknownEnumException, TransactionRetriesExceeded, InterruptedException {
         String group_id = "testGroup";
         GroupModel restGroup = new GroupModel();
         restGroup.setId("testGroup");
@@ -185,7 +188,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testGetAllGroups() {
+    public void testGetAllGroups() throws TransactionRetriesExceeded, InterruptedException {
         when(groupRepository.findAll()).thenReturn(new ArrayList<>());
 
         List<Group> groups = groupService.getAllGroups();
@@ -195,7 +198,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testGetGroupById() {
+    public void testGetGroupById() throws TransactionRetriesExceeded, InterruptedException {
 
         Group group = groupService.getGroupById("testGroup");
 
@@ -214,22 +217,23 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testDeleteGroup() {
+    public void testDeleteGroup() throws InterruptedException, TransactionRetriesExceeded, JpaException {
+        Group gr = new Group();
+        gr.setId("testGroup");
+        gr.setPriority(50);
 
-        doNothing().when(groupRepository).deleteById("testGroup");
+        when(groupRepository.deleteByIdCustomQuery("testGroup")).thenReturn(Optional.of(gr));
 
         Group group = groupService.deleteGroup("testGroup");
 
         assertNotNull(group);
-        assertEquals("testGroup", group.getId());
+        assertEquals(gr.getId(), group.getId());
     }
 
     @Test
     public void testDeleteGroup_NotFound() {
 
-        doNothing().when(groupRepository).deleteById("testGroup");
-
-        when(groupRepository.findById("testGroup")).thenReturn(Optional.empty());
+        when(groupRepository.deleteByIdCustomQuery("testGroup")).thenReturn(Optional.empty());
 
         Exception e = assertThrows(NoSuchElementException.class, () -> groupService.deleteGroup("testGroup"));
         assertNotNull(e);

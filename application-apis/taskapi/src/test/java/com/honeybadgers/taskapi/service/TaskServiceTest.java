@@ -1,6 +1,7 @@
 package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
@@ -59,7 +60,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testGetAllTasksAsRestModel(){
+    public void testGetAllTasksAsRestModel() throws TransactionRetriesExceeded, InterruptedException {
         List<Task> tasksList = new LinkedList<Task>();
         tasksList.add(generateFullTask(0));
         tasksList.add(generateFullTask(1));
@@ -74,7 +75,7 @@ public class TaskServiceTest {
 
 
     @Test
-    public void testCreateTask() throws JpaException, UnknownEnumException, CreationException, InterruptedException {
+    public void testCreateTask() throws JpaException, UnknownEnumException, CreationException, InterruptedException, TransactionRetriesExceeded {
         String taskId = UUID.randomUUID().toString();
 
         TaskModel restModel = new TaskModel();
@@ -91,7 +92,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testCreateTask_ThrowsTransactionException() throws JpaException, UnknownEnumException, CreationException, InterruptedException {
+    public void testCreateTask_ThrowsTransactionException() throws JpaException, UnknownEnumException, CreationException, InterruptedException, TransactionRetriesExceeded {
         String taskId = UUID.randomUUID().toString();
 
         TaskModel restModel = new TaskModel();
@@ -130,7 +131,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTask() throws UnknownEnumException, JpaException, CreationException, InterruptedException {
+    public void testUpdateTask() throws UnknownEnumException, JpaException, CreationException, InterruptedException, TransactionRetriesExceeded {
         String taskId =  UUID.randomUUID().toString();
 
         TaskModel restModel = new TaskModel();
@@ -237,7 +238,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void getTaskById(){
+    public void getTaskById() throws TransactionRetriesExceeded, InterruptedException {
         Task task = generateFullTask(0);
         TaskModel taskmodel = new TaskModel();
         taskmodel.setId(task.getId());
@@ -245,7 +246,7 @@ public class TaskServiceTest {
         when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
         when(converter.taskJpaToRest(task)).thenReturn(taskmodel);
 
-        TaskModel requestedTask = taskService.deleteTask(task.getId());
+        TaskModel requestedTask = taskService.getTaskById(task.getId());
 
         assertNotNull(requestedTask);
         assertEquals(task.getId(), requestedTask.getId());
@@ -257,19 +258,18 @@ public class TaskServiceTest {
 
         when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.deleteTask(id));
+        Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.getTaskById(id));
         assertNotNull(e);
         assertEquals("No existing Task with ID: " + id, e.getMessage());
     }
 
     @Test
-    public void testDeleteTask(){
+    public void testDeleteTask() throws TransactionRetriesExceeded, InterruptedException {
         Task task = generateFullTask(0);
         TaskModel taskmodel = new TaskModel();
         taskmodel.setId(task.getId());
 
-        when(taskRepository.findById(anyString())).thenReturn(Optional.of(task));
-        doNothing().when(taskRepository).deleteById(anyString());
+        when(taskRepository.deleteByIdCustomQuery(anyString())).thenReturn(Optional.of(task));
         when(converter.taskJpaToRest(task)).thenReturn(taskmodel);
 
         TaskModel deletedTask = taskService.deleteTask(task.getId());
@@ -281,12 +281,12 @@ public class TaskServiceTest {
     @Test
     public void testDeleteNonExistingTask(){
         String id = UUID.randomUUID().toString();
-        when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
+        when(taskRepository.deleteByIdCustomQuery(anyString())).thenReturn(Optional.empty());
 
         Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.deleteTask(id));
         assertNotNull(e);
         assertEquals("No existing Task with ID: " + id, e.getMessage());
-        verify(taskRepository, Mockito.never()).deleteById(anyString());
+        verify(taskRepository, Mockito.times(1)).deleteByIdCustomQuery(anyString());
     }
 
     @Test
@@ -378,25 +378,6 @@ public class TaskServiceTest {
         when(taskRepository.save(createdTask)).thenThrow(new DataIntegrityViolationException(""));
 
        assertThrows(JpaException.class, () -> taskService.createTask(restModel));
-    }
-
-    @Test
-    public void testGetTaskById(){
-        String id = UUID.randomUUID().toString();
-        Task task = new Task();
-        task.setId(id);
-
-        when(taskRepository.findById(id)).thenReturn(Optional.of(task));
-        taskService.getTaskById(id);
-
-        verify(converter).taskJpaToRest(task);
-    }
-
-    @Test
-    public void testGetTaskById_Exeption(){
-        String id = UUID.randomUUID().toString();
-
-        assertThrows(NoSuchElementException.class, () -> taskService.getTaskById(id));
     }
 
     @Test
