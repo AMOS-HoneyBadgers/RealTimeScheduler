@@ -160,7 +160,7 @@ public class SchedulerService implements ISchedulerService {
             lockrefresherThread.interrupt();
         } catch (Exception e) {
             logger.error(e.getMessage());
-            sender.sendTaskToTasksQueue("ERROR->Schedule");
+            // TODO (problem: lockAcquisition from LockService also triggers this) sender.sendTaskToTasksQueue("ERROR->Schedule");
         } finally {
             if (lockrefresherThread != null)
                 lockrefresherThread.interrupt();
