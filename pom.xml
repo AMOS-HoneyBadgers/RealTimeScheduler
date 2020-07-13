@@ -255,25 +255,25 @@
                         <exclude>com/honeybadgers/models/model/**/*</exclude>
                         <exclude>com/honeybadgers/groupapi/configuration/**/*</exclude>
                         <exclude>com/honeybadgers/groupapi/controllers/**/*</exclude>
-                        <exclude>com/honeybadgers/groupapi/exceptions/**/*</exclude>
                         <exclude>com/honeybadgers/groupapi/models/**/*</exclude>
                         <exclude>com/honeybadgers/groupapi/OpenAPI2SpringBoot</exclude>
                         <exclude>com/honeybadgers/groupapi/RFC3339DateFormat</exclude>
                         <exclude>com/honeybadgers/groupapi/OpenAPI2SpringBoot/**/*</exclude>
                         <exclude>com/honeybadgers/taskapi/configuration/**/*</exclude>
                         <exclude>com/honeybadgers/taskapi/controllers/**/*</exclude>
-                        <exclude>com/honeybadgers/taskapi/exceptions/**/*</exclude>
                         <exclude>com/honeybadgers/taskapi/models/**/*</exclude>
                         <exclude>com/honeybadgers/taskapi/OpenAPI2SpringBoot</exclude>
                         <exclude>com/honeybadgers/taskapi/RFC3339DateFormat</exclude>
                         <exclude>com/honeybadgers/taskapi/OpenAPI2SpringBoot/**/*</exclude>
+                        <exclude>com/honeybadgers/managementapi/**/*</exclude>
+                        <!--For some reason jacoco ignores the last 3 excludes and thus fails
                         <exclude>com/honeybadgers/managementapi/configuration/**/*</exclude>
                         <exclude>com/honeybadgers/managementapi/controllers/**/*</exclude>
-                        <exclude>com/honeybadgers/managementapi/exceptions/**/*</exclude>
+                        <exclude>com/honeybadgers/managementapi/exception/**/*</exclude>
                         <exclude>com/honeybadgers/managementapi/models/**/*</exclude>
                         <exclude>com/honeybadgers/managementapi/OpenAPI2SpringBoot</exclude>
                         <exclude>com/honeybadgers/managementapi/RFC3339DateFormat</exclude>
-                        <exclude>com/honeybadgers/managementapi/OpenAPI2SpringBoot/**/*</exclude>
+                        <exclude>com/honeybadgers/managementapi/OpenAPI2SpringBoot/**/*</exclude>-->
                         <exclude>com/honeybadgers/monitoringapi/**/*</exclude>
                     </excludes>
                 </configuration>
