@@ -229,7 +229,7 @@ public class GroupService implements IGroupService {
                 return group;
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage() != null) {
-                    if(e.getMessage().contains("foreign")) {
+                    if(e.getMessage().contains("constraint [group_fk]")) {
                         logger.error("Group " + groupId + " delete failed due to foreign key: " + e.getMessage());
                         throw new JpaException("Group deletion failed due to being referenced by task!");
                     }
