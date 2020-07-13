@@ -38,7 +38,7 @@ public class Task {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
-    @Max(value = 999)
+    @Max(value = 9999)
     @Min(value = 0)
     @Column(name = "priority", nullable = false)
     private int priority;
