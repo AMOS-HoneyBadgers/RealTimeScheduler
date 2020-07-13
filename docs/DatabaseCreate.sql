@@ -1,3 +1,26 @@
+
+-----------------------------------------------------
+-- Please replace all occurrences of <OWNER> with the user you want to be the owner of the tables
+-----------------------------------------------------
+
+
+-- Functions
+
+CREATE FUNCTION public.reduce_dim(anyarray)
+    RETURNS SETOF anyarray AS
+$function$
+DECLARE
+    s $1%type;
+BEGIN
+    FOREACH s SLICE 1  IN ARRAY $1 LOOP
+            RETURN NEXT s;
+        END LOOP;
+    RETURN;
+END;
+$function$
+    LANGUAGE plpgsql IMMUTABLE;
+
+
 -- Table: public."group"
 
 -- DROP TABLE public."group";
@@ -27,7 +50,7 @@ CREATE TABLE public."group"
     TABLESPACE pg_default;
 
 ALTER TABLE public."group"
-    OWNER to realtimescheduler;
+    OWNER to <OWNER>;
 
 
 
@@ -64,7 +87,7 @@ CREATE TABLE public.task
     TABLESPACE pg_default;
 
 ALTER TABLE public.task
-    OWNER to realtimescheduler;
+    OWNER to <OWNER>;
 
 
 
@@ -84,7 +107,7 @@ CREATE TABLE public.paused
     TABLESPACE pg_default;
 
 ALTER TABLE public.paused
-    OWNER to realtimescheduler;
+    OWNER to <OWNER>;
 
 
 -- TODO for later the lock table
@@ -104,7 +127,7 @@ CREATE TABLE public.lock
     TABLESPACE pg_default;
 
 ALTER TABLE public.lock
-    OWNER to realtimescheduler;
+    OWNER to <OWNER>;
 
 
 -- Insert Default group

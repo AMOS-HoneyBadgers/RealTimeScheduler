@@ -59,7 +59,7 @@ public class TaskService implements ITaskService {
     @Value("${com.honeybadgers.transaction.max-retry-sleep:500}")
     int maxTransactionRetrySleep;
 
-    @Value("${com.honeybadgers.transaction.max-retry-count:3}")
+    @Value("${com.honeybadgers.transaction.max-retry-count:5}")
     int maxTransactionRetryCount;
 
     static final Logger logger = LogManager.getLogger(TaskService.class);
