@@ -1,3 +1,21 @@
+
+-- Functions
+
+CREATE FUNCTION public.reduce_dim(anyarray)
+    RETURNS SETOF anyarray AS
+$function$
+DECLARE
+    s $1%type;
+BEGIN
+    FOREACH s SLICE 1  IN ARRAY $1 LOOP
+            RETURN NEXT s;
+        END LOOP;
+    RETURN;
+END;
+$function$
+    LANGUAGE plpgsql IMMUTABLE;
+
+
 -- Table: public."group"
 
 -- DROP TABLE public."group";
