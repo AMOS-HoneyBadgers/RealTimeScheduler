@@ -36,12 +36,15 @@ public class TaskService implements ITaskService {
 
     @Autowired
     GroupRepository groupRepository;
+
     @Autowired
     TaskRepository taskRepository;
+
     @Autowired
     ICommunication sender;
-    @Qualifier("taskConvertUtils")
+
     @Autowired
+    @Qualifier("taskConvertUtils")
     ITaskConvertUtils converter;
 
     @Autowired
@@ -52,6 +55,9 @@ public class TaskService implements ITaskService {
 
     @Value("${com.honeybadgers.transaction.max-retry-sleep:500}")
     int maxTransactionRetrySleep;
+
+    @Value("${com.honeybadgers.transaction.max-retry-count:3}")
+    int maxTransactionRetryCount;
 
     static final Logger logger = LogManager.getLogger(TaskService.class);
 
@@ -71,17 +77,19 @@ public class TaskService implements ITaskService {
     @Override
     public Task createTask(TaskModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException {
         int iteration = 1;
-        while (true){
+        while (iteration <= maxTransactionRetryCount){
             try{
                 return _self.createTaskInternal(restModel);
             } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
                 double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Task " + restModel.getId() + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                logger.warn("Task " + restModel.getId() + " transaction exception while creating task. Try again after "+timeToSleep+" milliseconds" );
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
         }
+        // throw exception due to surpassing max retries
+        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -106,18 +114,20 @@ public class TaskService implements ITaskService {
     @Override
     public Task updateTask(String taskId, TaskModel restModel) throws UnknownEnumException, JpaException, CreationException, InterruptedException, IllegalStateException {
         int iteration =1;
-        while (true){
+        while (iteration <= maxTransactionRetryCount){
             try{
                 return _self.updateTaskInternal(taskId, restModel);
             }
             catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
                 double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.error("Task " + restModel.getId() + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                logger.error("Task " + restModel.getId() + " transaction exception while updating task. Try again after "+timeToSleep+" milliseconds" );
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
         }
+        // throw exception due to surpassing max retries
+        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
     @Transactional(isolation = Isolation.SERIALIZABLE)
@@ -150,23 +160,46 @@ public class TaskService implements ITaskService {
     }
 
     @Override
-    public TaskModel getTaskById(String taskid) {
-        Task task = taskRepository.findById(taskid).orElse(null);
-        if(task == null)
-            throw new NoSuchElementException("No existing Task with ID: " + taskid);
+    public TaskModel getTaskById(String taskid) throws InterruptedException, JpaException {
+        int iteration = 1;
+        while(iteration <= maxTransactionRetryCount) {
+            try {
+                Task task = taskRepository.findById(taskid).orElse(null);
+                if(task == null)
+                    throw new NoSuchElementException("No existing Task with ID: " + taskid);
 
-        return converter.taskJpaToRest(task);
+                return converter.taskJpaToRest(task);
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+                // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
+                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
+                logger.error("Task " + taskid + " transaction exception while getting task. Try again after "+timeToSleep+" milliseconds" );
+                Thread.sleep(Math.round(timeToSleep));
+                iteration++;
+            }
+        }
+        // throw exception due to surpassing max retries
+        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
     @Override
-    public TaskModel deleteTask(String taskid) {
-        // TODO custom query
-        Task task = taskRepository.findById(taskid).orElse(null);
-        if(task == null)
-            throw new NoSuchElementException("No existing Task with ID: " + taskid);
-
-        taskRepository.deleteById(taskid);
-        return converter.taskJpaToRest(task);
+    public TaskModel deleteTask(String taskid) throws InterruptedException, JpaException {
+        int iteration = 1;
+        while(iteration <= maxTransactionRetryCount) {
+            try {
+                Task task = taskRepository.deleteByIdCustomQuery(taskid).orElse(null);
+                if(task == null)
+                    throw new NoSuchElementException("No existing Task with ID: " + taskid);
+                return converter.taskJpaToRest(task);
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+                // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
+                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
+                logger.error("Task " + taskid + " transaction exception while deleting task. Try again after "+timeToSleep+" milliseconds" );
+                Thread.sleep(Math.round(timeToSleep));
+                iteration++;
+            }
+        }
+        // throw exception due to surpassing max retries
+        throw new JpaException("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
 

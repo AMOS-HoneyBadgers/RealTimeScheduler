@@ -51,7 +51,7 @@ public interface ITaskService {
      * @throws NoSuchElementException specified Task does not exist.
      */
     @Transactional(isolation = Isolation.SERIALIZABLE)
-    TaskModel deleteTask(String taskid) throws NoSuchElementException;
+    TaskModel deleteTask(String taskid) throws NoSuchElementException, InterruptedException, JpaException;
 
     /**
      * Get single Task.
@@ -59,7 +59,7 @@ public interface ITaskService {
      * @return Task as Rest Model.
      * @throws NoSuchElementException specified Task does not exist.
      */
-    TaskModel getTaskById(String taskid) throws NoSuchElementException;
+    TaskModel getTaskById(String taskid) throws NoSuchElementException, InterruptedException, JpaException;
 
     /**
      * Send Task to Scheduler Task Queue.
