@@ -26,6 +26,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -155,19 +156,10 @@ public class GroupService implements IGroupService {
             groupRepository.save(targetGroup);
             sender.sendTaskToTasksQueue(scheduler_trigger);
         } catch (DataIntegrityViolationException e) {
-            if (e.getMessage() != null) {
-                logger.error("DataIntegrityViolation while trying to add new Group: \n" + e.getMessage());
-                if (e.getMessage().contains("primary")) {
-                    throw new JpaException("Primary or unique constraint failed!");
-                } else {
-                    throw new JpaException(e.getMessage());
-                }
-            } else {
-                // exception has no message (should not happen but just in case)
-                logger.error("DataIntegrityViolation on group update!");
-                logger.error(e.getStackTrace());
-                throw new JpaException("DataIntegrityViolation on save new group!");
-            }
+            // exception has no message (should not happen but just in case)
+            logger.error("DataIntegrityViolation on group update!");
+            logger.error(Arrays.deepToString(e.getStackTrace()));
+            throw new JpaException("DataIntegrityViolation on updating group!");
         }
         return targetGroup;
     }

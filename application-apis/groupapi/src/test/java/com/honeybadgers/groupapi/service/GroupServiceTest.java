@@ -218,6 +218,28 @@ public class GroupServiceTest {
     }
 
     @Test
+    public void testGroupUpdate_dataIntegrityException() throws JpaException, UnknownEnumException {
+        String group_id = "testGroup";
+        GroupModel restGroup = new GroupModel();
+        restGroup.setId("testGroup");
+        restGroup.setPriority(100);
+        restGroup.setParentId("parentGroup");
+
+        Group parentGroup = new Group();
+        parentGroup.setId("parentGroup");
+        Group mockGroup = new Group();
+        mockGroup.setPriority(restGroup.getPriority());
+        mockGroup.setParentGroup(parentGroup);
+
+        when(convertUtils.groupRestToJpa(any(GroupModel.class))).thenReturn(mockGroup);
+
+        when(groupRepository.save(any())).thenThrow(new DataIntegrityViolationException(""));
+
+        Exception e = assertThrows(JpaException.class, () -> groupService.updateGroup(group_id, restGroup));
+        assertEquals("DataIntegrityViolation on updating group!", e.getMessage());
+    }
+
+    @Test
     public void testGetAllGroups() throws TransactionRetriesExceeded, InterruptedException {
         when(groupRepository.findAll()).thenReturn(new ArrayList<>());
 

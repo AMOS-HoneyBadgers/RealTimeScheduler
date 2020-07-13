@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
@@ -120,7 +121,7 @@ public class TaskService implements ITaskService {
             taskRepository.save(newTask);
         } catch (DataIntegrityViolationException e) {
             logger.error("DataIntegrityViolation on save new task!");
-            logger.error(e.getStackTrace());
+            logger.error(Arrays.deepToString(e.getStackTrace()));
             throw new JpaException("DataIntegrityViolation on save new task!");
         }
         return newTask;
@@ -167,7 +168,7 @@ public class TaskService implements ITaskService {
             sender.sendTaskToTasksQueue(scheduler_trigger);
         } catch (DataIntegrityViolationException e) {
             logger.error("DataIntegrityViolation on save new task!");
-            logger.error(e.getStackTrace());
+            logger.error(Arrays.deepToString(e.getStackTrace()));
             throw new JpaException("DataIntegrityViolation on save new task!");
         }
 
