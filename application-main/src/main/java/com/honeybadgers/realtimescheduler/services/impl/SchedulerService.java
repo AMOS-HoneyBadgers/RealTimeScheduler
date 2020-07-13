@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.exceptions.LockException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
@@ -60,6 +61,9 @@ public class SchedulerService implements ISchedulerService {
 
     @Autowired
     GroupRepository groupRepository;
+
+    @Autowired
+    ConvertUtils convertUtils;
 
     @Autowired
     RestTemplate restTemplate;
@@ -125,7 +129,10 @@ public class SchedulerService implements ISchedulerService {
             }
 
             // dispatch tasks
-            List<Task> tasks = taskRepository.findAllScheduledTasksSorted();
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            // +1 because postgres arrays starts at 1
+            int postgresIndex = convertUtils.fitDayOfWeekToWorkingDayBooleans(calendar.get(Calendar.DAY_OF_WEEK)) + 1;
+            List<Task> tasks = taskRepository.getTasksToBeDispatched(postgresIndex);
             if (!isSchedulerPaused()) {
                 logger.info("Step 3: dispatching " + tasks.size() + " tasks");
                 for (Task task : tasks) {
@@ -153,6 +160,7 @@ public class SchedulerService implements ISchedulerService {
             lockrefresherThread.interrupt();
         } catch (Exception e) {
             logger.error(e.getMessage());
+            // TODO (problem: lockAcquisition from LockService also triggers this) sender.sendTaskToTasksQueue("ERROR->Schedule");
         } finally {
             if (lockrefresherThread != null)
                 lockrefresherThread.interrupt();
@@ -232,8 +240,7 @@ public class SchedulerService implements ISchedulerService {
         if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
             return false;
 
-        if (!checkIfTaskIsInActiveTime(currentTask) || !checkIfTaskIsInWorkingDays(currentTask) ||
-                sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId()))
+        if (sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId()))
             return false;
 
         // Increment current parallelismDegree for all ancestors

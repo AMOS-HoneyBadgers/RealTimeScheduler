@@ -11,8 +11,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@SpringBootApplication
-@ComponentScan(basePackages = {"com.honeybadgers.managementapi", "com.honeybadgers.managementapi.controllers" , "com.honeybadgers.managementapi.configuration", "com.honeybadgers"})
+@SpringBootApplication(scanBasePackages = "com.honeybadgers")
 public class OpenAPI2SpringBoot implements CommandLineRunner {
 
     @Override

@@ -1,5 +1,7 @@
 package com.honeybadgers.models.model;
 
+import com.honeybadgers.models.exceptions.UnknownEnumException;
+
 public enum TaskStatusEnum {
     Waiting, Scheduled, Dispatched, Finished;
 
