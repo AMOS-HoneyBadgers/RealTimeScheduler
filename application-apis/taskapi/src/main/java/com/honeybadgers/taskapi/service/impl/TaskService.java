@@ -64,16 +64,29 @@ public class TaskService implements ITaskService {
     static final Logger logger = LogManager.getLogger(TaskService.class);
 
     @Override
-    public List<TaskModel> getAllTasks() {
-        List<TaskModel> taskModelList;
-        List<Task> taskList = taskRepository.findAll();
+    public List<TaskModel> getAllTasks() throws InterruptedException, TransactionRetriesExceeded {
+        int iteration = 1;
+        while(iteration <= maxTransactionRetryCount) {
+            try {
+                List<TaskModel> taskModelList;
+                List<Task> taskList = taskRepository.findAll();
 
-        taskModelList = taskList.stream().map(t -> {
-            TaskModel restModel = converter.taskJpaToRest(t);
-            return restModel;
-        }).collect(Collectors.toList());
+                taskModelList = taskList.stream().map(t -> {
+                    TaskModel restModel = converter.taskJpaToRest(t);
+                    return restModel;
+                }).collect(Collectors.toList());
 
-        return taskModelList;
+                return taskModelList;
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+                // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
+                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
+                logger.warn("Transaction exception while getting all tasks. Try again after "+timeToSleep+" milliseconds" );
+                Thread.sleep(Math.round(timeToSleep));
+                iteration++;
+            }
+        }
+        // throw exception due to surpassing max retries
+        throw new TransactionRetriesExceeded("Failed transaction " + maxTransactionRetryCount + " times!");
     }
 
     @Override

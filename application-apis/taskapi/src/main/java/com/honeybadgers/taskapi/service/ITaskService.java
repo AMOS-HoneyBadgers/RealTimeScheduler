@@ -44,7 +44,7 @@ public interface ITaskService {
      * Get all Tasks from Database.
      * @return List of all Tasks.
      */
-    List<TaskModel> getAllTasks();
+    List<TaskModel> getAllTasks() throws InterruptedException, TransactionRetriesExceeded;
 
     /**
      * Delete Task from Database.
