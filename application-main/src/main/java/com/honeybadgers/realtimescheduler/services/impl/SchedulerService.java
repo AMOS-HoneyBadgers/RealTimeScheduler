@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.exceptions.LockException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
@@ -159,6 +160,7 @@ public class SchedulerService implements ISchedulerService {
             lockrefresherThread.interrupt();
         } catch (Exception e) {
             logger.error(e.getMessage());
+            sender.sendTaskToTasksQueue("ERROR->Schedule");
         } finally {
             if (lockrefresherThread != null)
                 lockrefresherThread.interrupt();

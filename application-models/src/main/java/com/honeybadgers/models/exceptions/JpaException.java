@@ -1,4 +1,4 @@
-package com.honeybadgers.groupapi.exceptions;
+package com.honeybadgers.models.exceptions;
 
 public class JpaException extends Exception {
 

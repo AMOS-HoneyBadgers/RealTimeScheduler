@@ -22,6 +22,14 @@ public interface TaskRepository extends JpaRepository<Task, String> {
     Optional<Task> findById(String id);
 
     /**
+     * Deletes the task with the given id
+     * @param id id of task wanted to be deleted
+     * @return Optional of deleted task or empty Optional if task with id not found
+     */
+    @Query(value = "DELETE FROM task WHERE id=?1 RETURNING *", nativeQuery = true)
+    Optional<Task> deleteByIdCustomQuery(String id);
+
+    /**
      * Returns all Tasks which have the given priority and status='Scheduled' ordered by deadline DESC WITH NULLS ON TOP
      * @param priority priority the tasks have to have
      * @return List of all scheduled tasks ordered by deadline DESC NULL FIRST and then by type_flag ASC
