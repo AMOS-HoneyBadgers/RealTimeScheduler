@@ -82,20 +82,24 @@ public interface TaskRepository extends JpaRepository<Task, String> {
             "    g.active_times || t.times " +
             "    FROM public.group as g, group_tree as t " +
             "    WHERE g.parent_id = t.id " +
+            "), wrapped AS ( " +
+            "    SELECT t.id, " +
+            "    unnest((array_remove((t.active_times || gt.times), '[]'))[1\\:1]) as unnested_active_times, " +
+            "    reduce_dim((case when (t.working_days IS NULL AND gt.days = '{}') then ARRAY[ARRAY[1,1,1,1,1,1,1]]\\:\\:integer[][] else (ARRAY[t.working_days] || gt.days)[1\\:1] end)) as first_working_days " +
+            "    FROM task t JOIN group_tree gt ON t.group_id=gt.id " +
             "), first_not_null_from_tree AS ( " +
             "    SELECT t.id, " +
-            "    jsonb_array_elements(unnest((array_remove((t.active_times || gt.times), '[]'))[1\\:1])) as first_active_times, " +
-            "    reduce_dim((ARRAY[t.working_days] || gt.days)[1\\:1]) as first_working_days " +
-            "    FROM task t LEFT JOIN group_tree gt ON t.group_id=gt.id " +
+            "    json_elements.value as first_active_times, " +
+            "    w.first_working_days " +
+            "    FROM task t JOIN wrapped w ON t.id=w.id LEFT JOIN jsonb_array_elements(w.unnested_active_times) json_elements ON true " +
             ") " +
-            " " +
             "SELECT DISTINCT t.* " +
             "FROM task t " +
             "LEFT JOIN first_not_null_from_tree c ON t.id=c.id " +
             "WHERE t.status='Scheduled' " +
-            "AND c.first_working_days[?1]=1 " +
-            "AND TO_TIMESTAMP(c.first_active_times->>'to', 'HH24:MI:SS')\\:\\:TIME >= CURRENT_TIME " +
-            "AND TO_TIMESTAMP(c.first_active_times->>'from', 'HH24:MI:SS')\\:\\:TIME <= CURRENT_TIME",
+            "AND c.first_working_days[?1]=1 " + // not neccessary to check on null due to default case in wrapped
+            "AND (case when c.first_active_times IS NULL then true else TO_TIMESTAMP(c.first_active_times->>'to', 'HH24:MI:SS')\\:\\:TIME >= CURRENT_TIME end) " +
+            "AND (case when c.first_active_times IS NULL then true else TO_TIMESTAMP(c.first_active_times->>'from', 'HH24:MI:SS')\\:\\:TIME <= CURRENT_TIME end)",
             nativeQuery = true)
     List<Task> getTasksToBeDispatched(int postgresWorkingDayIndex);
 }
