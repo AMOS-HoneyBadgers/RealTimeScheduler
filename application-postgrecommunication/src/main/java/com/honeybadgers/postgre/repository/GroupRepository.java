@@ -16,9 +16,9 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     Optional<GROUP EXTENSION> findByIdWithChildrenList(String groupId);*/
 
     /**
-     * Deletes the task with the given id
-     * @param id id of task wanted to be deleted
-     * @return Optional of deleted task or empty Optional if task with id not found
+     * Deletes the group with the given id
+     * @param id id of group wanted to be deleted
+     * @return Optional of deleted group or empty Optional if task with id not found
      */
     @Query(value = "DELETE FROM public.\"group\" WHERE id=?1 RETURNING *", nativeQuery = true)
     Optional<Group> deleteByIdCustomQuery(String id);

@@ -5,17 +5,20 @@ import com.honeybadgers.groupapi.models.ResponseModel;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.models.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -60,6 +63,11 @@ public class GroupIdApiController implements GroupIdApi {
             return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
+        } catch (InterruptedException e) {
+            logger.error(Arrays.deepToString(e.getStackTrace()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (TransactionRetriesExceeded e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 
@@ -83,7 +91,7 @@ public class GroupIdApiController implements GroupIdApi {
         try {
             groupService.updateGroup(groupId.toString(), groupModel);
             logger.info("Group " + groupId + " updated.");
-        } catch (JpaException e) {
+        } catch (JpaException | TransactionRetriesExceeded e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
@@ -95,6 +103,9 @@ public class GroupIdApiController implements GroupIdApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
+        } catch (InterruptedException e) {
+            logger.error(Arrays.deepToString(e.getStackTrace()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
 
         return ResponseEntity.ok(response);
@@ -118,6 +129,13 @@ public class GroupIdApiController implements GroupIdApi {
             return ResponseEntity.ok(convertUtils.groupJpaToRest(group));
         } catch (NoSuchElementException e) {
             return ResponseEntity.notFound().build();
+        } catch (InterruptedException e) {
+            logger.error(Arrays.deepToString(e.getStackTrace()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (TransactionRetriesExceeded e) {
+            return ResponseEntity.badRequest().build();
+        } catch (JpaException e) {
+            return ResponseEntity.badRequest().build();
         }
     }
 }

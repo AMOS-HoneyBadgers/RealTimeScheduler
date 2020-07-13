@@ -3,6 +3,7 @@ package com.honeybadgers.groupapi.service;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.models.exceptions.CreationException;
 import com.honeybadgers.models.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,10 @@ public interface IGroupService {
      * @throws JpaException Group ID already exists or Database action error.
      * @throws UnknownEnumException Mode or Type does not exist.
      * @throws CreationException Parent Group has already Tasks assigned to it. Group can either have Tasks or Groups.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException;
+    Group createGroup(GroupModel restModel) throws JpaException, UnknownEnumException, CreationException, InterruptedException, TransactionRetriesExceeded;
 
     /**
      * Updates an existing Group in the Database.
@@ -34,9 +36,10 @@ public interface IGroupService {
      * @throws JpaException Parent Group has already Tasks assigned to it. Group can either have Tasks or Groups.
      * @throws UnknownEnumException Mode or Type does not exist.
      * @throws NoSuchElementException Group with grouid does not exist.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    Group updateGroup(String groupId, GroupModel restModel) throws JpaException, UnknownEnumException;
+    Group updateGroup(String groupId, GroupModel restModel) throws JpaException, UnknownEnumException, InterruptedException, TransactionRetriesExceeded;
 
     /**
      * Send a Group to the Scheduling Queue.
@@ -47,23 +50,29 @@ public interface IGroupService {
     /**
      * Returns all Groups from Database.
      * @return List of all Groups.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    List<Group> getAllGroups();
+    List<Group> getAllGroups() throws InterruptedException, TransactionRetriesExceeded;
 
     /**
      * Returns single Group from Database..
      * @param groupId id of specified Group.
      * @return Group with specified id.
      * @throws NoSuchElementException Group with specified id does not exist.
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    Group getGroupById(String groupId) throws NoSuchElementException;
+    Group getGroupById(String groupId) throws NoSuchElementException, InterruptedException, TransactionRetriesExceeded;
 
     /**
      * Delete a Group from Database.
      * @param groupId id of specified Group.
      * @return deleted Group.
      * @throws NoSuchElementException Group with specified id does not exist.
+     * @throws JpaException Group could not be deleted due to foreign key
+     * @throws InterruptedException Thread.sleep error for retry
+     * @throws TransactionRetriesExceeded if transaction has failed n times (configurable in application.properties)
      */
-    @Transactional(isolation = Isolation.SERIALIZABLE)
-    Group deleteGroup(String groupId) throws NoSuchElementException;
+    Group deleteGroup(String groupId) throws NoSuchElementException, JpaException, InterruptedException, TransactionRetriesExceeded;
 }
