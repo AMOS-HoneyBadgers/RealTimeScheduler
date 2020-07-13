@@ -7,6 +7,7 @@ import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.model.Task;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
+import org.hibernate.TransactionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +21,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.util.*;
@@ -30,6 +32,7 @@ import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = GroupService.class)
+@TestPropertySource(locations = "classpath:application-test.properties")
 public class GroupServiceTest {
 
     @MockBean
@@ -117,6 +120,19 @@ public class GroupServiceTest {
     }
 
     @Test
+    public void testCreateGroup_transactionException() throws UnknownEnumException {
+        when(groupRepository.findById(anyString())).thenThrow(new TransactionException(""));
+
+        GroupModel restGroup = new GroupModel();
+        restGroup.setId("TestGroup");
+        restGroup.setParentId("parentGroup");
+        restGroup.setPriority(100);
+
+        Exception e = assertThrows(TransactionRetriesExceeded.class, () -> groupService.createGroup(restGroup));
+        assertEquals("Failed transaction 1 times!", e.getMessage());
+    }
+
+    @Test
     public void testCreateGroup_parentChildrenViolation() throws UnknownEnumException {
 
         Task child = new Task();
@@ -188,6 +204,20 @@ public class GroupServiceTest {
     }
 
     @Test
+    public void testGroupUpdate_transactionException() throws JpaException, UnknownEnumException {
+
+        when(groupRepository.findById(anyString())).thenThrow(new TransactionException(""));
+
+        String group_id = "testGroupNotFound";
+        GroupModel restGroup = new GroupModel();
+        restGroup.setId("testGroupNotFound");
+        restGroup.setPriority(100);
+
+        Exception e = assertThrows(TransactionRetriesExceeded.class, () -> groupService.updateGroup(group_id, restGroup));
+        assertEquals("Failed transaction 1 times!", e.getMessage());
+    }
+
+    @Test
     public void testGetAllGroups() throws TransactionRetriesExceeded, InterruptedException {
         when(groupRepository.findAll()).thenReturn(new ArrayList<>());
 
@@ -195,6 +225,13 @@ public class GroupServiceTest {
 
         assertNotNull(groups);
         assertEquals(0, groups.size());
+    }
+
+    @Test
+    public void testGetAllGroups_transactionException() throws TransactionRetriesExceeded, InterruptedException {
+        when(groupRepository.findAll()).thenThrow(new TransactionException(""));
+
+        assertThrows(TransactionRetriesExceeded.class, () -> groupService.getAllGroups());
     }
 
     @Test
@@ -214,6 +251,16 @@ public class GroupServiceTest {
         Exception e = assertThrows(NoSuchElementException.class, () -> groupService.getGroupById("gg"));
         assertNotNull(e);
         assertEquals("Group with groupId gg not found!", e.getMessage());
+    }
+
+    @Test
+    public void testGetGroupById_transactionException() {
+
+        when(groupRepository.findById("gg")).thenThrow(new TransactionException(""));
+
+        Exception e = assertThrows(TransactionRetriesExceeded.class, () -> groupService.getGroupById("gg"));
+        assertNotNull(e);
+        assertEquals("Failed transaction 1 times!", e.getMessage());
     }
 
     @Test
@@ -238,6 +285,16 @@ public class GroupServiceTest {
         Exception e = assertThrows(NoSuchElementException.class, () -> groupService.deleteGroup("testGroup"));
         assertNotNull(e);
         assertEquals("Group with groupId testGroup not found!", e.getMessage());
+    }
+
+    @Test
+    public void testDeleteGroup_transactionException() {
+
+        when(groupRepository.deleteByIdCustomQuery("testGroup")).thenThrow(new TransactionException(""));
+
+        Exception e = assertThrows(TransactionRetriesExceeded.class, () -> groupService.deleteGroup("testGroup"));
+        assertNotNull(e);
+        assertEquals("Failed transaction 1 times!", e.getMessage());
     }
 
 }
