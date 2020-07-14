@@ -60,6 +60,14 @@ public interface TaskRepository extends JpaRepository<Task, String> {
     List<Task> findAllWaitingTasks();
 
     /**
+     * Deletes all tasks whose status is 'Finished' and the timestamp of the last element in the history is at least n milliseconds old
+     * @param nInMilliseconds milliseconds to be added to the timestamp of the last entry in the history for deletion check
+     * @return all deleted tasks
+     */
+    @Query(value = "DELETE FROM task WHERE status='Finished' AND ((history->(jsonb_array_length(history)-1)->>'timestamp')\\:\\:bigint + ?1) <= (EXTRACT(EPOCH FROM NOW() AT TIME ZONE 'UTC') * 1000)\\:\\:bigint RETURNING *", nativeQuery = true)
+    List<Task> deleteAllTasksFinishedSinceNMilliseconds(long nInMilliseconds);
+
+    /**
      * Query selects all tasks, which are in status 'Scheduled' and whose working_days are enabled at the given index
      * as well as the current time is within one of the time frames defined in active_times
      * @param postgresWorkingDayIndex index for current day WARNING: ARRAYS IN POSTGRES START AT 1!!!!
