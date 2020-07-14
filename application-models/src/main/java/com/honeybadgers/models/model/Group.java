@@ -37,7 +37,7 @@ public class Group {
     @JoinColumn(name = "parent_id")
     private Group parentGroup;
 
-    @Max(value = 999)
+    @Max(value = 9999)
     @Min(value = 0)
     @Column(name = "priority", nullable = false)
     private int priority;
