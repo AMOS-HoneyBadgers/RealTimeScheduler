@@ -107,7 +107,8 @@ public interface TaskRepository extends JpaRepository<Task, String> {
             "WHERE t.status='Scheduled' " +
             "AND c.first_working_days[?1]=1 " + // not neccessary to check on null due to default case in wrapped
             "AND (case when c.first_active_times IS NULL then true else TO_TIMESTAMP(c.first_active_times->>'to', 'HH24:MI:SS')\\:\\:TIME >= CURRENT_TIME end) " +
-            "AND (case when c.first_active_times IS NULL then true else TO_TIMESTAMP(c.first_active_times->>'from', 'HH24:MI:SS')\\:\\:TIME <= CURRENT_TIME end)",
+            "AND (case when c.first_active_times IS NULL then true else TO_TIMESTAMP(c.first_active_times->>'from', 'HH24:MI:SS')\\:\\:TIME <= CURRENT_TIME end) " +
+            "ORDER BY t.total_priority DESC",
             nativeQuery = true)
     List<Task> getTasksToBeDispatched(int postgresWorkingDayIndex);
 }
