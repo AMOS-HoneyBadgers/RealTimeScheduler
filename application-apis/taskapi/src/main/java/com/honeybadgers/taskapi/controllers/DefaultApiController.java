@@ -1,20 +1,23 @@
 package com.honeybadgers.taskapi.controllers;
 
-import com.honeybadgers.models.model.UnknownEnumException;
-import com.honeybadgers.taskapi.exceptions.CreationException;
-import com.honeybadgers.taskapi.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.ResponseModel;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -51,7 +54,15 @@ public class DefaultApiController implements DefaultApi {
      */
     @Override
     public ResponseEntity<List<TaskModel>> rootGet() {
-        List<TaskModel> list = taskService.getAllTasks();
+        List<TaskModel> list = null;
+        try {
+            list = taskService.getAllTasks();
+        } catch (InterruptedException e) {
+            logger.error(Arrays.deepToString(e.getStackTrace()));
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        } catch (TransactionRetriesExceeded e) {
+            return ResponseEntity.badRequest().build();
+        }
         return ResponseEntity.ok(list);
     }
 
@@ -80,7 +91,7 @@ public class DefaultApiController implements DefaultApi {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
-        } catch (JpaException | CreationException e) {
+        } catch (JpaException | CreationException | TransactionRetriesExceeded e) {
             response.setCode("400");
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);

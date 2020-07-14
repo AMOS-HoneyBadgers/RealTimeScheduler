@@ -1,4 +1,4 @@
-package com.honeybadgers.models.model;
+package com.honeybadgers.models.exceptions;
 
 public class UnknownEnumException extends Exception {
 

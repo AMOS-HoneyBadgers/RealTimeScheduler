@@ -1,4 +1,4 @@
-package com.honeybadgers.taskapi.exceptions;
+package com.honeybadgers.models.exceptions;
 
 public class CreationException extends Exception{
 

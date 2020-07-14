@@ -1,12 +1,12 @@
 package com.honeybadgers.groupapi.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.honeybadgers.groupapi.exceptions.CreationException;
-import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.groupapi.utils.TestUtils;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
