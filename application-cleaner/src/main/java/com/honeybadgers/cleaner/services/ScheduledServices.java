@@ -14,16 +14,13 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
-@Component
+@Service
 public class ScheduledServices {
 
     static final Logger logger = LogManager.getLogger(ScheduledServices.class);
@@ -66,6 +63,10 @@ public class ScheduledServices {
     }
 
 
+    /**
+     * If enabled (in properties):
+     * Cleans all tasks with status 'Finished' which have this status for at least N days (configured via application.properties)
+     */
     @Scheduled(fixedRateString = "${cleaner.finished-cleanup.fixed-rate}", initialDelayString = "${cleaner.finished-cleanup.initial-delay}")
     public void cleanFinishedTasks() {
         if(taskCleanupEnabled) {

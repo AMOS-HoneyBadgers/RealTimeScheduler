@@ -64,7 +64,7 @@ public interface TaskRepository extends JpaRepository<Task, String> {
      * @param nInMilliseconds milliseconds to be added to the timestamp of the last entry in the history for deletion check
      * @return all deleted tasks
      */
-    @Query(value = "DELETE FROM task WHERE status='Finished' AND ((history->(jsonb_array_length(history)-1)->>'timestamp')::bigint + ?1) <= (EXTRACT(EPOCH FROM NOW() AT TIME ZONE 'UTC') * 1000)::bigint RETURNING *", nativeQuery = true)
+    @Query(value = "DELETE FROM task WHERE status='Finished' AND ((history->(jsonb_array_length(history)-1)->>'timestamp')\\:\\:bigint + ?1) <= (EXTRACT(EPOCH FROM NOW() AT TIME ZONE 'UTC') * 1000)\\:\\:bigint RETURNING *", nativeQuery = true)
     List<Task> deleteAllTasksFinishedSinceNMilliseconds(long nInMilliseconds);
 
     /**
