@@ -39,11 +39,6 @@ public class TaskService implements ITaskService {
     boolean deadlineBaseDependant;
 
     @Override
-    public List<Task> getAllTasks() {
-        return taskRepository.findAll();
-    }
-
-    @Override
     public Optional<Task> getTaskById(String id) {
         return taskRepository.findById(id);
     }
@@ -83,11 +78,6 @@ public class TaskService implements ITaskService {
     public void finishTask(Task task) {
         updateTaskStatus(task, TaskStatusEnum.Finished);
         taskRepository.save(task);
-    }
-
-    @Override
-    public void deleteTask(String id) {
-        this.taskRepository.deleteById(id);
     }
 
     @Override

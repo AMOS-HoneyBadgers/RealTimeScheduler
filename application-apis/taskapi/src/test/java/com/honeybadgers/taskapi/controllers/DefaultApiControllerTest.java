@@ -1,9 +1,9 @@
 package com.honeybadgers.taskapi.controllers;
 
 
-import com.honeybadgers.models.model.UnknownEnumException;
-import com.honeybadgers.taskapi.exceptions.CreationException;
-import com.honeybadgers.taskapi.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.service.ITaskService;
 import com.honeybadgers.taskapi.utils.TestUtils;
@@ -17,7 +17,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.junit.jupiter.api.Assertions;
 
 import java.util.LinkedList;
 import java.util.List;

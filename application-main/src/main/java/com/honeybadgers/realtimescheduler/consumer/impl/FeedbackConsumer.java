@@ -53,7 +53,7 @@ public class FeedbackConsumer implements IFeedbackConsumer {
     @Override
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
-        int iteration =1;
+        int iteration = 1;
         while (true){
             try{
                 // finish task in transactional method
@@ -71,6 +71,7 @@ public class FeedbackConsumer implements IFeedbackConsumer {
             }
         }
 
+        // TODO can be removed if dispatching was extracted into @Scheduled method
         // separate while loop in order to prevent _self.processFeedback(taskid); from being called multiple times
         iteration = 1;
         while(true) {
@@ -99,7 +100,7 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         Task currentTask = taskService.getTaskById(taskId).orElse(null);
         if(currentTask == null)
             throw new RuntimeException("could not find tasks in postgre database");
-
+        //TODO: For Sequential Grops parallesm degree is not decremented ( stays 1 but LastIndex is incremented )
         checkAndSetParallelismDegree(currentTask);
 
         if(currentTask.getModeEnum()== ModeEnum.Sequential)

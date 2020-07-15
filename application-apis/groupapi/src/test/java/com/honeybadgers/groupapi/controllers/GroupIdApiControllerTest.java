@@ -2,11 +2,11 @@ package com.honeybadgers.groupapi.controllers;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.honeybadgers.groupapi.exceptions.JpaException;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.groupapi.utils.TestUtils;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.model.Group;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Test;

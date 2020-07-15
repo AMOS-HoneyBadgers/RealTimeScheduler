@@ -40,27 +40,12 @@ public class TaskServiceTest {
     boolean deadlineBaseDependant;
 
     @Test
-    public void testGetAllTasks() {
-        TaskService spy = spy(service);
-        spy.getAllTasks();
-        verify(taskPostgresRepository).findAll();
-    }
-
-    @Test
     public void testUploadTask() {
         TaskService spy = spy(service);
         Task t = new Task();
         spy.finishTask(t);
         t.setStatus(TaskStatusEnum.Finished);
         verify(taskPostgresRepository).save(t);
-    }
-
-    @Test
-    public void testDeleteTaskWithCorrectId() {
-        String id = "123";
-        TaskService spy = spy(service);
-        spy.deleteTask(id);
-        verify(taskPostgresRepository).deleteById(id);
     }
 
     @Test
@@ -213,19 +198,6 @@ public class TaskServiceTest {
         Assert.assertTrue(res10 > res11);
         Assert.assertTrue(res14 == res2);
 
-    }
-
-    @Test
-    public void testGetAllTasks2() {
-        List<Task> tasks = new ArrayList<Task>();
-        for (int i = 1; i < 4; i++) {
-            Task t = new Task();
-            t.setId(String.valueOf(i));
-            tasks.add(t);
-        }
-        Mockito.when(taskPostgresRepository.findAll()).thenReturn(tasks);
-        List<Task> returnedTasks = service.getAllTasks();
-        Assert.assertEquals(tasks, returnedTasks);
     }
 
     @Test

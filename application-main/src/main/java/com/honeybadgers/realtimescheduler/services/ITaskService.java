@@ -14,12 +14,7 @@ import java.util.Optional;
 public interface ITaskService {
 
     /**
-     * Returns all tasks of the taskRepository
-     * @return all tasks
-     */
-    List<Task> getAllTasks();
-
-    /**
+     * Warning: not transaction save (no try catch etc)
      * Returns a single tasks of the taskRepository
      * @param id id of the task
      * @return taskModel
@@ -36,16 +31,11 @@ public interface ITaskService {
     List<String> getRecursiveGroupsOfTask(String taskId);
 
     /**
+     * Warning: not transaction save (no try catch etc)
      * Set task status to finished
      * @param task taskModel
      */
     void finishTask(Task task);
-
-    /**
-     * Deletes task from the taskRepository
-     * @param id id of the task
-     */
-    void deleteTask(String id);
 
     /**
      * Main priority calculation of the task. Algorithm is processed (Specified in docs, can be modified with variables)

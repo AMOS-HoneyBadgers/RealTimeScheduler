@@ -2,10 +2,10 @@ package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.models.model.ActiveTimes;
 import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.UnknownEnumException;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.utils.IConvertUtils;
-import com.honeybadgers.taskapi.exceptions.CreationException;
-import com.honeybadgers.taskapi.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
@@ -15,7 +15,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 
 @Service

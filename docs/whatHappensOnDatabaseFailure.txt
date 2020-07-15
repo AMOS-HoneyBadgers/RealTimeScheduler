@@ -1,0 +1,8 @@
+On a Database Failure:
+	In Api's:
+		- Errors will be sent to the Requester
+		- Tasks will not get into the Database 
+		- The Scheduler can work on after the Database is available again
+	In Scheduler:
+		- Due to transactions no Changes will be in the Database and the Database will have a consistent state 
+		- After the Reconnection the Dispatcher can start working and work with a consistent state
