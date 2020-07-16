@@ -49,7 +49,6 @@
       "description": "Stop scheduling task with given task_Id",
       "requestBody": {
         "description": "DateTime body which indicates, when to resume scheduling",
-        "required": false,
         "content": {
           "application/json": {
             "schema": {
@@ -150,7 +149,6 @@
       "description": "Stop scheduling all task assigned to group with given group_Id",
       "requestBody": {
         "description": "DateTime body which indicates, when to resume scheduling",
-        "required": false,
         "content": {
           "application/json": {
             "schema": {
@@ -231,7 +229,6 @@
       "description": "Stop scheduler",
       "requestBody": {
         "description": "DateTime body which indicates, when to resume scheduling",
-        "required": false,
         "content": {
           "application/json": {
             "schema": {
