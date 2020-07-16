@@ -35,4 +35,13 @@ public interface PausedRepository extends JpaRepository<Paused, String> {
      */
     @Query(value = "INSERT INTO paused(id,resume_date) VALUES(?1,?2) RETURNING *", nativeQuery = true)
     Optional<Paused> insertCustomQuery(String id, Timestamp resumeDate);
+
+    /**
+     * Insert new paused entity into DB without timestamp
+     * Written like this due to jpa failing to parse java null to sql null in case of timestamp (java null equals sql type bytea)
+     * @param id id of new paused entity
+     * @return Optional of new Paused entity if successful or Optional.empty()
+     */
+    @Query(value = "INSERT INTO paused(id) VALUES(?1) RETURNING *", nativeQuery = true)
+    Optional<Paused> insertCustomQueryNoTimestamp(String id);
 }

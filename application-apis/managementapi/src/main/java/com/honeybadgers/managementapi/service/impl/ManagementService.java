@@ -54,7 +54,11 @@ public class ManagementService implements IManagementService {
                 toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
 
             try {
-                pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                // this is necessary due to the custom insert query (details in javadoc of insertCustomQueryNoTimestamp)
+                if(toSave.getResumeDate() != null)
+                    pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                else
+                    pausedRepository.insertCustomQueryNoTimestamp(toSave.getId());
                 return;
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
@@ -107,7 +111,11 @@ public class ManagementService implements IManagementService {
                 toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
 
             try {
-                pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                // this is necessary due to the custom insert query (details in javadoc of insertCustomQueryNoTimestamp)
+                if(toSave.getResumeDate() != null)
+                    pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                else
+                    pausedRepository.insertCustomQueryNoTimestamp(toSave.getId());
                 return;
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
@@ -161,7 +169,11 @@ public class ManagementService implements IManagementService {
                 toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
 
             try {
-                pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                // this is necessary due to the custom insert query (details in javadoc of insertCustomQueryNoTimestamp)
+                if(toSave.getResumeDate() != null)
+                    pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                else
+                    pausedRepository.insertCustomQueryNoTimestamp(toSave.getId());
                 return;
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
