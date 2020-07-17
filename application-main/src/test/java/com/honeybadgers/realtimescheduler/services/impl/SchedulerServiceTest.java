@@ -277,8 +277,8 @@ public class SchedulerServiceTest {
             groupAncestor.setCurrentParallelismDegree(groupAncestor.getCurrentParallelismDegree()+1);
             return Optional.of(groupAncestor);
         });
-        when(groupService.getGroupById(group.getId())).thenReturn(group);
-        when(groupService.getGroupById(groupAncestor.getId())).thenReturn(groupAncestor);
+        when(groupService.getGroupById(group.getId())).thenReturn(Optional.of(group));
+        when(groupService.getGroupById(groupAncestor.getId())).thenReturn(Optional.of(groupAncestor));
         when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
         when(pausedRepository.findById(PAUSED_GROUP_PREFIX +"456")).thenReturn(Optional.empty());
         when(taskRepository.save(any(Task.class))).thenReturn(task1);
@@ -376,7 +376,7 @@ public class SchedulerServiceTest {
         SchedulerService spy = spy(service);
 
         when(taskService.getRecursiveGroupsOfTask(task.getId())).thenReturn(new ArrayList<>());
-        when(groupService.getGroupById(anyString())).thenReturn(group);
+        when(groupService.getGroupById(anyString())).thenReturn(Optional.of(group));
         when(groupRepository.incrementCurrentParallelismDegree(group.getId())).then(invocationOnMock -> {
             group.setCurrentParallelismDegree(group.getCurrentParallelismDegree()+1);
             return Optional.of(group);
@@ -404,8 +404,8 @@ public class SchedulerServiceTest {
         Group groupAncestor = createGroupTestObject();
         group.setParentGroup(groupAncestor);
 
-        when(groupService.getGroupById(group.getId())).thenReturn(group);
-        when(groupService.getGroupById(groupAncestor.getId())).thenReturn(groupAncestor);
+        when(groupService.getGroupById(group.getId())).thenReturn(Optional.of(group));
+        when(groupService.getGroupById(groupAncestor.getId())).thenReturn(Optional.of(groupAncestor));
 
         List<String> groups = Arrays.asList(group.getId(), groupAncestor.getId());
 
@@ -422,8 +422,8 @@ public class SchedulerServiceTest {
         groupAncestor.setCurrentParallelismDegree(1);
         group.setParentGroup(groupAncestor);
 
-        when(groupService.getGroupById(group.getId())).thenReturn(group);
-        when(groupService.getGroupById(groupAncestor.getId())).thenReturn(groupAncestor);
+        when(groupService.getGroupById(group.getId())).thenReturn(Optional.of(group));
+        when(groupService.getGroupById(groupAncestor.getId())).thenReturn(Optional.of(groupAncestor));
 
         List<String> groups = Arrays.asList(group.getId(), groupAncestor.getId());
 

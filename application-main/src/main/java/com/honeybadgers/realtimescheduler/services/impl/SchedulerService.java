@@ -222,7 +222,7 @@ public class SchedulerService implements ISchedulerService {
      */
     public boolean checkParallelismDegreeSurpassed(List<String> groups, String taskid) {
         for (String groupId : groups) {
-            Group currentGroup = groupService.getGroupById(groupId);
+            Group currentGroup = groupService.getGroupById(groupId).orElse(null);
             if (currentGroup == null)
                 continue;
             if (currentGroup.getCurrentParallelismDegree() + 1 > currentGroup.getParallelismDegree()) {

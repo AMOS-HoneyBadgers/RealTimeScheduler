@@ -2,7 +2,7 @@ package com.honeybadgers.realtimescheduler.services;
 
 import com.honeybadgers.models.model.Group;
 
-import java.util.List;
+import java.util.Optional;
 
 public interface IGroupService {
 
@@ -12,5 +12,5 @@ public interface IGroupService {
      * @param groupId id of the group
      * @return groupModel
      */
-    Group getGroupById(String groupId);
+    Optional<Group> getGroupById(String groupId);
 }
