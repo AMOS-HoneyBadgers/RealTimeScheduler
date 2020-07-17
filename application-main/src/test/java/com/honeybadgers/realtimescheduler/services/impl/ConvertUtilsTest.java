@@ -1,22 +1,25 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import org.junit.Assert;
-import org.junit.jupiter.api.Test;
+import org.junit.Test;
 
-class ConvertUtilsTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+public class ConvertUtilsTest {
 
     @Test
-    void fitDayOfWeekToWorkingDayBools() {
+    public void fitDayOfWeekToWorkingDayBools() {
         ConvertUtils convertUtils = new ConvertUtils();
         //Sonntag
-        Assert.assertEquals(0,convertUtils.fitDayOfWeekToWorkingDayBooleans(1));
+        assertEquals(6,convertUtils.fitDayOfWeekToWorkingDayBooleans(1));
         //Montag
-        Assert.assertEquals(1,convertUtils.fitDayOfWeekToWorkingDayBooleans(2));
-        Assert.assertEquals(2,convertUtils.fitDayOfWeekToWorkingDayBooleans(3));
-        Assert.assertEquals(3,convertUtils.fitDayOfWeekToWorkingDayBooleans(4));
-        Assert.assertEquals(4,convertUtils.fitDayOfWeekToWorkingDayBooleans(5));
-        Assert.assertEquals(5,convertUtils.fitDayOfWeekToWorkingDayBooleans(6));
-        Assert.assertEquals(6,convertUtils.fitDayOfWeekToWorkingDayBooleans(0));
+        assertEquals(0,convertUtils.fitDayOfWeekToWorkingDayBooleans(2));
+        assertEquals(1,convertUtils.fitDayOfWeekToWorkingDayBooleans(3));
+        assertEquals(2,convertUtils.fitDayOfWeekToWorkingDayBooleans(4));
+        assertEquals(3,convertUtils.fitDayOfWeekToWorkingDayBooleans(5));
+        assertEquals(4,convertUtils.fitDayOfWeekToWorkingDayBooleans(6));
+        assertEquals(5,convertUtils.fitDayOfWeekToWorkingDayBooleans(7));
+        assertThrows(IllegalArgumentException.class, () -> convertUtils.fitDayOfWeekToWorkingDayBooleans(0));
+        assertThrows(IllegalArgumentException.class, () -> convertUtils.fitDayOfWeekToWorkingDayBooleans(8));
     }
 
 }
