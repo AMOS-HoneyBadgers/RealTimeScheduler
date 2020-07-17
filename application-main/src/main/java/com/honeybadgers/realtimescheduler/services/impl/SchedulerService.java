@@ -1,15 +1,11 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.exceptions.LockException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import com.honeybadgers.realtimescheduler.services.IGroupService;
-import com.honeybadgers.realtimescheduler.services.ISchedulerService;
-import com.honeybadgers.realtimescheduler.services.ITaskService;
-import lombok.SneakyThrows;
+import com.honeybadgers.realtimescheduler.services.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.TransactionException;
@@ -18,16 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.CannotAcquireLockException;
 import org.springframework.orm.jpa.JpaSystemException;
-import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestTemplate;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.honeybadgers.models.model.Constants.*;
@@ -37,7 +26,8 @@ import static com.honeybadgers.models.model.ModeEnum.Sequential;
 public class SchedulerService implements ISchedulerService {
 
     static final Logger logger = LogManager.getLogger(SchedulerService.class);
-    public static volatile boolean stopSchedulerDueToLockAcquisitionException = false;
+    static volatile boolean stopSchedulerDueToLockAcquisitionException = false;
+
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
 
@@ -66,7 +56,15 @@ public class SchedulerService implements ISchedulerService {
     ConvertUtils convertUtils;
 
     @Autowired
-    RestTemplate restTemplate;
+    ILockService lockService;
+
+    /**
+     * Setter for static variable stopSchedulerDueToLockAcquisitionException
+     * @param value new value
+     */
+    public static void setStopSchedulerDueToLockAcquisitionException(boolean value) {
+        stopSchedulerDueToLockAcquisitionException = value;
+    }
 
     @Override
     public boolean isTaskPaused(String taskId) {
@@ -96,15 +94,16 @@ public class SchedulerService implements ISchedulerService {
 
     @Override
     public void scheduleTaskWrapper(String trigger) {
-        stopSchedulerDueToLockAcquisitionException = false;
+        SchedulerService.setStopSchedulerDueToLockAcquisitionException(false);
+
         Thread lockrefresherThread = null;
         try {
 
             // try to acquire scheduling lock from Lock Application
-            LockResponse lockResponse = checkIfAllowedtoSchedule();
+            LockResponse lockResponse = lockService.requestLock();
 
             // create and start lock-refresh-thread
-            lockrefresherThread = new LockRefresherThread(lockResponse, restTemplate);
+            lockrefresherThread = lockService.createLockRefreshThread(lockResponse);
             lockrefresherThread.start();
 
             // get all tasks
@@ -165,48 +164,6 @@ public class SchedulerService implements ISchedulerService {
             if (lockrefresherThread != null)
                 lockrefresherThread.interrupt();
         }
-    }
-
-    /**
-     * Tries to acquire the lock for the scheduler application. If false, tasks can't be dispatched
-     *
-     * @return LockResponse Object with values for expiration date
-     * @throws LockException when another instance already claims the lock
-     */
-    public LockResponse checkIfAllowedtoSchedule() throws LockException {
-        String url = "https://lockservice-amos.cfapps.io/";
-        final String scheduler = "SCHEDULER";
-
-        // create headers
-        HttpEntity<Object> entity = getObjectHttpEntity();
-        try {
-            // send POST request
-            ResponseEntity<LockResponse> response = restTemplate.postForEntity(url + scheduler, entity, LockResponse.class);
-            if (response.getStatusCode() != HttpStatus.OK) {
-                logger.info("lock for scheduler already acquired");
-                throw new LockException("Failed to acquire lock for Lock Application");
-            }
-            logger.info("acquired lock for: " + response.getBody().getValue());
-            return response.getBody();
-        } catch (Exception e) {
-            throw new LockException("error by acquiring scheduler lock " + e.getMessage());
-        }
-
-
-    }
-
-    /**
-     * Wrapper method for http entity creation
-     *
-     * @return HttpEntity instance
-     */
-    private static HttpEntity<Object> getObjectHttpEntity() {
-        // create headers
-        HttpHeaders headers = new HttpHeaders();
-        // set `accept` header
-        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        // build the request
-        return new HttpEntity<>(null, headers);
     }
 
     /**
@@ -314,60 +271,5 @@ public class SchedulerService implements ISchedulerService {
             }
         }
         return false;
-    }
-
-
-    public static class LockRefresherThread extends Thread {
-        LockResponse lockresponse;
-        RestTemplate restTemplate;
-        final String name;
-        final String value;
-
-        public LockRefresherThread(LockResponse resp, RestTemplate template) {
-            lockresponse = resp;
-            restTemplate = template;
-            name = lockresponse.getName();
-            value = lockresponse.getValue();
-        }
-
-        /**
-         * Send a REST request to the lockservice periodically. Tries to refresh current lock status
-         */
-        @SneakyThrows
-        public void run() {
-            try {
-                HttpEntity<Object> entity = getObjectHttpEntity();
-                String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
-                while (true) {
-                    // send Put request
-                    ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.PUT, entity, LockResponse.class);
-                    if (response.getStatusCode() != HttpStatus.OK) {
-                        logger.error("could not refresh lock");
-                        throw new LockException("could not refresh lock");
-                    }
-
-                    Thread.sleep(15000);
-
-                }
-            } catch (Exception e) {
-                if (e.getClass().equals(InterruptedException.class)) {
-                    releaseLock();
-                    logger.info(lockresponse.getValue() + " releasing lock cause thread was interrupted by scheduler");
-                } else {
-                    logger.error("error by refreshing lock for lock " + name + "with value " + value + " " + e.getMessage());
-                    SchedulerService.stopSchedulerDueToLockAcquisitionException = true;
-                }
-            }
-        }
-
-        /**
-         * If an exception is thrown within the lock acquire attempt, this method deletes the current lock.
-         * F.e during thread interrupt in scheduler.
-         */
-        public void releaseLock() {
-            HttpEntity<Object> entity = getObjectHttpEntity();
-            String url = "https://lockservice-amos.cfapps.io/" + name + "/" + value;
-            ResponseEntity<LockResponse> response = restTemplate.exchange(url, HttpMethod.DELETE, entity, LockResponse.class);
-        }
     }
 }

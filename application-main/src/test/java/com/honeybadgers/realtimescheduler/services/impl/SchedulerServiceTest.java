@@ -7,7 +7,9 @@ import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
+import com.honeybadgers.realtimescheduler.services.ILockService;
 import com.honeybadgers.realtimescheduler.services.ITaskService;
+import com.honeybadgers.realtimescheduler.services.LockRefresherThread;
 import org.hibernate.TransactionException;
 import org.junit.Assert;
 import org.junit.Test;
@@ -22,8 +24,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
 
-import java.sql.Time;
-import java.time.LocalTime;
 import java.util.*;
 
 import static com.honeybadgers.models.model.Constants.*;
@@ -59,11 +59,21 @@ public class SchedulerServiceTest {
     @MockBean
     RestTemplate restTemplate;
 
+    @MockBean
+    ILockService lockService;
+
     @Autowired
     SchedulerService service;
 
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
+
+    @Test
+    public void testStopSchedulerDueToLockAcquisitionExceptionSetter() {
+        assertFalse(SchedulerService.stopSchedulerDueToLockAcquisitionException);
+        SchedulerService.setStopSchedulerDueToLockAcquisitionException(true);
+        assertTrue(SchedulerService.stopSchedulerDueToLockAcquisitionException);
+    }
 
     @Test
     public void testScheduleTaskWrapper() {
@@ -73,6 +83,14 @@ public class SchedulerServiceTest {
         Task t = createTaskTestObject(group, "TEST");
 
         SchedulerService spy = spy(service);
+
+        // mock LockService
+        LockResponse lockResponse = new LockResponse();
+        lockResponse.setName("SCHEDULER");
+        lockResponse.setValue("value");
+        when(lockService.requestLock()).thenReturn(lockResponse);
+        when(lockService.createLockRefreshThread(any())).thenReturn(new LockRefresherThread(lockResponse, restTemplate, ""));
+
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
@@ -97,6 +115,14 @@ public class SchedulerServiceTest {
         Task t = createTaskTestObject(group, "TEST");
         Task t2 = createTaskTestObject(group, "TEST2");
         SchedulerService spy = spy(service);
+
+        // mock LockService
+        LockResponse lockResponse = new LockResponse();
+        lockResponse.setName("SCHEDULER");
+        lockResponse.setValue("value");
+        when(lockService.requestLock()).thenReturn(lockResponse);
+        when(lockService.createLockRefreshThread(any())).thenReturn(new LockRefresherThread(lockResponse, restTemplate, ""));
+
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
@@ -105,6 +131,7 @@ public class SchedulerServiceTest {
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Arrays.asList(t, t2));
         // unfortunately not possible to mock checkTaskForDispatchingAndUpdate due to calling method on _self proxy
         // (mocking self results into mocking service which makes this tests useless)
+
 
         spy.scheduleTaskWrapper(scheduler_trigger);
 
@@ -164,6 +191,13 @@ public class SchedulerServiceTest {
 
         SchedulerService spy = spy(service);
 
+        // mock LockService
+        LockResponse lockResponse = new LockResponse();
+        lockResponse.setName("SCHEDULER");
+        lockResponse.setValue("value");
+        when(lockService.requestLock()).thenReturn(lockResponse);
+        when(lockService.createLockRefreshThread(any())).thenReturn(new LockRefresherThread(lockResponse, restTemplate, ""));
+
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
@@ -186,6 +220,13 @@ public class SchedulerServiceTest {
         Task t = createTaskTestObject(group, "TEST");
 
         SchedulerService spy = spy(service);
+
+        // mock LockService
+        LockResponse lockResponse = new LockResponse();
+        lockResponse.setName("SCHEDULER");
+        lockResponse.setValue("value");
+        when(lockService.requestLock()).thenReturn(lockResponse);
+        when(lockService.createLockRefreshThread(any())).thenReturn(new LockRefresherThread(lockResponse, restTemplate, ""));
 
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
@@ -217,6 +258,14 @@ public class SchedulerServiceTest {
         tasks.add(task1);
         tasks.add(task1);
         SchedulerService spy = spy(service);
+
+        // mock LockService
+        LockResponse lockResponse = new LockResponse();
+        lockResponse.setName("SCHEDULER");
+        lockResponse.setValue("value");
+        when(lockService.requestLock()).thenReturn(lockResponse);
+        when(lockService.createLockRefreshThread(any())).thenReturn(new LockRefresherThread(lockResponse, restTemplate, ""));
+
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
@@ -487,21 +536,11 @@ public class SchedulerServiceTest {
         LockResponse lockResponse = new LockResponse();
         lockResponse.setName("SCHEDULER");
         lockResponse.setValue("value");
-        Thread t = new SchedulerService.LockRefresherThread(lockResponse, restTemplate);
+        Thread t = new LockRefresherThread(lockResponse, restTemplate, "");
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.BAD_REQUEST));
         //Act
         t.run();
         Assert.assertTrue(SchedulerService.stopSchedulerDueToLockAcquisitionException);
-    }
-
-    @Test(expected = LockException.class)
-    public void testCheckIfAllowedToScheduleWithBAD_REQUESTThrowsLockException() {
-        //Arrange
-        when(restTemplate.postForEntity(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.BAD_REQUEST));
-        //Act
-        SchedulerService spy = spy(service);
-        spy.checkIfAllowedtoSchedule();
-
     }
 
 
