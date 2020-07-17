@@ -1,7 +1,6 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.exceptions.LockException;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
@@ -273,10 +272,10 @@ public class SchedulerServiceTest {
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(tasks);
         when(groupRepository.incrementCurrentParallelismDegree(anyString())).then(invocationOnMock -> {
             group.setCurrentParallelismDegree(group.getCurrentParallelismDegree()+1);
-            return group;
+            return Optional.of(group);
         }).then(invocationOnMock -> {
             groupAncestor.setCurrentParallelismDegree(groupAncestor.getCurrentParallelismDegree()+1);
-            return groupAncestor;
+            return Optional.of(groupAncestor);
         });
         when(groupService.getGroupById(group.getId())).thenReturn(group);
         when(groupService.getGroupById(groupAncestor.getId())).thenReturn(groupAncestor);
@@ -380,7 +379,7 @@ public class SchedulerServiceTest {
         when(groupService.getGroupById(anyString())).thenReturn(group);
         when(groupRepository.incrementCurrentParallelismDegree(group.getId())).then(invocationOnMock -> {
             group.setCurrentParallelismDegree(group.getCurrentParallelismDegree()+1);
-            return group;
+            return Optional.of(group);
         });
 
         // mock everything related to isPaused

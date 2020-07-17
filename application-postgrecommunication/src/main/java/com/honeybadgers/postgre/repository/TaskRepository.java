@@ -30,22 +30,6 @@ public interface TaskRepository extends JpaRepository<Task, String> {
     Optional<Task> deleteByIdCustomQuery(String id);
 
     /**
-     * Returns all Tasks which have the given priority and status='Scheduled' ordered by deadline DESC WITH NULLS ON TOP
-     * @param priority priority the tasks have to have
-     * @return List of all scheduled tasks ordered by deadline DESC NULL FIRST and then by type_flag ASC
-     */
-    @Query(value = "SELECT * FROM task WHERE priority=?1 AND (status='Scheduled' OR id=?2) ORDER BY deadline DESC NULLS FIRST, type_flag ASC", nativeQuery = true)
-    List<Task> findAllScheduledTasksWithSamePrio(int priority, String ownId);
-
-    /**
-     * Returns all tasks that belong to the same group and have their status set to "Dispatched"
-     * @param groupId if of specified group.
-     * @return List of tasks with status "Dispatched".
-     */
-    @Query(value = "SELECT * FROM task WHERE status='Dispatched' AND group_id=?1", nativeQuery = true)
-    List<Task> findAllDispatchedTasks(String groupId);
-
-    /**
      * Gets all tasks with status "Scheduled" and sorts them by "total_priority" descending.
      * @return List of tasks with status "Scheduled".
      */
