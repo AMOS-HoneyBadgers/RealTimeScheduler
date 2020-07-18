@@ -293,7 +293,7 @@ public class SchedulerServiceTest {
 
         assertEquals(1, task1.getGroup().getCurrentParallelismDegree().intValue());
         assertEquals(1, groupAncestor.getCurrentParallelismDegree().intValue());
-        verify(sender, times(1)).sendTaskToDispatcher(task1.getId());
+        verify(sender, times(1)).sendTaskToDispatcher(any());
         verify(groupRepository, times(2)).incrementCurrentParallelismDegree(anyString());
     }
 

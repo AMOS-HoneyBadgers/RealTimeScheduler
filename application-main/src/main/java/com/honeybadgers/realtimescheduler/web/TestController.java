@@ -46,7 +46,7 @@ public class TestController {
 
     @GetMapping("/testtask/{priority}")
     public ResponseEntity<?> createTestTask(@PathVariable(value = "priority") final String priority) {
-        sender.sendTaskToDispatcher("assassasa");
+        //sender.sendTaskToDispatcher("assassasa");
         return ResponseEntity.ok().build();
     }
 

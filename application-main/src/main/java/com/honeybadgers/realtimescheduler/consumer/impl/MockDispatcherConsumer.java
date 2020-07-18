@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.consumer.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.realtimescheduler.consumer.IMockDispatcherConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,11 +25,10 @@ public class MockDispatcherConsumer implements IMockDispatcherConsumer {
 
     @Override
     @RabbitListener(queues = "dispatch.queue", containerFactory = "dispatchcontainerfactory")
-    public void receiveTaskFromSchedulerMockDispatcher(String message) {
-        logger.info("Received message in Mock Dispatcher'{}'" + message);
-
+    public void receiveTaskFromSchedulerMockDispatcher(TaskQueueModel task) {
+        logger.info("Received task in Mock Dispatcher for task with id " + task.getId());
 
         // Send feedback back to scheduler
-        sender.sendFeedbackToScheduler(message);
+        sender.sendFeedbackToScheduler(task.getId());
     }
 }

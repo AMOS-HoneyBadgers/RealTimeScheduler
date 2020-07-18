@@ -1,6 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
@@ -21,6 +22,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -147,9 +150,9 @@ public class SchedulerService implements ISchedulerService {
                             return;
 
                         if (_self.checkTaskForDispatchingAndUpdate(task)) {
-                            // TODO document: if scheduler crashes here -> task could be dispatched twice
+                            // TODO see known issues of docs/technology_decisions.md
                             // dispatch here because this only gets executed if transaction succeeds
-                            sender.sendTaskToDispatcher(task.getId());
+                            dispatchTask(task);
                             logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
                         }
 
@@ -217,6 +220,21 @@ public class SchedulerService implements ISchedulerService {
         taskRepository.save(currentTask);
 
         return true;
+    }
+
+    /**
+     * Converts given task to TaskQueueModel and dispatches the task
+     *
+     * @param task task to be dispatched
+     */
+    public void dispatchTask(Task task) {
+        TaskQueueModel taskQueueModel = new TaskQueueModel();
+        taskQueueModel.setGroupId(task.getGroup().getId());
+        taskQueueModel.setId(task.getId());
+        taskQueueModel.setMetaData(task.getMetaData());
+        taskQueueModel.setDispatched(Timestamp.from(Instant.now()));
+
+        sender.sendTaskToDispatcher(taskQueueModel);
     }
 
     /**
