@@ -56,7 +56,7 @@ public class ScheduledServices {
             logger.warn("Cleaner encountered transaction exception!");
         }
         logger.info("Cleaner finished paused cleanup - deleted " + deleted.size() + " elements");
-        if(deleted.size() > 0) {
+        if (deleted.size() > 0) {
             sender.sendTaskToTasksQueue(scheduler_trigger);
             logger.info("Notified scheduler for rescheduling!");
         }
@@ -69,7 +69,7 @@ public class ScheduledServices {
      */
     @Scheduled(fixedRateString = "${cleaner.finished-cleanup.fixed-rate}", initialDelayString = "${cleaner.finished-cleanup.initial-delay}")
     public void cleanFinishedTasks() {
-        if(taskCleanupEnabled) {
+        if (taskCleanupEnabled) {
             logger.info("Cleaner starting finished tasks cleanup");
             // convert number of days to milliseconds
             long daysInMillis = taskCleanupDays * 24 * 60 * 60 * 1000L;
