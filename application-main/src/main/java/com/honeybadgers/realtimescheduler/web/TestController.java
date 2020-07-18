@@ -2,7 +2,6 @@ package com.honeybadgers.realtimescheduler.web;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.GroupAncestorModel;
-import com.honeybadgers.models.model.Task;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -14,9 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -41,13 +37,11 @@ public class TestController {
     PausedRepository pausedRepository;
 
 
-
     @Autowired
     TaskRepository taskRepository;
 
     @Autowired
     GroupAncestorRepository groupAncestorRepository;
-
 
 
     @GetMapping("/testtask/{priority}")
@@ -57,7 +51,7 @@ public class TestController {
     }
 
     @PostMapping("/testTaskQueue/{task}")
-    public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task){
+    public ResponseEntity<?> tasksQueue(@PathVariable(value = "task") final String task) {
         sender.sendTaskToTasksQueue(task);
         return ResponseEntity.ok("sent task " + task);
     }
@@ -67,7 +61,7 @@ public class TestController {
         log.warn("################## BEFORE QUERY");
 
         GroupAncestorModel ancestorModel = groupAncestorRepository.getAllAncestorIdsFromGroup(groupId).orElse(null);
-        if(ancestorModel == null) {
+        if (ancestorModel == null) {
             log.info("QUERY RETURNED NULL -> FAILURE/GROUPID INVALID");
             return ResponseEntity.badRequest().body("QUERY RETURNED NULL -> FAILURE/GROUPID INVALID");
         }

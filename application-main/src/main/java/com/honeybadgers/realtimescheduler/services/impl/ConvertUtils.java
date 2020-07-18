@@ -15,6 +15,7 @@ public class ConvertUtils implements IConvertUtils {
      * Friday: 6 --> 4
      * Saturday: 7 --> 5
      * Sunday: 1 --> 6
+     *
      * @param dayofweek equals Calendar.DAY_OF_WEEK
      * @return the weekday with monday equals zero
      */

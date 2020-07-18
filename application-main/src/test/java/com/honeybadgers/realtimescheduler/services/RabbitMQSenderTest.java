@@ -1,7 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
 
-
 import com.honeybadgers.communication.RabbitMQSender;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,7 +39,7 @@ public class RabbitMQSenderTest {
 
     @Test
     public void sendTaskToTaskQueue() {
-        RabbitMQSender spy =  Mockito.spy(sender);
+        RabbitMQSender spy = Mockito.spy(sender);
         spy.sendTaskToTasksQueue("tasks");
         Mockito.verify(rabbitTemplate).convertAndSend(Mockito.any(), Mockito.any(), (Object) Mockito.any());
     }

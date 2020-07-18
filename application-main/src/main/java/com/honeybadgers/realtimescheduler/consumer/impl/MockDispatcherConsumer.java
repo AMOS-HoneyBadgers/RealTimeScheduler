@@ -7,7 +7,6 @@ import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,12 +22,10 @@ public class MockDispatcherConsumer implements IMockDispatcherConsumer {
     public ICommunication sender;
 
 
-
     @Override
-    @RabbitListener(queues="dispatch.queue", containerFactory = "dispatchcontainerfactory")
+    @RabbitListener(queues = "dispatch.queue", containerFactory = "dispatchcontainerfactory")
     public void receiveTaskFromSchedulerMockDispatcher(String message) {
         logger.info("Received message in Mock Dispatcher'{}'" + message);
-
 
 
         // Send feedback back to scheduler

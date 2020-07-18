@@ -5,7 +5,10 @@ import com.honeybadgers.models.model.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import com.honeybadgers.realtimescheduler.services.*;
+import com.honeybadgers.realtimescheduler.services.IGroupService;
+import com.honeybadgers.realtimescheduler.services.ILockService;
+import com.honeybadgers.realtimescheduler.services.ISchedulerService;
+import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.TransactionException;
@@ -17,7 +20,10 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
 
 import static com.honeybadgers.models.model.Constants.*;
 import static com.honeybadgers.models.model.ModeEnum.Sequential;
@@ -60,6 +66,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Setter for static variable stopSchedulerDueToLockAcquisitionException
+     *
      * @param value new value
      */
     public static void setStopSchedulerDueToLockAcquisitionException(boolean value) {
