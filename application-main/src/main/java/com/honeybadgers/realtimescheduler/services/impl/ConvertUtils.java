@@ -38,7 +38,7 @@ public class ConvertUtils implements IConvertUtils {
      * @return TaskQueueModel representing the given task
      */
     public TaskQueueModel taskJpaToQueue(Task task) {
-        if(task.getGroup() == null)
+        if (task.getGroup() == null)
             throw new IllegalStateException("Given task with id " + task.getId() + " has no group!");
 
         TaskQueueModel taskQueueModel = new TaskQueueModel();

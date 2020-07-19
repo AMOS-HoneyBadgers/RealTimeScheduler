@@ -1,12 +1,12 @@
 package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.communication.model.TaskQueueModel;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import com.honeybadgers.models.exceptions.CreationException;
-import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
@@ -44,7 +44,7 @@ public class TaskConvertUtilsTest {
 
 
     @Test
-    public void testTaskJpaToRest(){
+    public void testTaskJpaToRest() {
         Group group = new Group();
         group.setId("exampleGroup");
 
@@ -54,7 +54,7 @@ public class TaskConvertUtilsTest {
         int priority = 100;
         int indexNumber = 0;
         int retries = 1;
-        int[] workdays = new int[]{1,0,1,0,1,0,1};
+        int[] workdays = new int[]{1, 0, 1, 0, 1, 0, 1};
         boolean force = false;
         ModeEnum mode = ModeEnum.Sequential;
         TypeFlagEnum type = TypeFlagEnum.Realtime;
@@ -63,8 +63,8 @@ public class TaskConvertUtilsTest {
 
         List<ActiveTimes> activeTimes = new LinkedList<ActiveTimes>();
         ActiveTimes timeFrame = new ActiveTimes();
-        Time from = new Time(9,0,0);
-        Time to = new Time(12,0,0);
+        Time from = new Time(9, 0, 0);
+        Time to = new Time(12, 0, 0);
         timeFrame.setFrom(from);
         timeFrame.setTo(to);
         activeTimes.add(timeFrame);
@@ -72,7 +72,7 @@ public class TaskConvertUtilsTest {
         Map<String, String> meta = new HashMap<String, String>();
         String key = "key123";
         String value = "value321";
-        meta.put(key,value);
+        meta.put(key, value);
 
         exampleTask.setId(taskID);
         exampleTask.setGroup(group);
@@ -90,21 +90,21 @@ public class TaskConvertUtilsTest {
 
         TaskModel restModel = converter.taskJpaToRest(exampleTask);
 
-        assertEquals(taskID,                          restModel.getId());
-        assertEquals(group.getId(),                   restModel.getGroupId());
-        assertEquals(priority,                        restModel.getPriority().intValue());
-        assertEquals(indexNumber,                     restModel.getIndexNumber().intValue());
-        assertEquals(force,                           restModel.getForce());
-        assertEquals(TaskModel.ModeEnum.SEQUENTIAL,   restModel.getMode());
+        assertEquals(taskID, restModel.getId());
+        assertEquals(group.getId(), restModel.getGroupId());
+        assertEquals(priority, restModel.getPriority().intValue());
+        assertEquals(indexNumber, restModel.getIndexNumber().intValue());
+        assertEquals(force, restModel.getForce());
+        assertEquals(TaskModel.ModeEnum.SEQUENTIAL, restModel.getMode());
         assertEquals(TaskModel.TypeFlagEnum.REALTIME, restModel.getTypeFlag());
-        assertEquals(TaskModel.StatusEnum.SCHEDULED,  restModel.getStatus());
-        assertEquals(workdays.length,                 restModel.getWorkingDays().size());
-        assertEquals( deadline.getNanos(),            restModel.getDeadline().getNano());
-        assertEquals(retries,                         restModel.getRetries().intValue());
-        assertEquals(meta.get(key),                   restModel.getMeta().get(0).getValue());
-        assertTrue( restModel.getWorkingDays().get(0) == true && restModel.getWorkingDays().get(1) == false );
-        assertTrue( activeTimes.get(0).getFrom() ==  restModel.getActiveTimes().get(0).getFrom() &&
-                    activeTimes.get(0).getTo() == restModel.getActiveTimes().get(0).getTo());
+        assertEquals(TaskModel.StatusEnum.SCHEDULED, restModel.getStatus());
+        assertEquals(workdays.length, restModel.getWorkingDays().size());
+        assertEquals(deadline.getNanos(), restModel.getDeadline().getNano());
+        assertEquals(retries, restModel.getRetries().intValue());
+        assertEquals(meta.get(key), restModel.getMeta().get(0).getValue());
+        assertTrue(restModel.getWorkingDays().get(0) == true && restModel.getWorkingDays().get(1) == false);
+        assertTrue(activeTimes.get(0).getFrom() == restModel.getActiveTimes().get(0).getFrom() &&
+                activeTimes.get(0).getTo() == restModel.getActiveTimes().get(0).getTo());
     }
 
     @Test
@@ -120,15 +120,15 @@ public class TaskConvertUtilsTest {
         boolean force = false;
         List<Boolean> workdays = new ArrayList<>();
         OffsetDateTime deadline = OffsetDateTime.now();
-        TaskModel.ModeEnum mode= TaskModel.ModeEnum.PARALLEL;
+        TaskModel.ModeEnum mode = TaskModel.ModeEnum.PARALLEL;
         TaskModel.TypeFlagEnum type = TaskModel.TypeFlagEnum.BATCH;
         workdays.addAll(Arrays.asList(true, false, true, false, true, false, true));
 
 
         List<TaskModelActiveTimes> activeTimes = new ArrayList<>();
         TaskModelActiveTimes timeFrame = new TaskModelActiveTimes();
-        Time from = new Time(9,0,0);
-        Time to = new Time(12,0,0);
+        Time from = new Time(9, 0, 0);
+        Time to = new Time(12, 0, 0);
         timeFrame.setFrom(from);
         timeFrame.setTo(to);
         activeTimes.add(timeFrame);
@@ -157,7 +157,6 @@ public class TaskConvertUtilsTest {
     }
 
 
-
     @Test
     public void testTaskRestToJpa() throws UnknownEnumException, JpaException, CreationException {
         Group group = new Group();
@@ -170,15 +169,15 @@ public class TaskConvertUtilsTest {
         boolean force = false;
         List<Boolean> workdays = new ArrayList<>();
         OffsetDateTime deadline = OffsetDateTime.now();
-        TaskModel.ModeEnum mode= TaskModel.ModeEnum.PARALLEL;
+        TaskModel.ModeEnum mode = TaskModel.ModeEnum.PARALLEL;
         TaskModel.TypeFlagEnum type = TaskModel.TypeFlagEnum.BATCH;
         workdays.addAll(Arrays.asList(true, false, true, false, true, false, true));
 
 
         List<TaskModelActiveTimes> activeTimes = new ArrayList<>();
         TaskModelActiveTimes timeFrame = new TaskModelActiveTimes();
-        Time from = new Time(9,0,0);
-        Time to = new Time(12,0,0);
+        Time from = new Time(9, 0, 0);
+        Time to = new Time(12, 0, 0);
         timeFrame.setFrom(from);
         timeFrame.setTo(to);
         activeTimes.add(timeFrame);
@@ -214,7 +213,7 @@ public class TaskConvertUtilsTest {
         assertEquals(ModeEnum.Parallel, jpaModel.getModeEnum());
         assertEquals(TypeFlagEnum.Batch, jpaModel.getTypeFlagEnum());
         assertEquals(workdays.size(), jpaModel.getWorkingDays().length);
-        assertEquals(deadline.getNano(), jpaModel.getDeadline().getNanos() );
+        assertEquals(deadline.getNano(), jpaModel.getDeadline().getNanos());
         assertTrue(activeTimes.get(0).getFrom() == jpaModel.getActiveTimeFrames().get(0).getFrom() &&
                 activeTimes.get(0).getTo() == jpaModel.getActiveTimeFrames().get(0).getTo());
         assertEquals(metaData.getValue(), jpaModel.getMetaData().get(metaData.getKey()));
@@ -222,11 +221,11 @@ public class TaskConvertUtilsTest {
     }
 
     @Test
-    public void testActiveTimesJpaToRest(){
+    public void testActiveTimesJpaToRest() {
         List<ActiveTimes> times = new LinkedList<ActiveTimes>();
-        for(int i = 0; i < 5; i++){
-            Time from = new Time(5+i,0,0);
-            Time to = new Time(6+i,0,0);
+        for (int i = 0; i < 5; i++) {
+            Time from = new Time(5 + i, 0, 0);
+            Time to = new Time(6 + i, 0, 0);
             ActiveTimes timeFrame = new ActiveTimes();
             timeFrame.setFrom(from);
             timeFrame.setTo(to);
@@ -235,13 +234,13 @@ public class TaskConvertUtilsTest {
 
         List<TaskModelActiveTimes> res = converter.activeTimesJpaToRest(times);
 
-        assertEquals(5, res.size() );
+        assertEquals(5, res.size());
         assertEquals(5, res.get(0).getFrom().getHours());
     }
 
     @Test
-    public void testMetaDataJpaToRest(){
-        Map<String, String> metaMap = new HashMap<String,String>();
+    public void testMetaDataJpaToRest() {
+        Map<String, String> metaMap = new HashMap<String, String>();
         metaMap.put("key1", "value1");
         metaMap.put("key2", "value2");
         metaMap.put("key3", "value3");
@@ -253,13 +252,13 @@ public class TaskConvertUtilsTest {
     }
 
     @Test
-    public void testMetaDataJpaToRestDataIsNull(){
+    public void testMetaDataJpaToRestDataIsNull() {
         List<TaskModelMeta> res = converter.metaDataJpaToRest(null);
         assertNull(res);
     }
 
     @Test
-    public void testActiveTimesJpaToRestActivesTimesIsNull(){
+    public void testActiveTimesJpaToRestActivesTimesIsNull() {
         List<TaskModelActiveTimes> res = converter.activeTimesJpaToRest(null);
         assertNull(res);
     }
