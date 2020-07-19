@@ -2,7 +2,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
-import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.LockResponse;
 import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.models.model.jpa.Paused;
 import com.honeybadgers.models.model.jpa.Task;
@@ -26,8 +26,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.Calendar;
 import java.util.List;
 import java.util.TimeZone;
@@ -232,11 +230,7 @@ public class SchedulerService implements ISchedulerService {
      * @param task task to be dispatched
      */
     public void dispatchTask(Task task) {
-        TaskQueueModel taskQueueModel = new TaskQueueModel();
-        taskQueueModel.setGroupId(task.getGroup().getId());
-        taskQueueModel.setId(task.getId());
-        taskQueueModel.setMetaData(task.getMetaData());
-        taskQueueModel.setDispatched(Timestamp.from(Instant.now()));
+        TaskQueueModel taskQueueModel = convertUtils.taskJpaToQueue(task);
 
         sender.sendTaskToDispatcher(taskQueueModel);
     }
