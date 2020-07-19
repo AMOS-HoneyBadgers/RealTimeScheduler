@@ -3,7 +3,7 @@ package com.honeybadgers.taskapi.service;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
-import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.models.exceptions.CreationException;
@@ -21,7 +21,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 

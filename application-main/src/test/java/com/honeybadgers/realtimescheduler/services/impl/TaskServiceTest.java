@@ -1,13 +1,11 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,7 +15,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -216,7 +217,7 @@ public class TaskServiceTest {
 
         GroupAncestorModel ancestorModel = new GroupAncestorModel();
         ancestorModel.setId(group.getId());
-        ancestorModel.setAncestors(new String[] {parent.getId()});
+        ancestorModel.setAncestors(new String[]{parent.getId()});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
         when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
@@ -288,7 +289,7 @@ public class TaskServiceTest {
         task.setGroup(group);
 
         GroupAncestorModel ancestorModel = new GroupAncestorModel();
-        ancestorModel.setAncestors(new String[] {parent.getId()});
+        ancestorModel.setAncestors(new String[]{parent.getId()});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
         when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
@@ -315,7 +316,7 @@ public class TaskServiceTest {
 
         GroupAncestorModel ancestorModel = new GroupAncestorModel();
         ancestorModel.setId(group.getId());
-        ancestorModel.setAncestors(new String[] {parent.getId(), null});
+        ancestorModel.setAncestors(new String[]{parent.getId(), null});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
         when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
@@ -327,7 +328,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTaskStatus_NoHistoryElement(){
+    public void testUpdateTaskStatus_NoHistoryElement() {
         Task taskNoHistory = new Task();
         taskNoHistory.setHistory(null);
 
@@ -339,7 +340,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTaskStatus(){
+    public void testUpdateTaskStatus() {
         Task task = new Task();
         List<History> history = new ArrayList<>();
 

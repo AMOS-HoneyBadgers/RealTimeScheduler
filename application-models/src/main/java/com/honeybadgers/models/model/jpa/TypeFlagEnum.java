@@ -1,4 +1,4 @@
-package com.honeybadgers.models.model;
+package com.honeybadgers.models.model.jpa;
 
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 

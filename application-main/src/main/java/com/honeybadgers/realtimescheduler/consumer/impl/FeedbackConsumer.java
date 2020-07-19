@@ -1,8 +1,8 @@
 package com.honeybadgers.realtimescheduler.consumer.impl;
 
-import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.Group;
-import com.honeybadgers.models.model.ModeEnum;
+import com.honeybadgers.models.model.jpa.Group;
+import com.honeybadgers.models.model.jpa.ModeEnum;
+import com.honeybadgers.models.model.jpa.Task;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.realtimescheduler.consumer.IFeedbackConsumer;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
@@ -54,15 +54,15 @@ public class FeedbackConsumer implements IFeedbackConsumer {
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
         int iteration = 1;
-        while (true){
-            try{
+        while (true) {
+            try {
                 // finish task in transactional method
                 _self.processFeedback(taskid);
                 break;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Task " + taskid + " couldn't acquire locks for setting its status to finished. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Task " + taskid + " couldn't acquire locks for setting its status to finished. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             } catch (Exception e) {
@@ -74,15 +74,15 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         // TODO can be removed if dispatching was extracted into @Scheduled method
         // separate while loop in order to prevent _self.processFeedback(taskid); from being called multiple times
         iteration = 1;
-        while(true) {
+        while (true) {
             try {
                 // notify scheduler about reschedule
                 schedulerService.scheduleTaskWrapper("");
                 break;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Task " + taskid + " couldn't acquire locks for setting reschedule after finishTask. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Task " + taskid + " couldn't acquire locks for setting reschedule after finishTask. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             } catch (Exception e) {
@@ -98,12 +98,12 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         logger.info("Task " + taskId + " was processed by the dispatcher");
 
         Task currentTask = taskService.getTaskById(taskId).orElse(null);
-        if(currentTask == null)
+        if (currentTask == null)
             throw new RuntimeException("could not find tasks in postgre database");
         //TODO: For Sequential Grops parallesm degree is not decremented ( stays 1 but LastIndex is incremented )
         checkAndSetParallelismDegree(currentTask);
 
-        if(currentTask.getModeEnum()== ModeEnum.Sequential)
+        if (currentTask.getModeEnum() == ModeEnum.Sequential)
             checkAndSetSequentialAndIndexNumber(currentTask);
 
         taskService.finishTask(currentTask);
@@ -114,7 +114,7 @@ public class FeedbackConsumer implements IFeedbackConsumer {
     public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
         Group group = currentTask.getGroup();
         logger.debug("Task " + currentTask.getId() + " update index Number of group " + group.getId());
-        group.setLastIndexNumber(group.getLastIndexNumber()+1);
+        group.setLastIndexNumber(group.getLastIndexNumber() + 1);
         groupRepository.save(group);
     }
 

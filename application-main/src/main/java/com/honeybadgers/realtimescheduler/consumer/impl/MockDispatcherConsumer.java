@@ -1,13 +1,13 @@
 package com.honeybadgers.realtimescheduler.consumer.impl;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.realtimescheduler.consumer.IMockDispatcherConsumer;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -23,15 +23,12 @@ public class MockDispatcherConsumer implements IMockDispatcherConsumer {
     public ICommunication sender;
 
 
-
     @Override
-    @RabbitListener(queues="dispatch.queue", containerFactory = "dispatchcontainerfactory")
-    public void receiveTaskFromSchedulerMockDispatcher(String message) {
-        logger.info("Received message in Mock Dispatcher'{}'" + message);
-
-
+    @RabbitListener(queues = "dispatch.queue", containerFactory = "dispatchcontainerfactory")
+    public void receiveTaskFromSchedulerMockDispatcher(TaskQueueModel task) {
+        logger.info("Received task in Mock Dispatcher for task with id " + task.getId());
 
         // Send feedback back to scheduler
-        sender.sendFeedbackToScheduler(message);
+        sender.sendFeedbackToScheduler(task.getId());
     }
 }

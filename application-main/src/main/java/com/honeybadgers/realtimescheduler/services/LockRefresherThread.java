@@ -3,7 +3,6 @@ package com.honeybadgers.realtimescheduler.services;
 import com.honeybadgers.models.exceptions.LockException;
 import com.honeybadgers.models.model.LockResponse;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
-import lombok.Getter;
 import lombok.SneakyThrows;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -31,7 +30,7 @@ public class LockRefresherThread extends Thread {
         restTemplate = template;
         name = lockresponse.getName();
         value = lockresponse.getValue();
-        if(url.endsWith("/"))
+        if (url.endsWith("/"))
             lockUrl = url;
         else
             lockUrl = url + "/";

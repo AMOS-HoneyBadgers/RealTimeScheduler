@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.realtimescheduler.services.IGroupService;
 import lombok.extern.slf4j.Slf4j;

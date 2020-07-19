@@ -1,6 +1,6 @@
 package com.honeybadgers.postgre.repository;
 
-import com.honeybadgers.models.model.Paused;
+import com.honeybadgers.models.model.jpa.Paused;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;

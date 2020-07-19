@@ -2,6 +2,10 @@ package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.jpa.Group;
+import com.honeybadgers.models.model.jpa.ModeEnum;
+import com.honeybadgers.models.model.jpa.Paused;
+import com.honeybadgers.models.model.jpa.Task;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -271,16 +275,16 @@ public class SchedulerServiceTest {
         when(taskRepository.findAllWaitingTasks()).thenReturn(tasks);
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(tasks);
         when(groupRepository.incrementCurrentParallelismDegree(anyString())).then(invocationOnMock -> {
-            group.setCurrentParallelismDegree(group.getCurrentParallelismDegree()+1);
+            group.setCurrentParallelismDegree(group.getCurrentParallelismDegree() + 1);
             return Optional.of(group);
         }).then(invocationOnMock -> {
-            groupAncestor.setCurrentParallelismDegree(groupAncestor.getCurrentParallelismDegree()+1);
+            groupAncestor.setCurrentParallelismDegree(groupAncestor.getCurrentParallelismDegree() + 1);
             return Optional.of(groupAncestor);
         });
         when(groupService.getGroupById(group.getId())).thenReturn(Optional.of(group));
         when(groupService.getGroupById(groupAncestor.getId())).thenReturn(Optional.of(groupAncestor));
         when(taskService.getTaskById(any())).thenReturn(Optional.of(task1));
-        when(pausedRepository.findById(PAUSED_GROUP_PREFIX +"456")).thenReturn(Optional.empty());
+        when(pausedRepository.findById(PAUSED_GROUP_PREFIX + "456")).thenReturn(Optional.empty());
         when(taskRepository.save(any(Task.class))).thenReturn(task1);
 
         // mock everything related to isPaused
@@ -293,7 +297,7 @@ public class SchedulerServiceTest {
 
         assertEquals(1, task1.getGroup().getCurrentParallelismDegree().intValue());
         assertEquals(1, groupAncestor.getCurrentParallelismDegree().intValue());
-        verify(sender,times(1)).sendTaskToDispatcher(task1.getId());
+        verify(sender, times(1)).sendTaskToDispatcher(any());
         verify(groupRepository, times(2)).incrementCurrentParallelismDegree(anyString());
     }
 
@@ -378,7 +382,7 @@ public class SchedulerServiceTest {
         when(taskService.getRecursiveGroupsOfTask(task.getId())).thenReturn(new ArrayList<>());
         when(groupService.getGroupById(anyString())).thenReturn(Optional.of(group));
         when(groupRepository.incrementCurrentParallelismDegree(group.getId())).then(invocationOnMock -> {
-            group.setCurrentParallelismDegree(group.getCurrentParallelismDegree()+1);
+            group.setCurrentParallelismDegree(group.getCurrentParallelismDegree() + 1);
             return Optional.of(group);
         });
 
@@ -394,12 +398,12 @@ public class SchedulerServiceTest {
         assertEquals(0, group.getCurrentParallelismDegree().intValue());
         verify(groupRepository, never()).incrementCurrentParallelismDegree(anyString());
         verify(taskRepository).save(any(Task.class));
-        verify(pausedRepository,times(1)).findById(any());
-        verify(spy).checkParallelismDegreeSurpassed(anyList(),anyString());
+        verify(pausedRepository, times(1)).findById(any());
+        verify(spy).checkParallelismDegreeSurpassed(anyList(), anyString());
     }
 
     @Test
-    public void testCheckParallelismDegreeSurpassed(){
+    public void testCheckParallelismDegreeSurpassed() {
         Group group = createGroupTestObject();
         Group groupAncestor = createGroupTestObject();
         group.setParentGroup(groupAncestor);
@@ -410,13 +414,13 @@ public class SchedulerServiceTest {
         List<String> groups = Arrays.asList(group.getId(), groupAncestor.getId());
 
         SchedulerService spy = spy(service);
-        boolean ret = spy.checkParallelismDegreeSurpassed(groups,"testTask");
+        boolean ret = spy.checkParallelismDegreeSurpassed(groups, "testTask");
 
         assertFalse(ret);
     }
 
     @Test
-    public void testCheckParallelismDegreeSurpassed_ancestorSurpassed(){
+    public void testCheckParallelismDegreeSurpassed_ancestorSurpassed() {
         Group group = createGroupTestObject();
         Group groupAncestor = createGroupTestObject();
         groupAncestor.setCurrentParallelismDegree(1);
@@ -444,7 +448,7 @@ public class SchedulerServiceTest {
     @Test
     public void testCheckTaskForDispatchingAndUpdate_taskPaused() {
         Group group = createGroupTestObject();
-        Task task = createTaskTestObject(group,"TEST");
+        Task task = createTaskTestObject(group, "TEST");
 
         Paused taskPaused = new Paused();
         taskPaused.setId(PAUSED_TASK_PREFIX + task.getId());
@@ -543,13 +547,12 @@ public class SchedulerServiceTest {
     }
 
 
-
     private Group createGroupTestObject() {
         Group group = new Group();
         group.setId("456");
         group.setParallelismDegree(1);
         group.setParentGroup(null);
-        group.setWorkingDays(new int[]{1,1,1,1,1,1,1});
+        group.setWorkingDays(new int[]{1, 1, 1, 1, 1, 1, 1});
         return group;
     }
 }

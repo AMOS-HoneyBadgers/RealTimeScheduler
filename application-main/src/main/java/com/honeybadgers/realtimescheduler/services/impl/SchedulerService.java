@@ -1,11 +1,19 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.*;
+import com.honeybadgers.communication.model.TaskQueueModel;
+import com.honeybadgers.models.model.LockResponse;
+import com.honeybadgers.models.model.jpa.Group;
+import com.honeybadgers.models.model.jpa.Paused;
+import com.honeybadgers.models.model.jpa.Task;
+import com.honeybadgers.models.model.jpa.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import com.honeybadgers.realtimescheduler.services.*;
+import com.honeybadgers.realtimescheduler.services.IGroupService;
+import com.honeybadgers.realtimescheduler.services.ILockService;
+import com.honeybadgers.realtimescheduler.services.ISchedulerService;
+import com.honeybadgers.realtimescheduler.services.ITaskService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.hibernate.TransactionException;
@@ -17,10 +25,13 @@ import org.springframework.orm.jpa.JpaSystemException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
-import java.util.*;
+
+import java.util.Calendar;
+import java.util.List;
+import java.util.TimeZone;
 
 import static com.honeybadgers.models.model.Constants.*;
-import static com.honeybadgers.models.model.ModeEnum.Sequential;
+import static com.honeybadgers.models.model.jpa.ModeEnum.Sequential;
 
 @Service
 public class SchedulerService implements ISchedulerService {
@@ -60,6 +71,7 @@ public class SchedulerService implements ISchedulerService {
 
     /**
      * Setter for static variable stopSchedulerDueToLockAcquisitionException
+     *
      * @param value new value
      */
     public static void setStopSchedulerDueToLockAcquisitionException(boolean value) {
@@ -140,9 +152,9 @@ public class SchedulerService implements ISchedulerService {
                             return;
 
                         if (_self.checkTaskForDispatchingAndUpdate(task)) {
-                            // TODO document: if scheduler crashes here -> task could be dispatched twice
+                            // TODO see known issues of docs/technology_decisions.md
                             // dispatch here because this only gets executed if transaction succeeds
-                            sender.sendTaskToDispatcher(task.getId());
+                            dispatchTask(task);
                             logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
                         }
 
@@ -210,6 +222,17 @@ public class SchedulerService implements ISchedulerService {
         taskRepository.save(currentTask);
 
         return true;
+    }
+
+    /**
+     * Converts given task to TaskQueueModel and dispatches the task
+     *
+     * @param task task to be dispatched
+     */
+    public void dispatchTask(Task task) {
+        TaskQueueModel taskQueueModel = convertUtils.taskJpaToQueue(task);
+
+        sender.sendTaskToDispatcher(taskQueueModel);
     }
 
     /**

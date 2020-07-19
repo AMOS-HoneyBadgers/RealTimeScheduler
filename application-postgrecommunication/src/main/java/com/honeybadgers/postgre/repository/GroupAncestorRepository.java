@@ -1,6 +1,6 @@
 package com.honeybadgers.postgre.repository;
 
-import com.honeybadgers.models.model.GroupAncestorModel;
+import com.honeybadgers.models.model.jpa.GroupAncestorModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

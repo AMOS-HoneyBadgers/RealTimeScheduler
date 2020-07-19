@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;

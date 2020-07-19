@@ -1,4 +1,5 @@
 package com.honeybadgers.realtimescheduler;
+
 import com.honeybadgers.realtimescheduler.config.H2TestConfig;
 import org.junit.Test;
 import org.junit.runner.RunWith;

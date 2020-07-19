@@ -5,7 +5,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
-import com.honeybadgers.models.model.Paused;
+import com.honeybadgers.models.model.jpa.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.hibernate.TransactionException;
 import org.junit.Test;

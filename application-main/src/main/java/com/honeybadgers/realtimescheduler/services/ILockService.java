@@ -17,6 +17,7 @@ public interface ILockService {
 
     /**
      * Wrapper for creating new object of LockRefresherThread class
+     *
      * @param lockResponse contains information about the lock (received from ILockService.requestLock())
      * @return new instance of LockRefresherThread
      */

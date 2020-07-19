@@ -1,4 +1,4 @@
-package com.honeybadgers.models.model;
+package com.honeybadgers.models.model.jpa;
 
 import com.vladmihalcea.hibernate.type.array.IntArrayType;
 import com.vladmihalcea.hibernate.type.json.JsonBinaryType;
@@ -16,9 +16,10 @@ import javax.validation.constraints.Min;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 @Entity
-@Table(name = "\"group\"")
+@Table(name = "task")
 @TypeDefs({
         @TypeDef(name = "jsonb", typeClass = JsonBinaryType.class),
         @TypeDef(name = "int-array", typeClass = IntArrayType.class)
@@ -27,15 +28,15 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class Group {
+public class Task {
 
     @Id
-    @Column(name="id", unique = true, nullable = false)
+    @Column(name = "id", unique = true, nullable = false)
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private Group parentGroup;
+    @JoinColumn(name = "group_id", nullable = false)
+    private Group group;
 
     @Max(value = 9999)
     @Min(value = 0)
@@ -51,9 +52,14 @@ public class Group {
     private List<ActiveTimes> activeTimeFrames;
 
     // hibernate does not support boolean[] not even using hibernate-types-52
+    // -> boolean as int
     @Type(type = "int-array")
     @Column(name = "working_days", columnDefinition = "integer[]")
     private int[] workingDays;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private TaskStatusEnum status = TaskStatusEnum.Waiting;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "type_flag", nullable = false)
@@ -64,38 +70,58 @@ public class Group {
     private ModeEnum modeEnum = ModeEnum.Parallel;
 
     @Min(value = 0)
-    @Column(name = "last_index_number")
-    private Integer lastIndexNumber;
+    @Column(name = "retries")
+    private int retries = 0;
+
+    @Column(name = "force", nullable = false)
+    private boolean force = false;
 
     @Min(value = 1)
-    @Column(name = "parallelism_degree")
-    private Integer parallelismDegree;
+    @Column(name = "index_number")
+    private Integer indexNumber;
 
-    @Column(name = "current_parallelism_degree", nullable = false)
-    private Integer currentParallelismDegree = 0;
+    @Type(type = "jsonb")
+    @Column(name = "meta_data", columnDefinition = "jsonb")
+    @Basic(fetch = FetchType.LAZY)
+    private Map<String, String> metaData;
+
+    @Column(name = "total_priority")
+    private Long totalPriority;
+
+    @Type(type = "jsonb")
+    @Column(name = "history", columnDefinition = "jsonb")
+    @Basic(fetch = FetchType.LAZY)
+    private List<History> history;
 
 
     @PrePersist
     void checkModeParameters() {
-        if(this.modeEnum == ModeEnum.Sequential && this.lastIndexNumber == null) {
-            this.lastIndexNumber = 0;
+        if(this.modeEnum == ModeEnum.Sequential) {
+            assert this.indexNumber != null;
+        } else if(this.modeEnum == ModeEnum.Parallel) {
+            // TODO decide if necc
+            assert this.group.getParallelismDegree() != null;
         }
     }
 
     @Override
     public String toString() {
-        return "Group{" +
+        return "Task{" +
                 "id='" + id + '\'' +
-                ", parentGroup=" + parentGroup +
+                ", group=" + group +
                 ", priority=" + priority +
                 ", deadline=" + deadline +
                 ", activeTimeFrames=" + activeTimeFrames +
                 ", workingDays=" + Arrays.toString(workingDays) +
+                ", status=" + status +
                 ", typeFlagEnum=" + typeFlagEnum +
                 ", modeEnum=" + modeEnum +
-                ", lastIndexNumber=" + lastIndexNumber +
-                ", parallelismDegree=" + parallelismDegree +
-                ", currentParallelismDegree=" + currentParallelismDegree +
+                ", retries=" + retries +
+                ", force=" + force +
+                ", indexNumber=" + indexNumber +
+                ", metaData=" + metaData +
+                ", totalPriority=" + totalPriority +
+                ", history=" + history +
                 '}';
     }
 }
