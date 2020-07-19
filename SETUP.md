@@ -127,7 +127,7 @@ dispatch.queue | dispatch.exchange | dispatch.routingkey
     * Found in:
         * application-main
 * Minimal Priority + 1 
-    * `com.realtimescheduler.scheduler.priority.const=10000`
+    * `com.realtimescheduler.scheduler.priority.const=1000`
     * **Changes required changs in OpenAPI to allow creation of task**
     * Found in:
         * application-main
