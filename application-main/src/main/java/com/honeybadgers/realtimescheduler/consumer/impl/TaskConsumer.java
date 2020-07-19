@@ -1,5 +1,6 @@
 package com.honeybadgers.realtimescheduler.consumer.impl;
 
+import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.realtimescheduler.consumer.ITaskConsumer;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;
@@ -25,6 +26,9 @@ public class TaskConsumer implements ITaskConsumer {
     @Autowired
     SchedulerService service;
 
+    @Autowired
+    ICommunication sender;
+
     @Override
     @RabbitListener(queues = "tasks", containerFactory = "taskcontainerFactory")
     public void receiveTask(String taskid) {
@@ -43,6 +47,6 @@ public class TaskConsumer implements ITaskConsumer {
     @RabbitListener(queues = "priority", containerFactory = "priorityContainerFactory")
     public void receiveTaskQueueModel(TaskQueueModel message) {
         logger.info("Task " + message + " from Priority Queue");
-        // TODO: Send to dispatcher
+        sender.sendTaskToDispatcher(message);
     }
 }
