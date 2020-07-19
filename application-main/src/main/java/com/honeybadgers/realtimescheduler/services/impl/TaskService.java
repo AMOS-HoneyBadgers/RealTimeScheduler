@@ -35,8 +35,6 @@ public class TaskService implements ITaskService {
     double retriesModifier;
     @Value("${com.realtimescheduler.scheduler.priority.const}")
     double constant;
-    @Value("${com.realtimescheduler.scheduler.priority.deadline-bonus-base-prio-dependant}")
-    boolean deadlineBaseDependant;
 
     @Override
     public Optional<Task> getTaskById(String id) {

@@ -142,7 +142,6 @@ public class GroupConvertUtilsTest {
 
     @Test
     public void testGroupRestToJpa_notFound() throws UnknownEnumException {
-        Group group;
         GroupModel model = new GroupModel();
         model.setId("test");
         model.setParentId("parent");

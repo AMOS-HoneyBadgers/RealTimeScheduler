@@ -7,7 +7,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.PropertySource;
@@ -29,7 +28,7 @@ import static org.mockito.Mockito.*;
 public class TaskServiceTest {
 
     @MockBean
-    private TaskRepository taskPostgresRepository;
+    private TaskRepository taskRepository;
 
     @MockBean
     GroupAncestorRepository groupAncestorRepository;
@@ -37,23 +36,20 @@ public class TaskServiceTest {
     @Autowired
     private TaskService service;
 
-    @Value("${com.realtimescheduler.scheduler.priority.deadline-bonus-base-prio-dependant}")
-    boolean deadlineBaseDependant;
-
     @Test
     public void testUploadTask() {
         TaskService spy = spy(service);
         Task t = new Task();
         spy.finishTask(t);
         t.setStatus(TaskStatusEnum.Finished);
-        verify(taskPostgresRepository).save(t);
+        verify(taskRepository).save(t);
     }
 
     @Test
     public void testGetTaskById() {
         TaskService spy = spy(service);
         spy.getTaskById("123");
-        verify(taskPostgresRepository).findById("123");
+        verify(taskRepository).findById("123");
     }
 
     @Test
@@ -197,7 +193,7 @@ public class TaskServiceTest {
         Assert.assertTrue(res7 > res8);
         Assert.assertTrue(res9 > res10);
         Assert.assertTrue(res10 > res11);
-        Assert.assertTrue(res14 == res2);
+        Assert.assertEquals(res14, res2);
 
     }
 

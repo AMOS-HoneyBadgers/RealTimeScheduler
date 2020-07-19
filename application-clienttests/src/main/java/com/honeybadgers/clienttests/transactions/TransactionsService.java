@@ -104,7 +104,7 @@ public class TransactionsService {
 
         // send POST request
         ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
-        return CompletableFuture.completedFuture(taskModel.getId().toString());
+        return CompletableFuture.completedFuture(taskModel.getId());
     }
 
     /**
@@ -175,7 +175,7 @@ public class TransactionsService {
         taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
         taskModel.setPriority(100);
 
-        String url = "https://taskapi-amos.cfapps.io/api/task/" + taskModel.getId().toString();
+        String url = "https://taskapi-amos.cfapps.io/api/task/" + taskModel.getId();
 
         // create headers
         HttpHeaders headers = new HttpHeaders();

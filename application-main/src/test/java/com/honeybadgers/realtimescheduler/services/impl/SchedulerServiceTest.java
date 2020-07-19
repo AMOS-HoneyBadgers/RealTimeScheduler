@@ -1,7 +1,7 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.LockResponse;
 import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.models.model.jpa.ModeEnum;
 import com.honeybadgers.models.model.jpa.Paused;
@@ -31,7 +31,6 @@ import java.util.*;
 
 import static com.honeybadgers.models.model.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)

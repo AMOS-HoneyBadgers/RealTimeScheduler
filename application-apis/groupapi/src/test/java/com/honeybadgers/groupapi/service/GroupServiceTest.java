@@ -1,9 +1,13 @@
 package com.honeybadgers.groupapi.service;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.groupapi.models.GroupModel;
+import com.honeybadgers.groupapi.service.impl.GroupService;
 import com.honeybadgers.models.exceptions.CreationException;
 import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.models.model.jpa.Task;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -11,15 +15,10 @@ import org.hibernate.TransactionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import com.honeybadgers.models.model.jpa.Group;
-import com.honeybadgers.groupapi.models.GroupModel;
-import com.honeybadgers.models.exceptions.UnknownEnumException;
-import com.honeybadgers.groupapi.service.impl.GroupService;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.beans.factory.annotation.Autowired;
-
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -27,7 +26,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -88,9 +86,7 @@ public class GroupServiceTest {
     }
 
     @Test
-    public void testCreateGroup_primaryViolation(){
-        DataIntegrityViolationException vio = new DataIntegrityViolationException("primary key violation");
-
+    public void testCreateGroup_primaryViolation() {
         Group alreadyInGroup = new Group();
         alreadyInGroup.setId("TestGroupAlreadyExists");
 
@@ -170,7 +166,7 @@ public class GroupServiceTest {
 
         verify(sender, atMostOnce()).sendTaskToDispatcher(any());
         assertNotNull(group);
-        assertEquals( 100, group.getPriority() );
+        assertEquals(100, group.getPriority());
         assertEquals("parentGroup", group.getParentGroup().getId());
     }
 
