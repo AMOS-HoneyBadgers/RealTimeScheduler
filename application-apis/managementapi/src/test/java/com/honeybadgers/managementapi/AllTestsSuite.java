@@ -9,9 +9,9 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses(value = {
-        /*GroupApiControllerTest.class,
+        GroupApiControllerTest.class,
         SchedulerApiControllerTest.class,
-        TaskApiControllerTest.class,*/
+        TaskApiControllerTest.class,
         ManagementServiceTest.class
 })
 public class AllTestsSuite {

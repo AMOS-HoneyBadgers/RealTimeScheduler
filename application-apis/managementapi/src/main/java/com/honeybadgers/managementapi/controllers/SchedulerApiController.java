@@ -60,7 +60,7 @@ public class SchedulerApiController implements SchedulerApi {
         } catch (PauseException e) {
             response.setCode("400");
             response.setMessage("Scheduler was not paused!");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);

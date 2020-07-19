@@ -62,7 +62,7 @@ public class TaskApiController implements TaskApi {
         } catch (PauseException e) {
             response.setCode("400");
             response.setMessage("Task was not paused!");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
