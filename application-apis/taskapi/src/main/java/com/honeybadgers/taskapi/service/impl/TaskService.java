@@ -227,12 +227,8 @@ public class TaskService implements ITaskService {
 
     @Override
     public void sendTaskToPriorityQueue(TaskModel task) {
-        TaskQueueModel taskQueueModel = new TaskQueueModel();
-        taskQueueModel.setGroupId(task.getGroupId());
-        taskQueueModel.setId(task.getId());
-        if (task.getMeta() != null)
-            taskQueueModel.setMetaData(task.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
-        taskQueueModel.setDispatched(Timestamp.from(Instant.now()));
+        TaskQueueModel taskQueueModel = converter.taskRestToQueue(task);
+
         sender.sendTaskToPriorityQueue(taskQueueModel);
     }
 }

@@ -1,5 +1,6 @@
 package com.honeybadgers.taskapi.service.impl;
 
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
@@ -165,5 +166,17 @@ public class TaskConvertUtils implements ITaskConvertUtils {
             }).collect(Collectors.toList());
             return list;
         }
+    }
+
+    @Override
+    public TaskQueueModel taskRestToQueue(TaskModel taskModel) {
+        TaskQueueModel taskQueueModel = new TaskQueueModel();
+        taskQueueModel.setGroupId(taskModel.getGroupId());
+        taskQueueModel.setId(taskModel.getId());
+        if (taskModel.getMeta() != null)
+            taskQueueModel.setMetaData(taskModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
+        taskQueueModel.setDispatched(Timestamp.from(Instant.now()));
+
+        return taskQueueModel;
     }
 }

@@ -1,5 +1,6 @@
 package com.honeybadgers.taskapi.service;
 
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
@@ -261,5 +262,40 @@ public class TaskConvertUtilsTest {
     public void testActiveTimesJpaToRestActivesTimesIsNull(){
         List<TaskModelActiveTimes> res = converter.activeTimesJpaToRest(null);
         assertNull(res);
+    }
+
+    @Test
+    public void testTaskRestToQueue() {
+        TaskModel task = new TaskModel();
+        task.setId(UUID.randomUUID().toString());
+        task.setGroupId("TEST");
+
+        TaskQueueModel res = converter.taskRestToQueue(task);
+
+        assertNotNull(res);
+        assertEquals(task.getId(), res.getId());
+        assertEquals(task.getGroupId(), res.getGroupId());
+        assertNotNull(res.getDispatched());
+        assertNull(res.getMetaData());
+    }
+
+    @Test
+    public void testTaskRestToQueue_withMeta() {
+        List<TaskModelMeta> meta = new ArrayList<>();
+        meta.add(new TaskModelMeta().key("TEST").value("TEST"));
+
+        TaskModel task = new TaskModel();
+        task.setId(UUID.randomUUID().toString());
+        task.setGroupId("TEST");
+        task.setMeta(meta);
+
+        TaskQueueModel res = converter.taskRestToQueue(task);
+
+        assertNotNull(res);
+        assertEquals(task.getId(), res.getId());
+        assertEquals(task.getGroupId(), res.getGroupId());
+        assertNotNull(res.getDispatched());
+        assertNotNull(res.getMetaData());
+        assertTrue(res.getMetaData().containsKey("TEST"));
     }
 }
