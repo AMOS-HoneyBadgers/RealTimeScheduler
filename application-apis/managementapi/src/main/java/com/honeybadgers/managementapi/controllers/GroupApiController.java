@@ -16,6 +16,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import java.util.Optional;
+
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:26.284+02:00[Europe/Berlin]")
 
 @Controller
@@ -42,7 +43,8 @@ public class GroupApiController implements GroupApi {
 
     /**
      * Unlocks a Group.
-     * @param groupId  (required)
+     *
+     * @param groupId (required)
      * @return
      */
     @Override
@@ -62,6 +64,7 @@ public class GroupApiController implements GroupApi {
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (PauseException e) {
+            response.setCode("400");
             response.setMessage("Group was not paused!");
             return ResponseEntity.ok(response);
         }
@@ -71,7 +74,8 @@ public class GroupApiController implements GroupApi {
 
     /**
      * Locks a Group.
-     * @param groupId  (required)
+     *
+     * @param groupId      (required)
      * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
      * @return
      */
@@ -81,9 +85,9 @@ public class GroupApiController implements GroupApi {
         response.setCode("200");
         response.setMessage("Success");
 
-        try{
+        try {
             managmentService.pauseGroup(groupId, dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
-        } catch(PauseException e){
+        } catch (PauseException e) {
             response.setCode("400");
             response.setMessage("Group with groupId=" + groupId + " already paused!");
             return ResponseEntity.badRequest().body(response);
