@@ -1,8 +1,8 @@
 package com.honeybadgers.realtimescheduler.consumer.impl;
 
-import com.honeybadgers.models.model.Group;
-import com.honeybadgers.models.model.ModeEnum;
-import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.jpa.Group;
+import com.honeybadgers.models.model.jpa.ModeEnum;
+import com.honeybadgers.models.model.jpa.Task;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.realtimescheduler.consumer.IFeedbackConsumer;
 import com.honeybadgers.realtimescheduler.services.impl.SchedulerService;

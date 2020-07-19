@@ -4,11 +4,9 @@ import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.models.exceptions.CreationException;
 import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.NoSuchElementException;

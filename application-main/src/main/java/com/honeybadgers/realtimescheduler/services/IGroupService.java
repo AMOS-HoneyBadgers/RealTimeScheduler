@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.services;
 
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.Group;
 
 import java.util.Optional;
 

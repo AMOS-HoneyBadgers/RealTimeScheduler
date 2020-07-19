@@ -1,6 +1,6 @@
 package com.honeybadgers.realtimescheduler.consumer;
 
-import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.jpa.Task;
 
 public interface IFeedbackConsumer {
 

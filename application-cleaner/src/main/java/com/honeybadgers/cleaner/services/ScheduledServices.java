@@ -1,8 +1,8 @@
 package com.honeybadgers.cleaner.services;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.Paused;
-import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.jpa.Paused;
+import com.honeybadgers.models.model.jpa.Task;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import org.apache.logging.log4j.LogManager;

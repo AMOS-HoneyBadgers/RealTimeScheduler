@@ -7,7 +7,7 @@ import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.models.exceptions.CreationException;
 import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

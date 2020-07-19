@@ -1,6 +1,6 @@
 package com.honeybadgers.taskapi.models;
 
-import com.honeybadgers.models.model.ActiveTimes;
+import com.honeybadgers.models.model.jpa.ActiveTimes;
 import org.junit.jupiter.api.Test;
 
 import java.sql.Time;

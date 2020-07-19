@@ -3,6 +3,10 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.jpa.Group;
+import com.honeybadgers.models.model.jpa.Paused;
+import com.honeybadgers.models.model.jpa.Task;
+import com.honeybadgers.models.model.jpa.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -29,7 +33,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static com.honeybadgers.models.model.Constants.*;
-import static com.honeybadgers.models.model.ModeEnum.Sequential;
+import static com.honeybadgers.models.model.jpa.ModeEnum.Sequential;
 
 @Service
 public class SchedulerService implements ISchedulerService {

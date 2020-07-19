@@ -4,7 +4,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.service.IManagementService;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
-import com.honeybadgers.models.model.Paused;
+import com.honeybadgers.models.model.jpa.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

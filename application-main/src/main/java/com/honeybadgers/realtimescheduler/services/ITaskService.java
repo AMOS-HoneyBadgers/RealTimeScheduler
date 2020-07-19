@@ -1,8 +1,8 @@
 package com.honeybadgers.realtimescheduler.services;
 
 
-import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.TaskStatusEnum;
+import com.honeybadgers.models.model.jpa.Task;
+import com.honeybadgers.models.model.jpa.TaskStatusEnum;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;

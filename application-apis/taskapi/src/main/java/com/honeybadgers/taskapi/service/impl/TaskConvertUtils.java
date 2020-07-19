@@ -1,7 +1,7 @@
 package com.honeybadgers.taskapi.service.impl;
 
 import com.honeybadgers.models.exceptions.UnknownEnumException;
-import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.models.exceptions.CreationException;
