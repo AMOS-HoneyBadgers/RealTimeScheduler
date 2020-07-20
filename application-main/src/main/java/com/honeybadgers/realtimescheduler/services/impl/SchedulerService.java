@@ -3,10 +3,7 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.model.LockResponse;
-import com.honeybadgers.models.model.jpa.Group;
-import com.honeybadgers.models.model.jpa.Paused;
-import com.honeybadgers.models.model.jpa.Task;
-import com.honeybadgers.models.model.jpa.TaskStatusEnum;
+import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -31,6 +28,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static com.honeybadgers.models.model.Constants.*;
+import static com.honeybadgers.models.model.jpa.ModeEnum.Parallel;
 import static com.honeybadgers.models.model.jpa.ModeEnum.Sequential;
 
 @Service
@@ -209,12 +207,16 @@ public class SchedulerService implements ISchedulerService {
         if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
             return false;
 
-        if (sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId()))
+        // Check if task is sequential and has not the next sequence number
+        // Also check if task is parallel and parallelismdegree is exceeded
+        if (sequentialHasToWait(currentTask) || (currentTask.getModeEnum() == Parallel && checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId())))
             return false;
 
         // Increment current parallelismDegree for all ancestors
-        for (String group : groupsOfTask) {
-            groupRepository.incrementCurrentParallelismDegree(group);
+        if(currentTask.getModeEnum() == Parallel){
+            for (String group : groupsOfTask) {
+                groupRepository.incrementCurrentParallelismDegree(group);
+            }
         }
 
         // TODO custom query
