@@ -14,6 +14,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     /**
      * Deletes the group with the given id
+     *
      * @param id id of group wanted to be deleted
      * @return Optional of deleted group or empty Optional if task with id not found
      */
@@ -22,6 +23,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     /**
      * Returns a List of all groups with the same parent group.
+     *
      * @param parentId id of specified parent group.
      * @return List of child groups.
      */
@@ -30,6 +32,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
 
     /**
      * Increments current_parallelism_degree value by 1 and returns updated object
+     *
      * @param groupId id of group to be updated
      * @return Group object after update
      */
@@ -39,6 +42,7 @@ public interface GroupRepository extends JpaRepository<Group, String> {
     /**
      * Decrements current_parallelism_degree value by 1 and returns updated object
      * ONLY if group was found AND the current_parallelism_degree will not get negative (check through where clause)
+     *
      * @param groupId id of group to be updated
      * @return Optional of Group object, which is empty, if: group not found OR group.current_parallelism_degree == 0
      */
