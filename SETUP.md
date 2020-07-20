@@ -1,6 +1,6 @@
-#Setup
+# Setup
 
-##Cloud Foundry Setup
+## Cloud Foundry Setup
 
 **Disclaimer: Service names have to be the same as used in this guide, otherwise rename the services in following files:**
 * ./manifest.yml
@@ -14,22 +14,22 @@
 * ./application-clienttests/src/main/resources/application.properties
 * ./application-main-integrationtests/src/test/resources/application.properties
 
-###Services 
+### Services 
 Required:
 * Redis (Redis Cloud)
 * Postgres (ElephantSQL)
 * User Provided Service
 * Event Queue (In the following used rabbit (CloudAMQP))
 
-####Redis Cloud
+#### Redis Cloud
 **Name of Service**: _redis_
 
-####ElephantSQL
+#### ElephantSQL
 **Name of Service**: _task_storage_<br/>
 **Database Setup**:
-* Run ./docs/DatabaseCreate.sql **(Pay attention to change owner of tables in script, see top comment of sql script)**
+* Run ./docs/DatabaseCreate.sql in DB Admin Tool of your choice. **(Pay attention to change owner of tables in script, see top comment of sql script)**
 
-####User Provided Service Postgres
+#### User Provided Service Postgres
 **Name of Service**: _postgres_credentials_ <br/>
 **Configuration as JSON**: <br/>
 {<br/>
@@ -38,7 +38,7 @@ Required:
   "password":"**_PASSWORD_**" <br/>
 }
 
-####User Provided Service RabbitMQ
+#### User Provided Service RabbitMQ
 **Name of Service**: _rabbit_credentials_ <br/>
 **Configuration as JSON**: <br/>
 {<br/>
@@ -47,7 +47,7 @@ Required:
 "rabbitmq_password":"**_PASSWORD_**"<br/>
 }
 
-####CloudAMQP
+#### CloudAMQP
 **Name of Service**: _rabbit_ <br/>
 **Create Exchanges** (Renaming required changes in files mentioned in [Cloud Foundry Setup](#cloud-foundry-setup)): <br/>
 **All Exchanges have to be declared as durable**
@@ -73,9 +73,9 @@ dispatch.feedback | feedback.exchange | feedback.routingkey
 dispatch.queue | dispatch.exchange | dispatch.routingkey
 
 
-##Scheduler properties Configuration
+## Scheduler properties Configuration
 
-###All available property files 
+### All available property files 
 1. ./application-apis/groupapi/src/main/resources/application.properties
 2. ./application-apis/taskapi/src/main/resources/application.properties
 3. ./application-apis/managementapi/src/main/resources/application.properties
@@ -83,7 +83,7 @@ dispatch.queue | dispatch.exchange | dispatch.routingkey
 5. ./application-cleaner/src/main/resources/application.properties
 6. ./application-main/src/main/resources/application.properties
 
-###Configurable properties
+### Configurable properties
 
 * Transaction failure max sleep before retry (in ms)
     * `com.honeybadgers.transaction.max-retry-sleep=500`
