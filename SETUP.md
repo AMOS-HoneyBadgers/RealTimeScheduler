@@ -15,11 +15,14 @@
 * ./application-main-integrationtests/src/test/resources/application.properties
 
 ### Services 
+
+**Please follow the guide chronologically!**
+
 Required:
 * Redis (Redis Cloud)
 * Postgres (ElephantSQL)
 * User Provided Service
-* Event Queue (In the following used rabbit (CloudAMQP))
+* Event Queue (rabbit (CloudAMQP) was used during development and in this guide)
 
 #### Redis Cloud
 **Name of Service**: _redis_
@@ -31,22 +34,24 @@ Required:
 
 #### User Provided Service Postgres
 **Name of Service**: _postgres_credentials_ <br/>
-**Configuration as JSON**: <br/>
-{<br/>
-  "host":" postgres://**_USERNAME_**:**_PASSWORD_**@**_DBURL_**:**_DBPORT_**/**_DATABASE_**", <br/>
-  "username":"**_USERNAME_**", <br/>
-  "password":"**_PASSWORD_**" <br/>
+**Configuration as JSON**: (Replace **_DBURL_**, **_DBPORT_**, **_USERNAME_**, **_PASSWORD_** with your credentials)
+```json
+{
+  "host":" postgres://USERNAME:PASSWORD@DBURL:DBPORT/DATABASE", 
+  "username":"USERNAME", 
+  "password":"PASSWORD" 
 }
-
+```
 #### User Provided Service RabbitMQ
 **Name of Service**: _rabbit_credentials_ <br/>
-**Configuration as JSON**: <br/>
-{<br/>
-"rabbitmq_host":"**_URL_**",<br/>
-"rabbitmq_username":"**_USERNAME_**",<br/>
-"rabbitmq_password":"**_PASSWORD_**"<br/>
+**Configuration as JSON**: (Replace **_URL_**, **_USERNAME_**, **_PASSWORD_** with your credentials)
+```json
+{
+  "rabbitmq_host":"URL",
+  "rabbitmq_username":"USERNAME",
+  "rabbitmq_password":"PASSWORD"
 }
-
+```
 #### CloudAMQP
 **Name of Service**: _rabbit_ <br/>
 **Create Exchanges** (Renaming required changes in files mentioned in [Cloud Foundry Setup](#cloud-foundry-setup)): <br/>
@@ -71,6 +76,17 @@ tasks | task.exchange | tasks.routingkey
 priority | priority.exchange | priority.routingkey
 dispatch.feedback | feedback.exchange | feedback.routingkey
 dispatch.queue | dispatch.exchange | dispatch.routingkey
+
+#### Spring Boot Services
+In order to rename one of the service, change the _name_ field in manifest.yml. <br/>
+**Disclaimer:** If you rename the service _lockservice-amos_, adjust the property ``com.honeybadgers.lockservice.url`` (See [Configurable properties](#configurable-properties)).
+
+1. Please make sure to have all previous services created and configured.
+2. Install CF CLI using following [guide](https://github.com/cloudfoundry/cli).
+3. Run ``mvn clean install`` in root directory of project.
+4. Run ``mvn clean package`` in root directory of project (required for every change in project files).
+5. Run ``cf login`` to authenticate for remote Cloud Foundry access.
+6. Push all Spring Boot services using ``cf push`` (for pushing a single service: ``cf push <name>`` as specified in manifest.yml).
 
 
 ## Scheduler properties Configuration
@@ -127,23 +143,24 @@ dispatch.queue | dispatch.exchange | dispatch.routingkey
     * Found in:
         * application-main
 * Minimal Priority + 1 
-    * `com.realtimescheduler.scheduler.priority.const=1000`
+    * `com.honeybadgers.scheduler.priority.const=1000`
     * **Changes required changs in OpenAPI to allow creation of task**
     * Found in:
         * application-main
 * Modifier for weighting of user provided base priority.
-    * `com.realtimescheduler.scheduler.priority.prio-modifier=1`
+    * `com.honeybadgers.scheduler.priority.prio-modifier=1`
     * Found in:
         * application-main
 * Modifier for weighting of user provided deadline.
-    * `com.realtimescheduler.scheduler.priority.deadline-modifier=20`
+    * `com.honeybadgers.scheduler.priority.deadline-modifier=20`
     * Found in:
         * application-main
 * Modifier for weighting of task priority based on retries.
-    * `com.realtimescheduler.scheduler.priority.retries-modifier=500`
+    * `com.honeybadgers.scheduler.priority.retries-modifier=500`
     * Found in:
         * application-main
 * Modifier for weighting based on task type.
-    * `com.realtimescheduler.scheduler.priority.realtime-modifier=1`
+    * `com.honeybadgers.scheduler.priority.realtime-modifier=1`
     * Found in:
         * application-main
+        
