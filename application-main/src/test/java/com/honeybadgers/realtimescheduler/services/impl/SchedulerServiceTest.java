@@ -97,7 +97,7 @@ public class SchedulerServiceTest {
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
-        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasksNoForce()).thenReturn(Collections.singletonList(t));
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Collections.singletonList(t));
         // unfortunately not possible to mock checkTaskForDispatchingAndUpdate due to calling method on _self proxy
         // (mocking self results into mocking service which makes this tests useless)
@@ -129,7 +129,7 @@ public class SchedulerServiceTest {
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
         when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.empty());
-        when(taskRepository.findAllScheduledTasksSorted()).thenReturn(Collections.singletonList(t2));
+        when(taskRepository.findAllScheduledTasksNoForceSorted()).thenReturn(Collections.singletonList(t2));
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Arrays.asList(t, t2));
         // unfortunately not possible to mock checkTaskForDispatchingAndUpdate due to calling method on _self proxy
         // (mocking self results into mocking service which makes this tests useless)
@@ -137,8 +137,8 @@ public class SchedulerServiceTest {
 
         spy.scheduleTaskWrapper(scheduler_trigger);
 
-        verify(taskRepository, never()).findAllWaitingTasks();
-        verify(taskRepository, times(1)).findAllScheduledTasksSorted();
+        verify(taskRepository, never()).findAllWaitingTasksNoForce();
+        verify(taskRepository, times(1)).findAllScheduledTasksNoForceSorted();
         verify(taskRepository, times(1)).getTasksToBeDispatched(anyInt());
         verify(taskRepository, times(3)).save(any());// once in scheduleTask and twice (once for each task) in checkTaskForDispatchingAndUpdate
         verify(taskService).calculatePriority(t2);
@@ -156,7 +156,7 @@ public class SchedulerServiceTest {
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasksNoForce()).thenReturn(Collections.singletonList(t));
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Collections.singletonList(t));
 
         when(spy.isTaskPaused(t.getId())).thenThrow(new CannotAcquireLockException(""));
@@ -176,7 +176,7 @@ public class SchedulerServiceTest {
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasksNoForce()).thenReturn(Collections.singletonList(t));
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Collections.singletonList(t));
 
         when(spy.isTaskPaused(t.getId())).thenThrow(new TransactionException(""));
@@ -203,7 +203,7 @@ public class SchedulerServiceTest {
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasksNoForce()).thenReturn(Collections.singletonList(t));
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Collections.singletonList(t));
 
         when(taskService.calculatePriority(any())).thenThrow(new CannotAcquireLockException(""));
@@ -233,7 +233,7 @@ public class SchedulerServiceTest {
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasksNoForce()).thenReturn(Collections.singletonList(t));
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Collections.singletonList(t));
 
         when(taskService.calculatePriority(any())).thenThrow(new TransactionException(""));
@@ -271,7 +271,7 @@ public class SchedulerServiceTest {
         when(restTemplate.postForEntity(anyString(), any(), any(Class.class)))
                 .thenReturn(new ResponseEntity<>(new LockResponse("Name", "Value", null, false), HttpStatus.OK));
         when(restTemplate.exchange(anyString(), any(), any(), any(Class.class))).thenReturn(new ResponseEntity<>(null, HttpStatus.OK));
-        when(taskRepository.findAllWaitingTasks()).thenReturn(tasks);
+        when(taskRepository.findAllWaitingTasksNoForce()).thenReturn(tasks);
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(tasks);
         when(groupRepository.incrementCurrentParallelismDegree(anyString())).then(invocationOnMock -> {
             group.setCurrentParallelismDegree(group.getCurrentParallelismDegree() + 1);
@@ -306,7 +306,7 @@ public class SchedulerServiceTest {
         group.setCurrentParallelismDegree(50);
         Task t = createTaskTestObject(group, "TEST");
 
-        when(taskRepository.findAllWaitingTasks()).thenReturn(Collections.singletonList(t));
+        when(taskRepository.findAllWaitingTasksNoForce()).thenReturn(Collections.singletonList(t));
         when(taskRepository.getTasksToBeDispatched(anyInt())).thenReturn(Collections.singletonList(t));
         when(pausedRepository.findById(PAUSED_SCHEDULER_ALIAS)).thenReturn(Optional.of(new Paused()));
         //when(taskService.getTaskById(t.getId())).thenReturn(Optional.of(t));

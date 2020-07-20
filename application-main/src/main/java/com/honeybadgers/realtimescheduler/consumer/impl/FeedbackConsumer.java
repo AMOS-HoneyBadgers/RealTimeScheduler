@@ -49,7 +49,6 @@ public class FeedbackConsumer implements IFeedbackConsumer {
     int maxTransactionRetrySleep;
 
 
-    // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
     @Override
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
@@ -100,7 +99,6 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         Task currentTask = taskService.getTaskById(taskId).orElse(null);
         if (currentTask == null)
             throw new RuntimeException("could not find tasks in postgre database");
-        //TODO: For Sequential Grops parallesm degree is not decremented ( stays 1 but LastIndex is incremented )
         checkAndSetParallelismDegree(currentTask);
 
         if (currentTask.getModeEnum() == ModeEnum.Sequential)
@@ -109,7 +107,6 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         taskService.finishTask(currentTask);
     }
 
-    //TODO is it necessary to do this also for all grandparent groups??
     @Override
     public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
         Group group = currentTask.getGroup();

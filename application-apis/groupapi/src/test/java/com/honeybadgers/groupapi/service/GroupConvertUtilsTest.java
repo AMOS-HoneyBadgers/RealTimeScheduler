@@ -32,7 +32,6 @@ public class GroupConvertUtilsTest {
     @MockBean
     GroupRepository groupRepository;
 
-    // TODO tests for groupModel conversion
     @Before
     public void setUp() {
         Group parentGroup = new Group();

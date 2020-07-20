@@ -88,7 +88,6 @@ public class TaskIdApiController implements TaskIdApi {
         try {
             taskService.updateTask(taskId, taskModel);
             logger.info("Task " + taskId + " updated.");
-            //TODO: Behavior on changing force attributed. Task iight be scheduler by now. Dispatch once!
             if (taskModel.getForce() != null && taskModel.getForce()){
                 taskService.sendTaskToPriorityQueue(taskModel);
             }else{

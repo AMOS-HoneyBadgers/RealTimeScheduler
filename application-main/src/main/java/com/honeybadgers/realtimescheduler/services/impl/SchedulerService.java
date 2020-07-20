@@ -31,6 +31,7 @@ import java.util.List;
 import java.util.TimeZone;
 
 import static com.honeybadgers.models.model.Constants.*;
+import static com.honeybadgers.models.model.jpa.ModeEnum.Parallel;
 import static com.honeybadgers.models.model.jpa.ModeEnum.Sequential;
 
 @Service
@@ -121,9 +122,9 @@ public class SchedulerService implements ISchedulerService {
             // get all tasks
             List<Task> waitingTasks;
             if (trigger.equals(scheduler_trigger))
-                waitingTasks = taskRepository.findAllScheduledTasksSorted();
+                waitingTasks = taskRepository.findAllScheduledTasksNoForceSorted();
             else
-                waitingTasks = taskRepository.findAllWaitingTasks();
+                waitingTasks = taskRepository.findAllWaitingTasksNoForce();
 
             // schedule tasks
             logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
@@ -152,7 +153,7 @@ public class SchedulerService implements ISchedulerService {
                             return;
 
                         if (_self.checkTaskForDispatchingAndUpdate(task)) {
-                            // TODO see known issues of docs/technology_decisions.md
+                            // see known issues of docs/technology_decisions.md concerning crash at this point in the code
                             // dispatch here because this only gets executed if transaction succeeds
                             dispatchTask(task);
                             logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
@@ -209,7 +210,7 @@ public class SchedulerService implements ISchedulerService {
         if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
             return false;
 
-        if (sequentialHasToWait(currentTask) || checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId()))
+        if (sequentialHasToWait(currentTask) || (currentTask.getModeEnum() == Parallel && checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId())))
             return false;
 
         // Increment current parallelismDegree for all ancestors
@@ -217,7 +218,6 @@ public class SchedulerService implements ISchedulerService {
             groupRepository.incrementCurrentParallelismDegree(group);
         }
 
-        // TODO custom query
         taskService.updateTaskStatus(currentTask, TaskStatusEnum.Dispatched);
         taskRepository.save(currentTask);
 
