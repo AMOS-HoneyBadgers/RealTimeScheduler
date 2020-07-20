@@ -25,15 +25,15 @@ public class TaskService implements ITaskService {
     @Autowired
     GroupAncestorRepository groupAncestorRepository;
 
-    @Value("${com.realtimescheduler.scheduler.priority.deadline-modifier}")
+    @Value("${com.honeybadgers.scheduler.priority.deadline-modifier}")
     double deadlineModifier;
-    @Value("${com.realtimescheduler.scheduler.priority.prio-modifier}")
+    @Value("${com.honeybadgers.scheduler.priority.prio-modifier}")
     double prioModifier;
-    @Value("${com.realtimescheduler.scheduler.priority.realtime-modifier}")
+    @Value("${com.honeybadgers.scheduler.priority.realtime-modifier}")
     double realtimeModifier;
-    @Value("${com.realtimescheduler.scheduler.priority.retries-modifier}")
+    @Value("${com.honeybadgers.scheduler.priority.retries-modifier}")
     double retriesModifier;
-    @Value("${com.realtimescheduler.scheduler.priority.const}")
+    @Value("${com.honeybadgers.scheduler.priority.const}")
     double constant;
 
     @Override

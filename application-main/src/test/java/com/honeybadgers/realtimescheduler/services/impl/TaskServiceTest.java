@@ -37,7 +37,7 @@ public class TaskServiceTest {
     private TaskService service;
 
     @Test
-    public void testUploadTask() {
+    public void testFinishTask() {
         TaskService spy = spy(service);
         Task t = new Task();
         spy.finishTask(t);
