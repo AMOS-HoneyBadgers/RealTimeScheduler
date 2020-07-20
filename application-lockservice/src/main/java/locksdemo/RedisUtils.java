@@ -1,5 +1,6 @@
 /*
  * Copyright 2013-2014 the original author or authors.
+ * Modifications copyright 2020 Felix Mueller
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,6 +16,7 @@
  */
 package locksdemo;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
@@ -30,6 +32,15 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
  *
  */
 class RedisUtils {
+
+	@Value("${redis.host}")
+	private String host;
+
+	@Value("${redis.port:6379}")
+	private String port;
+
+	@Value("${redis.password}")
+	private String password;
 
 	static <K, V> RedisTemplate<K, V> createRedisTemplate(
 			RedisConnectionFactory connectionFactory, Class<V> valueClass) {
@@ -53,9 +64,9 @@ class RedisUtils {
 	@Bean
 	public RedisConnectionFactory redisConnectionFactory() {
 		RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration();
-		redisStandaloneConfiguration.setHostName("redis-19796.c8.us-east-1-3.ec2.cloud.redislabs.com");
-		redisStandaloneConfiguration.setPassword("fqFLV2FheLLAMbdqaaHiWGCweQS7uzCx");
-		redisStandaloneConfiguration.setPort(19796);
+		redisStandaloneConfiguration.setHostName(host);
+		redisStandaloneConfiguration.setPassword(password);
+		redisStandaloneConfiguration.setPort(Integer.parseInt(port));
 		return new JedisConnectionFactory(redisStandaloneConfiguration);
 	}
 }
