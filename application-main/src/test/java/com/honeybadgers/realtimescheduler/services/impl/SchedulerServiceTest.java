@@ -15,6 +15,7 @@ import com.honeybadgers.realtimescheduler.services.ITaskService;
 import com.honeybadgers.realtimescheduler.services.LockRefresherThread;
 import org.hibernate.TransactionException;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.web.client.RestTemplate;
+import reactor.core.scheduler.Scheduler;
 
 import java.util.*;
 
@@ -70,6 +72,11 @@ public class SchedulerServiceTest {
 
     @Value("${scheduler.trigger}")
     String scheduler_trigger;
+
+    @Before
+    public void Init(){
+        SchedulerService.stopSchedulerDueToLockAcquisitionException = false;
+    }
 
     @Test
     public void testStopSchedulerDueToLockAcquisitionExceptionSetter() {
