@@ -210,12 +210,16 @@ public class SchedulerService implements ISchedulerService {
         if (checkGroupOrAncesterGroupIsOnPause(groupsOfTask, currentTask.getId()))
             return false;
 
+        // Check if task is sequential and has not the next sequence number
+        // Also check if task is parallel and parallelismdegree is exceeded
         if (sequentialHasToWait(currentTask) || (currentTask.getModeEnum() == Parallel && checkParallelismDegreeSurpassed(groupsOfTask, currentTask.getId())))
             return false;
 
         // Increment current parallelismDegree for all ancestors
-        for (String group : groupsOfTask) {
-            groupRepository.incrementCurrentParallelismDegree(group);
+        if(currentTask.getModeEnum() == Parallel){
+            for (String group : groupsOfTask) {
+                groupRepository.incrementCurrentParallelismDegree(group);
+            }
         }
 
         taskService.updateTaskStatus(currentTask, TaskStatusEnum.Dispatched);

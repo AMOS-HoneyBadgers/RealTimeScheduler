@@ -99,6 +99,7 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         Task currentTask = taskService.getTaskById(taskId).orElse(null);
         if (currentTask == null)
             throw new RuntimeException("could not find tasks in postgre database");
+
         checkAndSetParallelismDegree(currentTask);
 
         if (currentTask.getModeEnum() == ModeEnum.Sequential)
