@@ -34,7 +34,7 @@ Required:
 
 #### User Provided Service Postgres
 **Name of Service**: _postgres_credentials_ <br/>
-**Configuration as JSON**: (Replace **_DBURL_**, **_DBPORT_**, **_USERNAME_**, **_PASSWORD_** with your credentials)
+**Configuration as JSON**: (Replace **_DBURL_**, **_DBPORT_**, **_DATABASE_**, **_USERNAME_**, **_PASSWORD_** with your credentials)
 ```json
 {
   "host":" postgres://USERNAME:PASSWORD@DBURL:DBPORT/DATABASE", 
