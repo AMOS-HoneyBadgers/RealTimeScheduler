@@ -10,7 +10,7 @@
 * ./application-apis/monitoringapi/src/main/resources/application.properties
 * ./application-cleaner/src/main/resources/application.properties
 * ./application-main/src/main/resources/application.properties
-* **TODO: Lock Service** 
+* ./application-lockservice/src/main/resources/application.properties
 * ./application-clienttests/src/main/resources/application.properties
 * ./application-main-integrationtests/src/test/resources/application.properties
 
@@ -40,6 +40,16 @@ Required:
   "host":" postgres://USERNAME:PASSWORD@DBURL:DBPORT/DATABASE", 
   "username":"USERNAME", 
   "password":"PASSWORD" 
+}
+```
+#### User Provided Service Redis
+**Name of Service**: _redis_credentials_ <br/>
+**Configuration as JSON**: (Replace **_HOST_**, **_PORT_**, **_PASSWORD_** with your credentials)
+```json
+{
+  "host":"HOST",
+  "password":"PASSWORD",
+  "port":"PORT"
 }
 ```
 #### User Provided Service RabbitMQ
