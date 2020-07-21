@@ -73,7 +73,6 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         else {
             List<Group> groupChildren = groupRepository.findAllByParentGroupId(group.getId());
             if (!groupChildren.isEmpty())
-                // TODO perhaps move group of task or sth similar
                 throw new CreationException("Group of task has other groups as children: " +
                         groupChildren.stream().map(Group::getId).collect(Collectors.joining(", ")) +
                         " -> aborting!");

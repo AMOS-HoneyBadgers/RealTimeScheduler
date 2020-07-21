@@ -6,9 +6,7 @@ import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
@@ -19,9 +17,9 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = "com.honeybadgers.consumer")
 public class RabbitMQTaskConfig {
 
-    private String tasksqueue = "tasks";
-    private String tasksExchange = "tasks.exchange";
-    private String tasksroutingkey = "tasks.routingkey";
+    private final String tasksqueue = "tasks";
+    private final String tasksExchange = "tasks.exchange";
+    private final String tasksroutingkey = "tasks.routingkey";
 
     @Qualifier("taskqueue")
     @Bean
@@ -36,7 +34,7 @@ public class RabbitMQTaskConfig {
     }
 
     @Bean
-    Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange")DirectExchange exchange) {
+    Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange") DirectExchange exchange) {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
 

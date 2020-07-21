@@ -14,6 +14,7 @@ public interface PausedRepository extends JpaRepository<Paused, String> {
 
     /**
      * Delete all paused elements, whose resume_date is in the past
+     *
      * @return list of all deleted elements (for logging)
      */
     @Query(value = "DELETE FROM paused WHERE resume_date < (NOW() AT TIME ZONE 'UTC')\\:\\:TIMESTAMP RETURNING *", nativeQuery = true)
@@ -21,6 +22,7 @@ public interface PausedRepository extends JpaRepository<Paused, String> {
 
     /**
      * Delete paused entity with given id
+     *
      * @param id id of paused entity to be deleted
      * @return Optional of deleted paused entity or empty Optional if paused entity with id not found
      */
@@ -29,7 +31,8 @@ public interface PausedRepository extends JpaRepository<Paused, String> {
 
     /**
      * Insert new paused entity into DB
-     * @param id id of new paused entity
+     *
+     * @param id         id of new paused entity
      * @param resumeDate resumeDate of new paused entity
      * @return Optional of new Paused entity if successful or Optional.empty()
      */
@@ -39,6 +42,7 @@ public interface PausedRepository extends JpaRepository<Paused, String> {
     /**
      * Insert new paused entity into DB without timestamp
      * Written like this due to jpa failing to parse java null to sql null in case of timestamp (java null equals sql type bytea)
+     *
      * @param id id of new paused entity
      * @return Optional of new Paused entity if successful or Optional.empty()
      */

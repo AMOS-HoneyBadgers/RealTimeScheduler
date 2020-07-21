@@ -39,7 +39,8 @@ public class TaskApiController implements TaskApi {
 
     /**
      * Unlocks a Task.
-     * @param taskId  (required)
+     *
+     * @param taskId (required)
      * @return
      */
     @Override
@@ -59,8 +60,9 @@ public class TaskApiController implements TaskApi {
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (PauseException e) {
+            response.setCode("400");
             response.setMessage("Task was not paused!");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
@@ -68,7 +70,8 @@ public class TaskApiController implements TaskApi {
 
     /**
      * Locks a Task.
-     * @param taskId  (required)
+     *
+     * @param taskId       (required)
      * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
      * @return
      */
@@ -78,9 +81,9 @@ public class TaskApiController implements TaskApi {
         response.setCode("200");
         response.setMessage("Success");
 
-        try{
+        try {
             managmentService.pauseTask(taskId, dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
-        } catch(PauseException e){
+        } catch (PauseException e) {
             response.setCode("400");
             response.setMessage("Task with taskId=" + taskId.toString() + " already paused!");
             return ResponseEntity.badRequest().body(response);

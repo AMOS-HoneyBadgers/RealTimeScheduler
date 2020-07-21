@@ -15,7 +15,7 @@ public class RabbitMQSender implements ICommunication {
     static final Logger logger = LogManager.getLogger(RabbitMQSender.class);
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Value("${dispatch.rabbitmq.dispatcherexchange}")
     private String dispatcherexchange;

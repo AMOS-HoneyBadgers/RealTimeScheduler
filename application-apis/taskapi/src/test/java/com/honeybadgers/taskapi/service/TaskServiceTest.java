@@ -1,13 +1,13 @@
 package com.honeybadgers.taskapi.service;
 
 import com.honeybadgers.communication.ICommunication;
+import com.honeybadgers.models.exceptions.CreationException;
+import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import com.honeybadgers.models.exceptions.CreationException;
-import com.honeybadgers.models.exceptions.JpaException;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
 import com.honeybadgers.taskapi.service.impl.TaskService;
@@ -32,7 +32,6 @@ import java.util.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest(classes = TaskService.class)
@@ -107,8 +106,6 @@ public class TaskServiceTest {
 
     @Test
     public void testCreateTask_JpaException() {
-        JpaException vio = new JpaException("Primary or unique constraint failed!");
-
         String taskId = UUID.randomUUID().toString();
 
         Task task = new Task();
@@ -173,7 +170,7 @@ public class TaskServiceTest {
 
     @Test
     public void testUpdateTask() throws UnknownEnumException, JpaException, CreationException, InterruptedException, TransactionRetriesExceeded {
-        String taskId =  UUID.randomUUID().toString();
+        String taskId = UUID.randomUUID().toString();
 
         TaskModel restModel = new TaskModel();
         restModel.setId(taskId);
@@ -189,14 +186,14 @@ public class TaskServiceTest {
 
         Task t = taskService.updateTask(taskId, restModel);
 
-        verify(communication,Mockito.only()).sendTaskToTasksQueue(Mockito.any());
+        verify(communication, Mockito.only()).sendTaskToTasksQueue(Mockito.any());
         assertNotNull(t);
-        assertEquals(updatedTask.getPriority(),t.getPriority());
+        assertEquals(updatedTask.getPriority(), t.getPriority());
     }
 
     @Test
     public void testUpdateTask_NoSuchElementException() throws UnknownEnumException, JpaException, CreationException {
-        String taskId =  UUID.randomUUID().toString();
+        String taskId = UUID.randomUUID().toString();
 
         TaskModel restModel = new TaskModel();
         restModel.setId(taskId);
@@ -209,7 +206,7 @@ public class TaskServiceTest {
 
     @Test
     public void testUpdateTask_StatusExceptionAlreayDispatched() throws UnknownEnumException, JpaException, CreationException {
-        String taskId =  UUID.randomUUID().toString();
+        String taskId = UUID.randomUUID().toString();
 
         TaskModel restModel = new TaskModel();
         restModel.setId(taskId);
@@ -228,7 +225,7 @@ public class TaskServiceTest {
 
     @Test
     public void testUpdateTask_StatusExceptionAlreayFinished() throws UnknownEnumException, JpaException, CreationException {
-        String taskId =  UUID.randomUUID().toString();
+        String taskId = UUID.randomUUID().toString();
 
         TaskModel restModel = new TaskModel();
         restModel.setId(taskId);
@@ -247,7 +244,7 @@ public class TaskServiceTest {
 
     @Test
     public void testUpdateTask_forceExeption() throws UnknownEnumException, JpaException, CreationException {
-        String taskId =  UUID.randomUUID().toString();
+        String taskId = UUID.randomUUID().toString();
 
         Task task = new Task();
         task.setId(taskId);
@@ -309,23 +306,23 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void getNonExistingTaskById(){
+    public void getNonExistingTaskById() {
         String id = UUID.randomUUID().toString();
 
         when(taskRepository.findById(anyString())).thenReturn(Optional.empty());
 
-        Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.getTaskById(id));
+        Exception e = assertThrows(NoSuchElementException.class, () -> taskService.getTaskById(id));
         assertNotNull(e);
         assertEquals("No existing Task with ID: " + id, e.getMessage());
     }
 
     @Test
-    public void testGetTaskById_transactionException(){
+    public void testGetTaskById_transactionException() {
         String id = UUID.randomUUID().toString();
 
         when(taskRepository.findById(anyString())).thenThrow(new TransactionException(""));
 
-        Exception  e = assertThrows(TransactionRetriesExceeded.class, () ->taskService.getTaskById(id));
+        Exception e = assertThrows(TransactionRetriesExceeded.class, () -> taskService.getTaskById(id));
         assertNotNull(e);
         assertEquals("Failed transaction 1 times!", e.getMessage());
     }
@@ -346,22 +343,22 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testDeleteNonExistingTask(){
+    public void testDeleteNonExistingTask() {
         String id = UUID.randomUUID().toString();
         when(taskRepository.deleteByIdCustomQuery(anyString())).thenReturn(Optional.empty());
 
-        Exception  e = assertThrows(NoSuchElementException.class, () ->taskService.deleteTask(id));
+        Exception e = assertThrows(NoSuchElementException.class, () -> taskService.deleteTask(id));
         assertNotNull(e);
         assertEquals("No existing Task with ID: " + id, e.getMessage());
         verify(taskRepository, Mockito.times(1)).deleteByIdCustomQuery(anyString());
     }
 
     @Test
-    public void testDeleteTask_transactionException(){
+    public void testDeleteTask_transactionException() {
         String id = UUID.randomUUID().toString();
         when(taskRepository.deleteByIdCustomQuery(anyString())).thenThrow(new TransactionException(""));
 
-        Exception  e = assertThrows(TransactionRetriesExceeded.class, () ->taskService.deleteTask(id));
+        Exception e = assertThrows(TransactionRetriesExceeded.class, () -> taskService.deleteTask(id));
         assertNotNull(e);
         assertEquals("Failed transaction 1 times!", e.getMessage());
         verify(taskRepository, Mockito.times(1)).deleteByIdCustomQuery(anyString());
@@ -382,7 +379,7 @@ public class TaskServiceTest {
         taskModel.setRetries(9);
         taskModel.setTypeFlag(TaskModel.TypeFlagEnum.BATCH);
         taskService.sendTaskToPriorityQueue(taskModel);
-        verify(communication,Mockito.only()).sendTaskToPriorityQueue(Mockito.any());
+        verify(communication, Mockito.only()).sendTaskToPriorityQueue(Mockito.any());
     }
 
     @Test
@@ -391,21 +388,21 @@ public class TaskServiceTest {
         taskModel.setId(UUID.randomUUID().toString());
         taskModel.setPriority(1);
         taskService.sendTaskToPriorityQueue(taskModel);
-        verify(communication,Mockito.only()).sendTaskToPriorityQueue(Mockito.any());
+        verify(communication, Mockito.only()).sendTaskToPriorityQueue(Mockito.any());
     }
 
 
-    private Task generateFullTask(int diff){
+    private Task generateFullTask(int diff) {
         Group group = new Group();
         group.setId("exampleGroup");
 
         Task exampleTask = new Task();
 
-        String taskID = "70884515-8692-40e0-9c0e-e34ba4bcc3f" + Integer.toString(diff);
+        String taskID = "70884515-8692-40e0-9c0e-e34ba4bcc3f" + diff;
         int priority = 100 + diff;
         int indexNumber = 0;
         int retries = 1;
-        int[] workdays = new int[]{1,0,1,0,1,0,1};
+        int[] workdays = new int[]{1, 0, 1, 0, 1, 0, 1};
         boolean force = false;
         ModeEnum mode = ModeEnum.Sequential;
         TypeFlagEnum type = TypeFlagEnum.Realtime;
@@ -414,8 +411,8 @@ public class TaskServiceTest {
 
         List<ActiveTimes> activeTimes = new LinkedList<ActiveTimes>();
         ActiveTimes timeFrame = new ActiveTimes();
-        Time from = new Time(9,0,0);
-        Time to = new Time(12,0,0);
+        Time from = new Time(9, 0, 0);
+        Time to = new Time(12, 0, 0);
         timeFrame.setFrom(from);
         timeFrame.setTo(to);
         activeTimes.add(timeFrame);
@@ -423,7 +420,7 @@ public class TaskServiceTest {
         Map<String, String> meta = new HashMap<String, String>();
         String key = "key123";
         String value = "value321";
-        meta.put(key,value);
+        meta.put(key, value);
 
         exampleTask.setId(taskID);
         exampleTask.setGroup(group);

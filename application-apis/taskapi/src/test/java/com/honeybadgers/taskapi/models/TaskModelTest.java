@@ -329,9 +329,9 @@ public class TaskModelTest {
         TaskModel model3 = new TaskModel();
         model3.setId(UUID.randomUUID().toString());
 
-        assertTrue(model1.equals(model2));
-        assertFalse(model1.equals(model3));
-        assertFalse(model2.equals(model3));
+        assertEquals(model1, model2);
+        assertNotEquals(model1, model3);
+        assertNotEquals(model2, model3);
     }
 
     @Test

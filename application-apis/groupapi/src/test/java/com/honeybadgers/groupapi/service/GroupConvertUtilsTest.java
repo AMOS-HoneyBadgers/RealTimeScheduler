@@ -32,7 +32,6 @@ public class GroupConvertUtilsTest {
     @MockBean
     GroupRepository groupRepository;
 
-    // TODO tests for groupModel conversion
     @Before
     public void setUp() {
         Group parentGroup = new Group();
@@ -142,7 +141,6 @@ public class GroupConvertUtilsTest {
 
     @Test
     public void testGroupRestToJpa_notFound() throws UnknownEnumException {
-        Group group;
         GroupModel model = new GroupModel();
         model.setId("test");
         model.setParentId("parent");

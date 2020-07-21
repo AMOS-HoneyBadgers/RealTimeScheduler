@@ -75,8 +75,6 @@ public class ScheduledServicesTest {
     @Test
     public void testTaskCleaner() {
         service.taskCleanupEnabled = true;
-        Task task1 = createTestTask(TaskStatusEnum.Dispatched, Timestamp.from(Instant.now()));
-        Task task2 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.now()));
         Task task3 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.ofEpochMilli(200))); // just something which is older than specified days (and this should be)
         long specifiedDaysInMillis = 10 * 24 * 60 * 60 * 1000L;
         when(taskRepository.deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis)).thenReturn(Collections.singletonList(task3));
@@ -90,8 +88,6 @@ public class ScheduledServicesTest {
     @Test
     public void testTaskCleaner_disabled() {
         service.taskCleanupEnabled = false;
-        Task task1 = createTestTask(TaskStatusEnum.Dispatched, Timestamp.from(Instant.now()));
-        Task task2 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.now()));
         Task task3 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.ofEpochMilli(200))); // just something which is older than specified days (and this should be)
         long specifiedDaysInMillis = 10 * 24 * 60 * 60 * 1000L;
         when(taskRepository.deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis)).thenReturn(Collections.singletonList(task3));

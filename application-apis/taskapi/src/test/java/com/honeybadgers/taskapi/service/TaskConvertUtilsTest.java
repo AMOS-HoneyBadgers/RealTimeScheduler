@@ -118,11 +118,10 @@ public class TaskConvertUtilsTest {
         Integer priority = 100;
         Integer indexNumber = 1;
         boolean force = false;
-        List<Boolean> workdays = new ArrayList<>();
         OffsetDateTime deadline = OffsetDateTime.now();
         TaskModel.ModeEnum mode = TaskModel.ModeEnum.PARALLEL;
         TaskModel.TypeFlagEnum type = TaskModel.TypeFlagEnum.BATCH;
-        workdays.addAll(Arrays.asList(true, false, true, false, true, false, true));
+        List<Boolean> workdays = new ArrayList<>(Arrays.asList(true, false, true, false, true, false, true));
 
 
         List<TaskModelActiveTimes> activeTimes = new ArrayList<>();
@@ -167,11 +166,10 @@ public class TaskConvertUtilsTest {
         Integer priority = 100;
         Integer indexNumber = 1;
         boolean force = false;
-        List<Boolean> workdays = new ArrayList<>();
         OffsetDateTime deadline = OffsetDateTime.now();
         TaskModel.ModeEnum mode = TaskModel.ModeEnum.PARALLEL;
         TaskModel.TypeFlagEnum type = TaskModel.TypeFlagEnum.BATCH;
-        workdays.addAll(Arrays.asList(true, false, true, false, true, false, true));
+        List<Boolean> workdays = new ArrayList<>(Arrays.asList(true, false, true, false, true, false, true));
 
 
         List<TaskModelActiveTimes> activeTimes = new ArrayList<>();
@@ -205,7 +203,7 @@ public class TaskConvertUtilsTest {
 
         Task jpaModel = converter.taskRestToJpa(exampleTaskModel);
 
-        assertEquals(taskId.toString(), jpaModel.getId());
+        assertEquals(taskId, jpaModel.getId());
         assertEquals(groupId, jpaModel.getGroup().getId());
         assertEquals(priority.intValue(), jpaModel.getPriority());
         assertEquals(indexNumber, jpaModel.getIndexNumber());

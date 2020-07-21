@@ -49,7 +49,6 @@ public class FeedbackConsumer implements IFeedbackConsumer {
     int maxTransactionRetrySleep;
 
 
-    // TODO WHEN TO DELETE THE TASK FROM POSTGRE DATABASE
     @Override
     @RabbitListener(queues = "dispatch.feedback", containerFactory = "feedbackcontainerfactory")
     public void receiveFeedbackFromDispatcher(String taskid) throws InterruptedException {
@@ -109,7 +108,6 @@ public class FeedbackConsumer implements IFeedbackConsumer {
         taskService.finishTask(currentTask);
     }
 
-    //TODO is it necessary to do this also for all grandparent groups??
     @Override
     public void checkAndSetSequentialAndIndexNumber(Task currentTask) {
         Group group = currentTask.getGroup();

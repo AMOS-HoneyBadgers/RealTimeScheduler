@@ -72,7 +72,6 @@ public interface ITaskService {
      */
     void sendTaskToTaskEventQueue(String taskId);
 
-    //TODO specify which type should be sent to the dispatcher
     /**
      * Dispatch Task immediately skipping Scheduling.
      * @param task Task received via Rest.

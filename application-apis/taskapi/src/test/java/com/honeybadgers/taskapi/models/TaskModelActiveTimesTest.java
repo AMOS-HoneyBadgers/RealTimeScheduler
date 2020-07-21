@@ -62,9 +62,9 @@ class TaskModelActiveTimesTest {
         TaskModelActiveTimes model3 = new TaskModelActiveTimes();
         model3.setTo(new Time(System.currentTimeMillis()));
 
-        assertTrue(model1.equals(model2));
-        assertFalse(model1.equals(model3));
-        assertFalse(model2.equals(model3));
+        assertEquals(model1, model2);
+        assertNotEquals(model1, model3);
+        assertNotEquals(model2, model3);
     }
 
     @Test

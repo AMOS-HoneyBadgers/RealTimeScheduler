@@ -3,7 +3,10 @@ package com.honeybadgers.realtimescheduler.services.impl;
 import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.model.LockResponse;
-import com.honeybadgers.models.model.jpa.*;
+import com.honeybadgers.models.model.jpa.Group;
+import com.honeybadgers.models.model.jpa.Paused;
+import com.honeybadgers.models.model.jpa.Task;
+import com.honeybadgers.models.model.jpa.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
@@ -119,9 +122,9 @@ public class SchedulerService implements ISchedulerService {
             // get all tasks
             List<Task> waitingTasks;
             if (trigger.equals(scheduler_trigger))
-                waitingTasks = taskRepository.findAllScheduledTasksSorted();
+                waitingTasks = taskRepository.findAllScheduledTasksNoForceSorted();
             else
-                waitingTasks = taskRepository.findAllWaitingTasks();
+                waitingTasks = taskRepository.findAllWaitingTasksNoForce();
 
             // schedule tasks
             logger.info("Step 2: scheduling " + waitingTasks.size() + " tasks");
@@ -150,7 +153,7 @@ public class SchedulerService implements ISchedulerService {
                             return;
 
                         if (_self.checkTaskForDispatchingAndUpdate(task)) {
-                            // TODO see known issues of docs/technology_decisions.md
+                            // see known issues of docs/technology_decisions.md concerning crash at this point in the code
                             // dispatch here because this only gets executed if transaction succeeds
                             dispatchTask(task);
                             logger.info("Task " + task.getId() + " was sent to dispatcher queue and status was set to 'Dispatched'");
@@ -219,7 +222,6 @@ public class SchedulerService implements ISchedulerService {
             }
         }
 
-        // TODO custom query
         taskService.updateTaskStatus(currentTask, TaskStatusEnum.Dispatched);
         taskRepository.save(currentTask);
 
