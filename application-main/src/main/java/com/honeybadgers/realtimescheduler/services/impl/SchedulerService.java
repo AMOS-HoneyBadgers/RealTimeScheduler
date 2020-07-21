@@ -138,6 +138,9 @@ public class SchedulerService implements ISchedulerService {
                     try {
                         if (stopSchedulerDueToLockAcquisitionException)
                             return;
+                        //Before Dispatching the scheduler is again checked for being paused
+                        if(isSchedulerPaused())
+                            break;
 
                         if (_self.checkTaskForDispatchingAndUpdate(task)) {
                             // TODO document: if scheduler crashes here -> task could be dispatched twice
