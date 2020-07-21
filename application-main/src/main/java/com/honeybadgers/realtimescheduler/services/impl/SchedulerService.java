@@ -151,6 +151,9 @@ public class SchedulerService implements ISchedulerService {
                     try {
                         if (stopSchedulerDueToLockAcquisitionException)
                             return;
+                        //check if Scheduler is paused before dispatching
+                        if(isSchedulerPaused())
+                            break;
 
                         if (_self.checkTaskForDispatchingAndUpdate(task)) {
                             // see known issues of docs/technology_decisions.md concerning crash at this point in the code
