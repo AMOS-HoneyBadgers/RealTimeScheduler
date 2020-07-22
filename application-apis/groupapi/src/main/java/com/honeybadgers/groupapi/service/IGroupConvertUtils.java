@@ -2,8 +2,8 @@ package com.honeybadgers.groupapi.service;
 
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
-import com.honeybadgers.models.model.ActiveTimes;
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.ActiveTimes;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.utils.IConvertUtils;
 import org.springframework.stereotype.Service;

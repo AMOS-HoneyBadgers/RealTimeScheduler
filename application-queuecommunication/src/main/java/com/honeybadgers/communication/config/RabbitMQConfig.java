@@ -1,11 +1,12 @@
 package com.honeybadgers.communication.config;
 
-import org.springframework.amqp.core.*;
+import org.springframework.amqp.core.Binding;
+import org.springframework.amqp.core.BindingBuilder;
+import org.springframework.amqp.core.DirectExchange;
+import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.config.SimpleRabbitListenerContainerFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
-import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -69,6 +70,7 @@ public class RabbitMQConfig {
     Queue tasksqueue() {
         return new Queue(tasksqueue, true);
     }
+
     @Qualifier("priorityqueue")
     @Bean
     Queue priorityqueue() {
@@ -103,12 +105,14 @@ public class RabbitMQConfig {
     Binding dispatchbinding(@Qualifier("dispatcherqueue") Queue dispatcherqueue, @Qualifier("dispatcherExchange") DirectExchange exchange) {
         return BindingBuilder.bind(dispatcherqueue).to(exchange).with(dispatcherroutingkey);
     }
+
     @Bean
-    Binding feedbackbinding(@Qualifier("feedbackqueue") Queue feedbackqueue, @Qualifier("feedbackExchange")DirectExchange exchange) {
+    Binding feedbackbinding(@Qualifier("feedbackqueue") Queue feedbackqueue, @Qualifier("feedbackExchange") DirectExchange exchange) {
         return BindingBuilder.bind(feedbackqueue).to(exchange).with(feedbackroutingkey);
     }
+
     @Bean
-    Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange")DirectExchange exchange) {
+    Binding tasksbinding(@Qualifier("tasksqueue") Queue tasksqueue, @Qualifier("tasksExchange") DirectExchange exchange) {
         return BindingBuilder.bind(tasksqueue).to(exchange).with(tasksroutingkey);
     }
 
@@ -135,7 +139,6 @@ public class RabbitMQConfig {
         factory.setMessageConverter(producerJackson2MessageConverter());
         return factory;
     }
-
 
 
     @Bean

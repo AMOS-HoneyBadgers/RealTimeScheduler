@@ -57,9 +57,9 @@ public class ErrorModelTest {
         ErrorModel model3 = new ErrorModel();
         model3.setCode("400");
 
-        assertTrue(model1.equals(model2));
-        assertFalse(model1.equals(model3));
-        assertFalse(model2.equals(model3));
+        assertEquals(model1, model2);
+        assertNotEquals(model1, model3);
+        assertNotEquals(model2, model3);
     }
 
     @Test

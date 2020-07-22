@@ -33,3 +33,5 @@ This Document is supposed to archive and document the technology and architectur
 ### Known Issues
 
 - In case the Scheduler instance crashes after the transaction for checkTaskForDispatchingAndUpdate finishes, the task will never be dispatched.
+- In case that there are too many scheduled/waiting tasks in the Database (tested for >=1000000) the Scheduler fails with an OutOfMemoryException
+

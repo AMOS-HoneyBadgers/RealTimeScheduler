@@ -3,8 +3,8 @@ package com.honeybadgers.groupapi.service;
 import com.honeybadgers.groupapi.models.GroupModel;
 import com.honeybadgers.groupapi.models.GroupModelActiveTimes;
 import com.honeybadgers.groupapi.service.impl.GroupConvertUtils;
-import com.honeybadgers.models.model.ActiveTimes;
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.ActiveTimes;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Before;
@@ -32,7 +32,6 @@ public class GroupConvertUtilsTest {
     @MockBean
     GroupRepository groupRepository;
 
-    // TODO tests for groupModel conversion
     @Before
     public void setUp() {
         Group parentGroup = new Group();
@@ -142,7 +141,6 @@ public class GroupConvertUtilsTest {
 
     @Test
     public void testGroupRestToJpa_notFound() throws UnknownEnumException {
-        Group group;
         GroupModel model = new GroupModel();
         model.setId("test");
         model.setParentId("parent");

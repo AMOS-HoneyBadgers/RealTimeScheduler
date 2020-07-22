@@ -5,19 +5,6 @@ import com.honeybadgers.communication.model.TaskQueueModel;
 public interface ICommunication {
 
     /**
-     * Sends a task to the dispatcher in the RabbitMQ
-     * @param task id of the task
-     */
-    void sendTaskToDispatcher(String task);
-
-    /**
-     * Sends feedback back to the scheduler if task is finished in the RabbitMQ
-     * @param feedback id of the task which is finished
-     * @return message for test purpose
-     */
-    String sendFeedbackToScheduler(String feedback);
-
-    /**
      * Sends task to the tasks queue (from api call to scheduler) in the RabbitMQ
      * @param task id of the task
      */
@@ -34,4 +21,17 @@ public interface ICommunication {
      * @param task taskQueueModel with timestamps for dispatching and metadata
      */
     void sendTaskToPriorityQueue(TaskQueueModel task);
+
+    /**
+     * Sends a task to the dispatcher in the RabbitMQ
+     * @param task id of the task
+     */
+    void sendTaskToDispatcher(TaskQueueModel task);
+
+    /**
+     * Sends feedback back to the scheduler if task is finished in the RabbitMQ
+     * @param feedback id of the task which is finished
+     * @return message for test purpose
+     */
+    String sendFeedbackToScheduler(String feedback);
 }

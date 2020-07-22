@@ -1,13 +1,12 @@
 package com.honeybadgers.cleaner.services;
 
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.History;
-import com.honeybadgers.models.model.Paused;
-import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.TaskStatusEnum;
+import com.honeybadgers.models.model.jpa.History;
+import com.honeybadgers.models.model.jpa.Paused;
+import com.honeybadgers.models.model.jpa.Task;
+import com.honeybadgers.models.model.jpa.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +43,7 @@ public class ScheduledServicesTest {
 
     @Test
     public void testSchedulerCleaner_twoIterations() throws InterruptedException {
-        verify(pausedRepository,never()).deleteAllExpired();
+        verify(pausedRepository, never()).deleteAllExpired();
 
         // wait for initial delay
         Thread.sleep(200);
@@ -76,31 +75,27 @@ public class ScheduledServicesTest {
     @Test
     public void testTaskCleaner() {
         service.taskCleanupEnabled = true;
-        Task task1 = createTestTask(TaskStatusEnum.Dispatched, Timestamp.from(Instant.now()));
-        Task task2 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.now()));
         Task task3 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.ofEpochMilli(200))); // just something which is older than specified days (and this should be)
         long specifiedDaysInMillis = 10 * 24 * 60 * 60 * 1000L;
         when(taskRepository.deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis)).thenReturn(Collections.singletonList(task3));
-        verify(taskRepository,never()).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
+        verify(taskRepository, never()).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
 
         service.cleanFinishedTasks();
 
-        verify(taskRepository,times(1)).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
+        verify(taskRepository, times(1)).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
     }
 
     @Test
     public void testTaskCleaner_disabled() {
         service.taskCleanupEnabled = false;
-        Task task1 = createTestTask(TaskStatusEnum.Dispatched, Timestamp.from(Instant.now()));
-        Task task2 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.now()));
         Task task3 = createTestTask(TaskStatusEnum.Finished, Timestamp.from(Instant.ofEpochMilli(200))); // just something which is older than specified days (and this should be)
         long specifiedDaysInMillis = 10 * 24 * 60 * 60 * 1000L;
         when(taskRepository.deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis)).thenReturn(Collections.singletonList(task3));
-        verify(taskRepository,never()).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
+        verify(taskRepository, never()).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
 
         service.cleanFinishedTasks();
 
-        verify(taskRepository,never()).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
+        verify(taskRepository, never()).deleteAllTasksFinishedSinceNMilliseconds(specifiedDaysInMillis);
     }
 
     private Task createTestTask(TaskStatusEnum taskStatusEnum, Timestamp lastEntry) {

@@ -1,6 +1,6 @@
 package com.honeybadgers.postgre.repository;
 
-import com.honeybadgers.models.model.GroupAncestorModel;
+import com.honeybadgers.models.model.jpa.GroupAncestorModel;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -13,6 +13,7 @@ public interface GroupAncestorRepository extends JpaRepository<GroupAncestorMode
      * and a string array containing the ids of all ancestors of the group with the input groupId (RECURSIVE!)
      * Note: do not ask me how it works here is the wiki: https://wiki.postgresql.org/wiki/Getting_list_of_all_children_from_adjacency_tree
      * Note2: The \\ before the : are required here, BUT not if entered into, e.g., pgadmin, to prevent syntax error (due to : indicating an parameter)
+     *
      * @param groupId groupId you want to have all ancestors of
      * @return GroupAncestorModel containing id of wanted group and String[] of the ids of all ancestors
      */

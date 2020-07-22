@@ -110,25 +110,5 @@ ALTER TABLE public.paused
     OWNER to <OWNER>;
 
 
--- TODO for later the lock table
--- Table: public.lock
-
--- DROP TABLE public.lock;
--- For now no foreign key, but: https://stackoverflow.com/questions/47550419/locks-on-updating-rows-with-foreign-key-constraint
-CREATE TABLE public.lock
-(
-    id character varying(256) COLLATE pg_catalog."default" NOT NULL,
-    is_dispatched boolean NOT NULL DEFAULT false,
-    CONSTRAINT lock_pkey PRIMARY KEY (id)
-)
-    WITH (
-        OIDS = FALSE
-    )
-    TABLESPACE pg_default;
-
-ALTER TABLE public.lock
-    OWNER to <OWNER>;
-
-
 -- Insert Default group
 INSERT INTO public."group" (id, priority, type_flag, mode, parallelism_degree) VALUES ('DEFAULT_GROUP', 1, 'Batch', 'Parallel', 100);

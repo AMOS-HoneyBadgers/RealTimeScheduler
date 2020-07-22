@@ -1,18 +1,13 @@
 package com.honeybadgers.communication;
 
 
-import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.communication.model.TaskQueueModel;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
-import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.messaging.converter.MessageConverter;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 
 @Service
 public class RabbitMQSender implements ICommunication {
@@ -20,7 +15,7 @@ public class RabbitMQSender implements ICommunication {
     static final Logger logger = LogManager.getLogger(RabbitMQSender.class);
 
     @Autowired
-    private RabbitTemplate rabbitTemplate;
+    private final RabbitTemplate rabbitTemplate;
 
     @Value("${dispatch.rabbitmq.dispatcherexchange}")
     private String dispatcherexchange;
@@ -54,7 +49,7 @@ public class RabbitMQSender implements ICommunication {
      * This Method is for testing purposes only, in productive environment, this has to be replaced with real Dispatcher Queue
      */
     @Override
-    public void sendTaskToDispatcher(String task) {
+    public void sendTaskToDispatcher(TaskQueueModel task) {
         rabbitTemplate.convertAndSend(dispatcherexchange, dispatcherroutingkey, task);
         logger.debug("Task " + task + " sent to dispatcher");
     }
@@ -62,7 +57,7 @@ public class RabbitMQSender implements ICommunication {
     @Override
     public String sendFeedbackToScheduler(String feedback) {
         rabbitTemplate.convertAndSend(feedbackExchange, feedbackroutingkey, feedback);
-        logger.debug("Feedback for Task " + feedback + " sent to Scheduler" );
+        logger.debug("Feedback for Task " + feedback + " sent to Scheduler");
         return "test";
     }
 

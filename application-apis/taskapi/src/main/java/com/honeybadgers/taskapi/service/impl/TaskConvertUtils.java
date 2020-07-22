@@ -1,11 +1,12 @@
 package com.honeybadgers.taskapi.service.impl;
 
-import com.honeybadgers.models.exceptions.UnknownEnumException;
-import com.honeybadgers.models.model.*;
-import com.honeybadgers.postgre.repository.GroupRepository;
-import com.honeybadgers.postgre.repository.TaskRepository;
+import com.honeybadgers.communication.model.TaskQueueModel;
 import com.honeybadgers.models.exceptions.CreationException;
 import com.honeybadgers.models.exceptions.JpaException;
+import com.honeybadgers.models.exceptions.UnknownEnumException;
+import com.honeybadgers.models.model.jpa.*;
+import com.honeybadgers.postgre.repository.GroupRepository;
+import com.honeybadgers.postgre.repository.TaskRepository;
 import com.honeybadgers.taskapi.models.TaskModel;
 import com.honeybadgers.taskapi.models.TaskModelActiveTimes;
 import com.honeybadgers.taskapi.models.TaskModelMeta;
@@ -32,7 +33,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
     @Override
     public TaskModel taskJpaToRest(Task task) {
-        if(task == null)
+        if (task == null)
             return null;
 
         TaskModel taskmodel = new TaskModel();
@@ -50,7 +51,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         taskmodel.setIndexNumber(task.getIndexNumber());
         taskmodel.setDeadline(timestampJpaToRest(task.getDeadline()));
         taskmodel.setMeta(metaDataJpaToRest(task.getMetaData()));
-        if(task.getHistory() != null)
+        if (task.getHistory() != null)
             taskmodel.setHistory(task.getHistory().stream().map(history -> (Object) history).collect(Collectors.toList()));
 
         return taskmodel;
@@ -62,7 +63,7 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
         newTask.setId(restModel.getId());
 
-        if(restModel.getGroupId() == null)
+        if (restModel.getGroupId() == null)
             restModel.setGroupId(DEFAULT_GROUP_ID);
 
         Group group = groupRepository.findById(restModel.getGroupId()).orElse(null);
@@ -72,7 +73,6 @@ public class TaskConvertUtils implements ITaskConvertUtils {
         else {
             List<Group> groupChildren = groupRepository.findAllByParentGroupId(group.getId());
             if (!groupChildren.isEmpty())
-                // TODO perhaps move group of task or sth similar
                 throw new CreationException("Group of task has other groups as children: " +
                         groupChildren.stream().map(Group::getId).collect(Collectors.joining(", ")) +
                         " -> aborting!");
@@ -139,9 +139,9 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
     @Override
     public List<TaskModelActiveTimes> activeTimesJpaToRest(List<ActiveTimes> activeTimes) {
-        if(activeTimes == null){
+        if (activeTimes == null) {
             return null;
-        }else {
+        } else {
             List<TaskModelActiveTimes> list = activeTimes.stream().map(t -> {
                 TaskModelActiveTimes time = new TaskModelActiveTimes();
                 time.setFrom(t.getFrom());
@@ -154,9 +154,9 @@ public class TaskConvertUtils implements ITaskConvertUtils {
 
     @Override
     public List<TaskModelMeta> metaDataJpaToRest(Map<String, String> data) {
-        if(data == null){
+        if (data == null) {
             return null;
-        }else{
+        } else {
             List<TaskModelMeta> list = data.entrySet().stream().map(d -> {
                 TaskModelMeta metaData = new TaskModelMeta();
                 metaData.setKey(d.getKey());
@@ -165,5 +165,17 @@ public class TaskConvertUtils implements ITaskConvertUtils {
             }).collect(Collectors.toList());
             return list;
         }
+    }
+
+    @Override
+    public TaskQueueModel taskRestToQueue(TaskModel taskModel) {
+        TaskQueueModel taskQueueModel = new TaskQueueModel();
+        taskQueueModel.setGroupId(taskModel.getGroupId());
+        taskQueueModel.setId(taskModel.getId());
+        if (taskModel.getMeta() != null)
+            taskQueueModel.setMetaData(taskModel.getMeta().stream().collect(Collectors.toMap(TaskModelMeta::getKey, TaskModelMeta::getValue)));
+        taskQueueModel.setDispatched(Timestamp.from(Instant.now()));
+
+        return taskQueueModel;
     }
 }

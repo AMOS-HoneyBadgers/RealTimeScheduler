@@ -1,6 +1,6 @@
 package com.honeybadgers.taskapi.service;
 
-import com.honeybadgers.models.model.Task;
+import com.honeybadgers.models.model.jpa.Task;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.exceptions.CreationException;
 import com.honeybadgers.models.exceptions.JpaException;
@@ -72,7 +72,6 @@ public interface ITaskService {
      */
     void sendTaskToTaskEventQueue(String taskId);
 
-    //TODO specify which type should be sent to the dispatcher
     /**
      * Dispatch Task immediately skipping Scheduling.
      * @param task Task received via Rest.

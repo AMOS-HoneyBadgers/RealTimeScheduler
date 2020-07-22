@@ -4,7 +4,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.service.IManagementService;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
-import com.honeybadgers.models.model.Paused;
+import com.honeybadgers.models.model.jpa.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -47,24 +47,28 @@ public class ManagementService implements IManagementService {
     @Override
     public void pauseScheduler(OffsetDateTime resumeDate) throws PauseException, InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
-        while(iteration <= maxTransactionRetryCount) {
+        while (iteration <= maxTransactionRetryCount) {
             Paused toSave = new Paused();
             toSave.setId(PAUSED_SCHEDULER_ALIAS);
-            if(resumeDate != null)
+            if (resumeDate != null)
                 toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
 
             try {
-                pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                // this is necessary due to the custom insert query (details in javadoc of insertCustomQueryNoTimestamp)
+                if (toSave.getResumeDate() != null)
+                    pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                else
+                    pausedRepository.insertCustomQueryNoTimestamp(toSave.getId());
                 return;
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
+                if (e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
                     throw new PauseException("Already locked!");
                 }
                 throw e;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Transaction exception while pausing scheduler. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Transaction exception while pausing scheduler. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
@@ -76,18 +80,18 @@ public class ManagementService implements IManagementService {
     @Override
     public void resumeScheduler() throws InterruptedException, TransactionRetriesExceeded, PauseException {
         int iteration = 1;
-        while(iteration <= maxTransactionRetryCount) {
+        while (iteration <= maxTransactionRetryCount) {
             try {
                 Paused paused = pausedRepository.deleteByIdCustomQuery(PAUSED_SCHEDULER_ALIAS).orElse(null);
-                if(paused == null)
+                if (paused == null)
                     throw new PauseException("Already unlocked!");
                 // only trigger reschedule if change in paused entities
                 sender.sendTaskToTasksQueue("123");
                 return;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Transaction exception while resuming scheduler. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Transaction exception while resuming scheduler. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
@@ -99,25 +103,29 @@ public class ManagementService implements IManagementService {
     @Override
     public void pauseTask(String taskId, OffsetDateTime resumeDate) throws PauseException, InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
-        while(iteration <= maxTransactionRetryCount) {
+        while (iteration <= maxTransactionRetryCount) {
             String id = PAUSED_TASK_PREFIX + taskId;
             Paused toSave = new Paused();
             toSave.setId(id);
-            if(resumeDate != null)
+            if (resumeDate != null)
                 toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
 
             try {
-                pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                // this is necessary due to the custom insert query (details in javadoc of insertCustomQueryNoTimestamp)
+                if (toSave.getResumeDate() != null)
+                    pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                else
+                    pausedRepository.insertCustomQueryNoTimestamp(toSave.getId());
                 return;
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
+                if (e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
                     throw new PauseException("Already locked!");
                 }
                 throw e;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Transaction exception while pausing task. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Transaction exception while pausing task. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
@@ -129,19 +137,19 @@ public class ManagementService implements IManagementService {
     @Override
     public void resumeTask(String taskId) throws InterruptedException, TransactionRetriesExceeded, PauseException {
         int iteration = 1;
-        while(iteration <= maxTransactionRetryCount) {
+        while (iteration <= maxTransactionRetryCount) {
             try {
                 String id = PAUSED_TASK_PREFIX + taskId;
                 Paused paused = pausedRepository.deleteByIdCustomQuery(id).orElse(null);
-                if(paused == null)
+                if (paused == null)
                     throw new PauseException("Already unlocked!");
                 // only trigger reschedule if change in paused entities
                 sender.sendTaskToTasksQueue("123");
                 return;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Transaction exception while resuming task. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Transaction exception while resuming task. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
@@ -153,25 +161,29 @@ public class ManagementService implements IManagementService {
     @Override
     public void pauseGroup(String groupId, OffsetDateTime resumeDate) throws PauseException, InterruptedException, TransactionRetriesExceeded {
         int iteration = 1;
-        while(iteration <= maxTransactionRetryCount) {
+        while (iteration <= maxTransactionRetryCount) {
             String id = PAUSED_GROUP_PREFIX + groupId;
             Paused toSave = new Paused();
             toSave.setId(id);
-            if(resumeDate != null)
+            if (resumeDate != null)
                 toSave.setResumeDate(Timestamp.valueOf(LocalDateTime.ofEpochSecond(resumeDate.toEpochSecond(), 0, ZoneOffset.UTC)));
 
             try {
-                pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                // this is necessary due to the custom insert query (details in javadoc of insertCustomQueryNoTimestamp)
+                if (toSave.getResumeDate() != null)
+                    pausedRepository.insertCustomQuery(toSave.getId(), toSave.getResumeDate());
+                else
+                    pausedRepository.insertCustomQueryNoTimestamp(toSave.getId());
                 return;
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
+                if (e.getMessage() != null && e.getMessage().contains("constraint [paused_pkey]")) {
                     throw new PauseException("Already locked!");
                 }
                 throw e;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Transaction exception while pausing group. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Transaction exception while pausing group. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }
@@ -183,19 +195,19 @@ public class ManagementService implements IManagementService {
     @Override
     public void resumeGroup(String groupId) throws InterruptedException, TransactionRetriesExceeded, PauseException {
         int iteration = 1;
-        while(iteration <= maxTransactionRetryCount) {
+        while (iteration <= maxTransactionRetryCount) {
             try {
                 String id = PAUSED_GROUP_PREFIX + groupId;
                 Paused paused = pausedRepository.deleteByIdCustomQuery(id).orElse(null);
-                if(paused == null)
+                if (paused == null)
                     throw new PauseException("Already unlocked!");
                 // only trigger reschedule if change in paused entities
                 sender.sendTaskToTasksQueue("123");
                 return;
-            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception){
+            } catch (JpaSystemException | TransactionException | CannotAcquireLockException | LockAcquisitionException exception) {
                 // TransactionException is nested ex of JpaSystemException and LockAcquisitionException is nested of CannotAcquireLockException
-                double timeToSleep= Math.random()*maxTransactionRetrySleep*iteration;
-                logger.warn("Transaction exception while resuming group. Try again after "+timeToSleep+" milliseconds" );
+                double timeToSleep = Math.random() * maxTransactionRetrySleep * iteration;
+                logger.warn("Transaction exception while resuming group. Try again after " + timeToSleep + " milliseconds");
                 Thread.sleep(Math.round(timeToSleep));
                 iteration++;
             }

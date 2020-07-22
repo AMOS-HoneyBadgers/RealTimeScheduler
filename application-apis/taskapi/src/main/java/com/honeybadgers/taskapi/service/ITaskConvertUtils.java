@@ -1,7 +1,8 @@
 package com.honeybadgers.taskapi.service;
 
-import com.honeybadgers.models.model.ActiveTimes;
-import com.honeybadgers.models.model.Task;
+import com.honeybadgers.communication.model.TaskQueueModel;
+import com.honeybadgers.models.model.jpa.ActiveTimes;
+import com.honeybadgers.models.model.jpa.Task;
 import com.honeybadgers.models.exceptions.UnknownEnumException;
 import com.honeybadgers.models.utils.IConvertUtils;
 import com.honeybadgers.models.exceptions.CreationException;
@@ -47,9 +48,16 @@ public interface ITaskConvertUtils extends IConvertUtils {
      List<TaskModelActiveTimes> activeTimesJpaToRest(List<ActiveTimes> activeTimes);
 
      /**
-      * ert ActiveTimes Objects from Rest Model to JPA Model.
+      * Convert ActiveTimes Objects from Rest Model to JPA Model.
       * @param data List of TaskModelActiveTimes Objects.
       * @return List of ActiveTimes.
       */
      List<TaskModelMeta> metaDataJpaToRest(Map<String,String> data);
+
+     /**
+      * Convert TaskModel received from REST to TaskQueueModel to be sent to priority Queue
+      * @param taskModel taskModel to be converted
+      * @return TaskQueueModel representing given TaskModel
+      */
+     TaskQueueModel taskRestToQueue(TaskModel taskModel);
 }

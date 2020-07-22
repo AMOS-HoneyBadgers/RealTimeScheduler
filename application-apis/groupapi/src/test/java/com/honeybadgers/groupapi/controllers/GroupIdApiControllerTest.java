@@ -7,7 +7,7 @@ import com.honeybadgers.groupapi.service.IGroupConvertUtils;
 import com.honeybadgers.groupapi.service.IGroupService;
 import com.honeybadgers.groupapi.utils.TestUtils;
 import com.honeybadgers.models.exceptions.JpaException;
-import com.honeybadgers.models.model.Group;
+import com.honeybadgers.models.model.jpa.Group;
 import com.honeybadgers.postgre.repository.GroupRepository;
 import org.junit.Test;
 import org.junit.runner.RunWith;

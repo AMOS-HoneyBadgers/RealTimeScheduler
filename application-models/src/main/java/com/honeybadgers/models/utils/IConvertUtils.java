@@ -31,7 +31,7 @@ public interface IConvertUtils {
         if(offsetDateTime == null)
             return null;
         // get input as milliseconds since epoch
-        long dateTimeAsMilli = Long.parseLong(Long.toString(offsetDateTime.toEpochSecond()) + Long.toString(offsetDateTime.getNano()).substring(0, 3));
+        long dateTimeAsMilli = Long.parseLong(offsetDateTime.toEpochSecond() + Long.toString(offsetDateTime.getNano()).substring(0, 3));
         return new Timestamp(dateTimeAsMilli);
     }
 

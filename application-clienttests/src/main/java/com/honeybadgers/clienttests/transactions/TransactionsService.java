@@ -3,8 +3,8 @@ package com.honeybadgers.clienttests.transactions;
 import com.honeybadgers.clienttests.models.ResponseModel;
 import com.honeybadgers.clienttests.models.TaskModel;
 import com.honeybadgers.communication.ICommunication;
-import com.honeybadgers.models.model.Task;
-import com.honeybadgers.models.model.TaskStatusEnum;
+import com.honeybadgers.models.model.jpa.Task;
+import com.honeybadgers.models.model.jpa.TaskStatusEnum;
 import com.honeybadgers.postgre.repository.TaskRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,7 +104,7 @@ public class TransactionsService {
 
         // send POST request
         ResponseEntity<ResponseModel> response = restTemplate.postForEntity(url, entity, ResponseModel.class);
-        return CompletableFuture.completedFuture(taskModel.getId().toString());
+        return CompletableFuture.completedFuture(taskModel.getId());
     }
 
     /**
@@ -175,7 +175,7 @@ public class TransactionsService {
         taskModel.setGroupId("TestGroupRunAlwaysNoLimit");
         taskModel.setPriority(100);
 
-        String url = "https://taskapi-amos.cfapps.io/api/task/" + taskModel.getId().toString();
+        String url = "https://taskapi-amos.cfapps.io/api/task/" + taskModel.getId();
 
         // create headers
         HttpHeaders headers = new HttpHeaders();

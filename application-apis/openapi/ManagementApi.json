@@ -55,10 +55,7 @@
             "type": "string",
             "format": "date-time"
           }
-        },
-        "required": [
-          "resume_date_time"
-        ]
+        }
       }
     },
     "securitySchemes": {

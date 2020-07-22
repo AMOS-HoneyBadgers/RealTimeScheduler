@@ -63,7 +63,7 @@ public class DefaultApiControllerTest {
 
         String response = mvcResult.getResponse().getContentAsString();
         assertTrue(response.contains("TestGroup"));
-        assertTrue(response.contains(uuid.toString()));
+        assertTrue(response.contains(uuid));
     }
 
 

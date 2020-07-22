@@ -1,15 +1,12 @@
 package com.honeybadgers.realtimescheduler.services.impl;
 
-import com.honeybadgers.models.model.*;
+import com.honeybadgers.models.model.jpa.*;
 import com.honeybadgers.postgre.repository.GroupAncestorRepository;
 import com.honeybadgers.postgre.repository.TaskRepository;
-
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.PropertySource;
@@ -17,7 +14,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.*;
 public class TaskServiceTest {
 
     @MockBean
-    private TaskRepository taskPostgresRepository;
+    private TaskRepository taskRepository;
 
     @MockBean
     GroupAncestorRepository groupAncestorRepository;
@@ -36,23 +36,20 @@ public class TaskServiceTest {
     @Autowired
     private TaskService service;
 
-    @Value("${com.realtimescheduler.scheduler.priority.deadline-bonus-base-prio-dependant}")
-    boolean deadlineBaseDependant;
-
     @Test
-    public void testUploadTask() {
+    public void testFinishTask() {
         TaskService spy = spy(service);
         Task t = new Task();
         spy.finishTask(t);
         t.setStatus(TaskStatusEnum.Finished);
-        verify(taskPostgresRepository).save(t);
+        verify(taskRepository).save(t);
     }
 
     @Test
     public void testGetTaskById() {
         TaskService spy = spy(service);
         spy.getTaskById("123");
-        verify(taskPostgresRepository).findById("123");
+        verify(taskRepository).findById("123");
     }
 
     @Test
@@ -196,7 +193,7 @@ public class TaskServiceTest {
         Assert.assertTrue(res7 > res8);
         Assert.assertTrue(res9 > res10);
         Assert.assertTrue(res10 > res11);
-        Assert.assertTrue(res14 == res2);
+        Assert.assertEquals(res14, res2);
 
     }
 
@@ -216,7 +213,7 @@ public class TaskServiceTest {
 
         GroupAncestorModel ancestorModel = new GroupAncestorModel();
         ancestorModel.setId(group.getId());
-        ancestorModel.setAncestors(new String[] {parent.getId()});
+        ancestorModel.setAncestors(new String[]{parent.getId()});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
         when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
@@ -288,7 +285,7 @@ public class TaskServiceTest {
         task.setGroup(group);
 
         GroupAncestorModel ancestorModel = new GroupAncestorModel();
-        ancestorModel.setAncestors(new String[] {parent.getId()});
+        ancestorModel.setAncestors(new String[]{parent.getId()});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
         when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
@@ -315,7 +312,7 @@ public class TaskServiceTest {
 
         GroupAncestorModel ancestorModel = new GroupAncestorModel();
         ancestorModel.setId(group.getId());
-        ancestorModel.setAncestors(new String[] {parent.getId(), null});
+        ancestorModel.setAncestors(new String[]{parent.getId(), null});
 
         when(service.getTaskById("test")).thenReturn(Optional.of(task));
         when(groupAncestorRepository.getAllAncestorIdsFromGroup("testGroup")).thenReturn(Optional.of(ancestorModel));
@@ -327,7 +324,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTaskStatus_NoHistoryElement(){
+    public void testUpdateTaskStatus_NoHistoryElement() {
         Task taskNoHistory = new Task();
         taskNoHistory.setHistory(null);
 
@@ -339,7 +336,7 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void testUpdateTaskStatus(){
+    public void testUpdateTaskStatus() {
         Task task = new Task();
         List<History> history = new ArrayList<>();
 

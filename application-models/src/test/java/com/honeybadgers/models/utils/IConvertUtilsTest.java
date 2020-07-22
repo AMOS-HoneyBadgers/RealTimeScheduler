@@ -3,7 +3,6 @@ package com.honeybadgers.models.utils;
 import org.junit.Test;
 
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -45,7 +44,7 @@ public class IConvertUtilsTest {
         timestamp = testConvertUtils.timestampRestToJpa(dateTime);
 
         // OffsetDateTime does not have method to get milliseconds since epoch -> getSecondsSinceEpoch + getNanosOfCurrentSecond concatenated
-        long dateTimeAsMilli = Long.parseLong(Long.toString(dateTime.toEpochSecond()) + Long.toString(dateTime.getNano()).substring(0, 3));
+        long dateTimeAsMilli = Long.parseLong(dateTime.toEpochSecond() + Long.toString(dateTime.getNano()).substring(0, 3));
         assertNotNull(timestamp);
         assertEquals(timestamp.getTime(), dateTimeAsMilli);
     }

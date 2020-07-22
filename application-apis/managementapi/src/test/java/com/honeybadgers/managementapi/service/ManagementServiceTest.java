@@ -5,7 +5,7 @@ import com.honeybadgers.communication.ICommunication;
 import com.honeybadgers.managementapi.exception.PauseException;
 import com.honeybadgers.managementapi.service.impl.ManagementService;
 import com.honeybadgers.models.exceptions.TransactionRetriesExceeded;
-import com.honeybadgers.models.model.Paused;
+import com.honeybadgers.models.model.jpa.Paused;
 import com.honeybadgers.postgre.repository.PausedRepository;
 import org.hibernate.TransactionException;
 import org.junit.Test;
@@ -18,6 +18,9 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.sql.Timestamp;
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,8 +51,22 @@ public class ManagementServiceTest {
         lockObj.setId(PAUSED_SCHEDULER_ALIAS);
         lockObj.setResumeDate(null);
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenReturn(Optional.of(lockObj));
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenReturn(Optional.of(lockObj));
         assertDoesNotThrow(() -> service.pauseScheduler(null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
+    }
+
+    @Test
+    public void testPauseScheduler_withResumeDate() {
+        Paused lockObj = new Paused();
+        lockObj.setId(PAUSED_SCHEDULER_ALIAS);
+        lockObj.setResumeDate(Timestamp.from(Instant.now()));
+
+        Mockito.when(pausedRepository.insertCustomQuery(anyString(), any())).thenReturn(Optional.of(lockObj));
+        assertDoesNotThrow(() -> service.pauseScheduler(OffsetDateTime.now()));
+        verify(pausedRepository, times(1)).insertCustomQuery(anyString(), any());
+        verify(pausedRepository, never()).insertCustomQueryNoTimestamp(anyString());
     }
 
     @Test
@@ -60,8 +77,10 @@ public class ManagementServiceTest {
 
         DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenThrow(exception);
         assertThrows(PauseException.class, () -> service.pauseScheduler(null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
     }
 
     @Test
@@ -72,8 +91,10 @@ public class ManagementServiceTest {
 
         TransactionException exception = new TransactionException("");
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenThrow(exception);
         assertThrows(TransactionRetriesExceeded.class, () -> service.pauseScheduler(null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
     }
 
     @Test
@@ -104,8 +125,24 @@ public class ManagementServiceTest {
         lockObj.setId(lockId);
         lockObj.setResumeDate(null);
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenReturn(Optional.of(lockObj));
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenReturn(Optional.of(lockObj));
         assertDoesNotThrow(() -> service.pauseTask(taskId.toString(), null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
+    }
+
+    @Test
+    public void testPauseTask_withResumeDate() {
+        UUID taskId = UUID.randomUUID();
+        String lockId = PAUSED_TASK_PREFIX + taskId.toString();
+        Paused lockObj = new Paused();
+        lockObj.setId(lockId);
+        lockObj.setResumeDate(Timestamp.from(Instant.now()));
+
+        Mockito.when(pausedRepository.insertCustomQuery(anyString(), any())).thenReturn(Optional.of(lockObj));
+        assertDoesNotThrow(() -> service.pauseTask(taskId.toString(), OffsetDateTime.now()));
+        verify(pausedRepository, times(1)).insertCustomQuery(anyString(), any());
+        verify(pausedRepository, never()).insertCustomQueryNoTimestamp(anyString());
     }
 
     @Test
@@ -118,8 +155,10 @@ public class ManagementServiceTest {
 
         DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenThrow(exception);
         assertThrows(PauseException.class, () -> service.pauseTask(taskId.toString(), null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
     }
 
     @Test
@@ -132,8 +171,10 @@ public class ManagementServiceTest {
 
         TransactionException exception = new TransactionException("");
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenThrow(exception);
         assertThrows(TransactionRetriesExceeded.class, () -> service.pauseTask(taskId.toString(), null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
     }
 
     @Test
@@ -170,9 +211,25 @@ public class ManagementServiceTest {
         lockObj.setId(lockId);
         lockObj.setResumeDate(null);
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenReturn(Optional.of(lockObj));
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenReturn(Optional.of(lockObj));
 
         assertDoesNotThrow(() -> service.pauseGroup(groupId, null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
+    }
+
+    @Test
+    public void testPauseGroup_withResumeDate() {
+        String groupId = "GROUPID";
+        String lockId = PAUSED_GROUP_PREFIX + groupId;
+        Paused lockObj = new Paused();
+        lockObj.setId(lockId);
+        lockObj.setResumeDate(Timestamp.from(Instant.now()));
+
+        Mockito.when(pausedRepository.insertCustomQuery(anyString(), any())).thenReturn(Optional.of(lockObj));
+        assertDoesNotThrow(() -> service.pauseTask(groupId, OffsetDateTime.now()));
+        verify(pausedRepository, times(1)).insertCustomQuery(anyString(), any());
+        verify(pausedRepository, never()).insertCustomQueryNoTimestamp(anyString());
     }
 
     @Test
@@ -185,9 +242,11 @@ public class ManagementServiceTest {
 
         DataIntegrityViolationException exception = new DataIntegrityViolationException("constraint [paused_pkey]");
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenThrow(exception);
 
         assertThrows(PauseException.class, () -> service.pauseGroup(groupId, null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
     }
 
     @Test
@@ -200,8 +259,10 @@ public class ManagementServiceTest {
 
         TransactionException exception = new TransactionException("");
 
-        Mockito.when(pausedRepository.insertCustomQuery(lockObj.getId(), lockObj.getResumeDate())).thenThrow(exception);
+        Mockito.when(pausedRepository.insertCustomQueryNoTimestamp(lockObj.getId())).thenThrow(exception);
         assertThrows(TransactionRetriesExceeded.class, () -> service.pauseGroup(groupId, null));
+        verify(pausedRepository, times(1)).insertCustomQueryNoTimestamp(anyString());
+        verify(pausedRepository, never()).insertCustomQuery(anyString(), any());
     }
 
     @Test

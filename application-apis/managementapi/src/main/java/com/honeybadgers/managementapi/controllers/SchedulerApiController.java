@@ -14,6 +14,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 
 import javax.validation.Valid;
 import java.util.Optional;
+
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.SpringCodegen", date = "2020-05-15T01:04:26.284+02:00[Europe/Berlin]")
 
 @Controller
@@ -37,6 +38,7 @@ public class SchedulerApiController implements SchedulerApi {
 
     /**
      * Resumes the Scheduler.
+     *
      * @return
      */
     @Override
@@ -56,8 +58,9 @@ public class SchedulerApiController implements SchedulerApi {
             response.setMessage(e.getMessage());
             return ResponseEntity.badRequest().body(response);
         } catch (PauseException e) {
+            response.setCode("400");
             response.setMessage("Scheduler was not paused!");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.badRequest().body(response);
         }
 
         return ResponseEntity.ok(response);
@@ -65,6 +68,7 @@ public class SchedulerApiController implements SchedulerApi {
 
     /**
      * Pauses the Scheduler.
+     *
      * @param dateTimeBody DateTime body which indicates, when to resume scheduling (optional)
      * @return
      */
@@ -74,9 +78,9 @@ public class SchedulerApiController implements SchedulerApi {
         response.setCode("200");
         response.setMessage("Success");
 
-        try{
+        try {
             managmentService.pauseScheduler(dateTimeBody != null ? dateTimeBody.getResumeDateTime() : null);
-        } catch(PauseException e){
+        } catch (PauseException e) {
             response.setCode("400");
             response.setMessage("Scheduler already paused!");
             return ResponseEntity.badRequest().body(response);
